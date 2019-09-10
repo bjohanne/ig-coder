@@ -1,0 +1,7 @@
+# In order for Flask-Restful etc to be found
+# add conda forge to your repo's list
+# conda config --append channels conda-forge
+Flask
+Flask-RESTPlus
+Flask-cors
+
