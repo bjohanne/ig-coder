@@ -8,6 +8,7 @@ import { Provider } from "react-redux";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import './App.css';
 import {store} from "./state/store";
+import Navbar from "./components/common/navbar";
 
 // Components
 import TestComponent from "./components/main";
@@ -15,7 +16,8 @@ import TestComponent from "./components/main";
 function App() {
   return (
   <Provider store={store}>
-    <div className="App container-fluid"> 
+    <Navbar/>
+    <div className="App container-fluid">      
       <BrowserRouter>
         <Switch>{/* Inside a Switch, only one Route is rendered at a time */}
           <Route exact path="/" component={TestComponent} />
