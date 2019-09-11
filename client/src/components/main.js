@@ -7,9 +7,14 @@ function TestComponent(props) {
     props.testAction()
   , [props]);
   return (
-    <div>
-    <h1>The test component will;</h1><h3>{props.test}</h3>
+    <div className="row">
+        <div className="col-md-4"></div>
+        <div className="col-md-4">
+            <h1>The test component will;</h1><h3>{props.test}</h3>
+        </div>
+        <div className="col-md-4"></div> 
     </div>
+
   );
 }
 

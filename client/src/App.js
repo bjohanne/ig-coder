@@ -15,7 +15,7 @@ import TestComponent from "./components/main";
 function App() {
   return (
   <Provider store={store}>
-    <div className="App">
+    <div className="App container-fluid"> 
       <BrowserRouter>
         <Switch>{/* Inside a Switch, only one Route is rendered at a time */}
           <Route exact path="/" component={TestComponent} />
