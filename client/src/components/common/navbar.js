@@ -1,4 +1,5 @@
 import React from "react";
+import './navbar.css';
 
 function Navbar(props) {  
   return (
@@ -24,11 +25,10 @@ function Navbar(props) {
                 </li>        
             </ul>
             <form className="navbar-form" role="search">
-                <div className="input-group">
+                <div className="search">
                     <input type="text" className="form-control" placeholder="Search" name="ig-q" />
-                    <div className="input-group-btn">
-                        <button className="btn btn-default" type="submit"><span className="oi oi-magnifying-glass"></span></button>
-                    </div>
+                    <span className="dark-igc-gray-text oi oi-magnifying-glass"></span>
+                    
                 </div>
             </form>
         </div>

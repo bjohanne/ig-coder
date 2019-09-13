@@ -26,13 +26,12 @@ code {
     background-color: rgb(129, 144, 165);
 }
 
-.container-fluid, .navbar {
-    background-color: rgb(229, 233, 242) !important;
+.dark-igc-gray-text {
+    color: rgb(129, 144, 165);
 }
 
-nav {
-    width: 100% !important;
-    margin: 0 !important;
+.container-fluid, .navbar {
+    background-color: rgb(229, 233, 242) !important;
 }
 
 @media (max-width: 1200px) {
