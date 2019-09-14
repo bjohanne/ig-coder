@@ -7,20 +7,23 @@ import React from 'react';
 import { Provider } from "react-redux";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import './App.css';
-import {store} from "./state/store";
+import { store } from "./state/store";
 import Navbar from "./components/common/navbar";
 
 // Components
 import TestComponent from "./components/main";
+import DocumentComponent from "./components/document";
 
 function App() {
   return (
-  <Provider store={store}>
+  <Provider store={ store }>
     <Navbar/>
+
     <div className="App container-fluid">      
       <BrowserRouter>
         <Switch>{/* Inside a Switch, only one Route is rendered at a time */}
-          <Route exact path="/" component={TestComponent} />
+          <Route exact path="/" component={ TestComponent } />
+          <Route exact path="/documents/:id/" component={ DocumentComponent } />
           {/* When none of the above match, <NoMatch> will be rendered (if we need a 404 page) */}
           {/*<Route component={NoMatch} />*/}
         </Switch>
