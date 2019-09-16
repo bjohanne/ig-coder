@@ -11,8 +11,9 @@ import { store } from "./state/store";
 import Navbar from "./components/common/navbar";
 
 // Components
-import TestComponent from "./components/main";
+import HomeComponent from "./components/home";
 import DocumentComponent from "./components/document";
+
 
 function App() {
   return (
@@ -22,7 +23,8 @@ function App() {
     <div className="App container-fluid">      
       <BrowserRouter>
         <Switch>{/* Inside a Switch, only one Route is rendered at a time */}
-          <Route exact path="/" component={ TestComponent } />
+
+          <Route exact path="/" component={HomeComponent} />
           <Route exact path="/documents/:id/" component={ DocumentComponent } />
           {/* When none of the above match, <NoMatch> will be rendered (if we need a 404 page) */}
           {/*<Route component={NoMatch} />*/}
