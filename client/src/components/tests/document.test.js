@@ -1,0 +1,36 @@
+import React from 'react';
+import Enzyme, { shallow, mount } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
+import { DocumentComponent } from '../document';  // Import the unconnected version of the component
+
+Enzyme.configure({ adapter: new Adapter() });
+
+function setup() {
+  // Mock all props the component needs
+  const props = {
+    document: {
+      name: "Document 1",
+      description: "Description of document 1"
+    },
+    match: {
+      params: {
+        id: 1
+      }
+    },
+    getDocument: jest.fn()
+  };
+
+  const wrapper = shallow(<DocumentComponent {...props} />);
+
+  return {
+    props,
+    wrapper
+  };
+}
+
+it('renders with text and button', () => {
+  const { props, wrapper } = setup();
+  expect(wrapper.length).toEqual(1);  // Exactly 1 React node is rendered
+  expect(wrapper.contains(props.document.name)).toBe(true); // The document name is displayed
+  expect(wrapper.find('button').text()).toBe('Create New Entry'); // There is a "Create New Entry" button
+});

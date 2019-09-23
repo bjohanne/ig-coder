@@ -25,7 +25,7 @@ function App() {
         <Switch>{/* Inside a Switch, only one Route is rendered at a time */}
           <Route exact path="/" component={ HomeComponent } />
           <Route exact path="/document/new" component={ NewDocumentComponent } />
-          <Route exact path="/document/:id/" component={ DocumentComponent } />
+          <Route exact path="/documents/:id/" component={ DocumentComponent } />
           {/* When none of the above match, <NoMatch> will be rendered (if we need a 404 page) */}
           {/*<Route component={NoMatch} />*/}
         </Switch>
