@@ -19,15 +19,18 @@ class DocumentsResource(Resource):
         """
         Displays a conference's details
         """
-        print(document_id)
-        document = {
-            "id": document_id,
-            "name": "Document {}".format(document_id),
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt "
-                           "ut labore et dolore magna aliqua. Ut... "
-        }
-
-        return jsonify(document)
+        if document_id:
+            document = {
+                "id": document_id,
+                "name": "Document {}".format(document_id),
+                "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt "
+                               "ut labore et dolore magna aliqua. Ut... "
+            }
+            return jsonify(document)
+        else:
+            # TODO: Return a list of documents
+            documents = []
+            return jsonify(documents)
 
     @marshal_with(document_fields)
     def post(self):
