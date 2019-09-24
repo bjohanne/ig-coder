@@ -1,8 +1,5 @@
-import os
-import logging
-
 from flask import Flask, jsonify
-from flask_restplus import Api, Resource, cors
+from flask_restplus import Api
 from werkzeug.exceptions import HTTPException
 from werkzeug.exceptions import default_exceptions
 
