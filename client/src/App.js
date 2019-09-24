@@ -15,7 +15,6 @@ import HomeComponent from "./components/home";
 import DocumentComponent from "./components/document";
 import NewDocumentComponent from "./components/newDocument";
 
-
 function App() {
   return (
   <Provider store={ store }>

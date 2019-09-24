@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { getDocument } from "../state/actions";
 
-function DocumentComponent(props) {
+export function DocumentComponent(props) {  // Also export the unconnected component for testing
     // TODO: Update getDocument() params when new document is created?
     useEffect(() => props.getDocument(props.match.params.id), []);
 
