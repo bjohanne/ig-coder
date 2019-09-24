@@ -13,7 +13,10 @@ function setup() {
   };
 }
 
-it('renders with text and button', () => {
+it('renders with static content', () => {
   const { wrapper } = setup();
   expect(wrapper.length).toEqual(1);  // Exactly 1 React node is rendered
+  expect(wrapper.contains("IG Coder")).toBe(true);  // The text "IG Coder" is displayed
+  expect(wrapper.contains("Home")).toBe(true);  // The text "Home" is displayed
+  expect(wrapper.find('input[type="text"][placeholder="Search"]').length).toEqual(1); // There is one search bar
 });

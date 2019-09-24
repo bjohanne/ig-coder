@@ -28,9 +28,10 @@ function setup() {
   };
 }
 
-it('renders with text and button', () => {
+it('renders with static content', () => {
   const { props, wrapper } = setup();
   expect(wrapper.length).toEqual(1);  // Exactly 1 React node is rendered
   expect(wrapper.contains(props.document.name)).toBe(true); // The document name is displayed
-  expect(wrapper.find('button').text()).toBe('Create New Entry'); // There is a "Create New Entry" button
+  expect(wrapper.contains(props.document.description)).toBe(true); // The document description is displayed
+  expect(wrapper.find('button').text()).toBe('Create New Entry'); // There is one button and it says "Create New Entry"
 });

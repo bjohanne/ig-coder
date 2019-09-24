@@ -13,7 +13,10 @@ function setup() {
   };
 }
 
-it('renders with text and button', () => {
+it('renders with static content', () => {
   const { wrapper } = setup();
   expect(wrapper.length).toEqual(1);  // Exactly 1 React node is rendered
+  expect(wrapper.contains("The making of IG Coder")).toBe(true);  // The text "The making..." is displayed
+  expect(wrapper.contains("Policy Coding - We're trying to make it work!")).toBe(true);  // The text "Policy..." is displayed
+  expect(wrapper.find('button').text()).toBe('Create New Document'); // There is one button and it says "Create New Document"
 });

@@ -13,7 +13,10 @@ function setup() {
   };
 }
 
-it('renders with text and button', () => {
+it('renders with static content', () => {
   const { wrapper } = setup();
   expect(wrapper.length).toEqual(1);  // Exactly 1 React node is rendered
+  expect(wrapper.find('input[type="text"][placeholder="Document Name"]').length).toEqual(1); // There is one input for document name
+  expect(wrapper.find('textarea[placeholder="Document Description"]').length).toEqual(1); // There is one textarea for document description
+  expect(wrapper.find('button').text()).toBe('Create New Document'); // There is one button and it says "Create New Document"
 });

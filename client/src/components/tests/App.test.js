@@ -6,14 +6,17 @@ import App from '../../App';
 Enzyme.configure({ adapter: new Adapter() });
 
 function setup() {
-  const wrapper = shallow(<App />);
+  const wrapper = mount(<App />); // Full rendering with child components
 
   return {
     wrapper
   };
 }
 
-it('renders with text and button', () => {
+it('renders with necessary content', () => {
   const { wrapper } = setup();
-  expect(wrapper.length).toEqual(1);  // Exactly 1 React node is rendered
+  expect(wrapper.find('Provider').length).toEqual(1); // There is one Provider element
+  expect(wrapper.find('Navbar').length).toEqual(1); // There is one Navbar element
+  expect(wrapper.find('BrowserRouter').length).toEqual(1);  // There is one BrowserRouter element
+  expect(wrapper.find('Switch').length).toEqual(1); // There is one Switch element
 });
