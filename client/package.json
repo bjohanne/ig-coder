@@ -15,10 +15,14 @@
     "redux": "^4.0.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "cross-env REACT_APP_STAGE=dev react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prebuild:test": "cross-env REACT_APP_STAGE=test",
+    "build:test": "npm run build",
+    "prebuild:prod": "cross-env REACT_APP_STAGE=prod",
+    "build:prod": "npm run build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -37,6 +41,7 @@
   },
   "devDependencies": {
     "enzyme": "^3.10.0",
-    "enzyme-adapter-react-16": "^1.14.0"
+    "enzyme-adapter-react-16": "^1.14.0",
+    "cross-env": "^6.0.0"
   }
 }
