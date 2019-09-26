@@ -1,6 +1,5 @@
 from flask import jsonify
-from flask_restplus import Resource, reqparse, cors
-from flask_restplus import fields, marshal_with, marshal
+from flask_restplus import Resource, reqparse, cors, fields, marshal_with, marshal
 
 document_fields = {
     'id': fields.Integer,
@@ -12,12 +11,17 @@ document_parser = reqparse.RequestParser()
 document_parser.add_argument('name', type=str, required=True, location=['json'],
                              help='Document name is required')
 
+"""
+TODO: Store this globally in the document resource:
+DOCUMENTS = [{document1}, {document2}]
+"""
 
 class DocumentsResource(Resource):
     @cors.crossdomain(origin='*')
     def get(self, document_id=None):
         """
-        Displays a conference's details
+        Displays a document's details
+        TODO: Get from the global variable.
         """
         if document_id:
             document = {
@@ -35,8 +39,15 @@ class DocumentsResource(Resource):
     @marshal_with(document_fields)
     def post(self):
         """
-        Adds a new conference to the list
+        Adds a new document to the list
+        TODO: Increment ID, set name and description and append to global.
         """
+        document = {
+            "id": 999,
+            "name": "Document {}".format(document_id),
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt "
+                           "ut labore et dolore magna aliqua. Ut... "
+        }
 
     @marshal_with(document_fields)
     def put(self, document_id):
