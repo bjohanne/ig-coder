@@ -8,7 +8,7 @@ import {
 
 const initialState = {
     test: null,
-    document: {name: "", description: ""},
+    document: { id: null, name: "", description: "" },
 };
 
 const reducer = (state: any = initialState, action: any) => {

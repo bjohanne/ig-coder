@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { addDocument } from "../state/actions";
 
 export function NewDocumentComponent(props) {
-
   /**
     Submits the "Create New Document" form.
     If the form is invalid (e.g. required fields not filled),
@@ -14,14 +13,19 @@ export function NewDocumentComponent(props) {
     const form = document.getElementById("newDocumentForm");
     if (form.checkValidity()) {
       const formData = new FormData(form);
-      var data = {
+      const data = {
         name: formData.get("name"),
         description: formData.get("description")
       }
       props.addDocument(data);
-      // TODO: Wait for response, then redirect with new ID
     }
   }
+
+  useEffect(() => {
+    if (props.addedDocument.id) { // A document has been set in state (not null)
+      window.location.href = `/documents/${props.addedDocument.id}`;  // Redirect to the newly created document
+    }
+  });
 
   return (
     <div className="card mx-auto" style={{maxWidth: 800 + "px"}}>
