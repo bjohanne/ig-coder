@@ -4,12 +4,21 @@ import { addDocument } from "../state/actions";
 
 export function NewDocumentComponent(props) {
 
+  /**
+    Submits the "Create New Document" form.
+    If the form is invalid (e.g. required fields not filled),
+    the form is not submitted.
+  */
   function submitDocument(e) {
     e.preventDefault();
-    var form = document.getElementById("newDocumentForm");
-    if (form.checkValidity()) { // Check for required fields etc.
-      var formData = new FormData(form);
-      props.addDocument(formData);
+    const form = document.getElementById("newDocumentForm");
+    if (form.checkValidity()) {
+      const formData = new FormData(form);
+      var data = {
+        name: formData.get("name"),
+        description: formData.get("description")
+      }
+      props.addDocument(data);
       // TODO: Wait for response, then redirect with new ID
     }
   }
@@ -22,7 +31,7 @@ export function NewDocumentComponent(props) {
             <input type="text" className="form-control" name="name" placeholder="Document Name" required/>
           </div>
           <div className="form-group">
-            <textarea className="form-control" rows="6" name="description" resize="vertical" placeholder="Document Description" required></textarea>
+            <textarea className="form-control" rows="6" name="description" resize="vertical" placeholder="Document Description"></textarea>
           </div>
           <button type="submit" className="btn btn-primary" onClick={submitDocument}>Create New Document</button>
         </form>

@@ -27,8 +27,7 @@ export const documentMiddleware = (store: Store) => (next: any) => (action: any)
       });
       break;
     case ADD_DOCUMENT:
-      // TODO: Send action.document
-      axios.post(`http://127.0.0.1:5000/documents`).then((response) => {
+      axios.post(`http://127.0.0.1:5000/documents`, action.document).then((response) => {
         store.dispatch({ type: ADD_DOCUMENT_RESPONSE, payload: response.data });
       });
       break;
