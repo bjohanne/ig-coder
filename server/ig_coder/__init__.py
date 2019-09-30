@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 from flask_restplus import Api
 from werkzeug.exceptions import HTTPException
 from werkzeug.exceptions import default_exceptions
@@ -9,6 +10,7 @@ from .endpoints.documents.resource import DocumentsResource
 
 def create_app():
     app = Flask(__name__)
+    cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
     @app.errorhandler(Exception)
     def handle_error(e):

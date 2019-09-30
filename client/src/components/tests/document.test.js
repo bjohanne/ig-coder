@@ -1,7 +1,7 @@
 import React from 'react';
 import Enzyme, { shallow, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import { DocumentComponent } from '../document';  // Import the unconnected version of the component
+import { DocumentComponent } from '../document';
 
 Enzyme.configure({ adapter: new Adapter() });
 
