@@ -1,4 +1,4 @@
-const environments = {
+const environments: any = {
     dev: { 
         api: {
             baseUrl: "http://localhost:5000"

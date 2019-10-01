@@ -1,7 +1,7 @@
 import React from "react";
 import './navbar.css';
 
-function Navbar(props) {
+function Navbar(props: any) {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light navbar-wrapper">
         <a href="/"><h2><span className="dark-igc-gray-bg badge text-light">IG Coder</span></h2></a>
