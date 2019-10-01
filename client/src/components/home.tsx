@@ -1,7 +1,7 @@
 import './home.css'
 import React from "react";
 
-function HomeComponent(props) {
+function HomeComponent(props: any) {
     return (
         <div className="home-root">
             <div className="row">

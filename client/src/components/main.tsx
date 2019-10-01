@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { testAction } from "../state/actions";
 
-function TestComponent(props) {
+function TestComponent(props: any) {
   useEffect(() =>
     props.testAction()
   , [props]);
@@ -18,11 +18,11 @@ function TestComponent(props) {
   );
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state: any) => ({
   test: state.reducer.test
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch: any) => ({
   testAction: () => dispatch(testAction())
 });
 

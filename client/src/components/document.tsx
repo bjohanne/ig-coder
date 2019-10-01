@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { getDocument } from "../state/actions";
 
-export function DocumentComponent(props) {  // Also export the unconnected component for testing
+export function DocumentComponent(props: any) {  // Also export the unconnected component for testing
     // TODO: Update getDocument() params when new document is created?
     useEffect(() => props.getDocument(props.match.params.id), []);
 
@@ -27,12 +27,12 @@ export function DocumentComponent(props) {  // Also export the unconnected compo
     );
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state: any) => ({
   document: state.reducer.document
 });
 
-const mapDispatchToProps = dispatch => ({
-  getDocument: (document_id) => dispatch(getDocument(document_id))
+const mapDispatchToProps = (dispatch: any) => ({
+  getDocument: (document_id: any) => dispatch(getDocument(document_id))
 });
 
 export default connect(
