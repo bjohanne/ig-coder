@@ -11,27 +11,27 @@ export const testAction = () => ({
     type: TEST_ACTION
 });
 
-export const testActionResponse = (payload) => ({
+export const testActionResponse = (payload: any) => ({
     type: TEST_ACTION_RESPONSE,
     payload: payload
 });
 
-export const getDocument = (document_id) => ({
+export const getDocument = (document_id: number) => ({
     type: GET_DOCUMENT,
     document_id: document_id
 });
 
-export const getDocumentResponse = (payload) => ({
+export const getDocumentResponse = (payload: any) => ({
     type: GET_DOCUMENT_RESPONSE,
     payload: payload
 });
 
-export const addDocument = (document) => ({
+export const addDocument = (document: any) => ({
     type: ADD_DOCUMENT,
     document: document
 });
 
-export const addDocumentResponse = (payload) => ({
+export const addDocumentResponse = (payload: any) => ({
     type: ADD_DOCUMENT_RESPONSE,
     payload: payload
 });

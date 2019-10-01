@@ -1,4 +1,3 @@
-//@flow
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import reducer from "./reducer";
 import { basicMiddleware, documentMiddleware } from "./middleware";

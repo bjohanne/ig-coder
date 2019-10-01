@@ -1,16 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { connect } from "react-redux";
 import { addDocument } from "../state/actions";
 
-export function NewDocumentComponent(props) {
+export function NewDocumentComponent(props: any) {
   /**
     Submits the "Create New Document" form.
     If the form is invalid (e.g. required fields not filled),
     the form is not submitted.
   */
-  function submitDocument(e) {
+  const submitDocument = useCallback((e: any) => {
     e.preventDefault();
-    const form = document.getElementById("newDocumentForm");
+    const form = document.getElementById("newDocumentForm") as HTMLFormElement;
     if (form.checkValidity()) {
       const formData = new FormData(form);
       const data = {
@@ -19,7 +19,7 @@ export function NewDocumentComponent(props) {
       }
       props.addDocument(data);
     }
-  }
+  }, []);
 
   useEffect(() => {
     if (props.addedDocument.id) { // A document has been set in state (not null)
@@ -35,21 +35,21 @@ export function NewDocumentComponent(props) {
             <input type="text" className="form-control" name="name" placeholder="Document Name" required/>
           </div>
           <div className="form-group">
-            <textarea className="form-control" rows="6" name="description" resize="vertical" placeholder="Document Description"></textarea>
+            <textarea className="form-control" rows={6} name="description" placeholder="Document Description"></textarea>
           </div>
-          <button type="submit" className="btn btn-primary" onClick={submitDocument}>Create New Document</button>
+          <button className="btn btn-primary" onClick={submitDocument}>Create New Document</button>
         </form>
       </div>
     </div>
   );
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state: any) => ({
   addedDocument: state.reducer.document
 });
 
-const mapDispatchToProps = dispatch => ({
-  addDocument: (documentData) => dispatch(addDocument(documentData))
+const mapDispatchToProps = (dispatch: any) => ({
+  addDocument: (documentData: any) => dispatch(addDocument(documentData))
 });
 
 export default connect(
