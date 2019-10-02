@@ -8,6 +8,7 @@ export function NewDocumentComponent(props: any) {
     If the form is invalid (e.g. required fields not filled),
     the form is not submitted.
   */
+  const { addDocument } = props;
   const submitDocument = useCallback((e: any) => {
     e.preventDefault();
     const form = document.getElementById("newDocumentForm") as HTMLFormElement;
@@ -17,9 +18,9 @@ export function NewDocumentComponent(props: any) {
         name: formData.get("name"),
         description: formData.get("description")
       }
-      props.addDocument(data);
+      addDocument(data);
     }
-  }, []);
+  }, [addDocument]);
 
   useEffect(() => {
     if (props.addedDocument.id) { // A document has been set in state (not null)

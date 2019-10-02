@@ -5,7 +5,8 @@ import { getDocument } from "../state/actions";
 
 export function DocumentComponent(props: any) {  // Also export the unconnected component for testing
     // TODO: Update getDocument() params when new document is created?
-    useEffect(() => props.getDocument(props.match.params.id), []);
+    const { getDocument, match: { params: { id }}} = props;
+    useEffect(() => getDocument(id), [getDocument, id]);
 
     return (
         <div className="card">
