@@ -8,7 +8,7 @@ import {
 } from "./actiontypes";
 import { Middleware, MiddlewareAPI } from "redux";
 import axios, { AxiosResponse } from "axios";
-import appconfig from "../core/config/appconfig"
+import appconfig from "../core/config/appconfig";
 
 export const basicMiddleware: Middleware = (store: MiddlewareAPI) => (next: any) => (action: any) => {
   if (action.type === TEST_ACTION) {

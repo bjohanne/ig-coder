@@ -1,9 +1,15 @@
 import environmentconfig from "./environmentconfig";
 
 class Config  {
-    api: any = { 
-        baseUrl: "http://localhost/"
+
+    api: { baseUrl: string } = { 
+        baseUrl: "http://localhost",        
     }
+
+    client: { path: string } = {
+        path: "/"
+    }
+
 }
 
 const config = new Config();
