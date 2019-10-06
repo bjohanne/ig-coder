@@ -1,6 +1,9 @@
 import React, { useEffect, useCallback } from "react";
 import { connect } from "react-redux";
 import { addDocument } from "../state/actions";
+import { Redirect } from "react-router";
+import appconfig from "../core/config/appconfig";
+import { withRouter } from 'react-router-dom';
 
 export function NewDocumentComponent(props: any) {
   /**
@@ -24,7 +27,8 @@ export function NewDocumentComponent(props: any) {
 
   useEffect(() => {
     if (props.addedDocument.id) { // A document has been set in state (not null)
-      window.location.href = `/documents/${props.addedDocument.id}`;  // Redirect to the newly created document
+        props.history.push(`${appconfig.client.path}/documents/${props.addedDocument.id}`);
+        //<Redirect to={{ pathname: `${appconfig.client.path}/documents/${props.addedDocument.id}` }}></Redirect> // Redirect to the newly created document
     }
   });
 
@@ -56,4 +60,4 @@ const mapDispatchToProps = (dispatch: any) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(NewDocumentComponent);
+)(withRouter(NewDocumentComponent));

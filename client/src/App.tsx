@@ -14,6 +14,7 @@ import Navbar from "./components/common/navbar";
 import HomeComponent from "./components/home";
 import DocumentComponent from "./components/document";
 import NewDocumentComponent from "./components/newDocument";
+import appconfig from "./core/config/appconfig";
 
 function App() {
   return (
@@ -22,9 +23,9 @@ function App() {
     <div className="App container-fluid">
       <BrowserRouter>
         <Switch>{/* Inside a Switch, only one Route is rendered at a time */}
-          <Route exact path="/" component={ HomeComponent } />
-          <Route exact path="/documents/new" component={ NewDocumentComponent } />
-          <Route exact path="/documents/:id" component={ DocumentComponent } />
+          <Route exact path={`${appconfig.client.path}/`} component={ HomeComponent } />
+          <Route exact path={`${appconfig.client.path}/documents/new`} component={ NewDocumentComponent } />
+          <Route exact path={`${appconfig.client.path}/documents/:id`} component={ DocumentComponent } />
           {/* When none of the above match, <NoMatch> will be rendered (if we need a 404 page) */}
           {/*<Route component={NoMatch} />*/}
         </Switch>

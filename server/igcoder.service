@@ -1,13 +1,13 @@
 [Unit]
-Description=uWSGI instance to serve myproject
+Description=uWSGI instance to serve igcoder-flask-api
 After=network.target
 
 [Service]
 User=www-data
 Group=www-data
-WorkingDirectory=/var/www/app/server
+WorkingDirectory=/var/www/app
 Environment="PATH=/var/www/app/server/igcoderenv/bin"
-ExecStart=/var/www/app/server/igcoderenv/bin/uwsgi --ini uwsgi.ini
+ExecStart=/var/www/app/server/igcoderenv/bin/uwsgi --ini server/uwsgi.ini
 
 [Install]
 WantedBy=multi-user.target
