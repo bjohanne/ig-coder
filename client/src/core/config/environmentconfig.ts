@@ -1,7 +1,7 @@
 const environments: any = {
     dev: { 
         api: {
-            baseUrl: "http://localhost:5000",
+            baseUrl: "http://localhost:5060",
         },
         client: {
             path: ""

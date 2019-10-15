@@ -32,3 +32,4 @@ wcwidth==0.1.7
 Werkzeug==0.15.6
 zipp==0.6.0
 uwsgi==2.0.17.1
+nltk==3.4.5
