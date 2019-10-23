@@ -1,5 +1,5 @@
 import Entry from "./entry";
-import { INode, IComponent, ICanHaveJunction, IProperty } from "./interfaces";
+import { INode, IComponent, ICanHaveJunction } from "./interfaces";
 import { JunctionType, NodeType, ComponentType } from "./enums";
 import { Component } from "./typecomponents";
 import { NodeCounter } from "./document";
@@ -60,6 +60,7 @@ export class CompositeNode extends BaseNode {
 
     /**
      * Creates and returns a new Composite node that has been appended to this.children
+     * TODO: Composite nodes are not components.
      * @param document the document id where the node belongs
      * @param component a nADICO component
      * @param origin if a reference
@@ -78,6 +79,14 @@ export class CompositeNode extends BaseNode {
 }
 
 /**
+ *
+ */
+export class NestedCompositeNode extends BaseNode {
+    entry!: Entry;
+    nodeType: NodeType = NodeType.nestedComposite;
+}
+
+/**
  * This type of node holds an ABDICO component: Attributes, Object, Deontic, Aim or Conditions.
  */
 export class ComponentNode extends BaseNode {
@@ -86,7 +95,7 @@ export class ComponentNode extends BaseNode {
 
     /**
      * Creates and returns a new standalone Component node, not yet attached to any node
-     * based on the entry passed in
+     * based on the component passed in
      *
      * @param document the document id where the node belongs
      * @param component a nADICO component
@@ -145,4 +154,13 @@ export class ComponentNode extends BaseNode {
         });
         return junction;
     }
+ }
+
+ /**
+  *
+  */
+ export class SanctionNode extends BaseNode {
+     nodeType: NodeType = NodeType.sanction;
+     leftChild!: INode;
+     rightChild!: INode;
  }

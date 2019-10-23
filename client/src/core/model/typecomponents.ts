@@ -11,16 +11,24 @@ import { ComponentType } from "./enums";
     suffix!: string;
 
     /**
-     *
+     * Create a new component.
+     * content, prefix and suffix are optional but if content is not provided,
+     * then prefix and suffix will be set to undefined.
      * @param type the component type: Attributes, Object, Deontic, Aim or Conditions
-     * @param properties descriptive characteristics of the component
-     * @param content text
+     * @param content the text that most narrowly fits the components
+     * @param prefix any excess text that goes before the main content
+     * @param suffix any excess text that goes after the main content
      */
-    public static createComponent(type: ComponentType, properties: IProperty[], content: string) {
+    public createComponent(type: ComponentType, content?: string, prefix?: string, suffix?: string) {
+        if (!content) {
+            prefix = undefined;
+            suffix = undefined;
+        }
         return Object.assign(new Component(), {
             type,
-            properties,
-            content
+            content,
+            prefix,
+            suffix
         });
     }
  }

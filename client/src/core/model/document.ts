@@ -1,52 +1,109 @@
-import { INode, IComponent } from "./interfaces";
-import { CompositeNode, ComponentNode, JunctionNode } from "./typenodes";
-import { JunctionType } from "./enums";
+import { INode } from "./interfaces";
+import { CompositeNode, NestedCompositeNode, SanctionNode } from "./typenodes";
 import Entry from "./entry";
 
 /**
- * A Document represents a policy.
+ * A Document represents a policy. It contains a forest of all trees connected to it.
+ * The Document class is responsible for keeping track of all node IDs within its forest.
+ * Functions to validate, read and write data structures from/to the server are found in this class.
  */
 export default class Document {
-    entryList: INode[] = [];  // Array of references to root nodes of all entries in the document, in chronological order
-    // NOTE: Could we refer to the nodes just by ID since all IDs within a Document are unique?
+    forest: INode[] = [];  // Array of all tree roots in the document, in chronological order
 
     constructor(public documentTitle: string, public documentDescription: string, public documentId: number) {
-      this.documentTitle = documentTitle;
-      this.documentDescription = documentDescription;
-      this.documentId = documentId;
+        this.documentTitle = documentTitle;
+        this.documentDescription = documentDescription;
+        this.documentId = documentId;
     }
 
     /**
-     * Create the root node for a policy
+     * Create the root node of a new tree in the forest, either a NestedComposite
+     * or Composite node.
+     * @param text The full text of the statement
+     * @param nested Whether to create a NestedComposite or Composite node
+     *               (whether the statement contains a Deontic)
      */
-    createRoot(text: string) {
-        this.entryList[0] = Object.assign(new CompositeNode(), {
+    public createTree(text: string, nested: boolean) {
+        let node = (nested) ? new NestedCompositeNode() : new CompositeNode();
+        this.forest.push(Object.assign(node, {
             document: this.documentId,
             id: NodeCounter.getInstance().getNextNodeId(this.documentId),
             parent: null,
             origin: null,
-            entry: Entry.createEntry(text),
+            entry: Entry.createEntry(text, this.documentId),
             createdAt: new Date(),
             updatedAt: new Date()
-        });
+        }));
     }
 
-    /*createComponentNode(parent: INode, component: IComponent, origin?: number)  :ComponentNode {
-        return ComponentNode.createComponentNode(parent, component, origin);
+    /**
+     * Delete a tree from the document. The node is removed from the forest array.
+     * This leaves the node ID unused, and does not affect the NodeCounter.
+     * @param id The root node ID of the tree to be deleted
+     */
+    public deleteTree(id: number) {
+        let forestIndex = this.forest.findIndex(node => node.id === id);
+        this.forest.splice(forestIndex, 1);
+        // NOTE: I'm not sure if we need to recursively delete all the children.
+        // Because of our nested structure, removing a reference to a node
+        // removes the reference to its children, and so on, thus deleting the whole tree (I think).
     }
 
-    createJunction(parent: INode, junctionType: JunctionType, ...children: INode[]) :JunctionNode {
-        return JunctionNode.createJunction(parent, junctionType, ...children);
+    /**
+     * Creates a Sanction node and makes it the root of the given tree.
+     * The old root is made the Sanction node's left child.
+     * The Sanction node is not given a right child in this function.
+     * If the given ID is not found, the function does not change anything.
+     * @param id The root node ID of the tree in question
+     */
+    public addSanctionNodeToTree(id: number) {
+        let oldRoot = this.forest.find(node => node.id === id); // Make a copy of the current root node
+        if (oldRoot) {  // A node with the given ID (the current root) exists
+            let sanctionNode = Object.assign(new SanctionNode(), { // Create new Sanction node
+                document: this.documentId,
+                id: NodeCounter.getInstance().getNextNodeId(this.documentId),
+                parent: null,
+                origin: null,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            });
+            sanctionNode.leftChild = oldRoot; // Attach the Sanction node's child
+            oldRoot.parent = sanctionNode.id; // Attach the old root's parent
+            let forestIndex = this.forest.findIndex(node => node.id === id);
+            this.forest[forestIndex] = sanctionNode;  // Replace the node in the document's forest
+        } else {
+            throw new Error(`No node with ID ${id} in this document!`);
+        }
     }
 
-    createCompositeNode(parent: INode, entry: Entry, origin?: number) :CompositeNode {
-        return CompositeNode.createCompositeNode(parent, entry, origin);
-    }*/
+    /**
+     * Deletes the Sanction node from the given tree.
+     * Its left child is raised to root, and its right child discarded with all the latter's descendants.
+     * @param id The ID of the Sanction node to be deleted, assumed to be the root of its tree
+     */
+    public removeSanctionNodeFromTree(id: number) {
+        let sanctionNode = <SanctionNode>this.forest.find(node => node.id === id);  // Make a copy of the Sanction node
+        if (sanctionNode) { // A node with the given ID (the Sanction node) exists
+            let newRoot = sanctionNode.leftChild; // Make a copy of the left child, which is to be root
+            newRoot.parent = null;  // Unset the new root's parent reference
+            let forestIndex = this.forest.findIndex(node => node.id === id);
+            this.forest[forestIndex] = newRoot;  // Replace the node in the document's forest
+        } else {
+            throw new Error(`No node with ID ${id} in this document!`);
+        }
+    }
+
+    /**
+     * Validate this document against the restrictions set in the specification.
+     */
+    public validate() {
+      // TODO
+    }
 
     /**
      * Recursively re-build an ADICO tree fetched from the database
      */
-    fromJSON(jsonData: object) {
+    public fromJSON(jsonData: object) {
         // TODO
         // this one will be interesting
     }
@@ -54,14 +111,13 @@ export default class Document {
     /**
      * Saves a document by posting it to the server where it is persisted to the database
      */
-    save() {
+    public save() {
         // TODO
-        // Save this document to the server
     }
 }
 
 /**
- * Keeps track of the next ID in each document
+ * Keeps track of the current and next node ID in each document
  */
 export class NodeCounter {
 
