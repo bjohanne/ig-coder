@@ -1,5 +1,5 @@
 import Entry from "./entry";
-import { INode, IComponent, ICanHaveJunction } from "./interfaces";
+import { INode, IComponent } from "./interfaces";
 import { JunctionType, NodeType, ComponentType } from "./enums";
 import { Component } from "./typecomponents";
 import { NodeCounter } from "./document";
