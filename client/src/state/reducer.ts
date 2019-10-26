@@ -1,14 +1,18 @@
-//@flow
+
 import update from 'immutability-helper';
+import Document from "../core/model/document";
 import {
     TEST_ACTION_RESPONSE,
     GET_DOCUMENT_RESPONSE,
     ADD_DOCUMENT_RESPONSE
 } from "./actiontypes";
 
-const initialState = {
-    test: null,
-    document: { id: null, name: "", description: "" },
+interface IInitialState {
+    document: Document | null
+}
+
+const initialState: IInitialState = {
+    document: null
 };
 
 const reducer = (state: any = initialState, action: any) => {

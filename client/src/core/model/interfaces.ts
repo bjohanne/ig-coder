@@ -33,6 +33,6 @@ export interface INode {
   * This applies to Component, Subcomponent and Junction node types.
   * Right now this is implemented by all nodes through BaseNode.
   */
- export interface ICanHaveJunction {
+ /*export interface ICanHaveJunction {
 
- }
+ }*/

@@ -14,6 +14,12 @@ import Navbar from "./components/common/navbar";
 import HomeComponent from "./components/home";
 import DocumentComponent from "./components/document";
 import NewDocumentComponent from "./components/newDocument";
+import { ToastContainer } from 'react-toastify';
+
+// Styles
+import 'react-toastify/dist/ReactToastify.css';
+
+// Config
 import appconfig from "./core/config/appconfig";
 
 function App() {
@@ -31,6 +37,17 @@ function App() {
         </Switch>
       </BrowserRouter>
     </div>
+    <ToastContainer
+        position="bottom-center"
+        autoClose={3500}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={true}
+        draggable
+        pauseOnHover
+        />
   </Provider>
   );
 }

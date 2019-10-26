@@ -10,10 +10,8 @@ import Entry from "./entry";
 export default class Document {
     forest: INode[] = [];  // Array of all tree roots in the document, in chronological order
 
-    constructor(public documentTitle: string, public documentDescription: string, public documentId: number) {
-        this.documentTitle = documentTitle;
-        this.documentDescription = documentDescription;
-        this.documentId = documentId;
+    constructor(public name: string, public description: string, public id: number) {
+        this.name = name;
     }
 
     /**
@@ -26,11 +24,11 @@ export default class Document {
     public createTree(text: string, nested: boolean) {
         let node = (nested) ? new NestedCompositeNode() : new CompositeNode();
         this.forest.push(Object.assign(node, {
-            document: this.documentId,
-            id: NodeCounter.getInstance().getNextNodeId(this.documentId),
+            document: this.id,
+            id: NodeCounter.getInstance().getNextNodeId(this.id),
             parent: null,
             origin: null,
-            entry: Entry.createEntry(text, this.documentId),
+            entry: Entry.createEntry(text, this.id),
             createdAt: new Date(),
             updatedAt: new Date()
         }));
@@ -60,8 +58,8 @@ export default class Document {
         let oldRoot = this.forest.find(node => node.id === id); // Make a copy of the current root node
         if (oldRoot) {  // A node with the given ID (the current root) exists
             let sanctionNode = Object.assign(new SanctionNode(), { // Create new Sanction node
-                document: this.documentId,
-                id: NodeCounter.getInstance().getNextNodeId(this.documentId),
+                document: this.id,
+                id: NodeCounter.getInstance().getNextNodeId(this.id),
                 parent: null,
                 origin: null,
                 createdAt: new Date(),
