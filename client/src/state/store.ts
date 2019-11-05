@@ -1,6 +1,6 @@
-import { createStore, combineReducers, applyMiddleware } from "redux";
+import {createStore, combineReducers, applyMiddleware} from "redux";
 import reducer from "./reducer";
-import { basicMiddleware, documentMiddleware } from "./middleware";
+import {basicMiddleware, documentMiddleware} from "./middleware";
 
 let allReducers = combineReducers({
     reducer

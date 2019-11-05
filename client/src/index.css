@@ -4,21 +4,21 @@ html, body, #root {
 
 .App {
     min-height: calc(100% - 64px) !important;
-    height:auto !important; /* cross-browser */
+    height: auto !important; /* cross-browser */
     height: calc(100% - 64px) !important; /* cross-browser */
 }
 
 body {
-  margin: 0 10rem;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    margin: 0 10rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
