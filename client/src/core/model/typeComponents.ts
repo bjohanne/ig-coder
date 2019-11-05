@@ -1,10 +1,10 @@
-import { IComponent } from "./interfaces"
-import { ComponentType } from "./enums";
+import {IComponent} from "./interfaces"
+import {ComponentType} from "./enums";
 
 /**
  * IComponent implementations
  */
- export class Component implements IComponent {
+export class Component implements IComponent {
     componentType!: ComponentType;
     content!: string;
     prefix!: string;
@@ -31,4 +31,4 @@ import { ComponentType } from "./enums";
             suffix
         });
     }
- }
+}

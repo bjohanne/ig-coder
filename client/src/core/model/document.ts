@@ -1,5 +1,5 @@
-import { INode } from "./interfaces";
-import { CompositeNode, NestedCompositeNode, SanctionNode } from "./typenodes";
+import {INode} from "./interfaces";
+import {CompositeNode, NestedCompositeNode, SanctionNode} from "./typeNodes";
 import Entry from "./entry";
 
 /**
@@ -80,7 +80,7 @@ export default class Document {
      * @param id The ID of the Sanction node to be deleted, assumed to be the root of its tree
      */
     public removeSanctionNodeFromTree(id: number) {
-        let sanctionNode = <SanctionNode>this.forest.find(node => node.id === id);  // Make a copy of the Sanction node
+        let sanctionNode = this.forest.find(node => node.id === id) as SanctionNode;  // Make a copy of the Sanction node
         if (sanctionNode) { // A node with the given ID (the Sanction node) exists
             let newRoot = sanctionNode.leftChild; // Make a copy of the left child, which is to be root
             newRoot.parent = null;  // Unset the new root's parent reference
@@ -95,7 +95,7 @@ export default class Document {
      * Validate this document against the restrictions set in the specification.
      */
     public validate() {
-      // TODO
+        // TODO
     }
 
     /**
@@ -126,24 +126,24 @@ export class NodeCounter {
         this.documents = {};
     }
 
-    static getInstance() :NodeCounter {
-        if(NodeCounter.instance == null) {
+    static getInstance(): NodeCounter {
+        if (NodeCounter.instance == null) {
             NodeCounter.instance = new NodeCounter();
         }
         return NodeCounter.instance;
     }
 
-    getNextNodeId(documentId: number) :number {
-        if(typeof(this.documents[documentId]) !== "undefined") {
-            this.documents[documentId] +=1;
+    getNextNodeId(documentId: number): number {
+        if (typeof (this.documents[documentId]) !== "undefined") {
+            this.documents[documentId] += 1;
         } else {
             this.documents[documentId] = 0;
         }
         return this.documents[documentId];
     }
 
-    getCurrentNodeId(documentId: number) :number {
-        if(typeof(this.documents[documentId]) !== "undefined") {
+    getCurrentNodeId(documentId: number): number {
+        if (typeof (this.documents[documentId]) !== "undefined") {
             return this.documents[documentId];
         } else {
             return 0;

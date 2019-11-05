@@ -7,7 +7,7 @@ import {
     ADD_DOCUMENT_RESPONSE,
     ADD_ENTRY_TO_DOCUMENT,
     SAVE_DOCUMENT_REQUEST
-} from "./actiontypes";
+} from "./actionTypes";
 
 export const testAction = () => ({
     type: TEST_ACTION
@@ -38,7 +38,7 @@ export const addDocumentResponse = (payload: any) => ({
     payload: payload
 });
 
-export const addEntryToDocument = ((entry: {documentId: number, content: string}) => ({
+export const addEntryToDocument = ((entry: { documentId: number, content: string }) => ({
     type: ADD_ENTRY_TO_DOCUMENT,
     payload: entry
 }));
@@ -46,4 +46,4 @@ export const addEntryToDocument = ((entry: {documentId: number, content: string}
 export const saveDocumentRequest = (document: any) => ({
     type: SAVE_DOCUMENT_REQUEST,
     payload: document
-})
+});

@@ -1,5 +1,5 @@
 const environments: any = {
-    dev: { 
+    dev: {
         api: {
             baseUrl: "http://localhost:5000",
         },
@@ -9,12 +9,12 @@ const environments: any = {
     },
     test: {
         api: {
-            baseUrl: "http://10.212.137.212/server"            
+            baseUrl: "http://10.212.137.212/server"
         },
         client: {
             path: ""
         }
-    },  
+    },
     prod: {
         api: {
             baseUrl: "http://unknown",
@@ -23,6 +23,6 @@ const environments: any = {
             path: "igcoder"
         }
     }
-}
+};
 
 export default environments;
