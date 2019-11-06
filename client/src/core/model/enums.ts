@@ -8,14 +8,10 @@ export enum NodeType {
     subcomponent = "Subcomponent"
 }
 
-// Basic and negated logical operators for junctions
 export enum JunctionType {
     and  = "AND",
     or   = "OR",
-    xor  = "XOR",
-    nand = "NAND",
-    nor  = "NOR",
-    xnor = "XNOR"
+    xor  = "XOR"
 }
 
 export enum ComponentType {

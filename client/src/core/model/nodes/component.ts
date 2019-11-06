@@ -1,9 +1,8 @@
 import { BaseNode } from "./base";
-import { INode, IComponentAndSubNode, ITwoChildren } from "../interfaces";
-import { NodeType, ComponentType , SubcomponentType} from "../enums";
+import { INode, IComponentAndSubNode, IOneChild, ITwoChildren } from "../interfaces";
+import { NodeType, ComponentType, SubcomponentType} from "../enums";
 import { Component } from "../component";
 
-import NormNode from "./norm";
 import ConventionNode from "./convention";
 import JunctionNode from "./junction";
 import NegationNode from "./negation";
@@ -11,16 +10,20 @@ import SubcomponentNode from "./subcomponent";
 
 /**
  * This type of node holds an ABDICO component: Attributes, Object, Deontic, Aim or Conditions.
+ * The Component node class has an internal method for adding children because
+ *   Component nodes have a varying number of children.
  */
-export default class ComponentNode extends BaseNode implements IComponentAndSubNode, ITwoChildren {
+export default class ComponentNode extends BaseNode implements IComponentAndSubNode, IOneChild, ITwoChildren {
     nodeType: NodeType = NodeType.component;
-    children!: INode[]; // Any number of children
+    children!: INode[]; // Any number of children (0-2)
     componentType!: ComponentType; // The type of component
-    component!: Component;  // Holds the actual text content
+    component!: Component | undefined;  // Holds the actual text content
 
     /**
-     * Creates a new Component node without children, except if it is of type Conditions,
-     * in which case it gets two fixed Subcomponent children.
+     * Creates a new Component node with dummy or fixed children.
+     * If the component type is not Object or Conditions, it is given a Component with text content "*".
+     * This text content is deleted when the node gets a new child. Alternatively, the text content can be updated,
+     * which deletes any dummy children this node has.
      *
      * @param componentType This node's component type (Attributes, Object, Deontic, Aim or Conditions)
      * @param document The ID of the document this node belongs to
@@ -31,63 +34,106 @@ export default class ComponentNode extends BaseNode implements IComponentAndSubN
         super(document, parent, origin);
         this.componentType = componentType;
         if (this.componentType === ComponentType.object) {
-            this.children = [ new BaseNode(document), new BaseNode(document) ]; // Dummy children
+            this.children = [
+                new SubcomponentNode(SubcomponentType.direct, document, this.id),     // Fixed children
+                new SubcomponentNode(SubcomponentType.indirect, document, this.id)
+            ];
         } else if (this.componentType === ComponentType.conditions) {
             this.children = [
                 new SubcomponentNode(SubcomponentType.activation, document, this.id), // Fixed children
                 new SubcomponentNode(SubcomponentType.execution, document, this.id)
             ];
         } else {
-            this.children = []; // No children
+            this.component = new Component("*");            // Attributes, Aim and Deontic get text content
+            if (this.componentType !== ComponentType.deontic) {
+                this.children = [ new BaseNode(document, this.id) ]; // Attributes and Aim get a dummy child
+            } else {
+                this.children = [];                         // Deontic gets no children
+            }
         }
     }
 
-    setContent(content: string, prefix?: string, suffix?: string) : void {
-        this.component = new Component(content, prefix, suffix);
+    /**
+     * Internal function that is called by all create*() functions.
+     * Checks this node's number of children, which dictates how the child should be added.
+     * When the child is added, this node's text content is also deleted.
+     * If called on an Object or Conditions node, which have fixed children, throws an error.
+     * @param node A reference to the node to be added as a child
+     */
+    private addChild(node: INode) {
+        if (this.componentType === ComponentType.object || this.componentType === ComponentType.conditions) {
+            throw new Error("Cannot add children to Component nodes of type Object or Conditions");
+        }
+        if (this.children.length === 0) { // No nodes in the array, dummy or not
+            this.children.push(node);
+        } else if (this.children.length === 1) {
+            this.children[0] = node; // Accessing index 0 is now safe
+        }
+        this.component = undefined; // Delete this node's text content
+    }
+
+    /**
+     * Modifies the node's Component with the passed in text content.
+     * This function also deletes any descendants the node has.
+     * @param content (Optional) The text that most narrowly fits the component
+     * @param prefix (Optional) Excess text that goes before the main content
+     * @param suffix (Optional) Excess text that goes after the main content
+     */
+    setContent(content?: string, prefix?: string, suffix?: string) : void {
+        if (this.componentType === ComponentType.object || this.componentType === ComponentType.conditions) {
+            throw new Error("Component nodes of type Object or Conditions cannot have text content");
+        } else if (typeof this.component !== "undefined") {
+            this.component.modify(content, prefix, suffix);
+            this.children.length = 0;
+        }
+    }
+
+    /* Getters for the children */
+
+    getChild() : INode {
+        if (this.componentType !== ComponentType.attributes && this.componentType !== ComponentType.aim) {
+            throw new Error("Component type must be Attributes or Aim in order to get single child");
+        }
+        if (this.children.length === 0) {
+            throw new Error("This Component node has no children");
+        }
+        if (typeof this.children[0].nodeType === "undefined") {
+            throw new Error("The child of this Component node is a dummy node");
+        }
+        return this.children[0];
     }
 
     getLeft() : INode {
         if (this.componentType !== ComponentType.object && this.componentType !== ComponentType.conditions) {
             throw new Error("Component type must be Object or Conditions in order to get left child");
         }
-        return this.children[0];
+        return this.children[0]; // Object and Conditions nodes have fixed children and cannot have dummy children
     }
 
     getRight() : INode {
         if (this.componentType !== ComponentType.object && this.componentType !== ComponentType.conditions) {
             throw new Error("Component type must be Object or Conditions in order to get right child");
         }
-        return this.children[1];
+        return this.children[1]; // Object and Conditions nodes have fixed children and cannot have dummy children
     }
 
     /**
      * Creates a Norm or Convention node as child of this node, if legal.
-     * NOTE: This function will overwrite any existing descendants in the given index without warning.
-     * If index does not apply to this node's children, index 0 will be used.
      * @param deontic Whether to create a Norm or Convention node
      *               (whether the statement contains a Deontic)
-     * @param index The index of this node's children array in which the Junction node should reside
-     * @param origin (Optional) The ID of the node this node is a reference to
+     * @param origin (Optional) The ID of the node the new node is a reference to
      */
-    createNormOrConventionNode(deontic: boolean, index: number, origin?: number) {
+    createNormOrConventionNode(deontic: boolean, origin?: number) {
         switch(this.componentType) {
             case ComponentType.attributes:
                 if (deontic) {
                     throw new Error("Component nodes of type Attributes cannot have Norm nodes as children");
                 } else {
-                    this.children[0] = new ConventionNode(this.document, this.id, origin); // Ignore index
+                    this.addChild(new ConventionNode(this.document, this.id, origin));
                 }
                 break;
             case ComponentType.object:
-                if (index === 0 || index === 1) {
-                    if (deontic) {
-                        throw new Error("Component nodes of type Object cannot have Norm nodes as children");
-                    } else {
-                        this.children[0] = new ConventionNode(this.document, this.id, origin); // Ignore index
-                    }
-                } else {
-                    throw new Error(`Invalid children index ${index} for existing Component node of type Object`);
-                }
+                throw new Error("Component nodes of type Object cannot have Norm/Convention nodes as children");
                 break;
             case ComponentType.deontic:
                 throw new Error("Component nodes of type Deontic cannot have children");
@@ -99,6 +145,69 @@ export default class ComponentNode extends BaseNode implements IComponentAndSubN
                 throw new Error("Component nodes of type Conditions cannot have Norm/Convention nodes as children");
                 break;
             default:
+        }
+    }
+
+    /**
+     * Creates a Junction node as child of this node, if legal.
+     */
+    createJunctionNode() {
+        switch(this.componentType) {
+            case ComponentType.attributes:
+                this.addChild(new JunctionNode(this.document, this.id));
+                break;
+            case ComponentType.object:
+                throw new Error("Component nodes of type Object cannot have Junction nodes as children");
+                break;
+            case ComponentType.deontic:
+                throw new Error("Component nodes of type Deontic cannot have children");
+                break;
+            case ComponentType.aim:
+                this.addChild(new JunctionNode(this.document, this.id));
+                break;
+            case ComponentType.conditions:
+                throw new Error("Component nodes of type Conditions cannot have Junction nodes as children");
+                break;
+            default:
+        }
+    }
+
+    /**
+     * Creates a Negation node as child of this node, if legal.
+     */
+    createNegationNode() {
+        switch(this.componentType) {
+            case ComponentType.attributes:
+                this.addChild(new NegationNode(this.document, this.id));
+                break;
+            case ComponentType.object:
+                throw new Error("Component nodes of type Object cannot have Negation nodes as children");
+                break;
+            case ComponentType.deontic:
+                throw new Error("Component nodes of type Deontic cannot have children");
+                break;
+            case ComponentType.aim:
+                this.addChild(new NegationNode(this.document, this.id));
+                break;
+            case ComponentType.conditions:
+                throw new Error("Component nodes of type Conditions cannot have Negation nodes as children");
+                break;
+            default:
+        }
+    }
+
+    /**
+     * Creates a Component node as child of this node, if legal.
+     * @param componentType The type of component (Attributes, Object, Deontic, Aim or Conditions)
+     * @param origin (Optional) The ID of the node this node is a reference to
+     */
+    createComponentNode(componentType: ComponentType, origin?: number) {
+        if (this.componentType === ComponentType.deontic) {
+            throw new Error("Component nodes of type Deontic cannot have children");
+        } else if (this.componentType === ComponentType.object || this.componentType === ComponentType.conditions) {
+            throw new Error("Component nodes of type Object or Conditions cannot have Component nodes as children");
+        } else { // Component node has type Attributes or Aim
+            this.addChild(new ComponentNode(componentType, this.document, this.id, origin));
         }
     }
 }

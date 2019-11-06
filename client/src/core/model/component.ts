@@ -2,13 +2,12 @@ import { IComponent } from "./interfaces"
 import { ComponentType } from "./enums";
 
 /**
- * An ABDICO component that can optionally have text content.
- * If it has text content, it can optionally also have prefix and suffix.
+ * An ABDICO component that holds text content.
+ * It can optionally have prefix and suffix.
  * Main holds the text that most narrowly fits the component type.
  * Prefix and suffix hold the rest of the clause that belongs to the component,
  * like prepositions. Example: "against a certified operation", an Object.
  * "a certified operation" is the content; "against" is the prefix.
- * The component is empty if its content is undefined.
  */
  export class Component implements IComponent {
     content!: {
@@ -29,6 +28,22 @@ import { ComponentType } from "./enums";
             main: content,
             prefix,
             suffix
+        }
+    }
+
+    /**
+     * Modify each part of the component individually.
+     * Only the provided parameters are changed.
+     */
+    modify(content?: string, prefix?: string, suffix?: string) {
+        if (content) {
+            this.content.main = content;
+        }
+        if (prefix) {
+            this.content.prefix = prefix;
+        }
+        if (suffix) {
+            this.content.suffix = suffix;
         }
     }
  }

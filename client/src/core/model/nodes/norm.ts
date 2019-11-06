@@ -31,9 +31,15 @@ export default class NormNode extends BaseNode implements INormAndConvention {
         ];
     }
 
+    /**
+     * Adds an Entry with the passed in statement to the node.
+     * @param statement The full text the Norm node represents
+     */
     setEntry(statement: string) : void {
         this.entry = new Entry(statement);
     }
+
+    /* Getters for the children */
 
     getAttributes() : ComponentNode {
         return this.children[0];
