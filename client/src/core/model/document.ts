@@ -1,5 +1,6 @@
 import { INode } from "./interfaces";
 import { NormNode, ConventionNode, SanctionNode } from "./nodes";
+import { Entry } from "./entry";
 
 /**
  * A Document represents a policy. It contains a forest of all trees connected to it.
@@ -15,8 +16,15 @@ export default class Document {
         this.documentId = documentId;
     }
 
-    getRoot() : INode {
-        return this.forest[0];
+    /**
+     * Returns the root node of the first tree in the forest,
+     * or undefined if there are no trees in the forest.
+     */
+    getRoot() : INode | undefined {
+        if (this.forest.length >= 0) {
+            return this.forest[0];
+        }
+        return undefined;
     }
 
     /**
@@ -35,9 +43,11 @@ export default class Document {
     }
 
     /**
-     * Deletes the given tree from the document. The node is deleted from
+     * Deletes the given tree from the document. The root node is deleted from
      * the forest array, and all its descendants are deleted as a consequence.
      * This leaves all the deleted node IDs unused while the NodeCounter keeps incrementing.
+     * If the node is not found, no nodes will be deleted
+     * because index will be -1 and no nodes can have the ID -1.
      *
      * @param id The root node ID of the tree to be deleted
      */
@@ -50,7 +60,7 @@ export default class Document {
      * Creates a Sanction node and makes it the root of the given tree.
      * The old root is made the Sanction node's left child.
      * The Sanction node is not given a right child in this function.
-     * If the given ID is not found, the function does not change anything.
+     * If the given ID is not found, this function does not modify the tree.
      *
      * @param id The current root node ID of the tree in question
      */
@@ -73,11 +83,11 @@ export default class Document {
      *
      * @param id The ID of the Sanction node to be deleted, assumed to be the root of its tree
      */
-    removeSanctionNodeFromTree(id: number) {
-        let sanctionNode = this.forest.find(node => node.id === id) as SanctionNode;  // Make a copy of the Sanction node
+    deleteSanctionNodeFromTree(id: number) {
+        let sanctionNode = this.forest.find(node => node.id === id) as SanctionNode; // Get a reference to the Sanction node
         if (sanctionNode) { // A node with the given ID (the Sanction node) exists
-            let newRoot = sanctionNode.getLeft(); // Make a copy of the left child, which is to be root
-            newRoot.parent = undefined;  // Unset the new root's parent reference
+            let newRoot = sanctionNode.getLeft(); // Get a reference to the left child, which is to be root
+            newRoot.parent = undefined;  // Unset the new root's parent
             let forestIndex = this.forest.findIndex(node => node.id === id);
             this.forest[forestIndex] = newRoot;  // Replace the node in the document's forest
         } else {
@@ -110,8 +120,8 @@ export default class Document {
 
 /**
  * Keeps track of the current and next node ID in each document
- * Node IDs start at 1 because I've had issues passing 0 as a parent
- * for the first-level children (it just remains undefined).
+ * Node IDs start at 1 because I've had issues passing the value 0
+ * in functions to set the parent for new nodes.
  */
 export class NodeCounter {
 

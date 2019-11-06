@@ -37,17 +37,25 @@ export interface INode {
      getConditions() : ComponentNode
  }
 
+
+ /**
+  * Common members for Component and Subcomponent nodes
+  */
+ export interface IComponentAndSubNode {
+     setContent(content?: string, prefix?: string, suffix?: string) : void
+ }
+
+ /**
+  * Common members for node types that can/must have one child
+  */
+ export interface IOneChild {
+     getChild() : INode
+ }
+
 /**
- * Common members for node types that have exactly two children
+ * Common members for node types that can/must have two children
  */
  export interface ITwoChildren {
      getLeft() : INode,
      getRight() : INode
- }
-
-/**
- * Common members for Component and Subcomponent nodes
- */
- export interface IComponentAndSubNode {
-     setContent(content: string, prefix?: string, suffix?: string) : void
  }
