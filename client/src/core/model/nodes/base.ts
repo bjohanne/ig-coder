@@ -1,8 +1,6 @@
 import { INode } from "../interfaces";
-import { NodeType, JunctionType, ComponentType, SubcomponentType } from "../enums";
+import { NodeType} from "../enums";
 import { NodeCounter } from "../document";
-import { Entry } from "../entry";
-import { Component } from "../component";
 
 /**
  * The base node has the implementation of INode.

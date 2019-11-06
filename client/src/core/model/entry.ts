@@ -14,4 +14,4 @@ export class Entry {
     constructor(content: string) {
         this.content = content;
     }
- }
+}

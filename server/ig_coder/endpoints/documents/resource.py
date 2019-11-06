@@ -1,4 +1,5 @@
 from flask_restplus import Resource, reqparse, cors, fields, marshal_with, marshal
+from flask import make_response
 
 document_fields = {
     'id': fields.Integer,
@@ -38,6 +39,13 @@ class DocumentsResource(Resource):
         }
         self.documents.append(document)
         return document
+
+
+    def patch(self):
+        args = document_parser.parse_args()
+        # save the document
+        # return true if successful
+        return make_response({"message": "Collection updated"}, 204)
 
     @marshal_with(document_fields)
     def put(self, document_id):

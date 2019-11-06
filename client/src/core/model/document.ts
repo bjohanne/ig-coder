@@ -1,6 +1,5 @@
 import { INode } from "./interfaces";
 import { NormNode, ConventionNode, SanctionNode } from "./nodes";
-import { Entry } from "./entry";
 
 /**
  * A Document represents a policy. It contains a forest of all trees connected to it.
@@ -10,10 +9,8 @@ import { Entry } from "./entry";
 export default class Document {
     forest: INode[] = [];  // Array of all tree roots in the document, in chronological order
 
-    constructor(public documentTitle: string, public documentDescription: string, public documentId: number) {
-        this.documentTitle = documentTitle;
-        this.documentDescription = documentDescription;
-        this.documentId = documentId;
+    constructor(public name: string, public description: string, public id: number) {
+        this.name = name;
     }
 
     /**
@@ -36,8 +33,8 @@ export default class Document {
      *               (whether the statement contains a Deontic)
      */
     createTree(statement: string, deontic: boolean) {
-        let node = (deontic) ? new NormNode(this.documentId)
-            : new ConventionNode(this.documentId);
+        let node = (deontic) ? new NormNode(this.id)
+            : new ConventionNode(this.id);
         node.setEntry(statement);
         this.forest.push(node);
     }
@@ -67,7 +64,7 @@ export default class Document {
     addSanctionNodeToTree(id: number) {
         let oldRoot = this.forest.find(node => node.id === id); // Get a reference to the current root node
         if (oldRoot) {  // A node with the given ID (the current root) exists
-            let sanctionNode = new SanctionNode(this.documentId);
+            let sanctionNode = new SanctionNode(this.id);
             sanctionNode.children[0] = oldRoot; // Attach the Sanction node's left child
             oldRoot.parent = sanctionNode.id; // Attach the old root's parent
             let forestIndex = this.forest.findIndex(node => node.id === id);
@@ -139,18 +136,18 @@ export class NodeCounter {
         return NodeCounter.instance;
     }
 
-    getNextNodeId(documentId: number) : number {
-        if(typeof(this.documents[documentId]) !== "undefined") {
-            this.documents[documentId] +=1;
+    getNextNodeId(id: number) : number {
+        if(typeof(this.documents[id]) !== "undefined") {
+            this.documents[id] +=1;
         } else {
-            this.documents[documentId] = 1;
+            this.documents[id] = 1;
         }
-        return this.documents[documentId];
+        return this.documents[id];
     }
 
-    getCurrentNodeId(documentId: number) : number {
-        if(typeof(this.documents[documentId]) !== "undefined") {
-            return this.documents[documentId];
+    getCurrentNodeId(id: number) : number {
+        if(typeof(this.documents[id]) !== "undefined") {
+            return this.documents[id];
         } else {
             return 1;
         }

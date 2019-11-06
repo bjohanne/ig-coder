@@ -6,7 +6,7 @@ import { NodeType, JunctionType, ComponentType, SubcomponentType } from '../../c
 import { Component } from '../../core/model/component';
 import { Entry } from "../../core/model/entry";
 
-Enzyme.configure({ adapter: new Adapter() });
+Enzyme.configure({adapter: new Adapter()});
 
 /*
 Notes and guidelines for the data model
@@ -32,7 +32,7 @@ it('Basic statement test', () => {
     // Setup
     const statement = "The Program Manager may initiate suspension or revocation proceedings against a certified operation";
     const document = new Document("Program Manager Policy", "description is missing", 101);
-    const documentId = document.documentId;
+    const id = document.id;
     document.createTree(statement, true);
     let root = document.getRoot() as NormNode;
 
@@ -84,7 +84,7 @@ it('Basic statement test', () => {
   it('Test for miscellaneous functionality', () => {
       // Setup
       const document = new Document("Test Policy", "description is missing", 102);
-      const documentId = document.documentId;
+      const id = document.id;
       document.createTree("", true);
 
       // Deleting a tree
