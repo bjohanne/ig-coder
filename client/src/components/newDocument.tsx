@@ -33,7 +33,6 @@ export function NewDocumentComponent(props: any) {
             ...form,
             [e.target.name]: e.target.value
         });
-        console.log(form);
     };
 
     return (

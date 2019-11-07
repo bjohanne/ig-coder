@@ -29,3 +29,7 @@
     padding: .25rem;
     border-radius: .5rem;
 }
+
+.entry-table {
+    padding: 0 !important;
+}

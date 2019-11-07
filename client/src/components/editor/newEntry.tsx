@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {connect} from "react-redux";
 
-const NewEntryComponent = (props: any) => {
+const NewEntryEditor = (props: any) => {
     const [isNewEntryShown, setNewEntryIsShown] = useState(false);
     const hide = () => setNewEntryIsShown(false);
     const show = () => setNewEntryIsShown(true);
@@ -21,4 +21,4 @@ const mapDispatchToProps = (dispatch: any) => ({});
 export default connect(
     null,
     mapDispatchToProps
-)(NewEntryComponent);
+)(NewEntryEditor);

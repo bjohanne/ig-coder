@@ -14,6 +14,7 @@ import Navbar from "./components/common/navbar";
 import HomeComponent from "./components/home";
 import DocumentComponent from "./components/document";
 import NewDocumentComponent from "./components/newDocument";
+import NewEntryComponent from "./components/newEntry"
 import NotFoundComponent from "./components/notFound";
 import {ToastContainer} from 'react-toastify';
 
@@ -33,6 +34,7 @@ function App() {
                         <Route exact path={`${appConfig.client.path}/`} component={HomeComponent}/>
                         <Route exact path={`${appConfig.client.path}/documents/new`} component={NewDocumentComponent}/>
                         <Route exact path={`${appConfig.client.path}/documents/:id`} component={DocumentComponent}/>
+                        <Route exact path={`${appConfig.client.path}/documents/:id/entries/new`} component={NewEntryComponent}/>
                         <Route path='*' component={NotFoundComponent} />
                     </Switch>
                 </BrowserRouter>
