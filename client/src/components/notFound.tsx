@@ -26,7 +26,7 @@ function NotFoundComponent(props: any) {
                 </div>
                 <div className="col-md-6 text-center">
                     <iframe src="https://giphy.com/embed/MDJ9IbxxvDUQM" width="480" height="270" frameBorder="0"
-                            className="giphy-embed" allowFullScreen/>
+                            className="giphy-embed" title="Cat gif" allowFullScreen/>
                     <p><a href="https://giphy.com/gifs/cat-kisses-hugs-MDJ9IbxxvDUQM">via GIPHY</a></p>
                 </div>
             </div>

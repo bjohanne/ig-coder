@@ -1,38 +1,61 @@
-import {ComponentType, NodeType} from "./enums";
+import { NodeType, ComponentType, JunctionType } from "./enums";
+import ComponentNode from "./nodes/component";
 
 /**
  * The interface implemented by all nodes
  */
 export interface INode {
-    document: number,
+    id:       number,
+    document: number,   // ID of the Document this node belongs to
     nodeType: NodeType;
-    id: number,
-    origin: number | null,
-    parent: number | null,
-    children: INode[],
+    origin?:  number,    // ID of the node this node is a reference to (optional)
+    parent?:  number,    // ID of the node this node is a child of (undefined if root)
+    children: INode[],   // Array of child nodes, more specified in the implementations
     createdAt: Date,
     updatedAt: Date
 }
 
 /**
- * An ABDICO component with text content.
- * Content holds the text that most narrowly fits the component type.
- * Prefix and suffix hold the rest of the clause that belongs to the component,
- * like prepositions. Example: "against a certified operation", an Object.
- * "a certified operation" is the content; "against" is the prefix.
+ * The contract for the Component class
  */
-export interface IComponent {
-    componentType: ComponentType,
-    content: string | null,
-    prefix: string | null,
-    suffix: string | null
-}
+ export interface IComponent {
+    content: {
+        main: string,
+        prefix?: string,
+        suffix?: string
+    }
+ }
 
 /**
- * Node types that can have a Junction as a child need to implement createJunction.
- * This applies to Component, Subcomponent and Junction node types.
- * Right now this is implemented by all nodes through BaseNode.
+ * Common members for Norm and Convention nodes
  */
-/*export interface ICanHaveJunction {
+ export interface INormAndConvention {
+     setEntry(statement: string) : void,
+     getAttributes() : ComponentNode,
+     getObject() : ComponentNode,
+     getAim() : ComponentNode,
+     getConditions() : ComponentNode
+ }
 
-}*/
+
+ /**
+  * Common members for Component and Subcomponent nodes
+  */
+ export interface IComponentAndSubNode {
+     setContent(content?: string, prefix?: string, suffix?: string) : void
+ }
+
+ /**
+  * Common members for node types that can/must have one child
+  */
+ export interface IOneChild {
+     getChild() : INode
+ }
+
+/**
+ * Common members for node types that can/must have two children
+ */
+ export interface ITwoChildren {
+     getLeft() : INode,
+     getRight() : INode
+ }
