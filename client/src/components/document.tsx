@@ -29,11 +29,11 @@ export function DocumentComponent(props: IDocumentEditorProps) {  // Also export
             <div className="card-body">
                 <div className="row">
                     <div className="col-md-6">
-                        <h2 className="card-title">{props.document.name}</h2>
-                        <small className="text-muted">{props.document.description}</small>
+                        <h2 className="card-title">{props.document.documentTitle}</h2>
+                        <small className="text-muted">{props.document.documentDescription}</small>
                     </div>
                     <div className="col-md-6 text-right">
-                        <a href={`/documents/${props.document.id}/entries/new`}
+                        <a href={`/documents/${props.document.documentId}/entries/new`}
                             className="btn btn-success">Create New Entry
                         </a>
                         {/*<NewEntryEditor*/}

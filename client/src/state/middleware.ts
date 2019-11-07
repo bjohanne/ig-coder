@@ -31,7 +31,8 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
             });
             break;
         case ADD_DOCUMENT:
-            axios.post(`${appConfig.api.baseUrl}/documents`, action.document).then((response) => {
+            console.log(action.document);
+            axios.post(`${appConfig.api.baseUrl}/documents`, {name: action.document.documentTitle, description: action.document.documentDescription}).then((response) => {
                 store.dispatch({type: ADD_DOCUMENT_RESPONSE, payload: response.data});
             });
             break;

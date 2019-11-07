@@ -21,6 +21,7 @@ export function NewDocumentComponent(props: any) {
             const data: Document = new Document(form.name, form.description, 123);
             addDocument(data);
         }
+        console.log(form)
     };
 
     useEffect(() => {
