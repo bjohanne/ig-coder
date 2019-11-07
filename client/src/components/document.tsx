@@ -28,27 +28,26 @@ export function DocumentComponent(props: IDocumentEditorProps) {  // Also export
         <div className="card">
             <div className="card-body">
                 <div className="row">
-                    <div className="col-md-4">
+                    <div className="col-md-6">
                         <h2 className="card-title">{props.document.name}</h2>
                         <small className="text-muted">{props.document.description}</small>
                     </div>
-                    <div className="col-md-8 text-right">
+                    <div className="col-md-6 text-right">
                         <NewEntryComponent
                             toggle={(show: any) => <button type="button" className="btn btn-success"
                                                            onClick={show}>Create New Entry</button>}
                             content={(hide: any) => (
                                 <>
                                     <Accordion close={hide} documentId={props.document.id}/>
-
                                 </>
                             )}
                         />
                     </div>
                 </div>
+
+                {/*<button type="button" className="btn btn-success" onClick={save}>Save Document</button>*/}
             </div>
-            <div className="card-body" id="accordion-root">
-                <button type="button" className="btn btn-success" onClick={save}>Save Document</button>
-            </div>
+
             <div className="card-body">
                 <h4 className="text-center">No entry available</h4>
             </div>

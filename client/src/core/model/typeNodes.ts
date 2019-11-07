@@ -1,5 +1,5 @@
 import Entry from "./entry";
-import {INode, IComponent} from "./interfaces";
+import {IComponent, INode} from "./interfaces";
 import {JunctionType, NodeType} from "./enums";
 import {Component} from "./typeComponents";
 import {NodeCounter} from "./document";
@@ -21,7 +21,8 @@ abstract class BaseNode implements INode {
      * Creates and returns a JunctionNode that has been appended to this.children
      * The children parameter passed in will be appended to this new junction's children
      *
-     * @param JunctionType The type of junction: and, or, xor, nand, nor, xnor
+     * @param document
+     * @param junctionType
      * @param children Any children to add; i.e n nodes
      */
     createJunction(document: number, junctionType: JunctionType, ...children: INode[]): JunctionNode {
@@ -49,13 +50,12 @@ export class CompositeNode extends BaseNode {
      * @param origin null if the entry is not referencing another entry in the tree
      */
     public static createStandalone(document: number, entry: Entry, origin?: number): CompositeNode {
-        let composite = Object.assign(new CompositeNode(), {
+        return Object.assign(new CompositeNode(), {
             id: NodeCounter.getInstance().getNextNodeId(document),
             document,
             entry,
             origin
         });
-        return composite;
     }
 
     /**
