@@ -134,16 +134,12 @@ export default class ComponentNode extends BaseNode implements IComponentAndSubN
                 break;
             case ComponentType.object:
                 throw new Error("Component nodes of type Object cannot have Norm/Convention nodes as children");
-                break;
             case ComponentType.deontic:
                 throw new Error("Component nodes of type Deontic cannot have children");
-                break;
             case ComponentType.aim:
                 throw new Error("Component nodes of type Aim cannot have Norm/Convention nodes as children");
-                break;
             case ComponentType.conditions:
                 throw new Error("Component nodes of type Conditions cannot have Norm/Convention nodes as children");
-                break;
             default:
         }
     }
@@ -158,16 +154,13 @@ export default class ComponentNode extends BaseNode implements IComponentAndSubN
                 break;
             case ComponentType.object:
                 throw new Error("Component nodes of type Object cannot have Junction nodes as children");
-                break;
             case ComponentType.deontic:
                 throw new Error("Component nodes of type Deontic cannot have children");
-                break;
             case ComponentType.aim:
                 this.addChild(new JunctionNode(this.document, this.id));
                 break;
             case ComponentType.conditions:
                 throw new Error("Component nodes of type Conditions cannot have Junction nodes as children");
-                break;
             default:
         }
     }
@@ -182,16 +175,13 @@ export default class ComponentNode extends BaseNode implements IComponentAndSubN
                 break;
             case ComponentType.object:
                 throw new Error("Component nodes of type Object cannot have Negation nodes as children");
-                break;
             case ComponentType.deontic:
                 throw new Error("Component nodes of type Deontic cannot have children");
-                break;
             case ComponentType.aim:
                 this.addChild(new NegationNode(this.document, this.id));
                 break;
             case ComponentType.conditions:
                 throw new Error("Component nodes of type Conditions cannot have Negation nodes as children");
-                break;
             default:
         }
     }

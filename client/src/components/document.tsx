@@ -29,11 +29,11 @@ export function DocumentComponent(props: IDocumentEditorProps) {  // Also export
             <div className="card-body">
                 <div className="row">
                     <div className="col-md-6">
-                        <h2 className="card-title">{props.document.documentTitle}</h2>
-                        <small className="text-muted">{props.document.documentDescription}</small>
+                        <h2 className="card-title">{props.document.name}</h2>
+                        <small className="text-muted">{props.document.description}</small>
                     </div>
                     <div className="col-md-6 text-right">
-                        <a href={`/documents/${props.document.documentId}/entries/new`}
+                        <a href={`/documents/${props.document.id}/entries/new`}
                             className="btn btn-success">Create New Entry
                         </a>
                         {/*<NewEntryEditor*/}
@@ -41,7 +41,7 @@ export function DocumentComponent(props: IDocumentEditorProps) {  // Also export
                         {/*                                   onClick={show}>Create New Entry</button>}*/}
                         {/*    content={(hide: any) => (*/}
                         {/*        <>*/}
-                        {/*            <Accordion close={hide} documentId={props.document.id}/>*/}
+                        {/*            <Accordion close={hide} id={props.document.id}/>*/}
                         {/*        </>*/}
                         {/*    )}*/}
                         {/*/>*/}

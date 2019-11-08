@@ -1,5 +1,4 @@
 import { IComponent } from "./interfaces"
-import { ComponentType } from "./enums";
 
 /**
  * An ABDICO component that holds text content.
