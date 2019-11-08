@@ -13,7 +13,7 @@ export interface INode {
     children: INode[],   // Array of child nodes, more specified in the implementations
     createdAt: Date,
     updatedAt: Date
-}
+ }
 
 /**
  * The contract for the Component class

@@ -11,6 +11,8 @@ export default class Document {
 
     constructor(public name: string, public description: string, public id: number) {
         this.name = name;
+        this.description = description;
+        this.id = id;
     }
 
     /**
