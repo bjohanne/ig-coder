@@ -6,7 +6,7 @@ import { NodeType, JunctionType, ComponentType, SubcomponentType } from '../../c
 import { Component } from '../../core/model/component';
 import { Entry } from "../../core/model/entry";
 
-Enzyme.configure({adapter: new Adapter()});
+Enzyme.configure({ adapter: new Adapter() });
 
 /*
 Notes and guidelines for the data model

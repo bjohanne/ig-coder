@@ -21,6 +21,7 @@ export function NewDocumentComponent(props: any) {
             const data: Document = new Document(form.name, form.description, 123);
             addDocument(data);
         }
+        console.log(form)
     };
 
     useEffect(() => {
@@ -33,7 +34,6 @@ export function NewDocumentComponent(props: any) {
             ...form,
             [e.target.name]: e.target.value
         });
-        console.log(form);
     };
 
     return (
