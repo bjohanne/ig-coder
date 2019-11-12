@@ -23,6 +23,7 @@ export function NewDocumentComponent(props: any) {
             // If we had time, we would initialize the Document first after getting
             // the server's response so that we could get the real ID
         }
+        console.log(form)
     };
 
     useEffect(() => {
