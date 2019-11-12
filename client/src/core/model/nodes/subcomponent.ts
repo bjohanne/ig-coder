@@ -15,9 +15,9 @@ import NegationNode from "./negation";
  */
 export default class SubcomponentNode extends BaseNode implements IComponentAndSubNode, IOneChild {
     nodeType: NodeType = NodeType.subcomponent;
-    children!: INode[]; // Any number of children (0-1)
     subcomponentType!: SubcomponentType; // The type of subcomponent
     component!: Component | undefined;  // Holds the actual text content
+    children!: INode[]; // Any number of children (0-1)
 
     /**
      * Creates a new Subcomponent node with a dummy child and a Component with text content "*".

@@ -1,31 +1,57 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { connect } from "react-redux";
+import { getDocument } from "../state/actions";
+import Document from "../core/model/document";
+import GraphComponent from "./graph";
 
 export function NewEntryComponent(props: any) {
+    const {getDocument, match: {params: {id}}} = props;
+
+    const [doc, updateDoc] = useState(props.document);
+
+    useEffect(() => {
+        if (!props.document) {
+            getDocument(id);
+        }
+        // After getting the Document, call Document.createTree() with Deontic.
+        // The graph should update
+    }, [getDocument, id, props.document]);
+
+    const initialData = {
+        "id": "1",
+        "nodeType": "Root",
+        "entry": {
+            "content": ""
+        }
+    };
 
     return (
+        props.document &&
         <div className="card">
             <div className="card-body">
                 <div className="row">
                     <div className="col-md-6">
-                        <h2 className="card-title">{"{Document Name Here}"}</h2>
-                        <small className="text-muted">{"{Document Description Here}"}</small>
+                        <h2 className="card-title">{props.document.name}</h2>
+                        <small className="text-muted">{props.document.description}</small>
                     </div>
                 </div>
             </div>
             <div className="card-body">
-                <h2>New Entry goes here</h2>
-                <p>First, we display an empty root node using D3</p>
-                <p>Second, when user hover over the root node and click edit, the entry editor modal will popup</p>
-                <p>Third, when user finish filling in the entry and click save, we repopulate the D3 tree</p>
-                <p>
-                    Tree JSON and populate code can be found &nbsp;
-                    <span>
-                        <a href={"https://github.com/bloonguyen1207/d3tree"}>here</a>
-                    </span>
-                </p>
+                <GraphComponent data={initialData}/>
             </div>
         </div>
     );
 }
 
-export default NewEntryComponent;
+const mapStateToProps = (state: any) => ({
+    document: state.reducer.document
+});
+
+const mapDispatchToProps = (dispatch: any) => ({
+    getDocument: (document_id: any) => dispatch(getDocument(document_id))
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(NewEntryComponent);

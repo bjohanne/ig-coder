@@ -14,8 +14,8 @@ import SubcomponentNode from "./subcomponent";
  */
 export default class JunctionNode extends BaseNode implements ITwoChildren {
    nodeType: NodeType = NodeType.junction;
-   children!: [INode, INode];   // Two children
    junctionType!: JunctionType;
+   children!: [INode, INode];   // Two children
 
    /**
     * Creates a new Junction node with dummy children.

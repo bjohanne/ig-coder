@@ -17,11 +17,12 @@ export function NewDocumentComponent(props: any) {
 
     const {addDocument} = props;
     const submitDocument = () => {
-        if (form.description !== "" && form.name !== "") {
+        if (form.name !== "" && form.description !== "") {
             const data: Document = new Document(form.name, form.description, 123);
             addDocument(data);
+            // If we had time, we would initialize the Document first after getting
+            // the server's response so that we could get the real ID
         }
-        console.log(form)
     };
 
     useEffect(() => {
@@ -29,6 +30,7 @@ export function NewDocumentComponent(props: any) {
             props.history.push(`${appConfig.client.path}/documents/${props.addedDocument.id}`);
         }
     });
+
     const updateField = (e: any) => {
         setValues({
             ...form,

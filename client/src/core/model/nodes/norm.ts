@@ -9,8 +9,8 @@ import { INormAndConvention } from "../interfaces";
  */
 export default class NormNode extends BaseNode implements INormAndConvention {
     nodeType: NodeType = NodeType.norm;
-    children!: [ComponentNode, ComponentNode, ComponentNode, ComponentNode, ComponentNode]; // Five Component nodes as children
     entry!: Entry;
+    children!: [ComponentNode, ComponentNode, ComponentNode, ComponentNode, ComponentNode]; // Five Component nodes as children
 
     /**
      * Creates a new Norm node with fixed children.

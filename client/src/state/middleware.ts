@@ -31,7 +31,6 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
             });
             break;
         case ADD_DOCUMENT:
-            console.log(action.document);
             axios.post(`${appConfig.api.baseUrl}/documents`, action.document).then((response) => {
                 store.dispatch({type: ADD_DOCUMENT_RESPONSE, payload: response.data});
             });
@@ -46,7 +45,6 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
             break;
         case SAVE_DOCUMENT_REQUEST:
             axios.patch(`${appConfig.api.baseUrl}/documents`, action.payload).then((response) => {
-                console.log(response);
                 let toaster = response.status === 204 ? toast.success : toast.error;
                 toaster('Document saved!', {
                     position: "bottom-center",

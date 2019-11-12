@@ -6,7 +6,6 @@ import {getDocument, saveDocumentRequest} from "../state/actions";
 // import Accordion from "./units/accordion";
 import Document from "../core/model/document";
 
-
 interface IDocumentEditorProps {
     document: Document,
     getDocument: Function,
@@ -19,9 +18,11 @@ export function DocumentComponent(props: IDocumentEditorProps) {  // Also export
     const {getDocument, match: {params: {id}}} = props;
     useEffect(() => getDocument(id), [getDocument, id]);
 
+    /*
     const save = () => {
         props.saveDocumentRequest(props.document);
     };
+    */
 
     return (
         props.document &&
@@ -36,6 +37,7 @@ export function DocumentComponent(props: IDocumentEditorProps) {  // Also export
                         <a href={`/documents/${props.document.id}/entries/new`}
                             className="btn btn-success">Create New Entry
                         </a>
+                        {/*Old button for Create New Entry*/}
                         {/*<NewEntryEditor*/}
                         {/*    toggle={(show: any) => <button type="button" className="btn btn-success"*/}
                         {/*                                   onClick={show}>Create New Entry</button>}*/}
@@ -51,9 +53,14 @@ export function DocumentComponent(props: IDocumentEditorProps) {  // Also export
                 <div className="card-body" id="accordion-root">
                 </div>
             </div>
-
             <div className="card-body entry-table">
-                {/*TODO: Remove this with actual generated table once we have real data*/}
+            <div className="row">
+            <div className="col-md-6">
+            <p className="card-body">No entries yet</p>
+            </div>
+            </div>
+            {/*
+                TODO: Remove this with actual generated table once we have real data
                 <table className="table table-striped">
                     <thead>
                         <tr>
@@ -85,7 +92,7 @@ export function DocumentComponent(props: IDocumentEditorProps) {  // Also export
                         <tr>
                             <th scope="row">2</th>
                             <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...</td>
-                            <td><a href={"#"}> Entry 1 / Condition</a></td>
+                            <td><a href="#/"> Entry 1 / Condition</a></td>
                             <td>
                                 <div className="row">
                                     <div className="col">
@@ -103,7 +110,7 @@ export function DocumentComponent(props: IDocumentEditorProps) {  // Also export
                         <tr>
                             <th scope="row">3</th>
                             <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...</td>
-                            <td><a href={"#"}> Entry 2 / Object</a></td>
+                            <td><a href="#/"> Entry 2 / Object</a></td>
                             <td>
                                 <div className="row">
                                     <div className="col">
@@ -120,6 +127,7 @@ export function DocumentComponent(props: IDocumentEditorProps) {  // Also export
                         </tr>
                     </tbody>
                 </table>
+                */}
             </div>
         </div>
     );

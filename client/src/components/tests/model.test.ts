@@ -76,6 +76,8 @@ it('Basic statement test', () => {
 
     let dirChild = indir.getChild() as SubcomponentNode;
     dirChild.setContent("certified operation", "a");
+
+    console.log(JSON.stringify(document, null, 2));
   });
 
   /**

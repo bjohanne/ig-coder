@@ -9,8 +9,8 @@ import { INormAndConvention } from "../interfaces";
  */
 export default class ConventionNode extends BaseNode implements INormAndConvention {
     nodeType: NodeType = NodeType.convention;
-    children!: [ComponentNode, ComponentNode, ComponentNode, ComponentNode];    // Four Component nodes as children
     entry!: Entry;
+    children!: [ComponentNode, ComponentNode, ComponentNode, ComponentNode];    // Four Component nodes as children
 
     /**
      * Creates a new Convention node with fixed children.

@@ -15,9 +15,9 @@ import SubcomponentNode from "./subcomponent";
  */
 export default class ComponentNode extends BaseNode implements IComponentAndSubNode, IOneChild, ITwoChildren {
     nodeType: NodeType = NodeType.component;
-    children!: INode[]; // Any number of children (0-2)
     componentType!: ComponentType; // The type of component
     component!: Component | undefined;  // Holds the actual text content
+    children!: INode[]; // Any number of children (0-2)
 
     /**
      * Creates a new Component node with dummy or fixed children.
