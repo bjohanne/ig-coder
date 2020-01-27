@@ -1,0 +1,35 @@
+.entry {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    background: #e2eaf4;
+    padding: .25rem;
+}
+
+.entry-content {
+    display: inline-block;
+    font-size: 16px;
+    color: #FFF;
+    background: rgb(129, 144, 165);
+    text-align: center;
+}
+
+.entry-token {
+
+}
+
+.entry-content:first-child {
+    width: 100%;
+    padding: 1rem;
+}
+
+.entry-content:not(:first-child) {
+    flex: 1;
+    margin: .125rem;
+    padding: .25rem;
+    border-radius: .5rem;
+}
+
+.entry-table {
+    padding: 0 !important;
+}
