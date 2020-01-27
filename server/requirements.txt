@@ -1,7 +1,35 @@
-# In order for Flask-Restful etc to be found
-# add conda forge to your repo's list
-# conda config --append channels conda-forge
-Flask
-Flask-RESTPlus
-Flask-cors
-
+aniso8601==8.0.0
+atomicwrites==1.3.0
+attrs==19.1.0
+certifi==2019.9.11
+chardet==3.0.4
+Click==7.0
+coverage==4.5.4
+decorators==0.1.1
+Flask==1.1.1
+Flask-Cors==3.0.8
+flask-restplus==0.13.0
+Flask-Script==2.0.6
+idna==2.8
+importlib-metadata==0.23
+itsdangerous==1.1.0
+Jinja2==2.10.1
+jsonschema==3.0.2
+MarkupSafe==1.1.1
+more-itertools==7.2.0
+packaging==19.2
+pluggy==0.13.0
+py==1.8.0
+pyparsing==2.4.2
+pyrsistent==0.15.4
+pytest==5.1.2
+pytest-cov==2.7.1
+pytz==2019.2
+requests==2.22.0
+six==1.12.0
+urllib3==1.25.5
+wcwidth==0.1.7
+Werkzeug==0.15.6
+zipp==0.6.0
+uwsgi==2.0.17.1
+nltk==3.4.5

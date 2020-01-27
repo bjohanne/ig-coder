@@ -1,0 +1,20 @@
+.search {
+    position: relative;
+}
+
+.search input {
+    text-indent: .25rem;
+}
+
+.search .oi-magnifying-glass {
+    position: absolute;
+    top: 9px;
+    right: 5px;
+    font-size: 15px;
+}
+
+
+nav {
+    width: 100% !important;
+    margin: 0 !important;
+}
