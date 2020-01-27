@@ -1,0 +1,2 @@
+export const TEST_ACTION = "TEST_ACTION";
+export const TEST_ACTION_RESPONSE = "TEST_ACTION_RESPONSE";
