@@ -1,9 +1,6 @@
-<<<<<<< HEAD
-.idea
-=======
 .idea/
 __pycache__/
 .pytest_cache/
 *.pyc
 /venv
->>>>>>> 5455d4fd4ef8a6d0845152613a0a9a44caf4305d
+/env
