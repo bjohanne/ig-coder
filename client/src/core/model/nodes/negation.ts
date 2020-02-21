@@ -1,6 +1,6 @@
 import { BaseNode } from "./base";
 import { INode, IOneChild } from "../interfaces";
-import { NodeType } from "../enums";
+import { NodeType, Arg } from "../enums";
 
 import NormNode from "./norm";
 import ConventionNode from "./convention";
@@ -35,13 +35,13 @@ export default class NegationNode extends BaseNode implements IOneChild {
 
     /**
      * Creates a Norm or Convention node as child of this node.
-     * @param deontic Whether to create a Norm or Convention node
-     *               (whether the statement contains a Deontic)
+     * @param type Whether to create a Norm or Convention node
+	 * @param statement (Optional) The full text of the statement
      * @param origin (Optional) The ID of the node the new node is a reference to
      */
-    createNormOrConventionNode(deontic: boolean, origin?: number) {
-        this.children = [(deontic) ? new NormNode(this.document, this.id, origin)
-            : new ConventionNode(this.document, this.id, origin)];
+    createNormOrConventionNode(type: Arg.norm | Arg.convention, statement?: string, origin?: number) {
+        this.children = [(type === Arg.norm) ? new NormNode(this.document, statement, this.id, origin)
+            : new ConventionNode(this.document, statement, this.id, origin)];
     }
 
     /**
@@ -57,5 +57,4 @@ export default class NegationNode extends BaseNode implements IOneChild {
     createNegationNode() {
         this.children[0] = new NegationNode(this.document, this.id);
     }
-
 }
