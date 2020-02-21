@@ -30,3 +30,22 @@ export enum SubcomponentType {
     activation = "Activation",
     execution  = "Execution"
 }
+
+/**
+ Named function arguments for abstracting away array indices for children
+ and differentiating entry types, which ease usage and improve readability.
+ */
+export enum Arg {
+	// Child types
+	left,
+	right,
+	only,
+	attributes,
+	object,
+	deontic,
+	aim,
+	conditions,
+	// Entry types
+	norm,
+	convention
+}

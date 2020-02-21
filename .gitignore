@@ -1,3 +1,6 @@
 # Environment folders
 /.idea
 /.venv
+
+# Visual Studio
+/.vs

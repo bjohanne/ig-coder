@@ -5,26 +5,28 @@ import { NodeType, ComponentType } from "../enums";
 import { INormAndConvention } from "../interfaces";
 
 /**
- * This is one of two node types that represent an Entry.
+ * This is one of two node types that represent an Entry, the other being Convention.
  */
 export default class NormNode extends BaseNode implements INormAndConvention {
     nodeType: NodeType = NodeType.norm;
     entry!: Entry;
-    children!: [ComponentNode, ComponentNode, ComponentNode, ComponentNode, ComponentNode]; // Five Component nodes as children
+    children!: [ComponentNode, BaseNode, ComponentNode, ComponentNode, ComponentNode]; // Four Component nodes and one BaseNode
 
     /**
      * Creates a new Norm node with fixed children.
+	 * Uses a dummy node to make room for adding an Object child.
      *
      * @param document The ID of the document this node belongs to
+	 * @param statement (Optional) The full text of the represented statement (entry)
      * @param parent (Optional) The ID of the node this node is a child of (the parent's children array must be set separately)
      * @param origin (Optional) The ID of the node this node is a reference to
      */
-    constructor(document: number, parent?: number, origin?: number) {
+    constructor(document: number, statement?: string, parent?: number, origin?: number) {
         super(document, parent, origin);
-        // Create fixed children
+		this.entry = new Entry(statement);
         this.children = [
             new ComponentNode(ComponentType.attributes, document, this.id),
-            new ComponentNode(ComponentType.object, document, this.id),
+            new BaseNode(document, this.id),
             new ComponentNode(ComponentType.deontic, document, this.id),
             new ComponentNode(ComponentType.aim, document, this.id),
             new ComponentNode(ComponentType.conditions, document, this.id)
@@ -32,12 +34,19 @@ export default class NormNode extends BaseNode implements INormAndConvention {
     }
 
     /**
-     * Adds an Entry with the passed in statement to the node.
+     * Sets a new value to (overwrites) the content of the Entry.
      * @param statement The full text the Norm node represents
      */
     setEntry(statement: string) : void {
-        this.entry = new Entry(statement);
+        this.entry.set(statement);
     }
+
+	/**
+	 * Unsets the content of the Entry (not the Entry itself, as it should always be present).
+	 */
+	unsetEntry() : void {
+		this.entry.unset();
+	}
 
     /* Getters for the children */
 
@@ -45,7 +54,10 @@ export default class NormNode extends BaseNode implements INormAndConvention {
         return this.children[0];
     }
 
-    getObject() : ComponentNode {
+    getObject() : BaseNode {
+		if (typeof this.children[1].nodeType === "undefined") {
+			throw new Error("This Norm node does not have an Object child");
+		}
         return this.children[1];
     }
 
@@ -60,4 +72,20 @@ export default class NormNode extends BaseNode implements INormAndConvention {
     getConditions() : ComponentNode {
         return this.children[4];
     }
+
+	/**
+	 * Creates a Component node of type Object in the pre-allotted space.
+	 * Will overwrite any existing Object child without warning.
+     * @param origin (Optional) The ID of the node this node is a reference to
+     */
+	createObject(origin?: number) {
+		this.children[1] = new ComponentNode(ComponentType.object, this.document, this.id, origin);
+	}
+
+	/**
+	 * Deletes the Object child and all of its descendants by replacing it with a new dummy node.
+	 */
+	deleteObject() {
+		this.children[1] = new BaseNode(this.document, this.id);
+	}
 }
