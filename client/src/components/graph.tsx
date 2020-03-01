@@ -1,16 +1,16 @@
 import './graph.css'
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import ReactTooltip from "react-tooltip";
 import { NodeType } from "../core/model/enums";
 import * as d3 from "d3";
+import Document from "../core/model/document";
 
 interface IProps {
-    data?: object;
+    document: Document;
 }
 
-// Afterwards, merge development into this branch.
-
-/* Data structure given to D3
+/*
+Data structure given to D3
 Changes from Bloo's original:
 name => nodeType (done)
 
@@ -21,12 +21,14 @@ Always check nodeType before accessing specific properties.
 export function GraphComponent(props: IProps) {
     const d3Container = useRef(null);
 
+	const [tree, updateTree] = useState({"id": 1, "nodeType": "Root"});	// D3 renders the graph from the state variable tree
+
     useEffect(() => {
-        if (props.data && d3Container.current) {
-            drawGraph(props.data, d3Container.current);
+        if (tree && d3Container.current) {
+            drawGraph(tree, d3Container.current);
         }
         ReactTooltip.rebuild();
-    }, [props.data]);
+    }, [tree]);
 
     return (
         <div>
@@ -37,8 +39,6 @@ export function GraphComponent(props: IProps) {
 }
 
 function drawGraph(data: object, container: any) {
-
-  //triggerPopOver();
 
   // Set the dimensions and margins of the diagram
   let margin = {top: 20, right: 90, bottom: 30, left: 90},
@@ -102,6 +102,8 @@ function drawGraph(data: object, container: any) {
       case "Negation":
         color = "#f44336"
         break;
+	  default:
+	    color = "#ffffff"
     }
 
     return color;
@@ -129,31 +131,30 @@ function drawGraph(data: object, container: any) {
         case "Negation":
           color = "#f44336"
           break;
+		default:
+	      color = "#ffffff"
     }
 
     return color;
   }
 
   function update(source: any) {
-    //triggerPopOver();
 
     // Assigns the x and y position for the nodes
     let treeData = treemap(root);
 
-    // Compute the new tree layout.
+    // Compute the new tree layout
     let nodes = treeData.descendants(),
         links = treeData.descendants().slice(1);
 
-    // Normalize for fixed-depth.
+    // Normalize for fixed-depth
     nodes.forEach(function(d: any){ d.y = d.depth * 180});
 
-    // *************************** Nodes section ***************************
-
-    // Update the nodes...
+    // Update the nodes
     let node = svg.selectAll('g.node')
         .data(nodes, function(d: any) {return d.id || (d.id = ++i); });
 
-    // Enter any new nodes at the parent's previous position.
+    // Enter any new nodes at the parent's previous position
     let nodeEnter = node.enter().append('g')
         .attr('class', 'node')
         .attr("transform", function(d) {
@@ -165,7 +166,7 @@ function drawGraph(data: object, container: any) {
     nodeEnter.append('circle')
         .attr('data-tip', function(d: any) {
             switch (d.data.nodeType) {
-                case "Root":
+                case "Root":	// Initial node to start building the tree from
                     return `<strong>Root</strong><br/><button>Create entry</button>`;
                 case NodeType.component:
                     return `<strong>${d.data.nodeType}</strong><br/><strong>${d.data.componentType}</strong>: ${d.data.component.content.prefix} ${d.data.component.content.main} ${d.data.component.content.suffix}`;
@@ -253,13 +254,11 @@ function drawGraph(data: object, container: any) {
     nodeExit.select('text')
       .style('fill-opacity', 1e-6);
 
-    // ****************** links section ***************************
-
-    // Update the links...
+    // Update the links
     let link = svg.selectAll('path.link')
         .data(links, function(d: any) { return d.id; });
 
-    // Enter any new links at the parent's previous position.
+    // Enter any new links at the parent's previous position
     let linkEnter = link.enter().insert('path', "g")
         .attr("class", "link")
         .attr('d', function(d: any){
@@ -276,7 +275,6 @@ function drawGraph(data: object, container: any) {
         .attr('d', function(d: any){ return diagonal(d, d.parent) });
 
     // Remove any exiting links
-    //let linkExit =
     link.exit().transition()
         .duration(duration)
         .attr('d', function(d: any) {
