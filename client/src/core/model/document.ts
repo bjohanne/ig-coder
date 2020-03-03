@@ -2,6 +2,13 @@ import { INode } from "./interfaces";
 import { Arg } from "./enums";
 import { NormNode, ConventionNode, SanctionNode } from "./nodes";
 
+// Interface for a Document object with empty forest
+interface IEmptyDocument {
+	name: string,
+	description: string,
+	id: number
+}
+
 /**
  * A Document represents a policy. It contains a forest of all trees connected to it.
  * The Document class is responsible for keeping track of all node IDs within its forest.
@@ -9,11 +16,26 @@ import { NormNode, ConventionNode, SanctionNode } from "./nodes";
  */
 export default class Document {
     forest: INode[] = [];  // Array of all tree roots in the document, in chronological order
+	//current: any;	// For React useRef()
 
+	/**
+	 * Constructor with separate parameters for name, description and ID.
+	 * @param name The document's title
+	 * @param description A free-text field describing the document
+	 * @param id The document's identifier, given by the server
+	 */
     constructor(public name: string, public description: string, public id: number) {
         this.name = name;
         this.description = description;
         this.id = id;
+    }
+
+	/**
+	 * Static factory method that takes an object containing name, description and ID.
+	 * @param data An object of type IEmptyDocument containing name, description and ID
+	 */
+	static fromData(data: IEmptyDocument) {
+		return new this(data.name, data.description, data.id);
     }
 
     /**
@@ -30,6 +52,7 @@ export default class Document {
     /**
      * Create the root node of a new tree in the forest, either a Norm
      * or Convention node.
+	 * Currently just overwrites index 0, since it's the only one we use for now.
      *
      * @param type Whether to create a Norm or Convention node
      * @param statement (Optional) The full text of the statement
@@ -37,14 +60,14 @@ export default class Document {
     createTree(type: Arg.norm | Arg.convention, statement?: string) {
         let node = (type === Arg.norm) ? new NormNode(this.id, statement)
             : new ConventionNode(this.id, statement);
-        this.forest.push(node);
+        this.forest.splice(0, 1, node);	// Replace element at index 0
     }
 
     /**
      * Deletes the given tree from the document. The root node is deleted from
      * the forest array, and all its descendants are deleted as a consequence.
      * This leaves all the deleted node IDs unused while the NodeCounter keeps incrementing.
-     * If there is no tree at the given index, no nodes will be deleted.
+     * If there is no tree at the given index, no nodes will be deleted (and there is no warning).
      *
      * @param The forest index of the tree to be deleted
      */

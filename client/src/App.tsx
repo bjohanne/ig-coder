@@ -7,14 +7,14 @@ import React from 'react';
 import {Provider} from "react-redux";
 import {BrowserRouter, Route, Switch} from "react-router-dom";
 import './App.css';
-import {store} from "./state/store";
+import { store, persistor } from "./state/store";
+import { PersistGate } from "redux-persist/integration/react";
 
 // Components
 import Navbar from "./components/common/navbar";
 import HomeComponent from "./components/home";
 import DocumentComponent from "./components/document";
 import NewDocumentComponent from "./components/newDocument";
-import NewEntryComponent from "./components/newEntry"
 import NotFoundComponent from "./components/notFound";
 import {ToastContainer} from 'react-toastify';
 
@@ -27,29 +27,31 @@ import appConfig from "./core/config/appConfig";
 function App() {
     return (
         <Provider store={store}>
-            <Navbar/>
-            <div className="App container-fluid">
-                <BrowserRouter>
-                    <Switch>{/* Inside a Switch, only one Route is rendered at a time */}
-                        <Route exact path={`${appConfig.client.path}/`} component={HomeComponent}/>
-                        <Route exact path={`${appConfig.client.path}/documents/new`} component={NewDocumentComponent}/>
-                        <Route exact path={`${appConfig.client.path}/documents/:id`} component={DocumentComponent}/>
-                        <Route exact path={`${appConfig.client.path}/documents/:id/entries/new`} component={NewEntryComponent}/>
-                        <Route path='*' component={NotFoundComponent} />
-                    </Switch>
-                </BrowserRouter>
-            </div>
-            <ToastContainer
-                position="bottom-center"
-                autoClose={3500}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss={true}
-                draggable
-                pauseOnHover
-            />
+			<PersistGate loading={null} persistor={persistor}>
+				<Navbar/>
+				<div className="App container-fluid">
+					<BrowserRouter>
+						<Switch>{/* Inside a Switch, only one Route is rendered at a time */}
+							<Route exact path={`${appConfig.client.path}/`} component={HomeComponent}/>
+							<Route exact path={`${appConfig.client.path}/documents/new`} component={NewDocumentComponent}/>
+							<Route exact path={`${appConfig.client.path}/documents/:id`} component={DocumentComponent}/>
+							<Route path='*' component={NotFoundComponent} />
+						</Switch>
+					</BrowserRouter>
+				</div>
+				{/* Default toaster settings */}
+				<ToastContainer
+					position="bottom-center"
+					autoClose={3500}
+					hideProgressBar={false}
+					newestOnTop={false}
+					closeOnClick={true}
+					rtl={false}
+					pauseOnFocusLoss={true}
+					pauseOnHover={true}
+					draggable={false}
+				/>
+			</PersistGate>
         </Provider>
     );
 }
