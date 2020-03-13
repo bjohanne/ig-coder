@@ -1,5 +1,5 @@
 import { INode } from "../interfaces";
-import { NodeType, Arg } from "../enums";
+import { NodeType, SubtreeType, Arg } from "../enums";
 import { NodeCounter } from "../document";
 
 /**
@@ -10,6 +10,7 @@ export class BaseNode implements INode {
     id!: number;
     document!: number;
     nodeType!: NodeType;
+	subtree?: SubtreeType;
     parent?: number;
     origin?: number;
     createdAt!: Date;
@@ -21,20 +22,32 @@ export class BaseNode implements INode {
      *
      * @param document The ID of the document this node belongs to
      * @param parent (Optional) The ID of the node this node is a child of (the parent's children array must be set separately)
+	 * @param subtree (Optional) The subtree this node is part of. Should be the same as its parent - used to pass that down.
      * @param origin (Optional) The ID of the node this node is a reference to
      */
-    constructor(document: number, parent?: number, origin?: number) {
+    constructor(document: number, parent?: number, subtree?: SubtreeType, origin?: number) {
         this.id = NodeCounter.getInstance().getNextNodeId(document);
         this.document = document;
         if (parent) {
             this.parent = parent;
         }
+		if (subtree) {
+			this.subtree = subtree;
+		}
         if (origin) {
             this.origin = origin;
         }
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }
+
+	/**
+	 * Small abstraction/convenience to set the updatedAt field.
+	 * Called when a property on the node is modified or when a child is created on the node.
+	 */
+	update() {
+		this.updatedAt = new Date();
+	}
 
 	/**
      * The standard way of deleting a node.

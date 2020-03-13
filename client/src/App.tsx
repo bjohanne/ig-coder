@@ -41,6 +41,7 @@ function App() {
 				</div>
 				{/* Default toaster settings */}
 				<ToastContainer
+					bodyClassName="toast-body"
 					position="bottom-center"
 					autoClose={3500}
 					hideProgressBar={false}

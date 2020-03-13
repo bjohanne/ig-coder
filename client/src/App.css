@@ -27,3 +27,7 @@
         transform: rotate(360deg);
     }
 }
+
+.toast-body {
+	padding-left: 8px;
+}

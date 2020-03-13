@@ -109,14 +109,22 @@ it('Test for miscellaneous functionality', () => {
     root = document.getRoot();
     expect(root).toBeUndefined();
 
-    // Adding and deleting a Sanction node to a tree
+    // Adding a Sanction node to a tree
     document.createTree(Arg.convention);
     root = document.getRoot() as ConventionNode;
     expect(root.nodeType).toEqual(NodeType.convention);
     document.addSanctionNodeToTree(0);
     root = document.getRoot() as SanctionNode;
     expect(root.nodeType).toEqual(NodeType.sanction);
+
+	// The subtree rule: no Component nodes outside of a Norm/Convention subtree
+	root.createJunctionNode(Arg.right);
+	let junction = root.getRight() as JunctionNode;
+	expect(() => { junction.createComponentNode(ComponentType.norm, Arg.left) }).toThrow("subtree");
+
+	// Deleting the Sanction node
     document.deleteSanctionNodeFromTree(0);
+
 
     // Nested children of the same node type; child deletion
     root = document.getRoot() as ConventionNode;

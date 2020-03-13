@@ -2,20 +2,14 @@ import React, {useEffect, useState, useRef} from "react";
 import {connect} from "react-redux";
 import {createDocument} from "../state/actions";
 import appConfig from "../core/config/appConfig";
-import {withRouter} from 'react-router-dom';
+import {withRouter, Redirect} from 'react-router-dom';
 import {toast} from 'react-toastify';
 import './newDocument.css'
-
-/*
-	The working document needs to be persistent between page refreshes, and simultaneously allow calling methods on it.
-	Also, a change should not trigger a refresh since the Graph component takes care of updating the graph
-	(as long as the working document is passed down to the Graph component).
-*/
 
 export function NewDocumentComponent(props: any) {
     const {createDocument} = props;
     const [form, setValues] = useState({name: "", description: ""});
-	const [submitted, setSubmitted] = useState(false);	// Whether the form has been submitted
+	const [redirect, setRedirect] = useState(false);	// Whether to redirect to the new document page
 	const prevDocument = usePrevious(props.addedDocument);
 
 	const buttonEl = useRef<HTMLButtonElement>(null);
@@ -34,17 +28,9 @@ export function NewDocumentComponent(props: any) {
 			if (buttonEl && buttonEl.current) {	// Null check for TypeScript
 				buttonEl.current.disabled = true;	// Disable the submit button to prevent multiple requests being sent
 			}
-			setSubmitted(true);	// This is the trigger for redirecting
+			setRedirect(true); // This is the trigger for redirecting
         }
     };
-
-    useEffect(() => {
-		// The form has been submitted and a document has been set in state, and
-		// either there is no previous document (first time) or the document has changed (subsequent times)
-		if (submitted && props.addedDocument && (!prevDocument || props.addedDocument.id !== prevDocument.id)) {
-			window.location.replace(`${appConfig.client.path}/documents/${props.addedDocument.id}`); // Redirect to document page
-		}
-    }, [prevDocument, submitted, props.addedDocument]);
 
     const updateField = (e: any) => {
         setValues({
@@ -52,6 +38,10 @@ export function NewDocumentComponent(props: any) {
             [e.target.name]: e.target.value
         });
     };
+
+	if (redirect && props.addedDocument && (!prevDocument || props.addedDocument.id !== prevDocument.id)) {
+       return <Redirect to={{ pathname: `${appConfig.client.path}/documents/${props.addedDocument.id}` }} />;
+    }
 
     return (
         <div className="card mx-auto" id="new-document-form">
@@ -71,7 +61,7 @@ export function NewDocumentComponent(props: any) {
 }
 
 /*
-Custom hook to get the previous value of a prop
+ Custom hook to get the previous value of a prop
 */
 const usePrevious = <T extends {}>(prop: T) => {
 	const ref = useRef<T>();

@@ -1,7 +1,7 @@
 import { BaseNode } from "./base";
 import ComponentNode from "./component";
 import { Entry } from "../entry";
-import { NodeType, ComponentType } from "../enums";
+import { NodeType, ComponentType, SubtreeType } from "../enums";
 import { INormAndConvention } from "../interfaces";
 
 /**
@@ -9,6 +9,7 @@ import { INormAndConvention } from "../interfaces";
  */
 export default class NormNode extends BaseNode implements INormAndConvention {
     nodeType: NodeType = NodeType.norm;
+	subtree: SubtreeType = SubtreeType.entry;
     entry!: Entry;
     children!: [ComponentNode, BaseNode, ComponentNode, ComponentNode, ComponentNode]; // Four Component nodes and one BaseNode
 
@@ -22,14 +23,14 @@ export default class NormNode extends BaseNode implements INormAndConvention {
      * @param origin (Optional) The ID of the node this node is a reference to
      */
     constructor(document: number, statement?: string, parent?: number, origin?: number) {
-        super(document, parent, origin);
+        super(document, parent, SubtreeType.entry, origin);
 		this.entry = new Entry(statement);
         this.children = [
-            new ComponentNode(ComponentType.attributes, document, this.id),
+            new ComponentNode(ComponentType.attributes, document, this.id, this.subtree),
             new BaseNode(document, this.id),
-            new ComponentNode(ComponentType.deontic, document, this.id),
-            new ComponentNode(ComponentType.aim, document, this.id),
-            new ComponentNode(ComponentType.conditions, document, this.id)
+            new ComponentNode(ComponentType.deontic, document, this.id, this.subtree),
+            new ComponentNode(ComponentType.aim, document, this.id, this.subtree),
+            new ComponentNode(ComponentType.conditions, document, this.id, this.subtree)
         ];
     }
 
@@ -39,13 +40,15 @@ export default class NormNode extends BaseNode implements INormAndConvention {
      */
     setEntry(statement: string) : void {
         this.entry.set(statement);
+		this.update();
     }
 
 	/**
-	 * Unsets the content of the Entry (not the Entry itself, as it should always be present).
+	 * Unsets the content of the Entry (not the Entry itself, which should always be present).
 	 */
 	unsetEntry() : void {
 		this.entry.unset();
+		this.update();
 	}
 
     /* Getters for the children */
@@ -79,7 +82,8 @@ export default class NormNode extends BaseNode implements INormAndConvention {
      * @param origin (Optional) The ID of the node this node is a reference to
      */
 	createObject(origin?: number) {
-		this.children[1] = new ComponentNode(ComponentType.object, this.document, this.id, origin);
+		this.children[1] = new ComponentNode(ComponentType.object, this.document, this.id, this.subtree, origin);
+		this.update();
 	}
 
 	/**
@@ -87,5 +91,6 @@ export default class NormNode extends BaseNode implements INormAndConvention {
 	 */
 	deleteObject() {
 		this.children[1] = new BaseNode(this.document, this.id);
+		this.update();
 	}
 }

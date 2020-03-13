@@ -1,7 +1,7 @@
 import { BaseNode } from "./base";
 import ComponentNode from "./component";
 import { Entry } from "../entry";
-import { NodeType, ComponentType } from "../enums";
+import { NodeType, ComponentType, SubtreeType } from "../enums";
 import { INormAndConvention } from "../interfaces";
 
 /**
@@ -9,6 +9,7 @@ import { INormAndConvention } from "../interfaces";
  */
 export default class ConventionNode extends BaseNode implements INormAndConvention {
     nodeType: NodeType = NodeType.convention;
+	subtree: SubtreeType = SubtreeType.entry;
     entry!: Entry;
     children!: [ComponentNode, BaseNode, ComponentNode, ComponentNode];    // Three Component nodes and one BaseNode
 
@@ -22,13 +23,13 @@ export default class ConventionNode extends BaseNode implements INormAndConventi
      * @param origin (Optional) The ID of the node this node is a reference to
      */
     constructor(document: number, statement?: string, parent?: number, origin?: number) {
-        super(document, parent, origin);
+        super(document, parent, SubtreeType.entry, origin);
 		this.entry = new Entry(statement);
         this.children = [
-            new ComponentNode(ComponentType.attributes, document, this.id),
+            new ComponentNode(ComponentType.attributes, document, this.id, this.subtree),
             new BaseNode(document, this.id),
             new ComponentNode(ComponentType.aim, document, this.id),
-            new ComponentNode(ComponentType.conditions, document, this.id)
+            new ComponentNode(ComponentType.conditions, document, this.id, this.subtree)
         ];
     }
 
@@ -38,6 +39,7 @@ export default class ConventionNode extends BaseNode implements INormAndConventi
      */
     setEntry(statement: string) : void {
         this.entry.set(statement);
+		this.update();
     }
 
 	/**
@@ -45,6 +47,7 @@ export default class ConventionNode extends BaseNode implements INormAndConventi
 	 */
 	unsetEntry() : void {
 		this.entry.unset();
+		this.update();
 	}
 
     /* Getters for the children */
@@ -74,7 +77,8 @@ export default class ConventionNode extends BaseNode implements INormAndConventi
      * @param origin (Optional) The ID of the node this node is a reference to
      */
 	createObject(origin?: number) {
-		this.children[1] = new ComponentNode(ComponentType.object, this.document, this.id, origin);
+		this.children[1] = new ComponentNode(ComponentType.object, this.document, this.id, this.subtree, origin);
+		this.update();
 	}
 
 	/**
@@ -82,5 +86,6 @@ export default class ConventionNode extends BaseNode implements INormAndConventi
 	 */
 	deleteObject() {
 		this.children[1] = new BaseNode(this.document, this.id);
+		this.update();
 	}
 }
