@@ -1,5 +1,13 @@
 import { INode } from "./interfaces";
+import { Arg } from "./enums";
 import { NormNode, ConventionNode, SanctionNode } from "./nodes";
+
+// Interface for a Document object with empty forest
+interface IEmptyDocument {
+	name: string,
+	description: string,
+	id: number
+}
 
 /**
  * A Document represents a policy. It contains a forest of all trees connected to it.
@@ -8,11 +16,26 @@ import { NormNode, ConventionNode, SanctionNode } from "./nodes";
  */
 export default class Document {
     forest: INode[] = [];  // Array of all tree roots in the document, in chronological order
+	//current: any;	// For React useRef()
 
+	/**
+	 * Constructor with separate parameters for name, description and ID.
+	 * @param name The document's title
+	 * @param description A free-text field describing the document
+	 * @param id The document's identifier, given by the server
+	 */
     constructor(public name: string, public description: string, public id: number) {
         this.name = name;
         this.description = description;
         this.id = id;
+    }
+
+	/**
+	 * Static factory method that takes an object containing name, description and ID.
+	 * @param data An object of type IEmptyDocument containing name, description and ID
+	 */
+	static fromData(data: IEmptyDocument) {
+		return new this(data.name, data.description, data.id);
     }
 
     /**
@@ -29,50 +52,46 @@ export default class Document {
     /**
      * Create the root node of a new tree in the forest, either a Norm
      * or Convention node.
+	 * Currently just overwrites index 0, since it's the only one we use for now.
      *
-     * @param statement The full text of the statement
-     * @param deontic Whether to create a Norm or Convention node
-     *               (whether the statement contains a Deontic)
+     * @param type Whether to create a Norm or Convention node
+     * @param statement (Optional) The full text of the statement
      */
-    createTree(statement: string, deontic: boolean) {
-        let node = (deontic) ? new NormNode(this.id)
-            : new ConventionNode(this.id);
-        node.setEntry(statement);
-        this.forest.push(node);
+    createTree(type: Arg.norm | Arg.convention, statement?: string) {
+        let node = (type === Arg.norm) ? new NormNode(this.id, statement)
+            : new ConventionNode(this.id, statement);
+        this.forest.splice(0, 1, node);	// Replace element at index 0
     }
 
     /**
      * Deletes the given tree from the document. The root node is deleted from
      * the forest array, and all its descendants are deleted as a consequence.
      * This leaves all the deleted node IDs unused while the NodeCounter keeps incrementing.
-     * If the node is not found, no nodes will be deleted
-     * because index will be -1 and no nodes can have the ID -1.
+     * If there is no tree at the given index, no nodes will be deleted (and there is no warning).
      *
-     * @param id The root node ID of the tree to be deleted
+     * @param The forest index of the tree to be deleted
      */
-    deleteTree(id: number) {
-        let forestIndex = this.forest.findIndex(node => node.id === id);
-        this.forest.splice(forestIndex, 1);
+    deleteTree(index: number) {
+		if (this.forest[index]) {
+	        this.forest.splice(index, 1);
+		}
     }
 
     /**
      * Creates a Sanction node and makes it the root of the given tree.
      * The old root is made the Sanction node's left child.
      * The Sanction node is not given a right child in this function.
-     * If the given ID is not found, this function does not modify the tree.
+     * If there is no tree at the given index, the forest will not be modified.
      *
-     * @param id The current root node ID of the tree in question
+     * @param index The forest index of the tree in question
      */
-    addSanctionNodeToTree(id: number) {
-        let oldRoot = this.forest.find(node => node.id === id); // Get a reference to the current root node
-        if (oldRoot) {  // A node with the given ID (the current root) exists
+    addSanctionNodeToTree(index: number) {
+        let oldRoot = this.forest[index]; // Get a reference to the current root node
+        if (oldRoot) {
             let sanctionNode = new SanctionNode(this.id);
             sanctionNode.children[0] = oldRoot; // Attach the Sanction node's left child
             oldRoot.parent = sanctionNode.id; // Attach the old root's parent
-            let forestIndex = this.forest.findIndex(node => node.id === id);
-            this.forest[forestIndex] = sanctionNode;  // Replace the node in the document's forest
-        } else {
-            throw new Error(`No node with ID ${id} in this document!`);
+            this.forest[index] = sanctionNode;  // Replace the node in the document's forest
         }
     }
 
@@ -80,17 +99,14 @@ export default class Document {
      * Deletes the Sanction node from the given tree.
      * Its left child is raised to root, and its right child discarded with all the latter's descendants.
      *
-     * @param id The ID of the Sanction node to be deleted, assumed to be the root of its tree
+     * @param index The forest index of the tree in question
      */
-    deleteSanctionNodeFromTree(id: number) {
-        let sanctionNode = this.forest.find(node => node.id === id) as SanctionNode; // Get a reference to the Sanction node
-        if (sanctionNode) { // A node with the given ID (the Sanction node) exists
+    deleteSanctionNodeFromTree(index: number) {
+        let sanctionNode = this.forest[index] as SanctionNode; // Get a reference to the Sanction node
+        if (sanctionNode) {
             let newRoot = sanctionNode.getLeft(); // Get a reference to the left child, which is to be root
             newRoot.parent = undefined;  // Unset the new root's parent
-            let forestIndex = this.forest.findIndex(node => node.id === id);
-            this.forest[forestIndex] = newRoot;  // Replace the node in the document's forest
-        } else {
-            throw new Error(`No node with ID ${id} in this document!`);
+            this.forest[index] = newRoot;  // Replace the node in the document's forest
         }
     }
 

@@ -7,42 +7,72 @@ import { IComponent } from "./interfaces"
  * Prefix and suffix hold the rest of the clause that belongs to the component,
  * like prepositions. Example: "against a certified operation", an Object.
  * "a certified operation" is the content; "against" is the prefix.
+ *
+ * When content is undefined, the Component is considered to be unset, otherwise set.
+ * Use that to differentiate between intentionally empty and not yet set content.
  */
  export class Component implements IComponent {
-    content!: {
+    content?: {
         main: string,
-        prefix?: string,
-        suffix?: string
+        prefix: string,
+        suffix: string
     };
 
     /**
-     * Create a new Component that holds text content.
-     *
-     * @param content The text that most narrowly fits the component
-     * @param prefix (Optional) Excess text that goes before the main content
-     * @param suffix (Optional) Excess text that goes after the main content
-     */
-    constructor(content: string, prefix?: string, suffix?: string) {
-        this.content = {
-            main: content,
-            prefix,
-            suffix
-        }
+	 * Create a new Component that holds text content.
+	 * If no arguments are provided, content will be undefined.
+	 * Otherwise, sets the content strings to the passed in arguments or an empty string.
+	 *
+	 * @param main (Optional) The text that most narrowly fits the component
+	 * @param prefix (Optional) Excess text that goes before the main content
+	 * @param suffix (Optional) Excess text that goes after the main content
+	 */
+    constructor(main?: string, prefix?: string, suffix?: string) {
+		if (main || prefix || suffix) {	// At least one argument provided
+			this.content = {
+				main: (main) ? main : "",
+				prefix: (prefix) ? prefix : "",
+				suffix: (suffix) ? suffix : ""
+			}
+		}
     }
 
     /**
-     * Modify each part of the component individually.
-     * Only the provided parameters are changed.
-     */
-    modify(content?: string, prefix?: string, suffix?: string) {
-        if (content) {
-            this.content.main = content;
-        }
-        if (prefix) {
-            this.content.prefix = prefix;
-        }
-        if (suffix) {
-            this.content.suffix = suffix;
-        }
+	 * Set each part of the component individually.
+	 * Only the provided parameters are changed.
+	 * If no arguments are provided, the content strings will not be changed.
+	 * If content is undefined, defines it.
+	 *
+	 * @param main (Optional) The text that most narrowly fits the component
+	 * @param prefix (Optional) Excess text that goes before the main content
+	 * @param suffix (Optional) Excess text that goes after the main content
+	 */
+    set(main?: string, prefix?: string, suffix?: string) {
+		if (!this.content) {
+			this.content = {
+				main: (main) ? main : "",
+				prefix: (prefix) ? prefix : "",
+				suffix: (suffix) ? suffix : ""
+			}
+		} else {
+			if (main) {
+				this.content.main = main;
+			}
+			if (prefix) {
+				this.content.prefix = prefix;
+			}
+			if (suffix) {
+				this.content.suffix = suffix;
+			}
+		}
     }
+
+	/**
+	 * Set this Component's content to undefined if it isn't already.
+	 */
+	unset() {
+		if (this.content) {
+			this.content = undefined;
+		}
+	}
  }
