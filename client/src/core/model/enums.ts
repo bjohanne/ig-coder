@@ -30,3 +30,32 @@ export enum SubcomponentType {
     activation = "Activation",
     execution  = "Execution"
 }
+
+/**
+ * What type of subtree or context a node is part of, if any.
+ * Entry subtrees have a Norm or Convention node as root,
+ * Sanction ones a Sanction node.
+ */
+export enum SubtreeType {
+	entry = "Entry",
+	sanction = "Sanction"
+}
+
+/**
+ Named function arguments used to abstract away array indices for children
+ and to differentiate between the two entry types, for easier usage and improved readability.
+ */
+export enum Arg {
+	// Child types
+	left,
+	right,
+	only,
+	attributes,
+	object,
+	deontic,
+	aim,
+	conditions,
+	// Entry types
+	norm,
+	convention
+}

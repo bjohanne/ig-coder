@@ -1,9 +1,11 @@
 import { BaseNode } from "./base";
 import { INode, ITwoChildren } from "../interfaces";
-import { NodeType } from "../enums";
+import { NodeType, SubtreeType, Arg } from "../enums";
 
 import NormNode from "./norm";
 import ConventionNode from "./convention";
+import JunctionNode from "./junction";
+import NegationNode from "./negation";
 
 /**
  * Sanction nodes signify an "or else" relationship between its two children.
@@ -12,15 +14,15 @@ import ConventionNode from "./convention";
  */
 export default class SanctionNode extends BaseNode implements ITwoChildren {
     nodeType: NodeType = NodeType.sanction;
+	subtree: SubtreeType = SubtreeType.sanction;
     children!: [INode, INode];  // Two children
 
     /**
      * Creates a new Sanction node with dummy children.
-     *
      * @param document The ID of the document this node belongs to
      */
     constructor(document: number) {
-        super(document);
+        super(document, undefined, SubtreeType.sanction);
         this.children = [
             new BaseNode(document, this.id),
             new BaseNode(document, this.id)
@@ -43,15 +45,38 @@ export default class SanctionNode extends BaseNode implements ITwoChildren {
         return this.children[1];
     }
 
-    /**
-     * Creates a Norm or Convention node as child of this node.
-     * @param deontic Whether to create a Norm or Convention node
-     *               (whether the statement contains a Deontic)
-     * @param index The index of this node's children array in which the Norm/Convention node should reside
-     * @param origin (Optional) The ID of the node the new node is a reference to
-     */
-    createNormOrConventionNode(deontic: boolean, index: 0 | 1, origin?: number) {
-        this.children[index] = (deontic) ? new NormNode(this.document, this.id, origin)
-            : new ConventionNode(this.document, this.id, origin);
-    }
+	/**
+	 * Creates a Norm or Convention node as child of this node.
+	 *
+	 * @param type Whether to create a Norm or Convention node
+	 * @param position Whether the new node should be the left or right child of this node
+	 * @param statement (Optional) The full text of the statement
+	 * @param origin (Optional) The ID of the node the new node is a reference to
+	 */
+	createNormOrConventionNode(type: Arg.norm | Arg.convention, position: Arg.left | Arg.right, statement?: string, origin?: number) {
+		let index = (position === Arg.left) ? 0 : 1;
+		this.children[index] = (type === Arg.norm) ? new NormNode(this.document, statement, this.id, origin)
+			: new ConventionNode(this.document, statement, this.id, origin);
+		this.update();
+	}
+
+	/**
+	 * Creates a Junction node as child of this node.
+	 * @param position Whether the new node should be the left or right child of this node
+	 */
+	createJunctionNode(position: Arg.left | Arg.right) {
+		let index = (position === Arg.left) ? 0 : 1;
+		this.children[index] = new JunctionNode(this.id, this.document, this.subtree);
+		this.update();
+	}
+
+	/**
+	 * Creates a Negation node as child of this node.
+	 * @param position Whether the new node should be the left or right child of this node
+	 */
+	createNegationNode(position: Arg.left | Arg.right) {
+		let index = (position === Arg.left) ? 0 : 1;
+		this.children[index] = new NegationNode(this.document, this.id, this.subtree);
+		this.update;
+	}
 }
