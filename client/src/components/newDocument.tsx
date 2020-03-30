@@ -39,6 +39,9 @@ export function NewDocumentComponent(props: any) {
         });
     };
 
+    // When all these criteria are satisfied, redirect to the Document page.
+    // The submit button has been clicked; currentDocument exists in state; if there is a previous value for
+    //  currentDocument, it is different from the current value.
 	if (redirect && props.addedDocument && (!prevDocument || props.addedDocument.id !== prevDocument.id)) {
        return <Redirect to={{ pathname: `${appConfig.client.path}/documents/${props.addedDocument.id}` }} />;
     }
@@ -61,7 +64,7 @@ export function NewDocumentComponent(props: any) {
 }
 
 /*
- Custom hook to get the previous value of a prop
+ Custom hook to get the previous value of a prop. TODO: Maybe make this reusable (separate file)?
 */
 const usePrevious = <T extends {}>(prop: T) => {
 	const ref = useRef<T>();

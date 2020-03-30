@@ -17,6 +17,8 @@ import DocumentComponent from "./components/document";
 import NewDocumentComponent from "./components/newDocument";
 import NotFoundComponent from "./components/notFound";
 import {ToastContainer} from 'react-toastify';
+import LoginContainer from "./components/login/loginContainer";
+import RegisterContainer from "./components/register/registerContainer";
 
 // Styles
 import 'react-toastify/dist/ReactToastify.css';
@@ -24,17 +26,20 @@ import 'react-toastify/dist/ReactToastify.css';
 // Config
 import appConfig from "./core/config/appConfig";
 
+
 function App() {
     return (
         <Provider store={store}>
 			<PersistGate loading={null} persistor={persistor}>
-				<Navbar/>
-				<div className="App container-fluid">
+				<div className="App container-fluid px-0">{/* Added px-0 to remove horizontal padding */}
+					<Navbar/>
 					<BrowserRouter>
 						<Switch>{/* Inside a Switch, only one Route is rendered at a time */}
 							<Route exact path={`${appConfig.client.path}/`} component={HomeComponent}/>
 							<Route exact path={`${appConfig.client.path}/documents/new`} component={NewDocumentComponent}/>
 							<Route exact path={`${appConfig.client.path}/documents/:id`} component={DocumentComponent}/>
+							<Route exact path={`${appConfig.client.path}/login`} component={LoginContainer}/>
+							<Route exact path={`${appConfig.client.path}/register`} component={RegisterContainer}/>
 							<Route path='*' component={NotFoundComponent} />
 						</Switch>
 					</BrowserRouter>
