@@ -1,6 +1,6 @@
 # Environment folders
 /.idea
 /.venv
-
+/client/.alm/
 # Visual Studio
 /.vs

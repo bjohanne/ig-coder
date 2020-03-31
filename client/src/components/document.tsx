@@ -1,9 +1,13 @@
 import './document.css'
-import React, { useEffect } from "react"; // , useRef
-import { connect } from "react-redux";
-import { getDocument, saveDocumentRequest } from "../state/actions";
+import React, {useEffect} from "react";
+import {connect} from "react-redux";
+import {getDocument, saveDocumentRequest} from "../state/actions";
+import NewEntryEditor from "./editor/newEntry";
+import Accordion from "./units/accordion";
 import EntryComponent from "./entry";
 import Document from "../core/model/document";
+import { INode } from "../core/model/interfaces";
+import TreeComponent from "./editor/tree";
 
 interface IDocumentEditorProps {
     documents: Array<Document>,
@@ -23,11 +27,11 @@ export function DocumentComponent(props: IDocumentEditorProps) {
         }
 	}, [getDocument, id, props.currentDocument]);
 
-    /*
+    
     const save = () => {
-        props.saveDocumentRequest(props.document);
+        props.saveDocumentRequest(props.currentDocument);
     };
-    */
+    
 
     return (
         props.currentDocument &&
@@ -38,8 +42,37 @@ export function DocumentComponent(props: IDocumentEditorProps) {
                         <h2 className="card-title">{props.currentDocument.name}</h2>
                         <small className="text-muted">{props.currentDocument.description}</small>
                     </div>
-					<EntryComponent document={props.currentDocument}/>
+                    <div className="col-md-6 text-right">                        
+                        <NewEntryEditor
+                            toggle={(show: any) => <button type="button" className="btn btn-success"
+                                                           onClick={show}>Create New Entry</button>}
+                            content={(hide: any) => (
+                                <>
+                                    <Accordion close={hide} id={props.currentDocument.id}/>
+                                </>
+                            )}
+                        />
+                    </div>
+					{/* <EntryComponent document={props.currentDocument}/> */}
                 </div>
+
+                <div className="card-body" id="node-100000">
+                {props.currentDocument.forest && props.currentDocument.forest.length &&
+                props.currentDocument.forest.map((forest: INode) => <div key={forest.id}><TreeComponent node={forest}/></div>) 
+                ||
+                <h4 className="text-center">No entry available</h4>
+                }
+            </div>
+
+                <div className="card-body" id="accordion-root">
+                </div>
+                <div className="card-body">
+                    <div className="row">
+                        <div className="col-md-12" style={{ textAlign: "left" }}>
+                            <button type="button" className="btn btn-success" onClick={save}>Save Document</button>
+                        </div>
+                    </div>
+                </div> 
             </div>
         </div>
     );

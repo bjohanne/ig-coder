@@ -1,0 +1,11 @@
+.node circle.Composite {
+    fill: rgb(255, 140, 140);
+  }
+ 
+  .node text { font: 12px sans-serif; }
+ 
+  .link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 2px;
+  }
