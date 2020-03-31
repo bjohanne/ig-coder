@@ -1,5 +1,6 @@
 from flask_restplus import Resource, reqparse, cors, fields, marshal_with, marshal
-from flask import make_response
+from flask import make_response, request
+from db.traverse import create_graph, get_next_doc_id
 import json
 
 document_fields = {
@@ -37,6 +38,7 @@ class DocumentsResource(Resource):
         args = document_parser.parse_args()
         id = len(self.documents) + 1    # Temporary solution for incrementing - does not work with deletion of documents!
         document = {
+            "document": get_next_doc_id(),
             "id": id,
             "name": args.name,
             "description": args.description,
@@ -48,12 +50,14 @@ class DocumentsResource(Resource):
 
     @marshal_with(document_fields)
     def patch(self):
-        args = document_parser.parse_args()
+        data = request.json        
+        # save the document                
         # save the document, including forest
         # Forest: From the client, get it as a string (JSON.stringify()).
         # Here, use json.loads() to make it a Dictionary.
         # Maybe make a custom type for the forest.
         # return true if successful
+        resp = create_graph(data)
         return make_response({"message": "Collection updated"}, 204)
 
     @marshal_with(document_fields)

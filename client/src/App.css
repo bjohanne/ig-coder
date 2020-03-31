@@ -28,6 +28,46 @@
     }
 }
 
+.node {
+    z-index: 1000;
+}
+
+.link {
+    z-index: 10;
+}
+
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+.accordion-title {
+    line-height: 3.25em;
+}
+
+.btn-square {
+    width: 5em;
+    height: 5em;
+    margin-top: .6em !important;
+}
+
+.entry-editor .row {
+    margin-top: .5em;
+}
+
+.modal-dialog {
+    min-width: 70% !important;
+}
+
+.modal-open {
+    padding-right: 0 !important;
+}
+
+.App-link {
+    color: #61dafb;
+}
+
 .toast-body {
 	padding-left: 8px;
 }

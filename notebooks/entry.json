@@ -1,0 +1,254 @@
+{
+  "id": "1",
+  "name": "entry",
+  "type": "",
+  "content": "The Program Manager may initiate suspension or revocation proceedings against a certified operation when the Program Manager has reason to believe that a certified operation has violated or is not in compliance with the Act or regulations in this part; or when a certifying agent or a State organic program's governing State official fails to take appropriate action to enforce the Act or regulations in this part.",
+  "children": [
+    {
+      "id": "1",
+      "name": "component",
+      "type": "attribute",
+      "content": "The Program Manager",
+      "children": []
+    },
+    {
+      "id": "2",
+      "name": "component",
+      "type": "deontic",
+      "content": "may",
+      "children": []
+    },
+    {
+      "id": "3",
+      "name": "component",
+      "type": "aim",
+      "content": "initiate",
+      "children": []
+    },
+    {
+      "id": "4",
+      "name": "component",
+      "type": "object",
+      "content": "",
+      "children": [
+        {
+          "id": "1",
+          "name": "junction",
+          "type": "",
+          "content": "XOR",
+          "children": [
+            {
+              "id": "5",
+              "name": "component",
+              "type": "direct_object",
+              "content": "suspension",
+              "children": []
+            },
+            {
+              "id": "6",
+              "name": "component",
+              "type": "direct_object",
+              "content": "revocation proceedings",
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "component",
+          "type": "indirect_object",
+          "content": "a certified operation",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "name": "component",
+      "type": "condition",
+      "content": "when the Program Manager has reason to believe that a certified operation has violated or is not in compliance with the Act or regulations in this part; or when a certifying agent or a State organic program's governing State official fails to take appropriate action to enforce the Act or regulations in this part.",
+      "children": [
+        {
+          "id": "8",
+          "name": "component",
+          "type": "activation_condition",
+          "content": "",
+          "children": [
+            {
+              "id": "2",
+              "name": "junction",
+              "type": "",
+              "content": "OR",
+              "children": [
+                {
+                  "id": "2",
+                  "name": "entry",
+                  "type": "",
+                  "content": "when the Program Manager has reason to believe that a certified operation has violated or is not in compliance with the Act or regulations in this part",
+                  "children": [
+                    {
+                      "id": "9",
+                      "name": "component",
+                      "type": "attribute",
+                      "content": "The Program Manager",
+                      "children": []
+                    },
+                    {
+                      "id": "10",
+                      "name": "component",
+                      "type": "object",
+                      "content": "",
+                      "children": [
+                        {
+                          "id": "3",
+                          "name": "entry",
+                          "type": "",
+                          "content": "a certified operation has violated the Act or regulations in this part",
+                          "children": [
+                            {
+                              "id": "12",
+                              "name": "component",
+                              "type": "attribute",
+                              "content": "a certified person",
+                              "children": []
+                            },
+                            {
+                              "id": "13",
+                              "name": "component",
+                              "type": "object",
+                              "content": "the Act or regulations in this part",
+                              "children": [
+                                {
+                                  "id": "3",
+                                  "name": "junction",
+                                  "type": "",
+                                  "content": "OR",
+                                  "children": [
+                                    {
+                                      "id": "14",
+                                      "name": "component",
+                                      "type": "indirect_object",
+                                      "content": "the Act",
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "15",
+                                      "name": "component",
+                                      "type": "indirect_object",
+                                      "content": "regulations in this part",
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "11",
+                      "name": "component",
+                      "type": "aim",
+                      "content": "has reason to believe",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "4",
+                  "name": "junction",
+                  "type": "negate",
+                  "content": "NOT",
+                  "children": [
+                    {
+                      "id": "4",
+                      "name": "entry",
+                      "type": "",
+                      "content": "When a certifying agent or a State organic program's governing State official fails to take appropriate action to enforce the Act or regulations in this part",
+                      "children": [
+                        {
+                          "id": "16",
+                          "name": "component",
+                          "type": "attribute",
+                          "content":"a certified agent or a State organic program's governing State official",
+                          "children": [
+                            {
+                              "id": "4",
+                              "name": "junction",
+                              "type": "",
+                              "content": "OR",
+                              "children": [
+                                {
+                                  "id": "17",
+                                  "name": "component",
+                                  "type": "attribute",
+                                  "content": "a certified agent",
+                                  "children": []
+                                },
+                                {
+                                  "id": "18",
+                                  "name": "component",
+                                  "type": "attribute",
+                                  "content": "a State organic program's governing State official",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "id": "19",
+                          "name": "component",
+                          "type": "indirect_object",
+                          "content": "the Act or regulations in this part",
+                          "children": [
+                            {
+                              "id": "5",
+                              "name": "junction",
+                              "type": "",
+                              "content": "OR",
+                              "children": [
+                                {
+                                  "id": "20",
+                                  "name": "component",
+                                  "type": "indirect_object",
+                                  "content": "the Act",
+                                  "children": []
+                                },
+                                {
+                                  "id": "21",
+                                  "name": "component",
+                                  "type": "indirect_object",
+                                  "content": "regulations in this part",
+                                  "children": []
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "id": "22",
+                          "name": "component",
+                          "type": "aim",
+                          "content": "takes appropriate action to enforce",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "23",
+          "name": "component",
+          "type": "execution_condition",
+          "content": "",
+          "children": []
+        }
+      ]
+    }
+  ]
+}

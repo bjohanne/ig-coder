@@ -11,6 +11,7 @@ import {Middleware, MiddlewareAPI} from "redux";
 import axios, {AxiosResponse} from "axios";
 import {toast} from 'react-toastify';
 import appConfig from "../core/config/appConfig";
+import Document from "../core/model/document";
 
 export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: any) => (action: any) => {
     switch (action.type) {
@@ -31,14 +32,6 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
             axios.post(`${appConfig.api.baseUrl}/documents`, action.payload).then((response) => {
 				response.data.forest = [];	// Turn the forest back into a JS array (needed string on the server)
                 store.dispatch({type: CREATE_DOCUMENT_RESPONSE, payload: response.data});
-            });
-            break;
-        case ADD_ENTRY_TO_DOCUMENT:
-            axios.post(`${appConfig.api.baseUrl}/tokenize`, action.payload).then((response) => {
-                store.dispatch({
-                    type: ADD_ENTRY_WITH_TOKENIZATION,
-                    payload: {content: action.payload.content, tokenization: response.data}
-                });
             });
             break;
         case SAVE_DOCUMENT_REQUEST:

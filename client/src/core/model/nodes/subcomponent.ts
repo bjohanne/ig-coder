@@ -64,7 +64,7 @@ export default class SubcomponentNode extends BaseNode implements IComponentAndS
         } else if (typeof this.component !== "undefined") {
             this.component.set(content, prefix, suffix);
             this.children.length = 0;
-			this.update;
+			this.update();
         }
     }
 
@@ -73,7 +73,7 @@ export default class SubcomponentNode extends BaseNode implements IComponentAndS
 	 */
 	unsetContent() : void {
 		this.component.unset();
-		this.update;
+		this.update();
 	}
 
     // Getter for the child

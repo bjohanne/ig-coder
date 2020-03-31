@@ -4,9 +4,12 @@ import {
     CREATE_DOCUMENT,
     CREATE_DOCUMENT_RESPONSE,
     ADD_ENTRY_TO_DOCUMENT,
-    SAVE_DOCUMENT_REQUEST
+    SAVE_DOCUMENT_REQUEST,
+    SET_ACTIVE_NODE,
+    UPDATE_ENTRY
 } from "./actionTypes";
 import Document from "../core/model/document";
+import { INode } from "../core/model/interfaces";
 
 export const getDocument = (document_id: number) => ({
     type: GET_DOCUMENT,
@@ -28,7 +31,7 @@ export const createDocumentResponse = (payload: Document) => ({
     payload: payload
 });
 
-export const addEntryToDocument = ((entry: { documentId: number, content: string }) => ({
+export const addEntryToDocument = ((entry: { documentId: number, content: string, hasDeontic: boolean }) => ({
     type: ADD_ENTRY_TO_DOCUMENT,
     payload: entry
 }));
@@ -36,4 +39,14 @@ export const addEntryToDocument = ((entry: { documentId: number, content: string
 export const saveDocumentRequest = (document: any) => ({
     type: SAVE_DOCUMENT_REQUEST,
     payload: document
+});
+
+export const setActiveNode = (node: INode) => ({
+    type: SET_ACTIVE_NODE,
+    payload: node
+});
+
+export const updateEntry = (node: INode) => ({
+    type: UPDATE_ENTRY,
+    payload: node
 });

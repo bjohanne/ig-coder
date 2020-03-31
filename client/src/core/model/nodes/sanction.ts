@@ -77,6 +77,6 @@ export default class SanctionNode extends BaseNode implements ITwoChildren {
 	createNegationNode(position: Arg.left | Arg.right) {
 		let index = (position === Arg.left) ? 0 : 1;
 		this.children[index] = new NegationNode(this.document, this.id, this.subtree);
-		this.update;
+		this.update();
 	}
 }
