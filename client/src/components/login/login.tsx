@@ -1,6 +1,6 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
-import {Button} from "react-bootstrap";
+import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -8,11 +8,10 @@ import Col from "react-bootstrap/Col";
 function LoginComponent(props: any) {
     return (
         <div className="Container">
-            <br/>
             <div className="row text-center">
                 <div className="col-md-12">
                     <h1 className="home-title">
-                        Login
+                        Sign in
                     </h1>
                 </div>
             </div>
@@ -23,25 +22,35 @@ function LoginComponent(props: any) {
 
                 <div className='col-md-4'>
 
-                <Form>
+                    <Form>
                         <Form.Group controlId="formBasicEmail">
                             <Form.Label>Email address</Form.Label>
-                            <Form.Control type="email" placeholder="Please enter email" />
+                            <Form.Control
+                                type="email"
+                                placeholder="Please enter email address"
+                                required
+                                name="username"
+                                value={props.data.username}
+                                onChange={props.handleChange}
+                                autoComplete="email"
+                                autoFocus
+                            />
                         </Form.Group>
-                        <br />
 
                         <Form.Group controlId="formBasicPassword">
-                            <Form.Label>Confrim Password</Form.Label>
-                            
+                            <Form.Label>Password</Form.Label>
+
                             <InputGroup className="mb-3">
                                 <Form.Control
-                                    placeholder="Please enter password"
-                                    aria-label="Please enter password"
-                                    aria-describedby="basic-addon2"
                                     type="password"
+                                    placeholder="Please enter password"
+                                    required
+                                    name="pass"
+                                    value={props.data.pass}
+                                    onChange={props.handleChange}
                                 />
                                 <InputGroup.Append>
-                                    <Button variant="secondary">Show password</Button>
+                                    <Button variant="secondary">Show</Button>
                                 </InputGroup.Append>
                             </InputGroup>
 
@@ -51,23 +60,17 @@ function LoginComponent(props: any) {
 
                         </Form.Group>
 
-                        <br/>
-                        <Row>
-
-
+                        <Row className="d-flex align-items-center">
                             <Col>
-                            <Button variant='outline-dark' type="submit" ml-auto>
-                                Login
+                            <Button variant='outline-dark' type="submit" className="ml-auto w-75">
+                                Sign in
                             </Button>
                             </Col>
 
-                            <Col xs={0} ml-auto>
-                            <a href='./register' ml-auto>No account? Go for register</a>
+                            <Col xs={0} >
+                            <a href='./register' className="ml-auto">Don't have an account? Sign up</a>
                             </Col>
-
                         </Row>
-
-                        
                     </Form>
                 </div>
             </div>
@@ -80,5 +83,3 @@ function LoginComponent(props: any) {
 }
 
 export default LoginComponent
-
-
