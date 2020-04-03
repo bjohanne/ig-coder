@@ -43,6 +43,12 @@ function Navbar(props: any) {
                         }}>Login/Register</a>
                     </li>
                 </ul>
+                {/* <ul className="navbar-nav ml-auto">
+                    <li className="nav-item">
+                        <a className="nav-link" href="/login" onClick={() => {
+                        }}>Login/Register</a>
+                    </li>
+                </ul> */}
             </div>
         </nav>
     );
