@@ -1,6 +1,9 @@
 import React, {useState} from "react";
 import RegisterComponent from "./register";
 import TopAlertComponent from "../common/topAlert";
+import * as firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/firestore";
 
 function RegisterContainer() {
 
@@ -13,6 +16,7 @@ function RegisterContainer() {
             passConfirm:"",
             isSamePass:true,
             isFail:false,
+            failText:'',
             showPassword: false
         }
     )
@@ -77,46 +81,27 @@ function RegisterContainer() {
         if(!verfifyPassSame()){
             return
         }
-        const url="http://0.0.0.0:5000/users/register"
-        const data={
-            first_name:state.firstname,
-            last_name:state.lastname,
-            email:state.username,
-            password:state.pass
-        }
-        const otherPram ={
-            headers:{
-                "content-type":"application/json; charset=UTF-8"
-            },
-            body:JSON.stringify(data),
-            method:"POST"
-        }
-        fetch(url,otherPram).then(
-            data=>{return data.json()}
-        ).then(
-            res=>{
-                const {error, token, result}=res
-                if(error){
-                    setState(
-                        state=>(
-                            {
-                                ...state,
-                                isFail:true
-                            }
-                        )
+        firebase.auth().createUserWithEmailAndPassword(state.username, state.pass)
+            .then(data=>{
+                setSignup(true)
+                setTimeout(()=>{
+                    window.location = '/login'
+                }, 100)
+            })
+            .catch((error)=> {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                setState(
+                    state=>(
+                        {
+                            ...state,
+                            isFail:true,
+                            failText:errorMessage
+                        }
                     )
-                }else if(result){
-                    console.log(result)
-                    setSignup(true)
-                    setTimeout(()=>{
-                        window.location = '/login'
-                    }, 100)
-
-                }
-            }
-        ).catch(
-            error=>console.error(error)
-        )
+                )
+            });
         console.log("handle submit")
     }
 

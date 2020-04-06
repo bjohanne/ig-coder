@@ -104,9 +104,9 @@ export default function LoginComponent(props) {
                                         </IconButton>
                                     </InputAdornment>
                                 }
-                                labelWidth={70}
+                                labelWidth={80}
                             />
-                            <FormHelperText id="component-error-text" style={{display:props.data.isFail?'block':'none'}} error={props.data.isFail}>Email or password is not correct</FormHelperText>
+                            <FormHelperText id="component-error-text" style={{display:props.data.isFail?'block':'none'}} error={props.data.isFail}>{props.data.failText}</FormHelperText>
                         </FormControl>
                         <FormControlLabel
                             control={<Checkbox value="remember" color="primary" />}

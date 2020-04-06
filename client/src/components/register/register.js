@@ -118,19 +118,20 @@ export default function RegisterComponent(props) {
                                                 </IconButton>
                                             </InputAdornment>
                                         }
-                                        labelWidth={70}
+                                        labelWidth={80}
                                     />
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12}>
                                 <FormControl variant="outlined" fullWidth required error={!props.data.isSamePass}>
-                                    <InputLabel htmlFor="outlined-adornment-password">Confirm Password</InputLabel>
+                                    <InputLabel htmlFor="outlined-adornment-password">Confirm Pass</InputLabel>
                                     <OutlinedInput
                                         id="outlined-adornment-password"
                                         name={'passConfirm'}
                                         type={props.data.showPassword ? 'text' : 'password'}
                                         value={props.data.passConfirm}
                                         onChange={props.handleChange}
+                                        fullWidth
                                         endAdornment={
                                             <InputAdornment position="end">
                                                 <IconButton
@@ -143,7 +144,7 @@ export default function RegisterComponent(props) {
                                                 </IconButton>
                                             </InputAdornment>
                                         }
-                                        labelWidth={70}
+                                        labelWidth={105}
                                     />
                                     <FormHelperText id="component-error-text" style={{display:props.data.isSamePass?'none':'block'}} error={!props.data.isSamePass}>The passwords do not match.</FormHelperText>
                                     <FormHelperText id="component-error-text" style={{display:props.data.isFail?'block':'none'}} error={props.data.isFail}>An account is already using this email.</FormHelperText>

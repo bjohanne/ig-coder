@@ -1,5 +1,8 @@
 import React from "react";
 import LoginComponent from "./login";
+import * as firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/firestore";
 
 class LoginContainer extends React.Component {
     state = {
@@ -7,6 +10,7 @@ class LoginContainer extends React.Component {
         pass: "",
         isRemember: false,
         isFail: false,
+        failText:'',
         showPassword: false
     }
 
@@ -30,40 +34,23 @@ class LoginContainer extends React.Component {
     handleSubmit = (event) => {
         event.preventDefault()
         console.log(event)
-        const url = "http://0.0.0.0:5000/users/login"
-        const data = {
-            email: this.state.username,
-            password: this.state.pass
-        }
-        const otherPram = {
-            headers: {
-                "content-type": "application/json; charset=UTF-8"
-            },
-            body: JSON.stringify(data),
-            method: "POST"
-        }
-        fetch(url, otherPram).then( // TODO: This needs to go through Redux. Dispatch an action, send an Axios request and dispatch another action upon response. This component will wait for the action's reducer.
-            data => {
-                return data.json()
-            }
-        ).then(
-            res => {
-                const {error, token, result} = res
-                console.log(res)
-                if (error || result) {
-                    this.setState(
-                        {
-                            isFail: true
-                        }
-                    )
-                } else if (token) {
-                    localStorage.setItem('usertoken', token)
+        firebase.auth().signInWithEmailAndPassword(this.state.username, this.state.pass)
+            .then(data=> {
+                    localStorage.setItem('usertoken', data.user.getIdToken())
                     window.location = '/';
                 }
-            }
-        ).catch(
-            error => console.error(error)
-        )
+            )
+            .catch((error) => {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                this.setState(
+                    {
+                        isFail: true,
+                        failText:errorMessage
+                    }
+                )
+            });
         console.log("handle submit")
     }
 
