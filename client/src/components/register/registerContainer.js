@@ -24,9 +24,7 @@ function RegisterContainer() {
 
 
     const handleChange = (event) => {
-        console.log('handle change')
         const {name, value} = event.target
-        console.log(name+" "+value)
         setState(
             state=>(
                 {
@@ -37,11 +35,9 @@ function RegisterContainer() {
                 }
             )
         )
-       console.log(state)
     }
 
     const handleClickShowPassword = (event) => {
-        console.log(event.target)
         setState(
             state=>(
                 {
@@ -53,27 +49,47 @@ function RegisterContainer() {
     }
 
     const verfifyPassSame=()=>{
-        if(state.pass!==state.passConfirm){
-            setState(
-                state=>(
-                    {
-                        ...state,
-                        isSamePass:false
-                    }
-                )
+        setState(
+            state=>(
+                {
+                    ...state,
+                    isSamePass:state.pass===state.passConfirm
+                }
             )
-            return false
-        }else {
-            setState(
-                state=>(
-                    {
-                        ...state,
-                        isSamePass:true
-                    }
-                )
-            )
-            return true
-        }
+        )
+        return state.pass===state.passConfirm
+    }
+
+    const addUserData=(userId)=>{
+        var db = firebase.firestore();
+        db.collection("users").add({
+                "userId":userId,
+                "firstName":state.firstname,
+                "lastName":state.lastname,
+                "email":state.username,
+                "privilige":0
+            })
+            .then(function(docRef) {
+                console.log("Document written with ID: ", docRef.id);
+            })
+            .catch(function(error) {
+                console.error("Error adding document: ", error);
+            });
+    }
+
+    const getUserData=(userId)=>{
+        var db = firebase.firestore();
+        db.collection("users").where("userId", "==", userId)
+            .get()
+            .then(function(querySnapshot) {
+                querySnapshot.forEach(function(doc) {
+                    // doc.data() is never undefined for query doc snapshots
+                    console.log(doc.id, " => ", doc.data());
+                });
+            })
+            .catch(function(error) {
+                console.log("Error getting documents: ", error);
+            });
     }
 
     const handleSubmit =(event)=>{
@@ -84,6 +100,8 @@ function RegisterContainer() {
         firebase.auth().createUserWithEmailAndPassword(state.username, state.pass)
             .then(data=>{
                 setSignup(true)
+                addUserData(data.user.uid)
+                //getUserData(data.user.uid)
                 setTimeout(()=>{
                     window.location = '/login'
                 }, 100)

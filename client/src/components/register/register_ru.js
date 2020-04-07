@@ -43,8 +43,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function RegisterComponent(props) {
-
-    console.log('Register: '+props)
     const classes = useStyles();
     return (
         <Container component="main" maxWidth="sm">
@@ -94,7 +92,6 @@ export default function RegisterComponent(props) {
                                     name="username"
                                     value={props.data.username}
                                     onChange={props.handleChange}
-                                    error={props.data.isFail}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -147,7 +144,7 @@ export default function RegisterComponent(props) {
                                         labelWidth={105}
                                     />
                                     <FormHelperText id="component-error-text" style={{display:props.data.isSamePass?'none':'block'}} error={!props.data.isSamePass}>The passwords do not match.</FormHelperText>
-                                    <FormHelperText id="component-error-text" style={{display:props.data.isFail?'block':'none'}} error={props.data.isFail}>An account is already using this email.</FormHelperText>
+                                    <FormHelperText id="component-error-text" style={{display:props.data.isFail?'block':'none'}} error={props.data.isFail}>{props.data.failText}</FormHelperText>
                                 </FormControl>
                             </Grid>
                         </Grid>

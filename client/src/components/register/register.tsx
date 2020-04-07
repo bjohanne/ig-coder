@@ -5,7 +5,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-function LoginComponent(props: any) {
+function RegisterComponent(props: any) {
     return (
         <div className="Container">
             <div className="row text-center">
@@ -125,4 +125,4 @@ function LoginComponent(props: any) {
     );
 }
 
-export default LoginComponent
+export default RegisterComponent
