@@ -126,7 +126,7 @@ export default function RegisterComponent(props) {
                                 <FormControl variant="outlined" fullWidth required error={!props.data.isSamePass}>
                                     <InputLabel htmlFor="outlined-adornment-password">Confirm Pass</InputLabel>
                                     <OutlinedInput
-                                        id="outlined-adornment-password"
+                                        id="outlined-adornment-password-confirm"
                                         name={'passConfirm'}
                                         type={props.data.showPassword ? 'text' : 'password'}
                                         value={props.data.passConfirm}
