@@ -42,7 +42,7 @@ function LoginComponent(props: any) {
 
                             <InputGroup className="mb-3">
                                 <Form.Control
-                                    type="password"
+                                    type={props.data.showPassword ? 'text' : 'password'}
                                     placeholder="Please enter password"
                                     required
                                     name="pass"
@@ -50,7 +50,12 @@ function LoginComponent(props: any) {
                                     onChange={props.handleChange}
                                 />
                                 <InputGroup.Append>
-                                    <Button variant="secondary">Show</Button>
+                                    <Button
+                                        variant="secondary"
+                                        onClick={props.handleClickShowPassword}
+                                    >
+                                        Show
+                                    </Button>
                                 </InputGroup.Append>
                             </InputGroup>
 

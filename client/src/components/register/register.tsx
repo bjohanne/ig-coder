@@ -66,7 +66,7 @@ function RegisterComponent(props: any) {
 
                             <InputGroup className="mb-3">
                                 <Form.Control
-                                    type="password"
+                                    type={props.data.showPassword ? 'text' : 'password'}
                                     placeholder="Please create a password"
                                     required
                                     name="pass"
@@ -74,7 +74,11 @@ function RegisterComponent(props: any) {
                                     onChange={props.handleChange}
                                 />
                                 <InputGroup.Append>
-                                    <Button variant="secondary">Show</Button>
+                                    <Button variant="secondary"
+                                            onClick={props.handleClickShowPassword}
+                                    >
+                                        Show
+                                    </Button>
                                 </InputGroup.Append>
                             </InputGroup>
 
@@ -89,7 +93,7 @@ function RegisterComponent(props: any) {
 
                             <InputGroup className="mb-3">
                                 <Form.Control
-                                    type="password"
+                                    type={props.data.showPassword ? 'text' : 'password'}
                                     placeholder="Please reenter your password"
                                     required
                                     name="passConfirm"
@@ -97,7 +101,12 @@ function RegisterComponent(props: any) {
                                     onChange={props.handleChange}
                                 />
                                 <InputGroup.Append>
-                                    <Button variant="secondary">Show</Button>
+                                    <Button variant="secondary"
+                                            onClick={props.handleClickShowPassword}
+                                    >
+                                        Show
+                                    </Button>
+
                                 </InputGroup.Append>
 
                             </InputGroup>
