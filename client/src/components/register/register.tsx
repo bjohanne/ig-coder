@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import FormHelperText from "@material-ui/core/FormHelperText";
 
 function RegisterComponent(props: any) {
     return (
@@ -77,14 +78,10 @@ function RegisterComponent(props: any) {
                                     <Button variant="secondary"
                                             onClick={props.handleClickShowPassword}
                                     >
-                                        Show
+                                        {props.data.showPassword ? 'Hide' : 'Show'}
                                     </Button>
                                 </InputGroup.Append>
                             </InputGroup>
-
-                            <small id="passwordHelpBlock" className="form-text text-muted">
-                                Your password must be at least 8 characters long and contain both letters and numbers.
-                            </small>
 
                         </Form.Group>
 
@@ -104,13 +101,13 @@ function RegisterComponent(props: any) {
                                     <Button variant="secondary"
                                             onClick={props.handleClickShowPassword}
                                     >
-                                        Show
+                                        {props.data.showPassword ? 'Hide' : 'Show'}
                                     </Button>
 
                                 </InputGroup.Append>
 
                             </InputGroup>
-
+                            <FormHelperText id="component-error-text" style={{display:props.data.isFail?'block':'none'}} error={props.data.isFail}>{props.data.failText}</FormHelperText>
                         </Form.Group>
 
                         <Row className="d-flex align-items-center">

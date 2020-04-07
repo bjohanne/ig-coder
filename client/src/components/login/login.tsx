@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import FormHelperText from "@material-ui/core/FormHelperText";
 
 function LoginComponent(props: any) {
     return (
@@ -54,9 +55,10 @@ function LoginComponent(props: any) {
                                         variant="secondary"
                                         onClick={props.handleClickShowPassword}
                                     >
-                                        Show
+                                        {props.data.showPassword ? 'Hide' : 'Show'}
                                     </Button>
                                 </InputGroup.Append>
+                                <FormHelperText id="component-error-text" style={{display:props.data.isFail?'block':'none'}} error={props.data.isFail}>{props.data.failText}</FormHelperText>
                             </InputGroup>
 
                             <Form.Group controlId="formBasicCheckbox">
@@ -67,7 +69,12 @@ function LoginComponent(props: any) {
 
                         <Row className="d-flex align-items-center">
                             <Col>
-                            <Button variant='outline-dark' type="submit" className="ml-auto w-75">
+                            <Button
+                                variant='outline-dark'
+                                type="submit"
+                                className="ml-auto w-75"
+                                onClick={props.handleSubmit}
+                            >
                                 Sign in
                             </Button>
                             </Col>

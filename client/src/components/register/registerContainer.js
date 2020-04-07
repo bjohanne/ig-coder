@@ -49,11 +49,13 @@ function RegisterContainer() {
     }
 
     const verfifyPassSame=()=>{
+        console.log('verify password same')
         setState(
             state=>(
                 {
                     ...state,
-                    isSamePass:state.pass===state.passConfirm
+                    isFail:state.pass!==state.passConfirm,
+                    failText:'The passwords do not match.',
                 }
             )
         )
