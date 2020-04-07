@@ -1,5 +1,4 @@
-import { NodeType, ComponentType, JunctionType, SubtreeType } from "./enums";
-import { BaseNode } from "./nodes/base";
+import { NodeType, ComponentType, JunctionType } from "./enums";
 import ComponentNode from "./nodes/component";
 
 /**
@@ -8,23 +7,22 @@ import ComponentNode from "./nodes/component";
 export interface INode {
     id:       number,
     document: number,   // ID of the Document this node belongs to
-    nodeType: NodeType,
-	subtree?: SubtreeType,	// What type of subtree the node is part of, if any
-    parent?:  number,		// ID of the node this node is a child of (undefined if root)
-    origin?:  number,		// ID of the node this node is a reference to (optional)
+    nodeType: NodeType;
+    origin?:  number,    // ID of the node this node is a reference to (optional)
+    parent?:  number,    // ID of the node this node is a child of (undefined if root)
+    children: INode[],   // Array of child nodes, more specified in the implementations
     createdAt: Date,
-    updatedAt: Date,
-    children: INode[]   // Array of child nodes, more specified in the implementations
+    updatedAt: Date
  }
 
 /**
  * The contract for the Component class
  */
  export interface IComponent {
-    content?: {
+    content: {
         main: string,
-        prefix: string,
-        suffix: string
+        prefix?: string,
+        suffix?: string
     }
  }
 
@@ -33,9 +31,8 @@ export interface INode {
  */
  export interface INormAndConvention {
      setEntry(statement: string) : void,
-	 unsetEntry() : void,
      getAttributes() : ComponentNode,
-     getObject() : BaseNode,
+     getObject() : ComponentNode,
      getAim() : ComponentNode,
      getConditions() : ComponentNode
  }
@@ -45,8 +42,7 @@ export interface INode {
   * Common members for Component and Subcomponent nodes
   */
  export interface IComponentAndSubNode {
-     setContent(content?: string, prefix?: string, suffix?: string) : void,
-	 unsetContent() : void
+     setContent(content?: string, prefix?: string, suffix?: string) : void
  }
 
  /**

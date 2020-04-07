@@ -1,52 +1,133 @@
 import './document.css'
-import React, { useEffect } from "react"; // , useRef
-import { connect } from "react-redux";
-import { getDocument, saveDocumentRequest } from "../state/actions";
-import EntryComponent from "./entry";
+import React, {useEffect} from "react";
+import {connect} from "react-redux";
+import {getDocument, saveDocumentRequest} from "../state/actions";
+// import NewEntryEditor from "./editor/newEntry";
+// import Accordion from "./units/accordion";
 import Document from "../core/model/document";
 
+
 interface IDocumentEditorProps {
-    documents: Array<Document>,
-	currentDocument: Document | null,
+    document: Document,
     getDocument: Function,
     saveDocumentRequest: Function,
     match: any
 }
 
-export function DocumentComponent(props: IDocumentEditorProps) {
+export function DocumentComponent(props: IDocumentEditorProps) {  // Also export the unconnected component for testing
+    // TODO: Update getDocument() params when new document is created?
     const {getDocument, match: {params: {id}}} = props;
+    useEffect(() => getDocument(id), [getDocument, id]);
 
-    useEffect(() => {
-		// There is no currentDocument, or the currentDocument is not the requested one
-        if (!props.currentDocument || props.currentDocument.id !== Number(id)) { // Convert the match params ID from string to number
-            getDocument(id);
-        }
-	}, [getDocument, id, props.currentDocument]);
-
-    /*
     const save = () => {
         props.saveDocumentRequest(props.document);
     };
-    */
 
     return (
-        props.currentDocument &&
+        props.document &&
         <div className="card">
             <div className="card-body">
                 <div className="row">
                     <div className="col-md-6">
-                        <h2 className="card-title">{props.currentDocument.name}</h2>
-                        <small className="text-muted">{props.currentDocument.description}</small>
+                        <h2 className="card-title">{props.document.name}</h2>
+                        <small className="text-muted">{props.document.description}</small>
                     </div>
-					<EntryComponent document={props.currentDocument}/>
+                    <div className="col-md-6 text-right">
+                        <a href={`/documents/${props.document.id}/entries/new`}
+                            className="btn btn-success">Create New Entry
+                        </a>
+                        {/*<NewEntryEditor*/}
+                        {/*    toggle={(show: any) => <button type="button" className="btn btn-success"*/}
+                        {/*                                   onClick={show}>Create New Entry</button>}*/}
+                        {/*    content={(hide: any) => (*/}
+                        {/*        <>*/}
+                        {/*            <Accordion close={hide} id={props.document.id}/>*/}
+                        {/*        </>*/}
+                        {/*    )}*/}
+                        {/*/>*/}
+                    </div>
                 </div>
+
+                <div className="card-body" id="accordion-root">
+                </div>
+            </div>
+
+            <div className="card-body entry-table">
+                {/*TODO: Remove this with actual generated table once we have real data*/}
+                <table className="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Content</th>
+                            <th scope="col">Parent</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...</td>
+                            <td>N/A</td>
+                            <td>
+                                <div className="row">
+                                    <div className="col">
+                                        <button type="button" className="btn btn-outline-primary btn-block">View</button>
+                                    </div>
+                                    <div className="col">
+                                        <button type="button" className="btn btn-outline-success btn-block">Edit</button>
+                                    </div>
+                                    <div className="col">
+                                        <button type="button" className="btn btn-outline-danger btn-block">Delete</button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...</td>
+                            <td><a href={"#"}> Entry 1 / Condition</a></td>
+                            <td>
+                                <div className="row">
+                                    <div className="col">
+                                        <button type="button" className="btn btn-outline-primary btn-block">View</button>
+                                    </div>
+                                    <div className="col">
+                                        <button type="button" className="btn btn-outline-success btn-block">Edit</button>
+                                    </div>
+                                    <div className="col">
+                                        <button type="button" className="btn btn-outline-danger btn-block">Delete</button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">3</th>
+                            <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...</td>
+                            <td><a href={"#"}> Entry 2 / Object</a></td>
+                            <td>
+                                <div className="row">
+                                    <div className="col">
+                                        <button type="button" className="btn btn-outline-primary btn-block">View</button>
+                                    </div>
+                                    <div className="col">
+                                        <button type="button" className="btn btn-outline-success btn-block">Edit</button>
+                                    </div>
+                                    <div className="col">
+                                        <button type="button" className="btn btn-outline-danger btn-block">Delete</button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     );
 }
 
 const mapStateToProps = (state: any) => ({
-    currentDocument: state.reducer.currentDocument
+    document: state.reducer.document,
+    entries: state.reducer.entries
 });
 
 const mapDispatchToProps = (dispatch: any) => ({

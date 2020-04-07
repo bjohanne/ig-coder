@@ -1,6 +1,6 @@
 import { BaseNode } from "./base";
 import { INode, IComponentAndSubNode, IOneChild } from "../interfaces";
-import { NodeType, SubcomponentType, SubtreeType, Arg } from "../enums";
+import { NodeType, SubcomponentType } from "../enums";
 import { Component } from "../component";
 
 import NormNode from "./norm";
@@ -11,27 +11,28 @@ import NegationNode from "./negation";
 /**
  * Subcomponent nodes represent subtypes of Object and Conditions components.
  * The Subcomponent node class has an internal method for adding children because
- * Subcomponent nodes have a variable number of children.
+ *   Subcomponent nodes have a varying number of children.
  */
 export default class SubcomponentNode extends BaseNode implements IComponentAndSubNode, IOneChild {
     nodeType: NodeType = NodeType.subcomponent;
-    subcomponentType!: SubcomponentType; // The type of subcomponent
-    component!: Component;  // Holds the actual text content
     children!: INode[]; // Any number of children (0-1)
+    subcomponentType!: SubcomponentType; // The type of subcomponent
+    component!: Component | undefined;  // Holds the actual text content
 
     /**
-     * Creates a new Subcomponent node with a dummy child and an empty Component.
+     * Creates a new Subcomponent node with a dummy child and a Component with text content "*".
+     * This text content is deleted when the node gets a new child. Alternatively, the text content can be updated,
+     * which deletes the dummy child.
      *
      * @param componentType This node's subcomponent type (Direct, Indirect, Activation, Execution)
      * @param document The ID of the document this node belongs to
-     * @param parent The ID of the node this node is a child of (the parent's children array must be set separately)
-	 * @param subtree (Optional) The subtree this node is part of. Should be the same as its parent - used to pass that down.
+     * @param parent (Optional) The ID of the node this node is a child of (the parent's children array must be set separately)
      * @param origin (Optional) The ID of the node this node is a reference to
      */
-    constructor(subcomponentType: SubcomponentType, document: number, parent: number, subtree?: SubtreeType, origin?: number) {
-        super(document, parent, subtree, origin);
+    constructor(subcomponentType: SubcomponentType, document: number, parent?: number, origin?: number) {
+        super(document, parent, origin);
         this.subcomponentType = subcomponentType;
-        this.component = new Component();
+        this.component = new Component("*");
         this.children = [ new BaseNode(document, this.id) ]; // Dummy child
     }
 
@@ -47,8 +48,7 @@ export default class SubcomponentNode extends BaseNode implements IComponentAndS
         } else if (this.children.length === 1) {
             this.children[0] = node; // Accessing index 0 is now safe
         }
-        this.unsetContent(); // Delete this node's text content
-		this.update();
+        this.component = undefined; // Delete this node's text content
     }
 
     /**
@@ -62,19 +62,10 @@ export default class SubcomponentNode extends BaseNode implements IComponentAndS
         if (this.subcomponentType === SubcomponentType.activation || this.subcomponentType === SubcomponentType.execution) {
             throw new Error("Cannot modify text content of Activation or Execution nodes");
         } else if (typeof this.component !== "undefined") {
-            this.component.set(content, prefix, suffix);
+            this.component.modify(content, prefix, suffix);
             this.children.length = 0;
-			this.update;
         }
     }
-
-	/**
-	 * Unsets the Component's content (not the Component itself, as it should always be present).
-	 */
-	unsetContent() : void {
-		this.component.unset();
-		this.update;
-	}
 
     // Getter for the child
     getChild() : INode {
@@ -89,19 +80,19 @@ export default class SubcomponentNode extends BaseNode implements IComponentAndS
 
     /**
      * Creates a Norm or Convention node as child of this node, if legal.
-     * @param type Whether to create a Norm or Convention node
-	 * @param statement (Optional) The full text of the statement
+     * @param deontic Whether to create a Norm or Convention node
+     *               (whether the statement contains a Deontic)
      * @param origin (Optional) The ID of the node the new node is a reference to
      */
-    createNormOrConventionNode(type: Arg.norm | Arg.convention, statement?: string, origin?: number) {
-        if (type === Arg.norm) {
+    createNormOrConventionNode(deontic: boolean, origin?: number) {
+        if (deontic) {
             if (this.subcomponentType === SubcomponentType.direct || this.subcomponentType === SubcomponentType.indirect) {
                 throw new Error("Subcomponent nodes of an Object subtype cannot have Norm nodes as children");
             } else {
-                this.addChild(new NormNode(this.document, statement, this.id, origin));
+                this.addChild(new NormNode(this.document, this.id, origin));
             }
         } else {
-            this.addChild(new ConventionNode(this.document, statement, this.id, origin));
+            this.addChild(new ConventionNode(this.document, this.id, origin));
         }
     }
 
@@ -109,27 +100,25 @@ export default class SubcomponentNode extends BaseNode implements IComponentAndS
      * Creates a Junction node as child of this node.
      */
     createJunctionNode() {
-        this.addChild(new JunctionNode(this.id, this.document, this.subtree, undefined, this.subcomponentType));
+        this.addChild(new JunctionNode(this.document, this.id));
     }
 
     /**
      * Creates a Negation node as child of this node.
      */
     createNegationNode() {
-        this.addChild(new NegationNode(this.document, this.id, this.subtree, undefined, this.subcomponentType));
+        this.addChild(new NegationNode(this.document, this.id));
     }
 
     /**
      * Creates a Subcomponent node as child of this node, if legal.
-	 * Activation and Execution nodes can only be created as fixed children.
-	 *
-     * @param subcomponentType The type of Subcomponent (Direct, Indirect)
+     * @param subcomponentType The type of Subcomponent (Direct, Indirect, Activation, Execution)
      * @param origin (Optional) The ID of the node this node is a reference to
      */
-    createSubcomponentNode(subcomponentType: SubcomponentType.direct | SubcomponentType.indirect, origin?: number) {
+    createSubcomponentNode(subcomponentType: SubcomponentType, origin?: number) {
         if (this.subcomponentType === SubcomponentType.activation || this.subcomponentType === SubcomponentType.execution) {
             throw new Error("Subcomponent nodes of a Conditions subtype cannot have Subcomponent nodes as children");
         }
-        this.addChild(new SubcomponentNode(subcomponentType, this.document, this.id, this.subtree, origin));
+        this.addChild(new SubcomponentNode(subcomponentType, this.document, this.id));
     }
 }
