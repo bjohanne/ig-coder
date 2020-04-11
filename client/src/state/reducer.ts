@@ -6,7 +6,6 @@ import {
     ADD_ENTRY_TO_DOCUMENT,
     SET_ACTIVE_NODE
 } from "./actionTypes";
-import { INode } from '../core/model/interfaces';
 
 interface IInitialState {
     documents: Array<Document>,
