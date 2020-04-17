@@ -3,15 +3,12 @@ import {
     GET_DOCUMENT_RESPONSE,
     CREATE_DOCUMENT,
     CREATE_DOCUMENT_RESPONSE,
-    ADD_ENTRY_TO_DOCUMENT,
-    ADD_ENTRY_WITH_TOKENIZATION,
     SAVE_DOCUMENT_REQUEST
 } from "./actionTypes";
 import {Middleware, MiddlewareAPI} from "redux";
 import axios, {AxiosResponse} from "axios";
 import {toast} from 'react-toastify';
 import appConfig from "../core/config/appConfig";
-import Document from "../core/model/document";
 
 export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: any) => (action: any) => {
     switch (action.type) {

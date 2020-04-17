@@ -9,8 +9,11 @@ import ComponentEditor from "./componenteditor";
 
 const Edit = (props: any) => {
     return (
-        props.activeNode && [NodeType.convention, NodeType.norm].indexOf(props.activeNode.nodeType) > -1  &&
-        (<EntryEditor close={props.close}/>) || (props.activeNode.nodeType === NodeType.component && (<ComponentEditor/>)) || (props.activeNode.nodeType === NodeType.junction && (<JunctionEditor/>)) || <h2>No Entry</h2>
+        ((props.activeNode && [NodeType.convention, NodeType.norm].indexOf(props.activeNode.nodeType) > -1)  &&
+        (<EntryEditor close={props.close}/>)) || 
+        (props.activeNode.nodeType === NodeType.component && (<ComponentEditor/>)) 
+        || (props.activeNode.nodeType === NodeType.junction && (<JunctionEditor/>)) 
+        || <h2>No Entry</h2>
     )
 }
 

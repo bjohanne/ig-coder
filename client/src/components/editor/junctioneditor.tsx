@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { connect } from "react-redux";
 import { INode } from "../../core/model/interfaces";
 import { updateEntry } from "../../state/actions";
