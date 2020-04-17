@@ -17,9 +17,9 @@ class LoginContainer extends React.Component {
     handleChange = (event) => {
         console.log(event.target)
         const {name, value, type, checked} = event.target
-        const actuaValue = type === "CheckBox" ? checked : value
+        const actualValue = type === "CheckBox" ? checked : value
         this.setState({
-            [name]: actuaValue,
+            [name]: actualValue,
             isFail: false
         })
     }

@@ -48,7 +48,7 @@ function RegisterContainer() {
         )
     }
 
-    const verfifyPassSame=()=>{
+    const verifyPassSame=()=>{
         console.log('verify password same')
         setState(
             state=>(
@@ -69,7 +69,7 @@ function RegisterContainer() {
                 "firstName":state.firstname,
                 "lastName":state.lastname,
                 "email":state.username,
-                "privilige":0
+                "privilege":0
             })
             .then(function(docRef) {
                 console.log("Document written with ID: ", docRef.id);
@@ -96,7 +96,7 @@ function RegisterContainer() {
 
     const handleSubmit =(event)=>{
         event.preventDefault()
-        if(!verfifyPassSame()){
+        if(!verifyPassSame()){
             return
         }
         firebase.auth().createUserWithEmailAndPassword(state.username, state.pass)
@@ -127,7 +127,7 @@ function RegisterContainer() {
 
     return (
         <div>
-            <TopAlertComponent props={{display:signup,displayText:'Sign up successfully! Now turning to Sign In page....'}}/>
+            <TopAlertComponent props={{display:signup,displayText:'Sign up successful! Taking you to Sign in page...'}}/>
             <RegisterComponent data={state} handleChange={handleChange} handleSubmit={handleSubmit} handleClickShowPassword={handleClickShowPassword}/>
         </div>
     )
