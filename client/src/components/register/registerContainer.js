@@ -1,6 +1,9 @@
 import React, {useState} from "react";
 import RegisterComponent from "./register";
 import TopAlertComponent from "../common/topAlert";
+import * as firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/firestore";
 
 function RegisterContainer() {
 
@@ -13,6 +16,7 @@ function RegisterContainer() {
             passConfirm:"",
             isSamePass:true,
             isFail:false,
+            failText:'',
             showPassword: false
         }
     )
@@ -20,9 +24,7 @@ function RegisterContainer() {
 
 
     const handleChange = (event) => {
-        console.log('handle change')
         const {name, value} = event.target
-        console.log(name+" "+value)
         setState(
             state=>(
                 {
@@ -33,11 +35,9 @@ function RegisterContainer() {
                 }
             )
         )
-       console.log(state)
     }
 
     const handleClickShowPassword = (event) => {
-        console.log(event.target)
         setState(
             state=>(
                 {
@@ -48,81 +48,86 @@ function RegisterContainer() {
         )
     }
 
-    const verfifyPassSame=()=>{
-        if(state.pass!==state.passConfirm){
-            setState(
-                state=>(
-                    {
-                        ...state,
-                        isSamePass:false
-                    }
-                )
+    const verifyPassSame=()=>{
+        console.log('verify password same')
+        setState(
+            state=>(
+                {
+                    ...state,
+                    isFail:state.pass!==state.passConfirm,
+                    failText:'The passwords do not match.',
+                }
             )
-            return false
-        }else {
-            setState(
-                state=>(
-                    {
-                        ...state,
-                        isSamePass:true
-                    }
-                )
-            )
-            return true
-        }
+        )
+        return state.pass===state.passConfirm
+    }
+
+    const addUserData=(userId)=>{
+        var db = firebase.firestore();
+        db.collection("users").add({
+                "userId":userId,
+                "firstName":state.firstname,
+                "lastName":state.lastname,
+                "email":state.username,
+                "privilege":0
+            })
+            .then(function(docRef) {
+                console.log("Document written with ID: ", docRef.id);
+            })
+            .catch(function(error) {
+                console.error("Error adding document: ", error);
+            });
+    }
+
+    const getUserData=(userId)=>{
+        var db = firebase.firestore();
+        db.collection("users").where("userId", "==", userId)
+            .get()
+            .then(function(querySnapshot) {
+                querySnapshot.forEach(function(doc) {
+                    // doc.data() is never undefined for query doc snapshots
+                    console.log(doc.id, " => ", doc.data());
+                });
+            })
+            .catch(function(error) {
+                console.log("Error getting documents: ", error);
+            });
     }
 
     const handleSubmit =(event)=>{
         event.preventDefault()
-        if(!verfifyPassSame()){
+        if(!verifyPassSame()){
             return
         }
-        const url="http://0.0.0.0:5000/users/register"
-        const data={
-            first_name:state.firstname,
-            last_name:state.lastname,
-            email:state.username,
-            password:state.pass
-        }
-        const otherPram ={
-            headers:{
-                "content-type":"application/json; charset=UTF-8"
-            },
-            body:JSON.stringify(data),
-            method:"POST"
-        }
-        fetch(url,otherPram).then(
-            data=>{return data.json()}
-        ).then(
-            res=>{
-                const {error, token, result}=res
-                if(error){
-                    setState(
-                        state=>(
-                            {
-                                ...state,
-                                isFail:true
-                            }
-                        )
+        firebase.auth().createUserWithEmailAndPassword(state.username, state.pass)
+            .then(data=>{
+                setSignup(true)
+                addUserData(data.user.uid)
+                //getUserData(data.user.uid)
+                setTimeout(()=>{
+                    window.location = '/login'
+                }, 100)
+            })
+            .catch((error)=> {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                setState(
+                    state=>(
+                        {
+                            ...state,
+                            isFail:true,
+                            failText:errorMessage
+                        }
                     )
-                }else if(result){
-                    console.log(result)
-                    setSignup(true)
-                    setTimeout(()=>{
-                        window.location = '/login'
-                    }, 100)
-
-                }
-            }
-        ).catch(
-            error=>console.error(error)
-        )
+                )
+            });
         console.log("handle submit")
     }
 
     return (
         <div>
-            <TopAlertComponent props={{display:signup,displayText:'Sign up successfully! Now turning to Sign In page....'}}/>
+            <TopAlertComponent props={{display:signup,displayText:'Sign up successful! Taking you to Sign in page...'}}/>
             <RegisterComponent data={state} handleChange={handleChange} handleSubmit={handleSubmit} handleClickShowPassword={handleClickShowPassword}/>
         </div>
     )

@@ -4,8 +4,9 @@ import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import FormHelperText from "@material-ui/core/FormHelperText";
 
-function LoginComponent(props: any) {
+function RegisterComponent(props: any) {
     return (
         <div className="Container">
             <div className="row text-center">
@@ -66,7 +67,7 @@ function LoginComponent(props: any) {
 
                             <InputGroup className="mb-3">
                                 <Form.Control
-                                    type="password"
+                                    type={props.data.showPassword ? 'text' : 'password'}
                                     placeholder="Please create a password"
                                     required
                                     name="pass"
@@ -74,13 +75,13 @@ function LoginComponent(props: any) {
                                     onChange={props.handleChange}
                                 />
                                 <InputGroup.Append>
-                                    <Button variant="secondary">Show</Button>
+                                    <Button variant="secondary"
+                                            onClick={props.handleClickShowPassword}
+                                    >
+                                        {props.data.showPassword ? 'Hide' : 'Show'}
+                                    </Button>
                                 </InputGroup.Append>
                             </InputGroup>
-
-                            <small id="passwordHelpBlock" className="form-text text-muted">
-                                Your password must be at least 8 characters long and contain both letters and numbers.
-                            </small>
 
                         </Form.Group>
 
@@ -89,7 +90,7 @@ function LoginComponent(props: any) {
 
                             <InputGroup className="mb-3">
                                 <Form.Control
-                                    type="password"
+                                    type={props.data.showPassword ? 'text' : 'password'}
                                     placeholder="Please reenter your password"
                                     required
                                     name="passConfirm"
@@ -97,11 +98,16 @@ function LoginComponent(props: any) {
                                     onChange={props.handleChange}
                                 />
                                 <InputGroup.Append>
-                                    <Button variant="secondary">Show</Button>
+                                    <Button variant="secondary"
+                                            onClick={props.handleClickShowPassword}
+                                    >
+                                        {props.data.showPassword ? 'Hide' : 'Show'}
+                                    </Button>
+
                                 </InputGroup.Append>
 
                             </InputGroup>
-
+                            <FormHelperText id="component-error-text" style={{display:props.data.isFail?'block':'none'}} error={props.data.isFail}>{props.data.failText}</FormHelperText>
                         </Form.Group>
 
                         <Row className="d-flex align-items-center">
@@ -125,4 +131,4 @@ function LoginComponent(props: any) {
     );
 }
 
-export default LoginComponent
+export default RegisterComponent

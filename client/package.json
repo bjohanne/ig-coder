@@ -20,6 +20,7 @@
     "axios": "^0.19.0",
     "bootstrap": "^4.3.1",
     "d3": "^5.12.0",
+    "firebase": "^7.14.1",
     "immutability-helper": "^3.0.1",
     "react": "^16.11.0",
     "react-bootstrap": "^1.0.0",

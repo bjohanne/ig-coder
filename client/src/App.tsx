@@ -25,9 +25,12 @@ import 'react-toastify/dist/ReactToastify.css';
 
 // Config
 import appConfig from "./core/config/appConfig";
+import * as firebase from "firebase/app";
+import {firebaseConfig} from "./core/config/appConfig";
 
 
 function App() {
+	firebase.initializeApp(firebaseConfig);
     return (
         <Provider store={store}>
 			<PersistGate loading={null} persistor={persistor}>
