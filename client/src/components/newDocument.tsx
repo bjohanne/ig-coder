@@ -1,9 +1,10 @@
-import React, {useEffect, useState, useRef} from "react";
+import React, {useState, useRef} from "react";
 import {connect} from "react-redux";
 import {createDocument} from "../state/actions";
 import appConfig from "../core/config/appConfig";
 import {withRouter, Redirect} from 'react-router-dom';
 import {toast} from 'react-toastify';
+import usePrevious from '../core/helpers/usePrevious';
 import './newDocument.css'
 
 export function NewDocumentComponent(props: any) {
@@ -25,7 +26,7 @@ export function NewDocumentComponent(props: any) {
 		} else {
 			toast.dismiss();
             createDocument({name: form.name, description: form.description, forest: "[]"});
-			if (buttonEl && buttonEl.current) {	// Null check for TypeScript
+			if (buttonEl && buttonEl.current) {
 				buttonEl.current.disabled = true;	// Disable the submit button to prevent multiple requests being sent
 			}
 			setRedirect(true); // This is the trigger for redirecting
@@ -59,17 +60,6 @@ export function NewDocumentComponent(props: any) {
         </div>
     );
 }
-
-/*
- Custom hook to get the previous value of a prop
-*/
-const usePrevious = <T extends {}>(prop: T) => {
-	const ref = useRef<T>();
-	useEffect(() => {
-		ref.current = prop;
-	});
-	return ref.current;
-};
 
 const mapStateToProps = (state: any) => ({
     addedDocument: state.reducer.currentDocument

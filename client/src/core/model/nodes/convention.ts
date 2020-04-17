@@ -1,4 +1,4 @@
-import { BaseNode } from "./base";
+import BaseNode from "./base";
 import ComponentNode from "./component";
 import { Entry } from "../entry";
 import { NodeType, ComponentType, SubtreeType } from "../enums";
@@ -57,7 +57,7 @@ export default class ConventionNode extends BaseNode implements INormAndConventi
     }
 
     getObject() : BaseNode {
-		if (typeof this.children[1].nodeType === "undefined") {
+		if (this.children[1].isDummy()) {
 			throw new Error("This Convention node does not have an Object child");
 		}
         return this.children[1];

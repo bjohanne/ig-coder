@@ -17,7 +17,7 @@ Notes and guidelines for the data model
   This will delete them in the tree structure, but variables pointing to them will still be valid.
   The actual data the variables point to will not be deleted until they all go out of scope.
 - Several node types are created with dummy children. These children are of the BaseNode class
-  and can be checked for using 'typeof <node>.nodeType === "undefined"'. All getter functions check for dummy nodes,
+  and can be checked for using BaseNode.isDummy(). All getter functions check for dummy nodes,
   and throw an error if one is found.
 - Component and Subcomponent nodes with a dummy child are considered leaf nodes.
 
@@ -31,7 +31,7 @@ Notes and guidelines for the data model
 it('Basic statement test', () => {
     // Setup
     const statement = "The Program Manager may initiate suspension or revocation proceedings against a certified operation";
-    const document = new Document("Program Manager Policy", "description is missing", 101);
+    const document = new Document("Program Manager Policy", "Description", 101);
     const id = document.id;
     document.createTree(Arg.norm, statement);
     let root = document.getRoot() as NormNode;
@@ -82,15 +82,15 @@ it('Basic statement test', () => {
 /**
  * Tests miscellaneous functionality like node deletion and adding and deleting Sanction nodes.
  */
-it('Test for miscellaneous functionality', () => {
+it('Miscellaneous functionality', () => {
     // Setup
-    const document = new Document("Test Policy", "description is missing", 102);
+    const document = new Document("Test Policy", "Description", 101);
     const id = document.id;
     document.createTree(Arg.norm);
 
 	// Setting and unsetting text content
-	let root = document.getRoot();
-	let attr = root.getAttributes() as ComponentNode;
+	let root1 = document.getRoot() as NormNode;
+	let attr = root1.getAttributes() as ComponentNode;
 	expect(attr.component.content).toBeUndefined();
 	attr.setContent("two", "one", "three");				// Setting content first time
 	expect(attr.component.content.main).toEqual("two");
@@ -103,36 +103,45 @@ it('Test for miscellaneous functionality', () => {
 	expect(attr.component.content).toBeUndefined();
 
     // Deleting a tree
-    root = document.getRoot();
-    expect(root).toBeDefined();
+    let root2 = document.getRoot() as NormNode;
+    expect(root2).toBeDefined();
     document.deleteTree(0);
-    root = document.getRoot();
-    expect(root).toBeUndefined();
+    let root3 = document.getRoot() as NormNode;
+    expect(root3).toBeUndefined();
 
     // Adding a Sanction node to a tree
     document.createTree(Arg.convention);
-    root = document.getRoot() as ConventionNode;
-    expect(root.nodeType).toEqual(NodeType.convention);
+    let root4 = document.getRoot() as ConventionNode;
+    expect(root4.nodeType).toEqual(NodeType.convention);
     document.addSanctionNodeToTree(0);
-    root = document.getRoot() as SanctionNode;
-    expect(root.nodeType).toEqual(NodeType.sanction);
+    let root5 = document.getRoot() as SanctionNode;
+    expect(root5.nodeType).toEqual(NodeType.sanction);
 
 	// The subtree rule: no Component nodes outside of a Norm/Convention subtree
-	root.createJunctionNode(Arg.right);
-	let junction = root.getRight() as JunctionNode;
-	expect(() => { junction.createComponentNode(ComponentType.norm, Arg.left) }).toThrow("subtree");
+	root5.createJunctionNode(Arg.right);
+	let junction = root5.getRight() as JunctionNode;
+	expect(() => { junction.createComponentNode(ComponentType.object, Arg.left) }).toThrow("subtree");
 
 	// Deleting the Sanction node
     document.deleteSanctionNodeFromTree(0);
 
-
     // Nested children of the same node type; child deletion
-    root = document.getRoot() as ConventionNode;
-    attr = root.getAttributes() as ComponentNode;
+    let root6 = document.getRoot() as ConventionNode;
+    attr = root6.getAttributes() as ComponentNode;
     attr.createJunctionNode();
     let junction1 = attr.getChild() as JunctionNode;
     junction1.createJunctionNode(Arg.left);
     let junction2 = junction1.getLeft() as JunctionNode;
     attr.deleteChild(Arg.only);
     expect(() => { attr.getChild() }).toThrow("dummy"); // Newly deleted child should be a dummy node
+});
+
+it('Find a node by ID', () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", 101);
+    const id = document.id;
+    debugger;
+    document.createTree(Arg.norm);
+
+    console.log(JSON.stringify(document, null, 2));
 });

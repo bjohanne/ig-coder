@@ -1,6 +1,6 @@
 import { INode } from "./interfaces";
-import { Arg } from "./enums";
-import { NormNode, ConventionNode, SanctionNode } from "./nodes";
+import { Arg, NodeType } from "./enums";
+import { BaseNode, NormNode, ConventionNode, SanctionNode } from "./nodes";
 
 // Interface for a Document object with empty forest
 interface IEmptyDocument {
@@ -43,7 +43,7 @@ export default class Document {
      * or undefined if there are no trees in the forest.
      */
     getRoot() : INode | undefined {
-        if (this.forest.length >= 0) {
+        if (this.forest.length > 0) {
             return this.forest[0];
         }
         return undefined;
@@ -110,6 +110,42 @@ export default class Document {
         }
     }
 
+	/**
+	 * Toggle ON negation of the passed in node.
+	 * Adds a Negation node as parent of targetNode and hooks it into the tree.
+	 * @param targetNode The node that should get a Negation parent; must be either Norm, Convention or Negation
+	 */
+	turnOnNegation(targetNode: BaseNode) {
+		if ( ![NodeType.norm, NodeType.convention, NodeType.junction].includes(targetNode.nodeType) ) {
+			throw new Error("Cannot toggle negation of node types other than Norm, Convention and Junction");
+		}
+		let parentId = targetNode.parent;
+		let parentNode = this.find(parentId);
+	}
+
+	/**
+	 * Toggle OFF negation of the passed in node.
+	 * Removes the parent Negation node of targetNode and mends the tree.
+	 * @param targetNode The child of the Negation node that should be removed; must be either Norm, Convention or Negation
+	 */
+	turnOffNegation(targetNode: BaseNode) {
+		if ( ![NodeType.norm, NodeType.convention, NodeType.junction].includes(targetNode.nodeType) ) {
+			throw new Error("Cannot toggle negation of node types other than Norm, Convention and Junction");
+		}
+	}
+
+	/**
+	 * Find and return a node by ID.
+	 * @param targetId The ID of the node to be retrieved.
+	 * @return A reference to the node if found, undefined otherwise
+	 */
+	private find(targetId: number) : BaseNode | undefined {
+		this.forest.forEach(root => {	// Search in each tree in the forest
+			root.find(targetId);
+		});
+		return undefined;
+	}
+
     /**
      * Validate this document against the restrictions set in the specification.
      */
@@ -135,7 +171,7 @@ export default class Document {
 
 /**
  * Keeps track of the current and next node ID in each document
- * Node IDs start at 1 because I've had issues passing the value 0
+ * Node IDs start at 1 because I've had trouble passing the value 0
  * in functions to set the parent for new nodes.
  */
 export class NodeCounter {
@@ -154,6 +190,9 @@ export class NodeCounter {
         return NodeCounter.instance;
     }
 
+	/**
+	 * @param id ID of the Document in question
+	 */
     getNextNodeId(id: number) : number {
         if(typeof(this.documents[id]) !== "undefined") {
             this.documents[id] +=1;
@@ -163,6 +202,9 @@ export class NodeCounter {
         return this.documents[id];
     }
 
+	/**
+	 * @param id ID of the Document in question
+	 */
     getCurrentNodeId(id: number) : number {
         if(typeof(this.documents[id]) !== "undefined") {
             return this.documents[id];

@@ -6,7 +6,7 @@ import { NodeCounter } from "../document";
  * The base node has the implementation of INode.
  * It is also used as dummy children for several node types.
  */
-export class BaseNode implements INode {
+export default class BaseNode implements INode {
     id!: number;
     document!: number;
     nodeType!: NodeType;
@@ -41,6 +41,30 @@ export class BaseNode implements INode {
         this.updatedAt = new Date();
     }
 
+    /**
+     * Check whether this node is a dummy node, i.e. a BaseNode.
+     * (Defined here in order to be available to all node classes)
+     * Plain base nodes do not have the nodeType field.
+     * NB: The check must be done in this way, not simply "instanceof BaseNode",
+     * because that test counts inheritance => all node types pass.
+     */
+    isDummy() : boolean {
+        return (typeof this.nodeType === "undefined");
+    }
+
+    /**
+     * Recursively search for a descendant node with the passed in ID.
+     * On a match, return the node.
+     */
+    find(targetId: number) : BaseNode {
+        if (this.id === targetId) {
+            return this;
+        }
+        this.children.forEach(child => {
+            child.find(targetId);
+        });
+    }
+
 	/**
 	 * Small abstraction/convenience to set the updatedAt field.
 	 * Called when a property on the node is modified or when a child is created on the node.
@@ -65,9 +89,11 @@ export class BaseNode implements INode {
 	deleteChild(childPos: Arg.left | Arg.right | Arg.only) {
 		let index;
 
-		if (this.nodeType === NodeType.norm || this.nodeType === NodeType.convention) { // In case this is called on a Norm/Convention node
+        // In case this is called on a Norm/Convention node
+		if (this.nodeType === NodeType.norm || this.nodeType === NodeType.convention) {
 			throw new Error("Cannot delete fixed children of Norm and Convention nodes");
-		} else if (this.nodeType === NodeType.junction || this.nodeType === NodeType.sanction) { // Node types that have two non-fixed children
+        // Node types that have two non-fixed children
+		} else if (this.nodeType === NodeType.junction || this.nodeType === NodeType.sanction) {
 			if (childPos === Arg.only) {
 				throw new Error("Cannot delete only child of a Junction or Sanction node");
 			}

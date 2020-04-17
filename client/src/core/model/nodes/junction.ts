@@ -1,4 +1,4 @@
-import { BaseNode } from "./base";
+import BaseNode from "./base";
 import { INode, ITwoChildren } from "../interfaces";
 import { JunctionType, NodeType, ComponentType, SubcomponentType, SubtreeType, Arg } from "../enums";
 
@@ -50,14 +50,14 @@ export default class JunctionNode extends BaseNode implements ITwoChildren {
 	/* Getters for the children */
 
 	getLeft() : INode {
-		if (typeof this.children[0].nodeType === "undefined") {
+		if (this.children[0].isDummy()) {
 			throw new Error("Left child of this Junction node is a dummy node");
 		}
 		return this.children[0];
 	}
 
 	getRight() : INode {
-		if (typeof this.children[1].nodeType === "undefined") {
+		if (this.children[1].isDummy()) {
 			throw new Error("Right child of this Junction node is a dummy node");
 		}
 		return this.children[1];

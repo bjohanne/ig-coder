@@ -1,4 +1,4 @@
-import { BaseNode } from "./base";
+import BaseNode from "./base";
 import { INode, IComponentAndSubNode, IOneChild } from "../interfaces";
 import { NodeType, SubcomponentType, SubtreeType, Arg } from "../enums";
 import { Component } from "../component";
@@ -81,7 +81,7 @@ export default class SubcomponentNode extends BaseNode implements IComponentAndS
         if (this.children.length === 0) {
             throw new Error("This Subcomponent node has no children");
         }
-        if (typeof this.children[0].nodeType === "undefined") {
+        if (this.children[0].isDummy()) {
             throw new Error("The child of this Subcomponent node is a dummy node");
         }
         return this.children[0];

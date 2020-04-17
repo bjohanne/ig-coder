@@ -1,5 +1,5 @@
 import { NodeType, ComponentType, JunctionType, SubtreeType } from "./enums";
-import { BaseNode } from "./nodes/base";
+import BaseNode from "./nodes/base";
 import ComponentNode from "./nodes/component";
 
 /**
@@ -14,7 +14,9 @@ export interface INode {
     origin?:  number,		// ID of the node this node is a reference to (optional)
     createdAt: Date,
     updatedAt: Date,
-    children: INode[]   // Array of child nodes, more specified in the implementations
+    children: INode[],   // Array of child nodes, more specified in the implementations
+    isDummy() : boolean,
+    find(targetId: number) : BaseNode
  }
 
 /**
