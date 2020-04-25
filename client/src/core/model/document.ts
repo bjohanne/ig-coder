@@ -60,7 +60,7 @@ export default class Document {
     createTree(type: Arg.norm | Arg.convention, statement?: string) {
         let node = (type === Arg.norm) ? new NormNode(this.id, statement)
             : new ConventionNode(this.id, statement);
-        this.forest.splice(0, 1, node);	// Replace element at index 0
+        this.forest.splice(0, 1, node);	// Replace 1 element at index 0
     }
 
     /**
@@ -113,14 +113,20 @@ export default class Document {
 	/**
 	 * Toggle ON negation of the passed in node.
 	 * Adds a Negation node as parent of targetNode and hooks it into the tree.
-	 * @param targetNode The node that should get a Negation parent; must be either Norm, Convention or Negation
+	 * @param targetNode The node that should get a Negation parent; must be either Norm, Convention or Junction
 	 */
 	turnOnNegation(targetNode: BaseNode) {
 		if ( ![NodeType.norm, NodeType.convention, NodeType.junction].includes(targetNode.nodeType) ) {
 			throw new Error("Cannot toggle negation of node types other than Norm, Convention and Junction");
 		}
+
 		let parentId = targetNode.parent;
-		let parentNode = this.find(parentId);
+		if (typeof parentId === "undefined") {	// targetNode is the root of its tree
+
+		} else {
+			let parentNode = this.find(parentId);
+			//parentNode.createNegationNode();
+		}
 	}
 
 	/**
@@ -136,14 +142,35 @@ export default class Document {
 
 	/**
 	 * Find and return a node by ID.
+	 * Searches in each of this document's trees.
 	 * @param targetId The ID of the node to be retrieved.
 	 * @return A reference to the node if found, undefined otherwise
 	 */
-	private find(targetId: number) : BaseNode | undefined {
-		this.forest.forEach(root => {	// Search in each tree in the forest
-			root.find(targetId);
+	find(targetId: number) : BaseNode {
+		debugger;
+		/*
+		let node;
+		this.forest.forEach(root => {
+			node = this.findCore(root, targetId);
+			if (node) {
+				return node;
+			}
 		});
 		return undefined;
+		*/
+		return this.findCore(this.forest[0], targetId);
+	}
+
+	// TODO: Rename this and add comments from BaseNode
+	findCore(root: BaseNode, targetId: number) : BaseNode {
+		const stack = [ root ];
+		while (stack.length) {
+			const node = stack.shift();
+			if (node.id === targetId) {
+				return node;
+			}
+			node.children && stack.push(...node.children);
+		}
 	}
 
     /**
@@ -154,7 +181,7 @@ export default class Document {
     }
 
     /**
-     * Recursively re-build an ADICO tree fetched from the database
+     * Recursively re-build an ABDICO tree fetched from the database
      */
     fromJSON(jsonData: object) {
         // TODO

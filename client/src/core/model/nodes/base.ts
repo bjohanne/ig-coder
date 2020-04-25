@@ -53,16 +53,20 @@ export default class BaseNode implements INode {
     }
 
     /**
-     * Recursively search for a descendant node with the passed in ID.
+     * Iteratively search for a descendant node with the passed in ID.
      * On a match, return the node.
+     * NB: The test runs, but debugging reveals errors.
      */
     find(targetId: number) : BaseNode {
-        if (this.id === targetId) {
-            return this;
+        debugger;
+        const stack = [ this ];
+        while (stack.length) {
+            const node = stack.shift();
+            if (node.id === targetId) {
+                return node;
+            }
+            node.children && stack.push(...node.children);
         }
-        this.children.forEach(child => {
-            child.find(targetId);
-        });
     }
 
 	/**
@@ -87,9 +91,8 @@ export default class BaseNode implements INode {
 	 * @param childPos Which child to delete (left, right, only)
      */
 	deleteChild(childPos: Arg.left | Arg.right | Arg.only) {
-		let index;
+		let index;    // The child's index in the parent's child array
 
-        // In case this is called on a Norm/Convention node
 		if (this.nodeType === NodeType.norm || this.nodeType === NodeType.convention) {
 			throw new Error("Cannot delete fixed children of Norm and Convention nodes");
         // Node types that have two non-fixed children
@@ -98,7 +101,7 @@ export default class BaseNode implements INode {
 				throw new Error("Cannot delete only child of a Junction or Sanction node");
 			}
 			index = (childPos === Arg.left) ? 0 : 1;
-		} else { // The remaining three node types have or can have one child
+		} else { // The remaining three node types have one or no children
 			// A left or right child of a Component node must be a fixed child, which should not be deleted
 			if (childPos !== Arg.only) {
 				throw new Error("Cannot delete left or right child of a Component, Subcomponent or Negation node");
@@ -112,8 +115,8 @@ export default class BaseNode implements INode {
 			index = 0;
 		}
 
-		if (typeof this.children[index] === "undefined") {
-			throw new Error("The specified child does not exist");
+		if (this.children[index].isDummy()) {
+			throw new Error("The specified child is a dummy node");
 		}
 		this.children[index] = new BaseNode(this.document, this.id);
 	}
