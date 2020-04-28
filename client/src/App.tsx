@@ -9,6 +9,7 @@ import {BrowserRouter, Route, Switch} from "react-router-dom";
 import './App.css';
 import { store, persistor } from "./state/store";
 import { PersistGate } from "redux-persist/integration/react";
+import ReactTooltip from "react-tooltip";
 
 // Components
 import Navbar from "./components/common/navbar";
@@ -52,6 +53,7 @@ function App() {
 					pauseOnHover={true}
 					draggable={false}
 				/>
+                <ReactTooltip/>
 			</PersistGate>
         </Provider>
     );

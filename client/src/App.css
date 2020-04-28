@@ -71,3 +71,7 @@
 .toast-body {
 	padding-left: 8px;
 }
+
+.component-editor-entry-text, .component-editor-input-controls {
+    padding: 1rem;
+}

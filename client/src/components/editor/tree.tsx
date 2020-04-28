@@ -58,7 +58,6 @@ const TreeComponent = (props: Proptype) => {
 
     const update = (rootNode: INode) => {
         select(svgNode).selectAll("nodes").remove();
-        console.log("UPDATE FUNCTION RUNNING");
         let root = hierarchy(rootNode, (d: INode) => d.children);
         let treeNodes = treeLayout(root);
         let nodes = treeNodes.descendants().filter((node: any) => !!node.data.nodeType);
@@ -104,6 +103,7 @@ const TreeComponent = (props: Proptype) => {
             })
             .attr("data-html", true)
             .on("click", nodeToggle)
+
         nodeEnter.append("text")
             .attr('text-anchor', 'middle')
             .attr('alignment-baseline', 'middle')
@@ -111,6 +111,13 @@ const TreeComponent = (props: Proptype) => {
             .attr("fill-opacity", 1)
             .attr("fill", "white")
             .attr("pointer-events", "none")
+            .attr("data-tip", (d: any) => {
+                if (d.data.nodeType === NodeType.component && d.data.component.content) {
+                    return `<strong>${d.data.nodeType}</strong><br/><strong>${d.data.componentType}</strong>: ${(d.data.component && d.data.component.content.main) || "Empty"}`;
+                }
+                return `${d.data.nodeType && d.data.nodeType.toString()} ${d.data.subcomponentType || ""}` || `<strong>Missing type</strong>`;
+            })
+            .attr("data-html", true)
             .text((d: any) => d.data.id);
     }
 
@@ -129,7 +136,7 @@ const TreeComponent = (props: Proptype) => {
 
     const nodeToggle = (treeNode: any) => {
         if (props.setActiveNode) {
-            props.setActiveNode(treeNode.data);
+            props.setActiveNode(treeNode);
             toggle();
         }
     }
