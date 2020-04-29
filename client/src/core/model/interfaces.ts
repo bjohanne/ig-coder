@@ -1,6 +1,7 @@
 import { NodeType, ComponentType, JunctionType, SubtreeType } from "./enums";
 import { BaseNode } from "./nodes/base";
 import ComponentNode from "./nodes/component";
+import { Entry } from "./entry";
 
 /**
  * The interface implemented by all nodes
@@ -32,6 +33,7 @@ export interface INode {
  * Common members for Norm and Convention nodes
  */
  export interface INormAndConvention {
+     entry?: Entry,
      setEntry(statement: string) : void,
 	 unsetEntry() : void,
      getAttributes() : ComponentNode,

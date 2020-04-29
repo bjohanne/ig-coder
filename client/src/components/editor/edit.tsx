@@ -8,11 +8,12 @@ import JunctionEditor from "./junctioneditor";
 import ComponentEditor from "./componenteditor";
 
 const Edit = (props: any) => {
+    let activeNode = props.activeNode.data
     return (
-        ((props.activeNode && [NodeType.convention, NodeType.norm].indexOf(props.activeNode.nodeType) > -1)  &&
+        ((activeNode && [NodeType.convention, NodeType.norm].indexOf(activeNode.nodeType) > -1)  &&
         (<EntryEditor close={props.close}/>)) || 
-        (props.activeNode.nodeType === NodeType.component && (<ComponentEditor/>)) 
-        || (props.activeNode.nodeType === NodeType.junction && (<JunctionEditor/>)) 
+        (activeNode.nodeType === NodeType.component && (<ComponentEditor/>)) 
+        || (activeNode.nodeType === NodeType.junction && (<JunctionEditor/>)) 
         || <h2>No Entry</h2>
     )
 }
@@ -23,7 +24,6 @@ const mapStateToProps = (state: any) => ({
 
 const mapDispatchToProps = (dispatch: any) => ({
     updateEntry: (node: INode) => dispatch(updateEntry(node)),
-
 });
 
 export default connect(

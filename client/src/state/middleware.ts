@@ -33,7 +33,7 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
             break;
         case SAVE_DOCUMENT_REQUEST:
             axios.patch(`${appConfig.api.baseUrl}/documents`, action.payload).then((response) => {
-                let toaster = response.status === 204 ? toast.success : toast.error;
+                let toaster = response.status === 200 ? toast.success : toast.error;
                 toaster('Document saved!');
             });
             break;
