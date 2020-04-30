@@ -15,8 +15,8 @@ export interface INode {
     createdAt: Date,
     updatedAt: Date,
     children: INode[],   // Array of child nodes, more specified in the implementations
-    isDummy() : boolean,
-    find(targetId: number) : BaseNode
+    isDummy() : boolean//,
+    //find(targetId: number) : BaseNode
  }
 
 /**

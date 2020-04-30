@@ -198,14 +198,49 @@ it('Find a node by ID', () => {
     const document = new Document("Test Policy", "Description", documentId);
     document.createTree(Arg.norm);
 
-    // BaseNode function
-    /*let root = document.getRoot() as NormNode;
-    let node1 = root.find(4) as BaseNode;
+	// Without tree index
+    let node1 = document.find(9) as BaseNode;
     expect(node1).toBeDefined();
-    expect(node1.id).toEqual(4);
-*/
-    // Document function
-    let node2 = document.find(9) as BaseNode;
+    expect(node1.id).toEqual(9);
+
+	// With tree index
+	let node2 = document.find(4, 0) as BaseNode;
     expect(node2).toBeDefined();
-    expect(node2.id).toEqual(9);
+    expect(node2.id).toEqual(4);
+});
+
+//------------------------------------------------------------------------------
+
+it('Toggle negation of a root node', () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", documentId);
+    document.createTree(Arg.norm);
+
+	// Toggling negation of a root node
+    let root = document.getRoot() as NormNode;
+	document.turnOnNegation(root, 0);
+	expect(document.getRoot().nodeType === NodeType.negation);
+	document.turnOffNegation(root, 0);
+	expect(document.getRoot().nodeType === NodeType.norm);
+});
+
+//------------------------------------------------------------------------------
+
+it('Toggle negation of a non-root node', () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", documentId);
+    document.createTree(Arg.norm);
+
+	// Toggling negation of a non-root node
+	let root = document.getRoot() as NormNode;
+	let attr = root.getAttributes() as ComponentNode;
+	attr.createJunctionNode();
+    let junction = attr.getChild() as JunctionNode;
+	document.turnOnNegation(junction, 0);
+	let child = attr.getChild() as BaseNode;
+	expect(child.nodeType === NodeType.negation);
+	// Attempting to turn on negation of a Negation node, which is forbidden
+	expect(() => { document.turnOnNegation(child, 0) }).toThrow();
+	document.turnOffNegation(junction, 0);
+	expect(attr.getChild().nodeType === NodeType.junction);
 });

@@ -1,6 +1,6 @@
 import { INode } from "./interfaces";
 import { Arg, NodeType } from "./enums";
-import { BaseNode, NormNode, ConventionNode, SanctionNode } from "./nodes";
+import { BaseNode, NormNode, ConventionNode, JunctionNode, SanctionNode, NegationNode, ComponentNode, SubcomponentNode } from "./nodes";
 
 // Interface for a Document object with empty forest
 interface IEmptyDocument {
@@ -77,6 +77,34 @@ export default class Document {
 		}
     }
 
+	/**
+	 * Find and return a node by ID.
+     * Iteratively searches for a node with the passed in ID, in the entire document's forest by default.
+	 * @param targetId The ID of the node to be retrieved.
+	 * @param tree (Optional) The forest array index of the tree to search in.
+	 * @return A reference to the node if found, undefined otherwise
+     */
+	find(targetId: number, tree?: number) : BaseNode {
+		if (tree && tree >= this.forest.length) {
+			throw new Error("array out of bounds");	// This will be a custom error
+		}
+
+		let stack;
+		if (typeof tree === "undefined") {	// Parameter "tree" is not provided
+			stack = [ ...this.forest as BaseNode[] ];	// Search the entire forest
+		} else {							// Parameter "tree" is provided - can be 0
+			stack = [ this.forest[tree] ];	// Search only in the provided tree
+		}
+
+		while (stack.length) {
+			const node = stack.shift() as BaseNode;
+			if (node.id === targetId) {
+				return node;
+			}
+			node.children && stack.push(...node.children as BaseNode[]);	// Push the children to the stack, if any
+		}
+	}
+
     /**
      * Creates a Sanction node and makes it the root of the given tree.
      * The old root is made the Sanction node's left child.
@@ -114,18 +142,36 @@ export default class Document {
 	 * Toggle ON negation of the passed in node.
 	 * Adds a Negation node as parent of targetNode and hooks it into the tree.
 	 * @param targetNode The node that should get a Negation parent; must be either Norm, Convention or Junction
+	 * @param tree The forest array index of the tree targetNode is in
 	 */
-	turnOnNegation(targetNode: BaseNode) {
+	turnOnNegation(targetNode: BaseNode, tree: number) {
 		if ( ![NodeType.norm, NodeType.convention, NodeType.junction].includes(targetNode.nodeType) ) {
 			throw new Error("Cannot toggle negation of node types other than Norm, Convention and Junction");
 		}
 
 		let parentId = targetNode.parent;
 		if (typeof parentId === "undefined") {	// targetNode is the root of its tree
-
+			let negationNode = new NegationNode(this.id); // Create a Negation node manually
+			negationNode.children[0] = targetNode;	// Hook targetNode in as child
+			negationNode.update();
+			targetNode.parent = negationNode.id;
+			this.forest[tree] = negationNode;			// Make the Negation node the new root of the tree
 		} else {
-			let parentNode = this.find(parentId);
-			//parentNode.createNegationNode();
+			// Possible node types are all those that can have a Norm/Convention/Junction node as child
+			let parentNode = this.find(parentId, tree) as any;
+
+			// Find the index of parentNode's children array that currently holds targetNode
+			let childIndex = parentNode.children.indexOf(targetNode);
+			if (childIndex === -1) {
+				throw new Error("Could not find the child index of parentNode that holds targetNode");
+			}
+
+			// Depending on the node type, call the appropriate createNegationNode() function
+			if (parentNode.nodeType === NodeType.junction || parentNode.nodeType === NodeType.sanction) {
+				(childIndex === 0) ? parentNode.createNegationNode(Arg.left) : parentNode.createNegationNode(Arg.right);
+			} else if (parentNode.nodeType === NodeType.component || parentNode.nodeType === NodeType.subcomponent) {
+				parentNode.createNegationNode();
+			}
 		}
 	}
 
@@ -133,43 +179,30 @@ export default class Document {
 	 * Toggle OFF negation of the passed in node.
 	 * Removes the parent Negation node of targetNode and mends the tree.
 	 * @param targetNode The child of the Negation node that should be removed; must be either Norm, Convention or Negation
+	 * @param tree The forest array index of the tree targetNode is in
 	 */
-	turnOffNegation(targetNode: BaseNode) {
+	turnOffNegation(targetNode: BaseNode, tree: number) {
 		if ( ![NodeType.norm, NodeType.convention, NodeType.junction].includes(targetNode.nodeType) ) {
 			throw new Error("Cannot toggle negation of node types other than Norm, Convention and Junction");
 		}
-	}
 
-	/**
-	 * Find and return a node by ID.
-	 * Searches in each of this document's trees.
-	 * @param targetId The ID of the node to be retrieved.
-	 * @return A reference to the node if found, undefined otherwise
-	 */
-	find(targetId: number) : BaseNode {
-		debugger;
-		/*
-		let node;
-		this.forest.forEach(root => {
-			node = this.findCore(root, targetId);
-			if (node) {
-				return node;
+		let parentId = targetNode.parent;
+		let parentNode = this.find(parentId, tree);	// This is the Negation node we want to remove
+		let grandparentId = parentNode.parent;
+		
+		if (typeof grandparentId === "undefined") {	// The Negation node is the root of its tree
+			this.forest[tree] = targetNode;			// Make the Negation node's child the new root of the tree
+			targetNode.parent = undefined;
+		} else {
+			let grandparentNode = this.find(grandparentId, tree);
+			// Find the index of grandparentNode's children array that currently holds parentNode
+			let childIndex = grandparentNode.children.indexOf(parentNode);
+			if (childIndex === -1) {
+				throw new Error("Could not find the child index of grandparentNode that holds parentNode");
+			} else {
+				grandparentNode[childIndex] = targetNode;	// Overwrite the Negation node (parentNode)
+				targetNode.parent = grandparentId;
 			}
-		});
-		return undefined;
-		*/
-		return this.findCore(this.forest[0], targetId);
-	}
-
-	// TODO: Rename this and add comments from BaseNode
-	findCore(root: BaseNode, targetId: number) : BaseNode {
-		const stack = [ root ];
-		while (stack.length) {
-			const node = stack.shift();
-			if (node.id === targetId) {
-				return node;
-			}
-			node.children && stack.push(...node.children);
 		}
 	}
 

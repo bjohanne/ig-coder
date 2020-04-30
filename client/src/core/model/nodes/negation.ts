@@ -57,7 +57,7 @@ export default class NegationNode extends BaseNode implements IOneChild {
      * Creates a Junction node as child of this node.
      */
     createJunctionNode() {
-        this.children[0] = new JunctionNode(this.id, this.document, this.subtree, this.componentType, this.subcomponentType);
+        this.children[0] = new JunctionNode(this.document, this.id, this.subtree, this.componentType, this.subcomponentType);
 		this.update();
     }
 }

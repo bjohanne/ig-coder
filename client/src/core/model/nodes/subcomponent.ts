@@ -109,7 +109,7 @@ export default class SubcomponentNode extends BaseNode implements IComponentAndS
      * Creates a Junction node as child of this node.
      */
     createJunctionNode() {
-        this.addChild(new JunctionNode(this.id, this.document, this.subtree, undefined, this.subcomponentType));
+        this.addChild(new JunctionNode(this.document, this.id, this.subtree, undefined, this.subcomponentType));
     }
 
     /**

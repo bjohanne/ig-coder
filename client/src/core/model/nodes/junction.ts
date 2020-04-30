@@ -84,7 +84,7 @@ export default class JunctionNode extends BaseNode implements ITwoChildren {
 	 */
 	createJunctionNode(position: Arg.left | Arg.right) {
 		let index = (position === Arg.left) ? 0 : 1;
-		this.children[index] = new JunctionNode(this.id, this.document, this.subtree, this.componentType, this.subcomponentType);
+		this.children[index] = new JunctionNode(this.document, this.id, this.subtree, this.componentType, this.subcomponentType);
 		this.update();
 	}
 

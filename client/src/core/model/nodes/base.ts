@@ -52,23 +52,6 @@ export default class BaseNode implements INode {
         return (typeof this.nodeType === "undefined");
     }
 
-    /**
-     * Iteratively search for a descendant node with the passed in ID.
-     * On a match, return the node.
-     * NB: The test runs, but debugging reveals errors.
-     */
-    find(targetId: number) : BaseNode {
-        debugger;
-        const stack = [ this ];
-        while (stack.length) {
-            const node = stack.shift();
-            if (node.id === targetId) {
-                return node;
-            }
-            node.children && stack.push(...node.children);
-        }
-    }
-
 	/**
 	 * Small abstraction/convenience to set the updatedAt field.
 	 * Called when a property on the node is modified or when a child is created on the node.
@@ -107,7 +90,7 @@ export default class BaseNode implements INode {
 				throw new Error("Cannot delete left or right child of a Component, Subcomponent or Negation node");
 			}
 			if (this.nodeType === NodeType.component) {
-				// In case this is called with Arg.left, also check the child in index 0 for type Subcomponent
+				// In case this is called with Arg.left (0), also check the child in index 0 for type Subcomponent
 				if (this.children[0].nodeType === NodeType.subcomponent) {
 					throw new Error("Cannot delete Subcomponent child of a Component node");
 				}
