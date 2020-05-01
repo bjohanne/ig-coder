@@ -4,9 +4,11 @@ import {
     GET_DOCUMENT_RESPONSE,
     CREATE_DOCUMENT_RESPONSE,
     ADD_ENTRY_TO_DOCUMENT,
-    SET_ACTIVE_NODE
+    SET_ACTIVE_NODE,
+    UPDATE_ENTRY
 } from "./actionTypes";
-import { INode } from '../core/model/interfaces';
+import { INode, INormAndConvention } from '../core/model/interfaces';
+import { Arg } from '../core/model/enums';
 
 interface IInitialState {
     documents: Array<Document>,
@@ -27,7 +29,7 @@ const reducer = (state: any = initialState, action: any) => {
         case ADD_ENTRY_TO_DOCUMENT:
             if(state.currentDocument.forest.length === 0) { 
                 let doc = new Document(state.currentDocument.name, state.currentDocument.description, state.currentDocument.id);
-                doc.createTree(action.payload.content, action.payload.hasDeontic);             
+                doc.createTree(action.payload.hasDeontic, action.payload.content);             
                 return update(state, { currentDocument: { $set: doc }});
             } else {
                 return state;
@@ -37,8 +39,17 @@ const reducer = (state: any = initialState, action: any) => {
             return update(state, { activeNode: { $set: action.payload }});
     
         case CREATE_DOCUMENT_RESPONSE:
-			return update(state, {documents: {$push: [action.payload]}, currentDocument: {$set: action.payload}});
+            return update(state, {documents: {$push: [action.payload]}, currentDocument: {$set: new Document(action.payload.name, action.payload.description, action.payload.id)}});
+        case UPDATE_ENTRY:
+            state.currentDocument.updateNode(action.payload);
+            let doc = new Document(state.currentDocument.name, state.currentDocument.description, state.currentDocument.id, state.currentDocument.forest);            
+            return update(state, {currentDocument: { $set: doc } });
+        case "persist/REHYDRATE":
+            let d = action.payload.reducer.currentDocument;
+            let rebuiltDoc = new Document(d.name, d.description, d.id, d.forest);
+            return update(state, {currentDocument: { $set: rebuiltDoc }})
         default:
+            console.log("Unfortunately, no action was being hit", action);
             return state;
     }
 };

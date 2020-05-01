@@ -24,10 +24,14 @@ export default class Document {
 	 * @param description A free-text field describing the document
 	 * @param id The document's identifier, given by the server
 	 */
-    constructor(public name: string, public description: string, public id: number) {
+    constructor(public name: string, public description: string, public id: number, forest?: INode[]) {
         this.name = name;
         this.description = description;
         this.id = id;
+
+        if(forest) {
+            this.forest = forest;
+        }
     }
 
 	/**
@@ -47,6 +51,29 @@ export default class Document {
             return this.forest[0];
         }
         return undefined;
+    }
+
+    /**
+     * 
+     * @param type 
+     * @param statement 
+     */
+    updateNode(node: INode) : void {
+        let nodeStack: INode[] = [...this.forest];
+        let current = nodeStack.pop() || null;
+
+        while(current !== null) {
+            if(current.id === node.id) {
+                let children = current.children;
+                current = node;
+                current.children = children;
+            }
+            
+            if(current.children) {
+                nodeStack = nodeStack.concat(current.children);
+            }
+            current = nodeStack.pop() || null;
+        }
     }
 
     /**

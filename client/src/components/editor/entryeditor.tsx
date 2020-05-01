@@ -80,7 +80,7 @@ const EntryEditor = (props: any) => {
         if(props.activeNode && props.activeNode.children) {
             let nnode = props.activeNode.children.find((node: INode) => {
                 if(node.nodeType === NodeType.component) {
-                    return (node as ComponentNode).componentType == type;
+                    return (node as ComponentNode).componentType === type;
                 }
                 return false;
             });
@@ -95,15 +95,15 @@ const EntryEditor = (props: any) => {
         if(props.activeNode && props.activeNode.children) {
             let node = props.activeNode.children.find((node: INode) => {
                 let n = node as ComponentNode;
-                return n.componentType == ComponentType.object && n
+                return n.componentType === ComponentType.object && n
             });
-            return node && node.component && node.component.content && node.component.content.main || "";
+            return (node && node.component && node.component.content && node.component.content.main) || "";
         }
         return "";
     }
     
     return (        
-        props.activeNode &&
+        (props.activeNode &&
         (<><ModalBody>          
         <div className="container-fluid entry-editor">
             <div className="row">
@@ -213,7 +213,7 @@ const EntryEditor = (props: any) => {
         </div></ModalBody>
           <ModalFooter>
             <Button color="success" onClick={saveEntryData}>Save Changes</Button>            
-          </ModalFooter></>) || <h2>No blah Entry</h2>
+          </ModalFooter></>)) || <h2>No blah Entry</h2>
     )
 }
 

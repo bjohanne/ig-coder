@@ -37,9 +37,10 @@ class DocumentsResource(Resource):
         """
         args = document_parser.parse_args()
         id = len(self.documents) + 1    # Temporary solution for incrementing - does not work with deletion of documents!
+        next_doc = get_next_doc_id()
         document = {
-            "document": get_next_doc_id(),
-            "id": id,
+            "document": next_doc,
+            "id": next_doc,
             "name": args.name,
             "description": args.description,
             "forest": json.loads(args.forest)

@@ -4,7 +4,6 @@ import {connect} from "react-redux";
 import {getDocument, saveDocumentRequest} from "../state/actions";
 import NewEntryEditor from "./editor/newEntry";
 import Accordion from "./units/accordion";
-import EntryComponent from "./entry";
 import Document from "../core/model/document";
 import { INode } from "../core/model/interfaces";
 import TreeComponent from "./editor/tree";
@@ -57,8 +56,8 @@ export function DocumentComponent(props: IDocumentEditorProps) {
                 </div>
 
                 <div className="card-body" id="node-100000">
-                {props.currentDocument.forest && props.currentDocument.forest.length &&
-                props.currentDocument.forest.map((forest: INode) => <div key={forest.id}><TreeComponent node={forest}/></div>) 
+                {(props.currentDocument.forest && props.currentDocument.forest.length &&
+                props.currentDocument.forest.map((forest: INode) => <div key={forest.id}><TreeComponent node={forest}/></div>)) 
                 ||
                 <h4 className="text-center">No entry available</h4>
                 }
