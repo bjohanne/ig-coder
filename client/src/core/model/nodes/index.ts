@@ -1,3 +1,4 @@
+export { default as BaseNode }         from './base';
 export { default as NormNode }         from './norm';
 export { default as ConventionNode }   from './convention';
 export { default as JunctionNode }     from './junction';

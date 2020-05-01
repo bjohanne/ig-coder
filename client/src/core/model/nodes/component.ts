@@ -1,4 +1,4 @@
-import { BaseNode } from "./base";
+import BaseNode from "./base";
 import { INode, IComponentAndSubNode, IOneChild, ITwoChildren } from "../interfaces";
 import { NodeType, ComponentType, SubcomponentType, SubtreeType, Arg } from "../enums";
 import { Component } from "../component";
@@ -105,7 +105,7 @@ export default class ComponentNode extends BaseNode implements IComponentAndSubN
         if (this.children.length === 0) {
             throw new Error("This Component node has no children");
         }
-        if (typeof this.children[0].nodeType === "undefined") {
+        if (this.children[0].isDummy()) {
             throw new Error("The child of this Component node is a dummy node");
         }
         return this.children[0];
@@ -158,14 +158,14 @@ export default class ComponentNode extends BaseNode implements IComponentAndSubN
     createJunctionNode() {
         switch(this.componentType) {
             case ComponentType.attributes:
-                this.addChild(new JunctionNode(this.id, this.document, this.subtree, this.componentType));
+                this.addChild(new JunctionNode(this.document, this.id, this.subtree, this.componentType));
                 break;
             case ComponentType.object:
                 throw new Error("Component nodes of type Object cannot have Junction nodes as children");
             case ComponentType.deontic:
                 throw new Error("Component nodes of type Deontic cannot have children");
             case ComponentType.aim:
-                this.addChild(new JunctionNode(this.id, this.document, this.subtree, this.componentType));
+                this.addChild(new JunctionNode(this.document, this.id, this.subtree, this.componentType));
                 break;
             case ComponentType.conditions:
                 throw new Error("Component nodes of type Conditions cannot have Junction nodes as children");

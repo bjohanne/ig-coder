@@ -1,4 +1,4 @@
-import { BaseNode } from "./base";
+import BaseNode from "./base";
 import { INode, IOneChild } from "../interfaces";
 import { NodeType, ComponentType, SubcomponentType, SubtreeType, Arg } from "../enums";
 
@@ -34,7 +34,7 @@ export default class NegationNode extends BaseNode implements IOneChild {
 
     // Getter for the child
     getChild() : INode {
-        if (typeof this.children[0].nodeType === "undefined") {
+        if (this.children[0].isDummy()) {
             throw new Error("The child of this Negation node is a dummy node");
         }
         return this.children[0];
@@ -57,7 +57,7 @@ export default class NegationNode extends BaseNode implements IOneChild {
      * Creates a Junction node as child of this node.
      */
     createJunctionNode() {
-        this.children[0] = new JunctionNode(this.id, this.document, this.subtree, this.componentType, this.subcomponentType);
+        this.children[0] = new JunctionNode(this.document, this.id, this.subtree, this.componentType, this.subcomponentType);
 		this.update();
     }
 }

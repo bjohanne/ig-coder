@@ -1,4 +1,4 @@
-import { BaseNode } from "./base";
+import BaseNode from "./base";
 import ComponentNode from "./component";
 import { Entry } from "../entry";
 import { NodeType, ComponentType, SubtreeType } from "../enums";
@@ -58,7 +58,7 @@ export default class NormNode extends BaseNode implements INormAndConvention {
     }
 
     getObject() : BaseNode {
-		if (typeof this.children[1].nodeType === "undefined") {
+		if (this.children[1].isDummy()) {
 			throw new Error("This Norm node does not have an Object child");
 		}
         return this.children[1];
