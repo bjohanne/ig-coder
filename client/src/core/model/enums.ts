@@ -6,7 +6,7 @@ export enum NodeType {
     negation     = "Negation",
     component    = "Component",
     subcomponent = "Subcomponent",
-    composite = "Composite"
+    composite    = "Composite"
 }
 
 export enum JunctionType {
