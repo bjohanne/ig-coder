@@ -6,7 +6,8 @@ import {
     ADD_ENTRY_TO_DOCUMENT,
     SAVE_DOCUMENT_REQUEST,
     SET_ACTIVE_NODE,
-    UPDATE_ENTRY
+    UPDATE_ENTRY,
+    PRE_SET_ACTIVE_NODE
 } from "./actionTypes";
 import Document from "../core/model/document";
 import { INode } from "../core/model/interfaces";
@@ -41,12 +42,17 @@ export const saveDocumentRequest = (document: any) => ({
     payload: document
 });
 
-export const setActiveNode = (node: INode) => ({
+export const preSetActiveNode = (node: INode) => ({
+    type: PRE_SET_ACTIVE_NODE,
+    payload: node
+});
+
+export const setActiveNode = (node: any) => ({
     type: SET_ACTIVE_NODE,
     payload: node
 });
 
-export const updateEntry = (node: INode) => ({
+export const updateEntry = (node: any) => ({
     type: UPDATE_ENTRY,
     payload: node
 });

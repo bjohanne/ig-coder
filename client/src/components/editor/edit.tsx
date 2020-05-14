@@ -8,7 +8,7 @@ import JunctionEditor from "./junctioneditor";
 import ComponentEditor from "./componenteditor";
 
 const Edit = (props: any) => {
-    let activeNode = props.activeNode.data
+    let activeNode = props.activeNode.node.data
     return (
         ((activeNode && [NodeType.convention, NodeType.norm].indexOf(activeNode.nodeType) > -1)  &&
         (<EntryEditor close={props.close}/>)) || 

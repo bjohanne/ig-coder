@@ -45,6 +45,9 @@ const reducer = (state: any = initialState, action: any) => {
             let doc = new Document(state.currentDocument.name, state.currentDocument.description, state.currentDocument.id, state.currentDocument.forest);            
             return update(state, {currentDocument: { $set: doc } });
         case "persist/REHYDRATE":
+            if (!action.payload) {
+                return state;
+            }
             let d = action.payload.reducer.currentDocument;
             let rebuiltDoc = new Document(d.name, d.description, d.id, d.forest);
             return update(state, {currentDocument: { $set: rebuiltDoc }})
