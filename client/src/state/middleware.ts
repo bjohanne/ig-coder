@@ -3,12 +3,15 @@ import {
     GET_DOCUMENT_RESPONSE,
     CREATE_DOCUMENT,
     CREATE_DOCUMENT_RESPONSE,
-    SAVE_DOCUMENT_REQUEST
+    SAVE_DOCUMENT_REQUEST,
+    PRE_SET_ACTIVE_NODE,
+    SET_ACTIVE_NODE
 } from "./actionTypes";
 import {Middleware, MiddlewareAPI} from "redux";
 import axios, {AxiosResponse} from "axios";
 import {toast} from 'react-toastify';
 import appConfig from "../core/config/appConfig";
+import { INormAndConvention } from "../core/model/interfaces";
 
 export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: any) => (action: any) => {
     switch (action.type) {
@@ -36,6 +39,15 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
                 let toaster = response.status === 200 ? toast.success : toast.error;
                 toaster('Document saved!');
             });
+            break;
+        case PRE_SET_ACTIVE_NODE:
+            // extract the entry text, pass it to the endpoint
+            let parent = action.payload.node.parent.data as INormAndConvention;
+            let data = { entry: parent.entry.content }
+            axios.post(`${appConfig.api.baseUrl}/entities`, data).then((response) => {
+                store.dispatch({type: SET_ACTIVE_NODE, payload: Object.assign(action.payload, { ents: response.data }) });
+                action.payload.togglefunc();
+            })
             break;
         default:
             break;

@@ -75,3 +75,21 @@
 .component-editor-entry-text, .component-editor-input-controls {
     padding: 1rem;
 }
+
+.ent, .pos {
+    display: flex;
+}
+
+.ents, .pos-tag {
+    display: flex;
+    flex-direction: column;
+}
+
+.ent-text-title, .pos-text-title {
+    width: 6rem;
+}
+
+.ent-text, .pos-text {
+    text-indent: .25em;
+
+}

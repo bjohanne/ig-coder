@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { select, tree, hierarchy, scaleOrdinal, TreeLayout } from "d3";
 import { INode } from "../../core/model/interfaces";
 import { Modal } from 'reactstrap';
-import { setActiveNode } from "../../state/actions";
+import { preSetActiveNode } from "../../state/actions";
 import "./tree.css";
 import Edit from "./edit";
 import { NodeType, ComponentType } from "../../core/model/enums";
@@ -12,7 +12,7 @@ import ReactTooltip from "react-tooltip";
 
 interface Proptype {
     node: INode,
-    setActiveNode?: Function
+    preSetActiveNode?: Function
 }
 
 const TreeComponent = (props: Proptype) => {
@@ -135,9 +135,8 @@ const TreeComponent = (props: Proptype) => {
     }
 
     const nodeToggle = (treeNode: any) => {
-        if (props.setActiveNode) {
-            props.setActiveNode(treeNode);
-            toggle();
+        if (props.preSetActiveNode) {
+            props.preSetActiveNode({ node: treeNode, togglefunc: toggle });
         }
     }
 
@@ -160,7 +159,7 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    setActiveNode: (node: INode) => dispatch(setActiveNode(node))
+    preSetActiveNode: (node: INode) => dispatch(preSetActiveNode(node))
 });
 
 export default connect(

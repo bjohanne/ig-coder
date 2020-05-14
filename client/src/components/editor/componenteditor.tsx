@@ -9,8 +9,8 @@ const ComponentEditor = (props: any) => {
     const [content, setContent] = useState("");
     const [entryContentVal, setEntryContentVal] = useState("");
     const [saveEnabled, setSaveEnabled] = useState(false);
-    let active = props.activeNode.data as ComponentNode;
-    let parent = props.activeNode.parent.data as INormAndConvention;
+    let active = props.activeNode.node.data as ComponentNode;
+    let parent = props.activeNode.node.parent.data as INormAndConvention;
     let entryContent = parent.entry.content;
 
     useEffect(() => {        
@@ -56,6 +56,21 @@ const ComponentEditor = (props: any) => {
             <div className="component-editor-entry-text" dangerouslySetInnerHTML={{__html: entryContentVal }}></div>
             <div className="component-editor-input-controls"><input type="text" name="component-value" onChange={changeValue} value={content} />
             <button disabled={!saveEnabled} className="btn-success btn" onClick={saveComponent}>Save</button>
+            <h4>Named entities identified</h4>
+            <div className="ents">
+                {
+                    Object.keys(props.activeNode.ents).map((key: any) => {
+                        return (<div className="ent"><span className="ent-text-title">{key}</span><span className="ent-text">{props.activeNode.ents[key]}</span></div>)
+                    })
+                }
+            </div>
+            <div className="pos-tags">
+                {
+                    Object.keys(props.activeNode.pos).map((key: any) => {
+                        return (<div className="pos"><span className="pos-text-title">{key}</span><span className="pos-text">{props.activeNode.ents[key]}</span></div>)
+                    })
+                }
+            </div>
             </div>
             </div>
         </ModalBody>) 
