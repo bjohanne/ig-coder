@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import { INode, INormAndConvention } from "../../core/model/interfaces";
-import { updateEntry } from "../../state/actions";
+import { INode, INormAndConvention } from "../../../core/model/interfaces";
+import { updateEntry } from "../../../state/actions";
 import { ModalBody } from 'reactstrap';
-import { ComponentNode } from "../../core/model/nodes";
-import { Component } from "../../core/model/component";
+import { ComponentNode } from "../../../core/model/nodes";
+import { Component } from "../../../core/model/component";
 const ComponentEditor = (props: any) => { 
     const [content, setContent] = useState("");
     const [entryContentVal, setEntryContentVal] = useState("");

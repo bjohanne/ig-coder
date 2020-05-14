@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
-import { INode } from "../../core/model/interfaces";
-import { updateEntry } from "../../state/actions";
+import { INode } from "../../../core/model/interfaces";
+import { updateEntry } from "../../../state/actions";
 import { ModalBody } from 'reactstrap';
 const JunctionEditor = (props: any) => {    
     return (        

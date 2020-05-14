@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { connect } from "react-redux";
 import { Collapse, Button, Row, Col, ModalBody, ModalFooter } from 'reactstrap';
-import { INode } from "../../core/model/interfaces";
-import { updateEntry } from "../../state/actions";
-import { buildEntrySubTree } from "../../core/model/builder";
-import Chevron from "../units/chevron";
-import { NodeType, ComponentType, SubcomponentType } from "../../core/model/enums";
-import ComponentNode from "../../core/model/nodes/component";
+import { INode } from "../../../core/model/interfaces";
+import { updateEntry } from "../../../state/actions";
+import { buildEntrySubTree } from "../../../core/model/builder";
+import Chevron from "../../units/chevron";
+import { NodeType, ComponentType, SubcomponentType } from "../../../core/model/enums";
+import ComponentNode from "../../../core/model/nodes/component";
 
 const EntryEditor = (props: any) => {    
     console.log("Get some props! ", props);

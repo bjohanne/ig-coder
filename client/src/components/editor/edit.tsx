@@ -3,9 +3,9 @@ import { connect } from "react-redux";
 import { INode } from "../../core/model/interfaces";
 import { updateEntry } from "../../state/actions";
 import { NodeType } from "../../core/model/enums";
-import EntryEditor from "./entryeditor";
-import JunctionEditor from "./junctioneditor";
-import ComponentEditor from "./componenteditor";
+import EntryEditor from "./nodes/entryeditor";
+import JunctionEditor from "./nodes/junctioneditor";
+import ComponentEditor from "./nodes/componenteditor";
 
 const Edit = (props: any) => {
     let activeNode = props.activeNode.node.data
