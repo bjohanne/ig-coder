@@ -1,6 +1,6 @@
 from flask_restplus import Resource, reqparse, cors, fields, marshal_with, marshal
 from flask import make_response, request
-from db.traverse import create_graph, get_next_doc_id
+from db.traverse import create_graph, get_next_doc_id, create_document_anchor
 import json
 
 document_fields = {
@@ -46,6 +46,10 @@ class DocumentsResource(Resource):
             "forest": json.loads(args.forest)
         }
         self.documents.append(document)
+
+        # Create an "anchor" node for the document
+        create_document_anchor(next_doc)
+
         return document
 
 
