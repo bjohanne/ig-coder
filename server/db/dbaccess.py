@@ -9,7 +9,7 @@ class DataAccess(object):
         self._driver.close()
 
     def get_next_doc_id(self):
-        q = """start n=node(*) WHERE EXISTS(n.document) RETURN n.document ORDER BY n.document LIMIT 1"""
+        q = """MATCH (n) WHERE EXISTS(n.document) RETURN n.document ORDER BY n.document DESC LIMIT 1"""
         with self._driver.session() as session:
             response = session.run(q)
             record = response.single()
@@ -45,3 +45,8 @@ class DataAccess(object):
         create_nodes_statement = "{0} ".format(" ".join(statements))
         with self._driver.session() as session:
             session.run(create_nodes_statement.strip())
+
+    def create_document_anchor(self, id):
+        q = "CREATE (a {{ document: {0} }})".format(id)
+        with self._driver.session() as session:
+            response = session.run(q)

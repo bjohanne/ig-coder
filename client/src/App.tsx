@@ -5,7 +5,7 @@
 
 import React from 'react';
 import {Provider} from "react-redux";
-import {BrowserRouter, Route, Switch} from "react-router-dom";
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import './App.css';
 import { store, persistor } from "./state/store";
 import { PersistGate } from "redux-persist/integration/react";
@@ -29,26 +29,25 @@ function App() {
     return (
         <Provider store={store}>
 			<PersistGate loading={null} persistor={persistor}>
-				<Navbar/>
 				<div className="App container-fluid">
-					<BrowserRouter>
+					<Router>
+						<Navbar/>
 						<Switch>{/* Inside a Switch, only one Route is rendered at a time */}
 							<Route exact path={`${appConfig.client.path}/`} component={HomeComponent}/>
 							<Route exact path={`${appConfig.client.path}/documents/new`} component={NewDocumentComponent}/>
 							<Route exact path={`${appConfig.client.path}/documents/:id`} component={DocumentComponent}/>
 							<Route path='*' component={NotFoundComponent} />
 						</Switch>
-					</BrowserRouter>
+					</Router>
 				</div>
 				{/* Default toaster settings */}
 				<ToastContainer
 					bodyClassName="toast-body"
 					position="bottom-center"
 					autoClose={3500}
-					hideProgressBar={false}
+					hideProgressBar={true}
 					newestOnTop={false}
 					closeOnClick={true}
-					rtl={false}
 					pauseOnFocusLoss={true}
 					pauseOnHover={true}
 					draggable={false}

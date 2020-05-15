@@ -28,4 +28,8 @@ def create_graph(json: dict):
     for tree in data["forest"]:
         db_access.create_nodes(traversal(tree))
 
+def create_document_anchor(id: int):
+    db_access = DataAccess(uri="bolt://10.212.137.212:7687", user="neo4j", password="igcoder")
+    return db_access.create_document_anchor(id)
+
 
