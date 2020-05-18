@@ -8,6 +8,7 @@ import "./tree.css";
 import Edit from "./edit";
 import { NodeType, ComponentType } from "../../core/model/enums";
 import ReactTooltip from "react-tooltip";
+import { componentColorScaler, nodeColorScaler } from "../../core/config/scales";
 
 
 interface Proptype {
@@ -73,13 +74,6 @@ const TreeComponent = (props: Proptype) => {
     }
 
     const buildNodes = (allNodes: any) => {
-        let nodeColorScaler = scaleOrdinal()
-            .domain([NodeType.component, NodeType.composite, NodeType.junction, NodeType.negation, NodeType.norm, NodeType.sanction, NodeType.subcomponent])
-            .range(["#5E4FA2", "#3288BD", "#66C2A5", "#ABDDA4", "#E6F598", "#FFFFBF", "#FEE08B"]);
-        let componentColorScaler = scaleOrdinal()
-            .domain([ComponentType.aim, ComponentType.attributes, ComponentType.conditions, ComponentType.deontic, ComponentType.object])
-            .range(["#f45905", "#010038", "#f35588", "#7c0a02", "#91b029"])
-
         let nodeEnter = allNodes.enter().append("g");
         nodeEnter.attr("class", "node")
             .attr("id", (d: any) => `node-${d.data.id}`)
@@ -136,7 +130,7 @@ const TreeComponent = (props: Proptype) => {
 
     const nodeToggle = (treeNode: any) => {
         if (props.preSetActiveNode) {
-            props.preSetActiveNode({ node: treeNode, togglefunc: toggle });
+            props.preSetActiveNode({ node: treeNode, togglefunc: toggle, modalState: setModal });
         }
     }
 
