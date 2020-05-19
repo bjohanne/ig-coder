@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { select, tree, hierarchy, scaleOrdinal, TreeLayout } from "d3";
+import { select, tree, hierarchy, TreeLayout } from "d3";
 import { INode } from "../../core/model/interfaces";
 import { Modal } from 'reactstrap';
 import { preSetActiveNode } from "../../state/actions";
@@ -9,7 +9,7 @@ import Edit from "./edit";
 import { NodeType, ComponentType } from "../../core/model/enums";
 import { Component } from "../../core/model/component";
 import ReactTooltip from "react-tooltip";
-import { componentColorScaler, nodeColorScaler } from "../../core/config/scales";
+import { nodeColorScaler, strokeColorScaler } from "../../core/config/scales";
 
 interface Proptype {
     node: INode,
@@ -78,16 +78,6 @@ const TreeComponent = (props: Proptype) => {
     }
 
     const buildNodes = (allNodes: any) => {
-		// Color for each node type
-        let nodeColorScaler = scaleOrdinal()
-            .domain([NodeType.norm, NodeType.convention, NodeType.junction, NodeType.negation, NodeType.sanction, NodeType.component, NodeType.subcomponent])
-            .range(["#7ab648", "#7ab648", "#fcc438", "#c92d39", "#6a4100", "#99d2f2", "#0c7cba"]);
-
-		// Slightly darker border color
-		let strokeColorScaler = scaleOrdinal()
-            .domain([NodeType.norm, NodeType.convention, NodeType.junction, NodeType.negation, NodeType.sanction, NodeType.component, NodeType.subcomponent])
-            .range(["#46692a", "#46692a", "#ac8219", "#7f151e", "#2f1901", "#4286ae", "#003f61"]);
-
         let nodeEnter = allNodes.enter().append("g");
         nodeEnter.attr("class", "node")
             .attr("id", (d: any) => `node-${d.data.id}`)
