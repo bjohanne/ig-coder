@@ -9,6 +9,7 @@ import Edit from "./edit";
 import { NodeType, ComponentType } from "../../core/model/enums";
 import { Component } from "../../core/model/component";
 import ReactTooltip from "react-tooltip";
+import { componentColorScaler, nodeColorScaler } from "../../core/config/scales";
 
 interface Proptype {
     node: INode,
@@ -203,7 +204,7 @@ const TreeComponent = (props: Proptype) => {
 
     const nodeToggle = (treeNode: any) => {
         if (props.preSetActiveNode) {
-            props.preSetActiveNode({ node: treeNode, togglefunc: toggle });
+            props.preSetActiveNode({ node: treeNode, togglefunc: toggle, modalState: setModal });
         }
     }
 
