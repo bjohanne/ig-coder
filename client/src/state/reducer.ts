@@ -7,10 +7,8 @@ import {
     SET_ACTIVE_NODE,
     UPDATE_ENTRY
 } from "./actionTypes";
-//import { INode, INormAndConvention } from '../core/model/interfaces';
-//import { Arg } from '../core/model/enums';
 
-import { NormNode, NegationNode, SanctionNode, ConventionNode, JunctionNode, ComponentNode, SubcomponentNode } from '../core/model/nodes';
+import { NormNode, SanctionNode, JunctionNode, ComponentNode, SubcomponentNode } from '../core/model/nodes';
 import { Arg, SubcomponentType, JunctionType } from '../core/model/enums';
 
 interface IInitialState {
@@ -34,7 +32,7 @@ const reducer = (state: any = initialState, action: any) => {
                 let doc = new Document(state.currentDocument.name, state.currentDocument.description, state.currentDocument.id);
                 doc.createTree(action.payload.hasDeontic, action.payload.content);
 
-				// Below is development stuff - building an example tree
+				// Below is development stuff - building an example tree to demonstrate the different node types
 				doc.addSanctionNodeToTree(0);
 				let root = doc.getRoot() as SanctionNode;
 				let norm = root.getLeft() as NormNode;	// Actually a Convention node, maybe

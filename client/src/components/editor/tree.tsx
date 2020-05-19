@@ -6,9 +6,9 @@ import { Modal } from 'reactstrap';
 import { preSetActiveNode } from "../../state/actions";
 import "./tree.css";
 import Edit from "./edit";
-import { NodeType } from "../../core/model/enums";
+import { NodeType, ComponentType } from "../../core/model/enums";
+import { Component } from "../../core/model/component";
 import ReactTooltip from "react-tooltip";
-
 
 interface Proptype {
     node: INode,
@@ -27,8 +27,8 @@ const TreeComponent = (props: Proptype) => {
 
     const createTreeModel = (forestNode: INode) => {
         let margin = { top: 20, right: 40, bottom: 20, left: 40 };
-        width = 1920 - margin.right - margin.left;
-        height = 500 - margin.top - margin.bottom;
+        width = 1400 - margin.right - margin.left;
+        height = 500 - margin.top - margin.bottom;	// This affects how the tree looks
 
         // diagonal = linkHorizontal().x((d) => d[1]).y((d) => d[0]);
 
@@ -77,9 +77,15 @@ const TreeComponent = (props: Proptype) => {
     }
 
     const buildNodes = (allNodes: any) => {
+		// Color for each node type
         let nodeColorScaler = scaleOrdinal()
             .domain([NodeType.norm, NodeType.convention, NodeType.junction, NodeType.negation, NodeType.sanction, NodeType.component, NodeType.subcomponent])
             .range(["#7ab648", "#7ab648", "#fcc438", "#c92d39", "#6a4100", "#99d2f2", "#0c7cba"]);
+
+		// Slightly darker border color
+		let strokeColorScaler = scaleOrdinal()
+            .domain([NodeType.norm, NodeType.convention, NodeType.junction, NodeType.negation, NodeType.sanction, NodeType.component, NodeType.subcomponent])
+            .range(["#46692a", "#46692a", "#ac8219", "#7f151e", "#2f1901", "#4286ae", "#003f61"]);
 
         let nodeEnter = allNodes.enter().append("g");
         nodeEnter.attr("class", "node")
@@ -93,54 +99,54 @@ const TreeComponent = (props: Proptype) => {
             .attr("fill", (d: any) => {
                 return nodeColorScaler(d.data.nodeType);
             })
+			.style("stroke", (d: any) => {
+                return strokeColorScaler(d.data.nodeType);
+            })
+			.attr("cursor", "pointer")
             .attr("r", 16)
 			// Tooltips
             .attr("data-tip", (d: any) => {
+				let html: string;
 				switch (d.data.nodeType) {
 					case NodeType.norm:
-						if (d.data.entry) {
-							return `<strong>Norm</strong><br/>"${d.data.entry.content}"`;
-						} else {
-							return `<strong>Norm</strong><br/>No content`;
-						}
+						html = `<strong>Norm</strong><br/>` +
+							((d.data.entry) ? `"${d.data.entry.content.toString()}"` : `<em>No content</em>`);
+						break;
 					case NodeType.convention:
-						if (d.data.entry) {
-							return `<strong>Convention</strong><br/>"${d.data.entry.content}"`;
-						} else {
-							return `<strong>Convention</strong><br/>No content`;
-						}
+						html = `<strong>Convention</strong><br/>` +
+							((d.data.entry) ? `"${d.data.entry.content.toString()}"` : `<em>No content</em>`);
+						break;
 					case NodeType.junction:
-						if (d.data.junctionType){
-							return `<strong>Junction</strong><br/>Operator: ${d.data.junctionType}`;
-						} else {
-							return `<strong>Junction</strong><br/>Operator not set`;
-						}
+						html = `<strong>Junction</strong><br/>` +
+							((d.data.junctionType) ? `Operator: ${d.data.junctionType.toString()}` : `<em>No operator</em>`);
+						break;
 					case NodeType.negation:
-						return `<strong>Negation</strong>`;
+						html = `<strong>Negation</strong>`;
+						break;
 					case NodeType.sanction:
-						return `<strong>Sanction</strong>`;
+						html = `<strong>Sanction</strong>`;
+						break;
 					case NodeType.component:
-						if (d.data.component.content) {
-							let content = d.data.component.string();
-							return `<strong>${d.data.nodeType}</strong><br/>${d.data.componentType}<br/>"${content}"`;
-						} else {
-							return `<strong>${d.data.nodeType}</strong><br/>${d.data.componentType}`;
-						}
+						// Object.assign doesn't use our constructor but for the purposes of this, we just need to call string()
+						let comp = Object.assign(new Component(), d.data.component).string();
+						html = `<strong>Component</strong><br/>${d.data.componentType}<br/>` +
+							((comp) ? `"${comp}"` : `<em>No content</em>`);
+						break;
 					case NodeType.subcomponent:
-						if (d.data.component.content) {
-							let content = d.data.component.string();
-							return `<strong>${d.data.nodeType}</strong><br/>${d.data.subcomponentType}<br/>"${content}"`;
-						} else {
-							return `<strong>${d.data.nodeType}</strong><br/>${d.data.subcomponentType}`;
-						}
+						let scomp = Object.assign(new Component(), d.data.component).string();
+						html = `<strong>Subcomponent</strong><br/>${d.data.subcomponentType}<br/>` +
+							((scomp) ? `"${scomp}"` : `<em>No content</em>`);
+						break;
 					default:
-						return `${d.data.nodeType && d.data.nodeType.toString()}` || `<strong>Missing type</strong>`;
+						html = `${d.data.nodeType && d.data.nodeType.toString()}` || `<strong>Missing type</strong>`;
+						break;
 				}
+				return html;
             })
             .attr("data-html", true)
             .on("click", nodeToggle)
 
-		// Node type labels
+		// Label above each node showing node type
         nodeEnter.append("text")
             .attr('text-anchor', 'middle')
             .attr('alignment-baseline', 'middle')
@@ -149,7 +155,7 @@ const TreeComponent = (props: Proptype) => {
 			.attr("dy", "-24")
 			.text((d: any) => d.data.nodeType);
 
-		// NOT and operators for Negation and Junction nodes
+		// Labels on nodes showing logical operators and ABDICO components
         nodeEnter.append("text")
             .attr('text-anchor', 'middle')
             .attr('alignment-baseline', 'middle')
@@ -162,6 +168,19 @@ const TreeComponent = (props: Proptype) => {
 					return d.data.junctionType;
 				} else if (d.data.nodeType === NodeType.negation) {
 					return "NOT";
+				} else if (d.data.componentType) {
+					switch (d.data.componentType) {
+						case ComponentType.attributes:
+						return "A";
+						case ComponentType.object:
+						return "B";
+						case ComponentType.deontic:
+						return "D"
+						case ComponentType.aim:
+						return "I";
+						case ComponentType.conditions:
+						return "C";
+					}
 				}
 			});
 
@@ -178,6 +197,8 @@ const TreeComponent = (props: Proptype) => {
                     + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
                     + " " + d.parent.y + "," + d.parent.x;
             })
+			.style("stroke-width", "1")
+			//.style('opacity', .8);
     }
 
     const nodeToggle = (treeNode: any) => {
@@ -188,11 +209,13 @@ const TreeComponent = (props: Proptype) => {
 
     return (
         <>
-            <svg
-                className="d3-component"
-                width={1200}
-                height={500}
-                ref={n => (svgNode = n)} />
+			<div className="treeContainer">
+				<svg
+					className="d3-component"
+					width={800}
+					height={500}
+					ref={n => (svgNode = n)} />
+			</div>
             <Modal isOpen={modal} toggle={toggle} className="modal-open">
                 <Edit close={toggle} />
             </Modal>

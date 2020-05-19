@@ -11,7 +11,6 @@ import {Middleware, MiddlewareAPI} from "redux";
 import axios, {AxiosResponse} from "axios";
 import {toast} from 'react-toastify';
 import appConfig from "../core/config/appConfig";
-import { INormAndConvention } from "../core/model/interfaces";
 
 export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: any) => (action: any) => {
     switch (action.type) {

@@ -52,7 +52,6 @@ export function DocumentComponent(props: IDocumentEditorProps) {
                             )}
                         />
                     </div>
-					{/* <EntryComponent document={props.currentDocument}/> */}
                 </div>
 
                 <div className="card-body" id="node-100000">

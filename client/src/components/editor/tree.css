@@ -40,3 +40,8 @@ p.component {
         opacity: 1 !important;
     }
 }
+
+.treeContainer {
+	width: 100%;
+	overflow-x: scroll;
+}

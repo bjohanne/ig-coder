@@ -76,12 +76,31 @@ import { IComponent } from "./interfaces"
 		}
 	}
 
-	/**
-	 * Concatenates prefix, main and suffix and returns a properly formatted string.
-	 * @return A string made from this component's text content
+	/*
+	 Concatenates the Component's prefix, main and suffix.
+	 If main is an empty string, the resulting string will have no superfluous spaces.
 	 */
 	string() : string {
-		return "lolhjj";
-	};
+		let ret: string = "";
+
+		if (this.content) {
+			if (this.content.prefix) {
+				ret += this.content.prefix;
+				if (this.content.main) {
+					ret += " ";
+				}
+			}
+
+			ret += this.content.main;
+
+			if (this.content.suffix) {
+				if (this.content.main) {
+					ret += " ";
+				}
+				ret += this.content.suffix;
+			}
+		}
+		return ret;
+	}
 }
 

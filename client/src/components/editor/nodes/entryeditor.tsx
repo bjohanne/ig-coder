@@ -118,7 +118,7 @@ const EntryEditor = (props: any) => {
             <Collapse isOpen={collapse.collapseTop}>            
             <div className="row">
                 <div className="col-md-12">
-                    <textarea name="node-entry-content" className="form-control input-lg" defaultValue={props.activeNode.entry.content}></textarea>                
+                    <textarea name="node-entry-content" className="form-control input-lg" defaultValue={props.activeNode.node.data.entry.content}></textarea>                
                 </div>
             </div>            
             </Collapse>
