@@ -52,7 +52,7 @@ function App() {
 					pauseOnHover={true}
 					draggable={false}
 				/>
-                <ReactTooltip/>
+                <ReactTooltip delayHide={1000} effect="solid" />
 			</PersistGate>
         </Provider>
     );

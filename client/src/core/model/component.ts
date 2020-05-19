@@ -75,4 +75,32 @@ import { IComponent } from "./interfaces"
 			this.content = undefined;
 		}
 	}
- }
+
+	/*
+	 Concatenates the Component's prefix, main and suffix.
+	 If main is an empty string, the resulting string will have no superfluous spaces.
+	 */
+	string() : string {
+		let ret: string = "";
+
+		if (this.content) {
+			if (this.content.prefix) {
+				ret += this.content.prefix;
+				if (this.content.main) {
+					ret += " ";
+				}
+			}
+
+			ret += this.content.main;
+
+			if (this.content.suffix) {
+				if (this.content.main) {
+					ret += " ";
+				}
+				ret += this.content.suffix;
+			}
+		}
+		return ret;
+	}
+}
+

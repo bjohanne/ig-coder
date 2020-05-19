@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { select, tree, hierarchy, scaleOrdinal, TreeLayout } from "d3";
+import { select, tree, hierarchy, TreeLayout } from "d3";
 import { INode } from "../../core/model/interfaces";
 import { Modal } from 'reactstrap';
 import { preSetActiveNode } from "../../state/actions";
 import "./tree.css";
 import Edit from "./edit";
 import { NodeType, ComponentType } from "../../core/model/enums";
+import { Component } from "../../core/model/component";
 import ReactTooltip from "react-tooltip";
-import { componentColorScaler, nodeColorScaler } from "../../core/config/scales";
-
+import { nodeColorScaler, strokeColorScaler } from "../../core/config/scales";
 
 interface Proptype {
     node: INode,
@@ -27,9 +27,9 @@ const TreeComponent = (props: Proptype) => {
     let treeLayout: TreeLayout<INode>;
 
     const createTreeModel = (forestNode: INode) => {
-        let margin = { top: 20, right: 120, bottom: 20, left: 120 };
-        width = 960 - margin.right - margin.left;
-        height = 500 - margin.top - margin.bottom;
+        let margin = { top: 20, right: 40, bottom: 20, left: 40 };
+        width = 1400 - margin.right - margin.left;
+        height = 500 - margin.top - margin.bottom;	// This affects how the tree looks
 
         // diagonal = linkHorizontal().x((d) => d[1]).y((d) => d[0]);
 
@@ -45,17 +45,21 @@ const TreeComponent = (props: Proptype) => {
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         treeLayout = tree<INode>().size([height, width]);
-        console.log("Create Tree Model");
         update(forestNode);
-
     };
 
-    /* The useEffect Hook is for running side effects outside of React,
-    for instance inserting elements into the DOM using D3 */
-    useEffect(
-        () => {
-            createTreeModel(props.node);
-        })
+	/*
+		NOTE:
+		props.node is added to the below dependency array because without it,
+		the tree is not cleared before it is redrawn, resulting in the lines
+		becoming thicker and blacker each time.
+		In exchange, there's a warning in the console about adding createTreeModel
+		to the dependency array. To do that, we'd need to move the whole function inside this callback.
+		It's a tradeoff, and this is the better option.
+	*/
+	useEffect(() => {
+		createTreeModel(props.node);
+    }, [props.node])
 
     const update = (rootNode: INode) => {
         select(svgNode).selectAll("nodes").remove();
@@ -70,7 +74,7 @@ const TreeComponent = (props: Proptype) => {
 
         buildNodes(allNodes);
         buildLinks(links);
-        ReactTooltip.rebuild()
+        ReactTooltip.rebuild();
     }
 
     const buildNodes = (allNodes: any) => {
@@ -81,38 +85,96 @@ const TreeComponent = (props: Proptype) => {
                 return "translate(" + d.y + "," + d.x + ")";
             });
 
+		// Graphical circles for nodes
         nodeEnter.append("circle")
             .attr("fill", (d: any) => {
-                if (d.data.nodeType === NodeType.component) {
-                    return componentColorScaler(d.data.componentType);
-                }
                 return nodeColorScaler(d.data.nodeType);
             })
+			.style("stroke", (d: any) => {
+                return strokeColorScaler(d.data.nodeType);
+            })
+			.attr("cursor", "pointer")
             .attr("r", 16)
+			// Tooltips
             .attr("data-tip", (d: any) => {
-                if (d.data.nodeType === NodeType.component && d.data.component.content) {
-                    return `<strong>${d.data.nodeType}</strong><br/><strong>${d.data.componentType}</strong>: ${(d.data.component && d.data.component.content.main) || "Empty"}`;
-                }
-                return `${d.data.nodeType && d.data.nodeType.toString()} ${d.data.subcomponentType || ""}` || `<strong>Missing type</strong>`;
+				let html: string;
+				switch (d.data.nodeType) {
+					case NodeType.norm:
+						html = `<strong>Norm</strong><br/>` +
+							((d.data.entry) ? `"${d.data.entry.content.toString()}"` : `<em>No content</em>`);
+						break;
+					case NodeType.convention:
+						html = `<strong>Convention</strong><br/>` +
+							((d.data.entry) ? `"${d.data.entry.content.toString()}"` : `<em>No content</em>`);
+						break;
+					case NodeType.junction:
+						html = `<strong>Junction</strong><br/>` +
+							((d.data.junctionType) ? `Operator: ${d.data.junctionType.toString()}` : `<em>No operator</em>`);
+						break;
+					case NodeType.negation:
+						html = `<strong>Negation</strong>`;
+						break;
+					case NodeType.sanction:
+						html = `<strong>Sanction</strong>`;
+						break;
+					case NodeType.component:
+						// Object.assign doesn't use our constructor but for the purposes of this, we just need to call string()
+						let comp = Object.assign(new Component(), d.data.component).string();
+						html = `<strong>Component</strong><br/>${d.data.componentType}<br/>` +
+							((comp) ? `"${comp}"` : `<em>No content</em>`);
+						break;
+					case NodeType.subcomponent:
+						let scomp = Object.assign(new Component(), d.data.component).string();
+						html = `<strong>Subcomponent</strong><br/>${d.data.subcomponentType}<br/>` +
+							((scomp) ? `"${scomp}"` : `<em>No content</em>`);
+						break;
+					default:
+						html = `${d.data.nodeType && d.data.nodeType.toString()}` || `<strong>Missing type</strong>`;
+						break;
+				}
+				return html;
             })
             .attr("data-html", true)
             .on("click", nodeToggle)
 
+		// Label above each node showing node type
         nodeEnter.append("text")
             .attr('text-anchor', 'middle')
             .attr('alignment-baseline', 'middle')
-            .style('font-size', (d: any) => 20 * .75 + 'px')
-            .attr("fill-opacity", 1)
-            .attr("fill", "white")
-            .attr("pointer-events", "none")
-            .attr("data-tip", (d: any) => {
-                if (d.data.nodeType === NodeType.component && d.data.component.content) {
-                    return `<strong>${d.data.nodeType}</strong><br/><strong>${d.data.componentType}</strong>: ${(d.data.component && d.data.component.content.main) || "Empty"}`;
-                }
-                return `${d.data.nodeType && d.data.nodeType.toString()} ${d.data.subcomponentType || ""}` || `<strong>Missing type</strong>`;
-            })
             .attr("data-html", true)
-            .text((d: any) => d.data.id);
+			.attr("pointer-events", "none")
+			.attr("dy", "-24")
+			.text((d: any) => d.data.nodeType);
+
+		// Labels on nodes showing logical operators and ABDICO components
+        nodeEnter.append("text")
+            .attr('text-anchor', 'middle')
+            .attr('alignment-baseline', 'middle')
+            .style('font-size', (d: any) => 16 * .75 + 'px')
+            .attr("data-html", true)
+            .attr("pointer-events", "none")
+			.attr("dy", "1")
+            .text((d: any) => {
+				if (d.data.junctionType) {
+					return d.data.junctionType;
+				} else if (d.data.nodeType === NodeType.negation) {
+					return "NOT";
+				} else if (d.data.componentType) {
+					switch (d.data.componentType) {
+						case ComponentType.attributes:
+						return "A";
+						case ComponentType.object:
+						return "B";
+						case ComponentType.deontic:
+						return "D"
+						case ComponentType.aim:
+						return "I";
+						case ComponentType.conditions:
+						return "C";
+					}
+				}
+			});
+
     }
 
     const buildLinks = (links: any) => {
@@ -126,6 +188,8 @@ const TreeComponent = (props: Proptype) => {
                     + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
                     + " " + d.parent.y + "," + d.parent.x;
             })
+			.style("stroke-width", "1")
+			//.style('opacity', .8);
     }
 
     const nodeToggle = (treeNode: any) => {
@@ -136,11 +200,13 @@ const TreeComponent = (props: Proptype) => {
 
     return (
         <>
-            <svg
-                className="d3-component"
-                width={800}
-                height={400}
-                ref={n => (svgNode = n)} />
+			<div className="treeContainer">
+				<svg
+					className="d3-component"
+					width={800}
+					height={500}
+					ref={n => (svgNode = n)} />
+			</div>
             <Modal isOpen={modal} toggle={toggle} className="modal-open">
                 <Edit close={toggle} />
             </Modal>

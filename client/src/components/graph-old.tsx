@@ -1,4 +1,4 @@
-import './graph.css'
+import './graph-old.css'
 import React, { useRef, useState, useEffect } from "react";
 import ReactTooltip from "react-tooltip";
 import { NodeType } from "../core/model/enums";
@@ -10,12 +10,7 @@ interface IProps {
 }
 
 /*
-Data structure given to D3
-Changes from Bloo's original:
-name => nodeType (done)
-
-Code:
-Always check nodeType before accessing specific properties.
+	This file is unused, but kept for some potentially useful D3 snippets.
 */
 
 export function GraphComponent(props: IProps) {

@@ -31,6 +31,13 @@ export interface INode {
     }
  }
 
+ /**
+ * The contract for the Entry class
+ */
+ export interface IEntry {
+    content?: string
+ }
+
 /**
  * Common members for Norm and Convention nodes
  */

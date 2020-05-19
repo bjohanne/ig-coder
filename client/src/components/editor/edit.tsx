@@ -10,8 +10,7 @@ import ComponentEditor from "./nodes/componenteditor";
 const Edit = (props: any) => {
     let activeNode = props.activeNode.node.data
     return (
-        ((activeNode && [NodeType.convention, NodeType.norm].indexOf(activeNode.nodeType) > -1)  &&
-        (<EntryEditor close={props.close}/>)) || 
+        ((activeNode && [NodeType.convention, NodeType.norm].indexOf(activeNode.nodeType) > -1) && (<EntryEditor close={props.close}/>)) || 
         (activeNode.nodeType === NodeType.component && (<ComponentEditor/>)) 
         || (activeNode.nodeType === NodeType.junction && (<JunctionEditor/>)) 
         || <h2>No Entry</h2>

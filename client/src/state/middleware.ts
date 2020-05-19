@@ -11,7 +11,6 @@ import {Middleware, MiddlewareAPI} from "redux";
 import axios, {AxiosResponse} from "axios";
 import {toast} from 'react-toastify';
 import appConfig from "../core/config/appConfig";
-import { INormAndConvention } from "../core/model/interfaces";
 
 export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: any) => (action: any) => {
     switch (action.type) {
@@ -41,6 +40,7 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
             });
             break;
         case PRE_SET_ACTIVE_NODE:
+			/*
             // extract the entry text, pass it to the endpoint
             if(action.payload.node.data.nodeType !== "Component") {
                 store.dispatch({type: SET_ACTIVE_NODE, payload: action.payload });
@@ -53,6 +53,14 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
                 store.dispatch({type: SET_ACTIVE_NODE, payload: Object.assign(action.payload, { ents: response.data["ent"], pos: response.data["pos"] }) });
                 action.payload.togglefunc();
             })
+			*/
+
+            // extract the entry text, pass it to the endpoint
+            if (action.payload.node.data.nodeType !== "Component") {
+                store.dispatch({type: SET_ACTIVE_NODE, payload: action.payload });
+                action.payload.togglefunc();
+                return;
+            }
             break;
         default:
             break;

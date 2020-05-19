@@ -7,8 +7,9 @@ import {
     SET_ACTIVE_NODE,
     UPDATE_ENTRY
 } from "./actionTypes";
-import { INode, INormAndConvention } from '../core/model/interfaces';
-import { Arg } from '../core/model/enums';
+
+import { NormNode, SanctionNode, JunctionNode, ComponentNode, SubcomponentNode } from '../core/model/nodes';
+import { Arg, SubcomponentType, JunctionType } from '../core/model/enums';
 
 interface IInitialState {
     documents: Array<Document>,
@@ -27,9 +28,38 @@ const reducer = (state: any = initialState, action: any) => {
 			// But maybe such a comparison is expensive, and we might as well just always overwrite.
             return update(state, {currentDocument: {$set: action.payload}});
         case ADD_ENTRY_TO_DOCUMENT:
-            if(state.currentDocument.forest.length === 0) { 
+            if(state.currentDocument.forest.length === 0) { // NB: Change this when allowing multiple entries per document
                 let doc = new Document(state.currentDocument.name, state.currentDocument.description, state.currentDocument.id);
-                doc.createTree(action.payload.hasDeontic, action.payload.content);             
+                doc.createTree(action.payload.hasDeontic, action.payload.content);
+
+				// Below is development stuff - building an example tree to demonstrate the different node types
+				doc.addSanctionNodeToTree(0);
+				let root = doc.getRoot() as SanctionNode;
+				let norm = root.getLeft() as NormNode;	// Actually a Convention node, maybe
+				doc.turnOnNegation(norm, 0);
+				norm.setEntry("The Program Manager may not initiate suspension or revocation proceedings against a certified operation.");
+				norm.createObject();
+				let attr = norm.getAttributes() as ComponentNode;
+				attr.setContent("Program Manager", "The");
+				let obj = norm.getObject() as ComponentNode;
+				let dirObj = obj.getLeft() as SubcomponentNode;
+				dirObj.createJunctionNode();
+				let jun = dirObj.getChild() as JunctionNode;
+				jun.setJunction(JunctionType.xor);
+				jun.createSubcomponentNode(SubcomponentType.direct, Arg.left);
+				jun.createSubcomponentNode(SubcomponentType.direct, Arg.right);
+				let left = jun.getLeft() as SubcomponentNode;
+				left.setContent("suspension");
+				let right = jun.getRight() as SubcomponentNode;
+				right.setContent("revocation proceedings");
+				let indirObj = obj.getRight() as SubcomponentNode;
+				indirObj.createSubcomponentNode(SubcomponentType.indirect, Arg.only);
+				let only = indirObj.getChild() as SubcomponentNode;
+				only.setContent("a certified operation");
+				let aim = norm.getAim() as ComponentNode;
+				aim.setContent("initiate");
+				// End dev stuff
+
                 return update(state, { currentDocument: { $set: doc }});
             } else {
                 return state;
@@ -47,7 +77,6 @@ const reducer = (state: any = initialState, action: any) => {
             return update(state, {currentDocument: { $set: doc } });
         case "persist/REHYDRATE":
 			// This is a "manual override" for rehydrating Redux state from local storage. Happens on page load/refresh.
-			// NB: This shouldn't happen on page navigation. For now, I'm writing this as if we were using proper single-page app navigation.
 
             if (!action.payload) {
                 return state;
@@ -66,7 +95,6 @@ const reducer = (state: any = initialState, action: any) => {
 			// Rehydrate both the list of documents and the current document
 		    return update(state, {documents: {$set: dlist}, currentDocument: { $set: rebuiltDoc }})
         default:
-            console.log("No action was hit", action);
             return state;
     }
 };
