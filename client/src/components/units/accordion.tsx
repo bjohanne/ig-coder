@@ -64,7 +64,6 @@ const Accordion = (props: any) => {
                     <textarea value={entryContent}
                               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange(e)}
                               className="new-entry-text-area"/>
-
                     }
                 </div>
                 <div className="accordion__actionbar">

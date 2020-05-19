@@ -57,7 +57,7 @@ export function DocumentComponent(props: IDocumentEditorProps) {
 
                 <div className="card-body" id="node-100000">
                 {(props.currentDocument.forest && props.currentDocument.forest.length &&
-                props.currentDocument.forest.map((forest: INode) => <div key={forest.id}><TreeComponent node={forest}/></div>)) 
+                props.currentDocument.forest.map((root: INode) => <div key={root.id}><TreeComponent node={root}/></div>)) 
                 ||
                 <h4 className="text-center">No entry available</h4>
                 }

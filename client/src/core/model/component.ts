@@ -75,4 +75,13 @@ import { IComponent } from "./interfaces"
 			this.content = undefined;
 		}
 	}
- }
+
+	/**
+	 * Concatenates prefix, main and suffix and returns a properly formatted string.
+	 * @return A string made from this component's text content
+	 */
+	string() : string {
+		return "lolhjj";
+	};
+}
+

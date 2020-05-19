@@ -8,8 +8,7 @@ import Chevron from "../../units/chevron";
 import { NodeType, ComponentType, SubcomponentType } from "../../../core/model/enums";
 import ComponentNode from "../../../core/model/nodes/component";
 
-const EntryEditor = (props: any) => {    
-    console.log("Get some props! ", props);
+const EntryEditor = (props: any) => {
     const [collapse, setCollapse] = useState({ collapseTop: false, collapseBottom: false, collapseObjects: false, collapseConditions: false });
     
     const [atoms, setAtoms] = useState({ Attributes: null, Deontics: null, Aim: null, DirectObject: null, IndirectObject: null })
@@ -113,7 +112,7 @@ const EntryEditor = (props: any) => {
                 <strong className="accordion__title">#1</strong> 
             </button>
             </div>
-            <div className="col-md-10"><div className="truncate accordion-title">{props.activeNode.entry.content}</div></div>
+            <div className="col-md-10"><div className="truncate accordion-title">{props.activeNode.node.data.entry.content}</div></div>
             </div>
 
             <Collapse isOpen={collapse.collapseTop}>            

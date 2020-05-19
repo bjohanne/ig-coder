@@ -1,6 +1,7 @@
 import { INode } from "./interfaces";
 import { Arg, NodeType } from "./enums";
-import { BaseNode, NormNode, ConventionNode, JunctionNode, SanctionNode, NegationNode, ComponentNode, SubcomponentNode } from "./nodes";
+import { BaseNode, NormNode, ConventionNode, SanctionNode, NegationNode } from "./nodes";
+// Import if needed: JunctionNode, ComponentNode, SubcomponentNode
 
 // Interface for a Document object with empty forest
 interface IEmptyDocument {
@@ -184,6 +185,7 @@ export default class Document {
 			targetNode.parent = negationNode.id;
 			this.forest[tree] = negationNode;			// Make the Negation node the new root of the tree
 		} else {
+			// Get the parent of targetNode. The new Negation node will go between it and targetNode
 			// Possible node types are all those that can have a Norm/Convention/Junction node as child
 			let parentNode = this.find(parentId, tree) as any;
 
@@ -193,12 +195,24 @@ export default class Document {
 				throw new Error("Could not find the child index of parentNode that holds targetNode");
 			}
 
+			let negNode;
 			// Depending on the node type, call the appropriate createNegationNode() function
 			if (parentNode.nodeType === NodeType.junction || parentNode.nodeType === NodeType.sanction) {
-				(childIndex === 0) ? parentNode.createNegationNode(Arg.left) : parentNode.createNegationNode(Arg.right);
+				if (childIndex === 0) {
+					parentNode.createNegationNode(Arg.left);
+					negNode = parentNode.getLeft();
+				} else {
+					parentNode.createNegationNode(Arg.right);
+					negNode = parentNode.getRight();
+				}
 			} else if (parentNode.nodeType === NodeType.component || parentNode.nodeType === NodeType.subcomponent) {
 				parentNode.createNegationNode();
+				negNode = parentNode.getChild();
 			}
+			// Hook it in
+			negNode.children[0] = targetNode;
+			negNode.update();
+			targetNode.parent = negNode.id;
 		}
 	}
 

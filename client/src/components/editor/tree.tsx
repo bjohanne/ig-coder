@@ -6,7 +6,7 @@ import { Modal } from 'reactstrap';
 import { preSetActiveNode } from "../../state/actions";
 import "./tree.css";
 import Edit from "./edit";
-import { NodeType, ComponentType } from "../../core/model/enums";
+import { NodeType } from "../../core/model/enums";
 import ReactTooltip from "react-tooltip";
 
 
@@ -26,8 +26,8 @@ const TreeComponent = (props: Proptype) => {
     let treeLayout: TreeLayout<INode>;
 
     const createTreeModel = (forestNode: INode) => {
-        let margin = { top: 20, right: 120, bottom: 20, left: 120 };
-        width = 960 - margin.right - margin.left;
+        let margin = { top: 20, right: 40, bottom: 20, left: 40 };
+        width = 1920 - margin.right - margin.left;
         height = 500 - margin.top - margin.bottom;
 
         // diagonal = linkHorizontal().x((d) => d[1]).y((d) => d[0]);
@@ -44,17 +44,21 @@ const TreeComponent = (props: Proptype) => {
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         treeLayout = tree<INode>().size([height, width]);
-        console.log("Create Tree Model");
         update(forestNode);
-
     };
 
-    /* The useEffect Hook is for running side effects outside of React,
-    for instance inserting elements into the DOM using D3 */
-    useEffect(
-        () => {
-            createTreeModel(props.node);
-        })
+	/*
+		NOTE:
+		props.node is added to the below dependency array because without it,
+		the tree is not cleared before it is redrawn, resulting in the lines
+		becoming thicker and blacker each time.
+		In exchange, there's a warning in the console about adding createTreeModel
+		to the dependency array. To do that, we'd need to move the whole function inside this callback.
+		It's a tradeoff, and this is the better option.
+	*/
+	useEffect(() => {
+		createTreeModel(props.node);
+    }, [props.node])
 
     const update = (rootNode: INode) => {
         select(svgNode).selectAll("nodes").remove();
@@ -69,16 +73,13 @@ const TreeComponent = (props: Proptype) => {
 
         buildNodes(allNodes);
         buildLinks(links);
-        ReactTooltip.rebuild()
+        ReactTooltip.rebuild();
     }
 
     const buildNodes = (allNodes: any) => {
         let nodeColorScaler = scaleOrdinal()
-            .domain([NodeType.component, NodeType.composite, NodeType.junction, NodeType.negation, NodeType.norm, NodeType.sanction, NodeType.subcomponent])
-            .range(["#5E4FA2", "#3288BD", "#66C2A5", "#ABDDA4", "#E6F598", "#FFFFBF", "#FEE08B"]);
-        let componentColorScaler = scaleOrdinal()
-            .domain([ComponentType.aim, ComponentType.attributes, ComponentType.conditions, ComponentType.deontic, ComponentType.object])
-            .range(["#f45905", "#010038", "#f35588", "#7c0a02", "#91b029"])
+            .domain([NodeType.norm, NodeType.convention, NodeType.junction, NodeType.negation, NodeType.sanction, NodeType.component, NodeType.subcomponent])
+            .range(["#7ab648", "#7ab648", "#fcc438", "#c92d39", "#6a4100", "#99d2f2", "#0c7cba"]);
 
         let nodeEnter = allNodes.enter().append("g");
         nodeEnter.attr("class", "node")
@@ -87,38 +88,83 @@ const TreeComponent = (props: Proptype) => {
                 return "translate(" + d.y + "," + d.x + ")";
             });
 
+		// Graphical circles for nodes
         nodeEnter.append("circle")
             .attr("fill", (d: any) => {
-                if (d.data.nodeType === NodeType.component) {
-                    return componentColorScaler(d.data.componentType);
-                }
                 return nodeColorScaler(d.data.nodeType);
             })
             .attr("r", 16)
+			// Tooltips
             .attr("data-tip", (d: any) => {
-                if (d.data.nodeType === NodeType.component && d.data.component.content) {
-                    return `<strong>${d.data.nodeType}</strong><br/><strong>${d.data.componentType}</strong>: ${(d.data.component && d.data.component.content.main) || "Empty"}`;
-                }
-                return `${d.data.nodeType && d.data.nodeType.toString()} ${d.data.subcomponentType || ""}` || `<strong>Missing type</strong>`;
+				switch (d.data.nodeType) {
+					case NodeType.norm:
+						if (d.data.entry) {
+							return `<strong>Norm</strong><br/>"${d.data.entry.content}"`;
+						} else {
+							return `<strong>Norm</strong><br/>No content`;
+						}
+					case NodeType.convention:
+						if (d.data.entry) {
+							return `<strong>Convention</strong><br/>"${d.data.entry.content}"`;
+						} else {
+							return `<strong>Convention</strong><br/>No content`;
+						}
+					case NodeType.junction:
+						if (d.data.junctionType){
+							return `<strong>Junction</strong><br/>Operator: ${d.data.junctionType}`;
+						} else {
+							return `<strong>Junction</strong><br/>Operator not set`;
+						}
+					case NodeType.negation:
+						return `<strong>Negation</strong>`;
+					case NodeType.sanction:
+						return `<strong>Sanction</strong>`;
+					case NodeType.component:
+						if (d.data.component.content) {
+							let content = d.data.component.string();
+							return `<strong>${d.data.nodeType}</strong><br/>${d.data.componentType}<br/>"${content}"`;
+						} else {
+							return `<strong>${d.data.nodeType}</strong><br/>${d.data.componentType}`;
+						}
+					case NodeType.subcomponent:
+						if (d.data.component.content) {
+							let content = d.data.component.string();
+							return `<strong>${d.data.nodeType}</strong><br/>${d.data.subcomponentType}<br/>"${content}"`;
+						} else {
+							return `<strong>${d.data.nodeType}</strong><br/>${d.data.subcomponentType}`;
+						}
+					default:
+						return `${d.data.nodeType && d.data.nodeType.toString()}` || `<strong>Missing type</strong>`;
+				}
             })
             .attr("data-html", true)
             .on("click", nodeToggle)
 
+		// Node type labels
         nodeEnter.append("text")
             .attr('text-anchor', 'middle')
             .attr('alignment-baseline', 'middle')
-            .style('font-size', (d: any) => 20 * .75 + 'px')
-            .attr("fill-opacity", 1)
-            .attr("fill", "white")
-            .attr("pointer-events", "none")
-            .attr("data-tip", (d: any) => {
-                if (d.data.nodeType === NodeType.component && d.data.component.content) {
-                    return `<strong>${d.data.nodeType}</strong><br/><strong>${d.data.componentType}</strong>: ${(d.data.component && d.data.component.content.main) || "Empty"}`;
-                }
-                return `${d.data.nodeType && d.data.nodeType.toString()} ${d.data.subcomponentType || ""}` || `<strong>Missing type</strong>`;
-            })
             .attr("data-html", true)
-            .text((d: any) => d.data.id);
+			.attr("pointer-events", "none")
+			.attr("dy", "-24")
+			.text((d: any) => d.data.nodeType);
+
+		// NOT and operators for Negation and Junction nodes
+        nodeEnter.append("text")
+            .attr('text-anchor', 'middle')
+            .attr('alignment-baseline', 'middle')
+            .style('font-size', (d: any) => 16 * .75 + 'px')
+            .attr("data-html", true)
+            .attr("pointer-events", "none")
+			.attr("dy", "1")
+            .text((d: any) => {
+				if (d.data.junctionType) {
+					return d.data.junctionType;
+				} else if (d.data.nodeType === NodeType.negation) {
+					return "NOT";
+				}
+			});
+
     }
 
     const buildLinks = (links: any) => {
@@ -144,8 +190,8 @@ const TreeComponent = (props: Proptype) => {
         <>
             <svg
                 className="d3-component"
-                width={800}
-                height={400}
+                width={1200}
+                height={500}
                 ref={n => (svgNode = n)} />
             <Modal isOpen={modal} toggle={toggle} className="modal-open">
                 <Edit close={toggle} />
