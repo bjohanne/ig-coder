@@ -61,7 +61,7 @@ const EntryEditor = (props: any) => {
             setRotateState(setActive === "active" ? "accordion__icon" : "accordion__icon rotate");
         } else if(accordion === "collapseBottom") {
             setActiveStateBottom(setActiveBottom === "" ? "active" : "");
-            setRotateStateBottom(setActiveBottom === "active" ? "accordion__icon accordion-bottom" : "accordion__icon rotate-bottom");
+            setRotateStateBottom(setActiveBottom === "active" ? "accordion__icon" : "accordion__icon rotate");
         } else if(accordion === "collapseObjects") {
             console.log(setRotateObjects);
             setActiveStateObjects(setActiveObjects === "" ? "active" : "");
