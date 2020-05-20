@@ -22,7 +22,7 @@ export function DocumentComponent(props: IDocumentEditorProps) {
     useEffect(() => {
 		// There is no currentDocument, or the currentDocument is not the requested one
         if (!props.currentDocument || props.currentDocument.id !== Number(id)) { // Convert the match params ID from string to number
-            getDocument(id);
+            getDocument(id);	// Fetch the document if it's not already in store
         }
 	}, [getDocument, id, props.currentDocument]);
 
@@ -43,7 +43,7 @@ export function DocumentComponent(props: IDocumentEditorProps) {
                     </div>
                     <div className="col-md-6 text-right">                        
                         <NewEntryEditor
-                            toggle={(show: any) => <button type="button" className="btn btn-success"
+                            toggle={(show: any) => <button type="button" className="btn btn-primary"
                                                            onClick={show}>Create New Entry</button>}
                             content={(hide: any) => (
                                 <>
@@ -58,7 +58,7 @@ export function DocumentComponent(props: IDocumentEditorProps) {
                 {(props.currentDocument.forest && props.currentDocument.forest.length &&
                 props.currentDocument.forest.map((root: INode) => <div key={root.id}><TreeComponent node={root}/></div>)) 
                 ||
-                <h4 className="text-center">No entry available</h4>
+                <h4 className="text-center">No entries to display</h4>
                 }
             </div>
 
@@ -67,7 +67,7 @@ export function DocumentComponent(props: IDocumentEditorProps) {
                 <div className="card-body">
                     <div className="row">
                         <div className="col-md-12" style={{ textAlign: "left" }}>
-                            <button type="button" className="btn btn-success" onClick={save}>Save Document</button>
+                            <button type="button" className="btn btn-primary" onClick={save}>Save Document</button>
                         </div>
                     </div>
                 </div> 

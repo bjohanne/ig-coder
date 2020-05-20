@@ -100,11 +100,11 @@ const TreeComponent = (props: Proptype) => {
 				let html: string;
 				switch (d.data.nodeType) {
 					case NodeType.norm:
-						html = `<strong>Norm</strong><br/>` +
+						html = `<strong>Norm (entry)</strong><br/>` +
 							((d.data.entry) ? `"${d.data.entry.content.toString()}"` : `<em>No content</em>`);
 						break;
 					case NodeType.convention:
-						html = `<strong>Convention</strong><br/>` +
+						html = `<strong>Convention (entry)</strong><br/>` +
 							((d.data.entry) ? `"${d.data.entry.content.toString()}"` : `<em>No content</em>`);
 						break;
 					case NodeType.junction:
@@ -118,18 +118,18 @@ const TreeComponent = (props: Proptype) => {
 						html = `<strong>Sanction</strong>`;
 						break;
 					case NodeType.component:
-						// Object.assign doesn't use our constructor but for the purposes of this, we just need to call string()
+						// Object.assign() bypasses our constructor but for the purposes of this, we just need to print the string
 						let comp = Object.assign(new Component(), d.data.component).string();
-						html = `<strong>Component</strong><br/>${d.data.componentType}<br/>` +
+						html = `<strong>Component</strong><br/>Type: ${d.data.componentType.toString()}<br/>` +
 							((comp) ? `"${comp}"` : `<em>No content</em>`);
 						break;
 					case NodeType.subcomponent:
 						let scomp = Object.assign(new Component(), d.data.component).string();
-						html = `<strong>Subcomponent</strong><br/>${d.data.subcomponentType}<br/>` +
+						html = `<strong>Subcomponent</strong><br/>Type: ${d.data.subcomponentType.toString()}<br/>` +
 							((scomp) ? `"${scomp}"` : `<em>No content</em>`);
 						break;
 					default:
-						html = `${d.data.nodeType && d.data.nodeType.toString()}` || `<strong>Missing type</strong>`;
+						html = `<em>Missing type</em>`;
 						break;
 				}
 				return html;
@@ -192,6 +192,8 @@ const TreeComponent = (props: Proptype) => {
 			//.style('opacity', .8);
     }
 
+	// This is the function called on node click, opening that node's modal.
+	// (It does so by setting the activeNode field in Redux state, which the Edit component responds to.)
     const nodeToggle = (treeNode: any) => {
         if (props.preSetActiveNode) {
             props.preSetActiveNode({ node: treeNode, togglefunc: toggle, modalState: setModal });

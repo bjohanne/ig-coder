@@ -91,7 +91,7 @@ const ComponentEditor = (props: any) => {
             <div className="component-editor-input-controls">
             <div className="nlp-controls">
             <input type="text" name="component-value" onFocus={changeValue} onMouseOver={changeValue} onChange={changeValue} value={content} />
-            <button disabled={!saveEnabled} className="btn-success btn" onClick={saveComponent}>Save</button>
+            <button disabled={!saveEnabled} type="button" className="btn btn-primary" onClick={saveComponent}>Save</button>
             </div>
             <div className="nlp-wrap">
                 <div>

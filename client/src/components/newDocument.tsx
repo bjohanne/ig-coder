@@ -55,7 +55,7 @@ export function NewDocumentComponent(props: any) {
                     <textarea className="form-control" rows={6} name="description" placeholder="Document Description"
                               value={form.description} onChange={updateField}/>
                 </div>
-                <button className="btn btn-primary" ref={buttonEl} onClick={submitDocument}>Create New Document</button>
+                <button type="button" className="btn btn-primary" ref={buttonEl} onClick={submitDocument}>Create New Document</button>
             </div>
         </div>
     );
