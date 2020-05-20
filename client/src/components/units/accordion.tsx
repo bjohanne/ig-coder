@@ -8,20 +8,24 @@ import "./accordion.css";
 
 let newEntryRoot: HTMLElement | null;
 
+/*
+	This component governs the Create New Entry form.
+*/
+
 const Accordion = (props: any) => {
-    const [setActive, setActiveState] = useState("active");
-    const [setHeight, setHeightState] = useState("500px");
-    const [setRotate, setRotateState] = useState("accordion__icon");
+    const [active, setActiveState] = useState(true);
+    const [height, setHeightState] = useState("500px");
+    const [rotate, setRotateState] = useState("accordion__icon rotate");
     const [hasDeontic, setHasDeontic] = useState(false);
     const [entryContent, setContent] = useState("");
 
     const content = useRef<HTMLDivElement>(null);
 
     const toggleAccordion = () => {
-        setActiveState(setActive === "" ? "active" : "");
-        setRotateState(setActive === "active" ? "accordion__icon" : "accordion__icon rotate");
+        setActiveState(!active);
+        setRotateState(active ? "accordion__icon" : "accordion__icon rotate");
         if (content.current !== null) {
-            setHeightState(setActive === "active" ? "0px" : `${content.current.scrollHeight}px`);
+            setHeightState(active ? "0px" : `${content.current.scrollHeight}px`);
         }
     };
 
@@ -33,7 +37,9 @@ const Accordion = (props: any) => {
     };
 
     const changeDeontic = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setHasDeontic(!!e.currentTarget.value);
+		console.log("hasDeontic val before: " + hasDeontic);
+        setHasDeontic(!e.currentTarget.value);
+		console.log("hasDeontic val after: " + hasDeontic);
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -46,17 +52,17 @@ const Accordion = (props: any) => {
             <div className="accordion__section">
                 <div className="accordion-header">
                     <button className="accordion" onClick={toggleAccordion}>
-                        <Chevron className={`${setRotate}`} width={10} fill={"#777"}/>
+                        <Chevron className={`${rotate}`} width={10} fill={"#777"}/>
                         <strong className="accordion__title">#1</strong>
                     </button>
                     <Toggle
                         id='has-deontic-status'
-                        defaultChecked={hasDeontic}
+                        defaultChecked={false}
                         aria-labelledby='biscuit-label'
                         onChange={changeDeontic} />
-                    <span id='biscuit-label'>Has deontic</span>
+                    <span id='biscuit-label' className="ml-2">Has a Deontic component</span>
                 </div>
-                <div ref={content} style={{maxHeight: `${setHeight}`}} className="accordion__content">
+                <div ref={content} style={{maxHeight: `${height}`}} className="accordion__content">
                     {props.content &&
                     <div className="accordion__text" dangerouslySetInnerHTML={{__html: props.content}}/>
                     }
@@ -68,10 +74,10 @@ const Accordion = (props: any) => {
                 </div>
                 <div className="accordion__actionbar">
                     <div className="accordion__button">
-                        <button type="button" className="btn btn-success" onClick={save}>Save</button>
+                        <button type="button" className="btn btn-primary" onClick={save}>Save</button>
                     </div>
                     <div className="accordion__button">
-                        <button type="button" className="btn btn-success" onClick={props.close}>Cancel</button>
+                        <button type="button" className="btn btn-secondary" onClick={props.close}>Cancel</button>
                     </div>
                 </div>
             </div>

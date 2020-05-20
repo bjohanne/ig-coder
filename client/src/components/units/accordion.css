@@ -51,9 +51,19 @@
     transition: transform 0.6s ease;
 }
 
-/* Style to rotate icon when state is active */
-.rotate {
+/* Style to rotate icon when state is active (with an alias to explicitly state the direction) */
+.rotate, .rotate-down {
     transform: rotate(90deg);
+}
+
+/* Rotate icon so that it points up (default: right) */
+.rotate-up {
+    transform: rotate(-90deg);
+}
+
+/* Rotate icon so that it points left (default: right) */
+.rotate-left {
+    transform: rotate(180deg);
 }
 
 /* Style the accordion content panel. Note: hidden by default */

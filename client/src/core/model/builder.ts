@@ -3,7 +3,7 @@ import { INode } from "./interfaces";
 import { ComponentType, NodeType } from "./enums";
 import { NormNode, ComponentNode } from "./nodes";
 
-export const buildEntrySubTree = (node: INode, atoms: any, conditions: any, orElse: any, action: Function) => {
+export const buildEntrySubTree = (node: INode, atoms: any, conditions: any, action: Function) => {
     let conventionNode = node as NormNode;
     if(atoms.Aim) {
         let aimNode = conventionNode.children.find((child: INode) => child.nodeType === NodeType.component && (child as ComponentNode).componentType === ComponentType.aim);

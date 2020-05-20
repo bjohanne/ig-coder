@@ -9,12 +9,20 @@ import ComponentEditor from "./nodes/componenteditor";
 
 const Edit = (props: any) => {
     let activeNode = props.activeNode.node.data
-    return (
-        ((activeNode && [NodeType.convention, NodeType.norm].indexOf(activeNode.nodeType) > -1) && (<EntryEditor close={props.close}/>)) || 
-        (activeNode.nodeType === NodeType.component && (<ComponentEditor/>)) 
-        || (activeNode.nodeType === NodeType.junction && (<JunctionEditor/>)) 
-        || <h2>No Entry</h2>
-    )
+	if (activeNode && activeNode.nodeType) {
+		switch(activeNode.nodeType) {
+			case NodeType.norm:
+				return <EntryEditor close={props.close}/>;
+			case NodeType.convention:
+				return <EntryEditor close={props.close}/>;
+			case NodeType.junction:
+				return <JunctionEditor close={props.close}/>;
+			case NodeType.component:
+				return <ComponentEditor close={props.close}/>;
+			default:
+				return <h2>No Entry</h2>;
+		}
+	}
 }
 
 const mapStateToProps = (state: any) => ({
@@ -28,4 +36,4 @@ const mapDispatchToProps = (dispatch: any) => ({
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-  )(Edit);
+)(Edit);
