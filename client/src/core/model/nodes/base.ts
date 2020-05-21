@@ -102,5 +102,9 @@ export default class BaseNode implements INode {
 			throw new Error("The specified child is a dummy node");
 		}
 		this.children[index] = new BaseNode(this.document, this.id);
-	}
+    }
+    
+    deleteAllChildren() {
+        this.children = [];
+    }
 }

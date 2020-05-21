@@ -7,7 +7,8 @@ import {
     SAVE_DOCUMENT_REQUEST,
     SET_ACTIVE_NODE,
     UPDATE_ENTRY,
-    PRE_SET_ACTIVE_NODE
+    PRE_SET_ACTIVE_NODE,
+    ADD_JUNCTION
 } from "./actionTypes";
 import Document from "../core/model/document";
 import { INode } from "../core/model/interfaces";
@@ -56,3 +57,8 @@ export const updateEntry = (node: any) => ({
     type: UPDATE_ENTRY,
     payload: node
 });
+
+export const addJunction = (parentNode: any) => ({
+    type: ADD_JUNCTION,
+    payload: parentNode
+})

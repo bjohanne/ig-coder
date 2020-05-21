@@ -37,9 +37,7 @@ const Accordion = (props: any) => {
     };
 
     const changeDeontic = (e: React.ChangeEvent<HTMLInputElement>) => {
-		console.log("hasDeontic val before: " + hasDeontic);
-        setHasDeontic(!e.currentTarget.value);
-		console.log("hasDeontic val after: " + hasDeontic);
+        setHasDeontic(e.target.checked);
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

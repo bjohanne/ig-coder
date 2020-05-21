@@ -6,8 +6,23 @@ import { ModalBody } from 'reactstrap';
 import { ComponentNode } from "../../../core/model/nodes";
 import { Component } from "../../../core/model/component";
 import { componentColorScaler, posColorScaler, entColorScaler } from "../../../core/config/scales";
+import SubComponentEditor from "./subcomponenteditor";
+import SubComponentActivationEditor from "./subcomponentactivationeditor";
+import { ComponentType } from "../../../core/model/enums";
+
+interface IComponentData {
+    prefix?: string,
+    main?: string,
+    suffix?: string
+}
+
 const ComponentEditor = (props: any) => { 
-    const [content, setContent] = useState("");
+    const [content, setContent] = useState<IComponentData>({
+        prefix: "",
+        main: "",
+        suffix: ""
+    });
+
     const [entryContentVal, setEntryContentVal] = useState("");
     const [saveEnabled, setSaveEnabled] = useState(false);
     let active = props.activeNode.node.data as ComponentNode;
@@ -17,7 +32,7 @@ const ComponentEditor = (props: any) => {
     useEffect(() => {        
     
         if(active.component.content && active.component.content.main) {
-            setContent(active.component.content.main);
+            setContent({ main: active.component.content.main });
         }
     
         if(entryContent) {
@@ -27,31 +42,24 @@ const ComponentEditor = (props: any) => {
 
     let currentComponentColor = componentColorScaler(props.activeNode.node.data.componentType);
 
-    
-    let changeValue = (e: React.FormEvent<HTMLInputElement>) => {
+    let changeValue = (e: any) => {
         // we know that the parent is an entry (this being a component)
         if(entryContent) {
-            let written = e.currentTarget.value;
+            const {name, value} = e.target
+            let written = value;
             let textExists = parent.entry.content.indexOf(written) > -1
             if(textExists) {                
                 setEntryContentVal(entryContent.replace(written, `<mark style='background-color: ${currentComponentColor}'>${written}</mark>`));                
             }
             setSaveEnabled(textExists && written.length > 0);
-            setContent(written);
+            setContent((prev) => ({ ...prev, [name]: written }));
         }
     }
 
     let saveComponent = () => {
-        console.log(active);
-        console.log(props);
-        if(active.component.content == null) {
-            active.component = new Component(content);
-        } else {
-            active.component.content.main = content;
-        }        
+        active.component = new Component(content.main, content.prefix, content.suffix);               
         props.updateEntry(active);
         props.activeNode.modalState(false);
-
     }
 
     let mouseOverPos = (pos: string) => {
@@ -86,21 +94,38 @@ const ComponentEditor = (props: any) => {
         props.activeNode && 
         (<ModalBody>
             <div>
-            <h4 style={{ padding: "1rem", color: "#fff", backgroundColor: currentComponentColor.toString() }}>{props.activeNode.node.data.componentType}</h4>
+            <h4 style={{ padding: "1rem", color: "#fff", backgroundColor: currentComponentColor.toString() }}>{props.activeNode.node.data.componentType} ({props.activeNode.node.data.id})</h4>
             <div className="component-editor-entry-text" dangerouslySetInnerHTML={{__html: entryContentVal }}></div>
             <div className="component-editor-input-controls">
             <div className="nlp-controls">
-            <input type="text" name="component-value" onFocus={changeValue} onMouseOver={changeValue} onChange={changeValue} value={content} />
-            <button disabled={!saveEnabled} type="button" className="btn btn-primary" onClick={saveComponent}>Save</button>
+            <div className="text-control-wrap">
+                <div className="text-control">
+                    <input type="text" name="prefix" placeholder="Prefix" onFocus={changeValue} onMouseOver={changeValue} onChange={changeValue} value={content.prefix} />
+                </div>
+                <div className="text-control">
+                    <input type="text" name="main" placeholder="Main" onFocus={changeValue} onMouseOver={changeValue} onChange={changeValue} value={content.main} />
+                </div>
+                <div className="text-control">
+                    <input type="text" name="suffix" placeholder="Suffix" onFocus={changeValue} onMouseOver={changeValue} onChange={changeValue} value={content.suffix} />
+                </div>
+            </div>
+            { active.componentType === ComponentType.conditions && 
+            <>
+                <SubComponentActivationEditor node={active.children[0]}/>
+                <SubComponentEditor node={active.children[1]}/>
+            </>
+            }
+            <button className="btn-success btn" onClick={saveComponent}>Save</button>
             </div>
             <div className="nlp-wrap">
                 <div>
                     <h4>Named entities</h4>
                     <div className="ents">
                         {
+                            props.activeNode.ents ?
                             Object.keys(props.activeNode.ents).map((key: any) => {
                             return (<div className="ent"><span className="badge ent-text" style={{ backgroundColor: entColorScaler(key) }} onMouseOver={() => mouseOverEnt(key)} onMouseOut={() => mouseOutOfEnt()}>{key} ({props.activeNode.ents[key].length})</span></div>)
-                            })
+                            }) : (<h4>None</h4>)
                         }
                     </div>
                     <h4>Part of speech tags</h4>

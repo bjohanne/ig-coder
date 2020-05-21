@@ -31,7 +31,6 @@ export function DocumentComponent(props: IDocumentEditorProps) {
         props.saveDocumentRequest(props.currentDocument);
     };
     
-
     return (
         props.currentDocument &&
         <div className="card">
