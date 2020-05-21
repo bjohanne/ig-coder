@@ -29,9 +29,15 @@ export default class Document {
         this.name = name;
         this.description = description;
         this.id = id;
+        this.forest = [];
 
-        if(forest) {
-            this.forest = forest;
+        if(forest && forest.length > 0) {
+            let node = forest[0] as NormNode;
+            if(forest[0].nodeType === NodeType.norm) {                
+                this.createTree(Arg.norm, node.entry.content)
+            } else if (forest[0].nodeType === NodeType.convention) {
+                this.createTree(Arg.convention, node.entry.content);
+            }
         }
     }
 

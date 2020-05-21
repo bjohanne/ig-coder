@@ -5,20 +5,24 @@ import {
     CREATE_DOCUMENT_RESPONSE,
     ADD_ENTRY_TO_DOCUMENT,
     SET_ACTIVE_NODE,
-    UPDATE_ENTRY
+    UPDATE_ENTRY,
+    ADD_JUNCTION
 } from "./actionTypes";
 
 import { NormNode, SanctionNode, JunctionNode, ComponentNode, SubcomponentNode } from '../core/model/nodes';
 import { Arg, SubcomponentType, JunctionType } from '../core/model/enums';
+import { INode } from '../core/model/interfaces';
 
 interface IInitialState {
     documents: Array<Document>,
-	currentDocument: Document | null
+    currentDocument: Document | null
+    activeNode: any
 }
 
 const initialState: IInitialState = {
     documents: [],
-	currentDocument: null
+    currentDocument: null,
+    activeNode: null
 };
 
 const reducer = (state: any = initialState, action: any) => {
@@ -27,6 +31,15 @@ const reducer = (state: any = initialState, action: any) => {
 			// Here, we could check whether the existing currentDocument is identical to the new one.
 			// But maybe such a comparison is expensive, and we might as well just always overwrite.
             return update(state, {currentDocument: {$set: action.payload}});
+        case ADD_JUNCTION:
+            let node = action.payload as INode;
+            let currentDocument = state.currentDocument as Document;
+            currentDocument.forest[0].updatedAt = new Date();
+            currentDocument.updateNode(node);
+            let newDocument = Object.assign(new Document("", "", -1), currentDocument);
+            return update(state, {currentDocument: {$set: newDocument }});
+
+            
         case ADD_ENTRY_TO_DOCUMENT:
             if(state.currentDocument.forest.length === 0) { // NB: Change this when allowing multiple entries per document
                 let doc = new Document(state.currentDocument.name, state.currentDocument.description, state.currentDocument.id);
@@ -64,17 +77,15 @@ const reducer = (state: any = initialState, action: any) => {
             } else {
                 return state;
             }
-        case SET_ACTIVE_NODE:
-            console.log("SET_ACTIVE_NODE", action.payload);
-            return update(state, { activeNode: { $set: action.payload }});
-    
+        case SET_ACTIVE_NODE:            
+            return update(state, { activeNode: { $set: action.payload }});    
         case CREATE_DOCUMENT_RESPONSE:
 			let document = new Document(action.payload.name, action.payload.description, action.payload.id);
             return update(state, {documents: {$push: [document]}, currentDocument: {$set: document}});
-        case UPDATE_ENTRY:
+        case UPDATE_ENTRY:            
             state.currentDocument.updateNode(action.payload);
-            let doc = new Document(state.currentDocument.name, state.currentDocument.description, state.currentDocument.id, state.currentDocument.forest);            
-            return update(state, {currentDocument: { $set: doc } });
+            let nDoc = Object.assign(new Document("", "", -1), state.currentDocument);            
+            return update(state, {currentDocument: { $set: nDoc } });
         case "persist/REHYDRATE":
 			// This is a "manual override" for rehydrating Redux state from local storage. Happens on page load/refresh.
 

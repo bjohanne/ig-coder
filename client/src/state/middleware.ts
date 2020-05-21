@@ -41,8 +41,9 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
             });
             break;
         case PRE_SET_ACTIVE_NODE:
-			// extract the entry text, pass it to the endpoint
-            if (action.payload.node.data.nodeType !== "Component") {
+			
+            // extract the entry text, pass it to the endpoint
+            if(action.payload.node.data.nodeType !== "Component") {
                 store.dispatch({type: SET_ACTIVE_NODE, payload: action.payload });
                 action.payload.togglefunc();
                 return;

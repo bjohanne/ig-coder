@@ -13,6 +13,7 @@ import { nodeColorScaler, strokeColorScaler } from "../../core/config/scales";
 
 interface Proptype {
     node: INode,
+    currentDocument: any,
     preSetActiveNode?: Function
 }
 
@@ -34,7 +35,7 @@ const TreeComponent = (props: Proptype) => {
         // diagonal = linkHorizontal().x((d) => d[1]).y((d) => d[0]);
 
         const svg = select(svgNode);
-
+        if(svg.select("g").empty()) {
         svg.append("g")
             .attr("class", "links")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -43,8 +44,9 @@ const TreeComponent = (props: Proptype) => {
             .append("g")
             .attr("class", "nodes")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
+        }
         treeLayout = tree<INode>().size([height, width]);
+        
         update(forestNode);
     };
 
@@ -58,11 +60,13 @@ const TreeComponent = (props: Proptype) => {
 		It's a tradeoff, and this is the better option.
 	*/
 	useEffect(() => {
-		createTreeModel(props.node);
-    }, [props.node])
+		createTreeModel(props.currentDocument.forest[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.currentDocument])
 
     const update = (rootNode: INode) => {
-        select(svgNode).selectAll("nodes").remove();
+        select(svgNode).selectAll("g.node").remove();
+        select(svgNode).selectAll("path.link").remove();
         let root = hierarchy(rootNode, (d: INode) => d.children);
         let treeNodes = treeLayout(root);
         let nodes = treeNodes.descendants().filter((node: any) => !!node.data.nodeType);
@@ -201,7 +205,7 @@ const TreeComponent = (props: Proptype) => {
     }
 
     return (
-        <>
+        <div>
 			<div className="treeContainer">
 				<svg
 					className="d3-component"
@@ -209,15 +213,16 @@ const TreeComponent = (props: Proptype) => {
 					height={500}
 					ref={n => (svgNode = n)} />
 			</div>
+            <span>{props.currentDocument.forest[0].updatedAt.toLocaleString()}</span>
             <Modal isOpen={modal} toggle={toggle} className="modal-open">
                 <Edit close={toggle} />
             </Modal>
-        </>
+        </div>
     );
 }
 
 const mapStateToProps = (state: any) => ({
-    document: state.reducer.document
+    currentDocument: state.reducer.currentDocument
 });
 
 const mapDispatchToProps = (dispatch: any) => ({

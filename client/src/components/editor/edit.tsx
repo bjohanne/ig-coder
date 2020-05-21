@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { INode } from "../../core/model/interfaces";
 import { updateEntry } from "../../state/actions";
@@ -6,19 +6,28 @@ import { NodeType } from "../../core/model/enums";
 import EntryEditor from "./nodes/entryeditor";
 import JunctionEditor from "./nodes/junctioneditor";
 import ComponentEditor from "./nodes/componenteditor";
+import SubComponentEditor from "./nodes/subcomponenteditor";
 
 const Edit = (props: any) => {
     let activeNode = props.activeNode.node.data
+    
+    useEffect((): void => {
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		activeNode = props.activeNode.node.data;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.activeNode])
+
 	if (activeNode && activeNode.nodeType) {
 		switch(activeNode.nodeType) {
 			case NodeType.norm:
-				return <EntryEditor close={props.close}/>;
-			case NodeType.convention:
-				return <EntryEditor close={props.close}/>;
+            case NodeType.convention:
+				return <EntryEditor close={props.close} created={props.activeNode.node.data.updatedAt}/>;				
 			case NodeType.junction:
-				return <JunctionEditor close={props.close}/>;
+                return <JunctionEditor close={props.close} created={props.activeNode.node.data.updatedAt}/>;
+            case NodeType.subcomponent:
+                return <SubComponentEditor close={props.close} created={props.activeNode.node.data.updatedAt}/>
 			case NodeType.component:
-				return <ComponentEditor close={props.close}/>;
+				return <ComponentEditor close={props.close} created={props.activeNode.node.data.updatedAt}/>;
 			default:
 				return <h2>No Entry</h2>;
 		}

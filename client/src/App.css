@@ -118,7 +118,25 @@
     flex-wrap: wrap;
 }
 
+.text-control-wrap {
+    display: flex;
+    flex-direction: row;
+}
 
+.text-control {
+    display: flex;
+    flex-grow: 1;
+}
+
+.sub-comp-wrap {
+    display: flex;
+    align-items: center;
+    margin-top: .25em;
+}
+
+#is-junc-label {
+    text-indent: 5px;
+}
 
 .ent-text, .pos-text {
     padding: .5rem !important;
