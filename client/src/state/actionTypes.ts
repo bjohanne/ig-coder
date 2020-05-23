@@ -14,3 +14,4 @@ export const SET_ACTIVE_NODE = "SET_ACTIVE_NODE";
 export const UPDATE_ENTRY = "UPDATE_ENTRY";
 
 export const ADD_JUNCTION = "ADD_JUNCTION";
+export const UPDATE_JUNCTION = "UPDATE_JUNCTION";

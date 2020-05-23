@@ -32,7 +32,7 @@ const ComponentEditor = (props: any) => {
     useEffect(() => {        
     
         if(active.component.content && active.component.content.main) {
-            setContent({ main: active.component.content.main });
+            setContent({ ...active.component.content });
         }
     
         if(entryContent) {
@@ -93,7 +93,7 @@ const ComponentEditor = (props: any) => {
     return (        
         props.activeNode && 
         (<ModalBody>
-            <div>
+            <div className="modal-wrapper">
             <h4 style={{ padding: "1rem", color: "#fff", backgroundColor: currentComponentColor.toString() }}>{props.activeNode.node.data.componentType} ({props.activeNode.node.data.id})</h4>
             <div className="component-editor-entry-text" dangerouslySetInnerHTML={{__html: entryContentVal }}></div>
             <div className="component-editor-input-controls">

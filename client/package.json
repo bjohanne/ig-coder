@@ -21,6 +21,7 @@
     "immutability-helper": "^3.0.1",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
+    "react-radio-buttons": "^1.2.2",
     "react-redux": "^7.1.1",
     "react-router-dom": "^5.0.1",
     "react-scripts": "^3.4.0",

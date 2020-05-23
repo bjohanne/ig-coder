@@ -5,8 +5,8 @@ import { updateEntry } from "../../../state/actions";
 import { ModalBody } from 'reactstrap';
 import { SubcomponentNode } from "../../../core/model/nodes";
 import { Component } from "../../../core/model/component";
-import { componentColorScaler, posColorScaler, entColorScaler } from "../../../core/config/scales";
-import { NodeType, ComponentType, SubcomponentType, SubtreeType } from "../../../core/model/enums";
+import { componentColorScaler } from "../../../core/config/scales";
+import { ComponentType } from "../../../core/model/enums";
 
 interface ISubcomponentData {
     prefix?: string,
@@ -20,10 +20,12 @@ const SubComponentEditor = (props: any) => {
         main: "",
         suffix: ""
     });
-    let active = props.node as SubcomponentNode;
 
-    const [entryContentVal, setEntryContentVal] = useState("");
-    
+    let active = (props.node ? props.node : props.activeNode.node.data) as SubcomponentNode;
+
+    useEffect(() => {
+        setContent({ ...active.component.content })
+    }, [active.component.content])    
     // let changeValue = (e: React.FormEvent<HTMLInputElement>) => {
     //     setContent(e.currentTarget.value);
     //     active.component = new Component(content);        
@@ -33,6 +35,12 @@ const SubComponentEditor = (props: any) => {
         active.component = new Component(content.main, content.prefix, content.suffix);               
         props.updateEntry(active);
         props.activeNode.modalState(false);
+    }
+
+    let change = (e: any) => {
+        const {name, value} = e.target
+        setContent((prev) => ({ ...prev, [name]: value }));
+        console.log(content);
     }
 
     const getparComponentType = () => {
@@ -54,16 +62,16 @@ const SubComponentEditor = (props: any) => {
                     <h4 style={{ padding: "1rem", color: "#fff", backgroundColor: currentComponentColor.toString() }}>{props.activeNode.node.parent.data.content}I want to put parent.data.content.main here.({props.activeNode.node.data.id})</h4>
                     <div className="text-control-wrap">
                         <div className="text-control">
-                            <input type="text" name="prefix" placeholder="Prefix" />
+                            <input onChange={change} value={content.prefix} type="text" name="prefix" placeholder="Prefix" />
                         </div>
                         <div className="text-control">
-                            <input type="text" name="main" placeholder="Main" />
+                            <input onChange={change} value={content.main} type="text" name="main" placeholder="Main" />
                         </div>
                         <div className="text-control">
-                            <input type="text" name="suffix" placeholder="Suffix" />
+                            <input onChange={change} value={content.suffix} type="text" name="suffix" placeholder="Suffix" />
                         </div>
                     </div>
-                    <button className="btn-success btn" style={{margin:5}} onClick={saveComponent}>Save</button>
+                    <button className="btn-primary btn" style={{margin:5}} onClick={saveComponent}>Save</button>
                     <button className="btn-light btn" style={{margin:5}} onClick={saveComponent}>Clear</button>
                 </div>
             </ModalBody>
@@ -77,13 +85,13 @@ const SubComponentEditor = (props: any) => {
 				<h4 style={{ padding: "1rem", color: "#fff", backgroundColor: currentComponentColor.toString() }}>{props.activeNode.node.parent.data.content}({props.activeNode.node.data.id})</h4>
 				<div className="text-control-wrap">
 					<div className="text-control">
-						<input type="text" name="prefix" placeholder="Prefix" />
+						<input onChange={change} value={content.prefix} type="text" name="prefix" placeholder="Prefix" />
 					</div>
 					<div className="text-control">
-						<input type="text" name="main" placeholder="Main" />
+						<input onChange={change} value={content.main} type="text" name="main" placeholder="Main" />
 					</div>
 					<div className="text-control">
-						<input type="text" name="suffix" placeholder="Suffix" />
+						<input onChange={change} value={content.suffix} type="text" name="suffix" placeholder="Suffix" />
 					</div>
 				</div>
 				<button className="btn-success btn" style={{margin:5}} onClick={saveComponent}>Save</button>
