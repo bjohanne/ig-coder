@@ -30,7 +30,7 @@ const TreeComponent = (props: Proptype) => {
     const createTreeModel = (forestNode: INode) => {
         let margin = { top: 20, right: 40, bottom: 20, left: 40 };
         width = 1800 - margin.right - margin.left;
-        height = 500 - margin.top - margin.bottom;	// This affects how the tree looks
+        height = 650 - margin.top - margin.bottom;	// This affects how the tree looks
 
         // diagonal = linkHorizontal().x((d) => d[1]).y((d) => d[0]);
 
