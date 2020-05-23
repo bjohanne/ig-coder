@@ -149,8 +149,35 @@ mark, .mark {
     padding: 0 !important;
 }
 
+.radio-wrap {
+    display: flex;
+    flex-grow: 1;
+}
+
 .radio {
     flex-grow: 1;
+}
+
+.radio label, .checkbox label {
+    font-size: 2em;
+}
+
+.radio input[type=radio], .checkbox input[type=checkbox] {
+    width: 30px;
+    height: 30px;
+}
+
+.checkbox-wrap {
+    display: flex;
+    flex-grow: 1;
+}
+.checkbox {
+    display: flex;
+    flex-grow: 1;
+}
+
+.hide {
+    display: none;
 }
 
 .radio label {

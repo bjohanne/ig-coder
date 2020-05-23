@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { Collapse, Row, Col, ModalBody, ModalFooter } from 'reactstrap';
 import Toggle from "react-toggle";
@@ -21,6 +21,7 @@ const EntryEditor = (props: any) => {
     const [collapse, setCollapse] = useState({ collapseTop: true, collapseBottom: true, collapseObjects: false, collapseConditions: false });
     const [atoms, setAtoms] = useState({ Attributes: null, Deontics: null, Aim: null, DirectObject: null, IndirectObject: null })
     const [conditions, setConditions] = useState({ ActivationCondition: null, ExecutionCondition: null });
+    const [entryText, setEntryText] = useState("")
 
     const updateAtoms = (e: any) => {
         setAtoms({
@@ -38,7 +39,8 @@ const EntryEditor = (props: any) => {
 
     const saveEntryData = () => {
         try {
-            buildEntrySubTree(props.activeNode, atoms, conditions, props.updateEntry);   
+            props.activeNode.node.data.entry.content = entryText;
+            buildEntrySubTree(props.activeNode.node.data, atoms, conditions, props.updateEntry);   
             props.close(); 
         } catch(error) {
             alert(error);
@@ -106,9 +108,9 @@ const EntryEditor = (props: any) => {
 	/* Functions to get the current value of this node's component children */
 
     const getValue = (type: ComponentType) : string => {
-        if (props.activeNode && props.activeNode.children) {
+        if (props.activeNode.node.data.activeNode && props.activeNode.node.data.children) {
 			// Find out whether this node has a child of the passed in type
-            let node = props.activeNode.children.find((node: INode) => {
+            let node = props.activeNode.node.data.children.find((node: INode) => {
                 if (node.nodeType === NodeType.component) {
                     return (node as ComponentNode).componentType === type;
                 }
@@ -132,6 +134,15 @@ const EntryEditor = (props: any) => {
         }
         return "";
     }
+
+    const entryTextChanged = (e: any) => {
+        let { value } = e.target;
+        setEntryText(value);
+    }
+
+    useEffect(() => {
+        setEntryText(props.activeNode.node.data.entry.content);
+    }, [props.activeNode.node.data.entry.content])
 
     return (
         props.activeNode &&
@@ -167,7 +178,7 @@ const EntryEditor = (props: any) => {
 			<Collapse isOpen={collapse.collapseTop}>
 				<div className="row">
 					<div className="col-md-12">
-						<textarea name="node-entry-content" className="form-control input-lg mb-3" defaultValue={props.activeNode.node.data.entry.content}></textarea>                
+						<textarea name="node-entry-content" onChange={entryTextChanged} className="form-control input-lg mb-3" value={entryText}></textarea>                
 					</div>
 				</div>
 			</Collapse>

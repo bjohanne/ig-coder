@@ -14,7 +14,7 @@ export class Entry implements IEntry {
      * @param content (Optional) The full text of the statement
      */
     constructor(content?: string) {
-		if (content) {
+		if (typeof(content) !== undefined) {
 			this.content = content;
 		}
     }
