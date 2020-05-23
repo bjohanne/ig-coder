@@ -6,7 +6,8 @@ import {
     ADD_ENTRY_TO_DOCUMENT,
     SET_ACTIVE_NODE,
     UPDATE_ENTRY,
-    ADD_JUNCTION
+    ADD_JUNCTION,
+    UPDATE_JUNCTION
 } from "./actionTypes";
 
 import { NormNode, SanctionNode, JunctionNode, ComponentNode, SubcomponentNode } from '../core/model/nodes';
@@ -26,20 +27,30 @@ const initialState: IInitialState = {
 };
 
 const reducer = (state: any = initialState, action: any) => {
+    let currentDocument: Document;
+    let newDocument: Document;
+    let node: INode;
     switch (action.type) {
         case GET_DOCUMENT_RESPONSE:
 			// Here, we could check whether the existing currentDocument is identical to the new one.
 			// But maybe such a comparison is expensive, and we might as well just always overwrite.
             return update(state, {currentDocument: {$set: action.payload}});
         case ADD_JUNCTION:
-            let node = action.payload as INode;
-            let currentDocument = state.currentDocument as Document;
+            node = action.payload as INode;
+            currentDocument = state.currentDocument as Document;
             currentDocument.forest[0].updatedAt = new Date();
             currentDocument.updateNode(node);
-            let newDocument = Object.assign(new Document("", "", -1), currentDocument);
+            newDocument = Object.assign(new Document("", "", -1), currentDocument);
+            return update(state, {currentDocument: {$set: newDocument }});
+        case UPDATE_JUNCTION:
+            let junctionNode = action.payload.node as JunctionNode;
+            currentDocument = state.currentDocument as Document;
+            currentDocument.forest[0].updatedAt = new Date();
+            junctionNode.setJunction(action.payload.junctionType);
+            currentDocument.updateNode(junctionNode);
+            newDocument = Object.assign(new Document("", "", -1), currentDocument);
             return update(state, {currentDocument: {$set: newDocument }});
 
-            
         case ADD_ENTRY_TO_DOCUMENT:
             if(state.currentDocument.forest.length === 0) { // NB: Change this when allowing multiple entries per document
                 let doc = new Document(state.currentDocument.name, state.currentDocument.description, state.currentDocument.id);

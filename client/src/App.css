@@ -148,3 +148,16 @@
 mark, .mark {
     padding: 0 !important;
 }
+
+.radio {
+    flex-grow: 1;
+}
+
+.radio label {
+    font-size: 2em;
+}
+
+.radio input[type=radio] {
+    width: 30px;
+    height: 30px;
+}

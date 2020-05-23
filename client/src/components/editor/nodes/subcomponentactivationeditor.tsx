@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import Toggle from "react-toggle";
 import { updateEntry, addJunction } from "../../../state/actions";
@@ -10,7 +10,11 @@ import { Arg } from "../../../core/model/enums";
 const SubComponentActivationEditor = (props: any) => { 
     const [hasChildJunction, setHasChildJunction] = useState(false);
     const [content, setContent] = useState("");
-    let active = props.node as SubcomponentNode;
+    let active = (props.node ? props.node : props.activeNode.node.data) as SubcomponentNode;
+
+    useEffect(() => {
+        setHasChildJunction(active.children.filter((child: INode) => !child.isDummy()).length > 0)
+    }, [active.children]);
     
     let changeValue = (e: React.FormEvent<HTMLInputElement>) => {
         setContent(e.currentTarget.value);
@@ -36,7 +40,7 @@ const SubComponentActivationEditor = (props: any) => {
                 <div className="sub-comp-wrap">
                 <Toggle
                     id='has-junction'
-                    defaultChecked={hasChildJunction}
+                    checked={hasChildJunction}
                     aria-labelledby='biscuit-label'
                     onChange={() => changeIsJunction()} />
                 <span id='is-junc-label'>Activation is Junction</span>
@@ -45,7 +49,7 @@ const SubComponentActivationEditor = (props: any) => {
                 { !hasChildJunction ? 
                     (<input type="text" 
                         style={{ width: "100%" }} 
-                        placeholder={`${props.node.nodeType} ${props.node.subcomponentType}`} 
+                        placeholder={`${props.activeNode.nodeType} ${props.activeNode.subcomponentType}`} 
                         name="component-value" 
                         onChange={changeValue} 
                         value={content} />) : null
