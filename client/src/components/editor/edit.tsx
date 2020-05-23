@@ -7,6 +7,7 @@ import EntryEditor from "./nodes/entryeditor";
 import JunctionEditor from "./nodes/junctioneditor";
 import ComponentEditor from "./nodes/componenteditor";
 import SubComponentEditor from "./nodes/subcomponenteditor";
+import NegationEditor from "./nodes/negationeditor";
 
 const Edit = (props: any) => {
     let activeNode = props.activeNode.node.data
@@ -27,7 +28,9 @@ const Edit = (props: any) => {
             case NodeType.subcomponent:
                 return <SubComponentEditor close={props.close} created={props.activeNode.node.data.updatedAt}/>
 			case NodeType.component:
-				return <ComponentEditor close={props.close} created={props.activeNode.node.data.updatedAt}/>;
+                return <ComponentEditor close={props.close} created={props.activeNode.node.data.updatedAt}/>;
+            case NodeType.negation:
+                return <NegationEditor close={props.close} created={props.activeNode.node.data.updatedAt}/>;
 			default:
 				return <h2>No Entry</h2>;
 		}

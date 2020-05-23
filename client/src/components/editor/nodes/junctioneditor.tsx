@@ -33,13 +33,11 @@ const JunctionEditor = (props: any) => {
         if(children.filter((node: INode) => node.nodeType === NodeType.sanction).length > 0) {
             setHasConvention(true);
         }
-    }, [active.children])
+
+        setJunctionType(active.junctionType);
+    }, [active.children, active.junctionType])
 
     const [junctionType, setJunctionType] = useState(null);
-
-    useEffect(() => {
-        setJunctionType(active.junctionType);
-    }, [active.junctionType])
 
     const onChange = (value: string) => {
         const jType: JunctionType = (JunctionType)[value.toLowerCase()];
@@ -135,8 +133,7 @@ const JunctionEditor = (props: any) => {
                         <input type="checkbox" name="children" onChange={select} value="Convention" disabled={(hasDirect || hasIndirect || hasNorm)}/>
                     </div>
                     <div className={`checkbox ${(active.subcomponentType === SubcomponentType.activation ? "show" : "hide")}`}>
-                        <label>Negation</label>
-                        // eslint-disable-next-line no-mixed-operators
+                        <label>Negation</label>                        
                         <input type="checkbox" name="children" onChange={select} value="Negation" disabled={hasDirect || hasIndirect && !(hasConvention && hasNorm)}/>
                     </div>                      
                     <div className={`checkbox ${(active.subcomponentType === SubcomponentType.direct ? "show" : "hide")}`}>

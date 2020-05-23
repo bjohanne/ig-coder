@@ -9,7 +9,8 @@ import {
     UPDATE_ENTRY,
     PRE_SET_ACTIVE_NODE,
     ADD_JUNCTION,
-    UPDATE_JUNCTION
+    UPDATE_JUNCTION,
+    UPDATE_NEGATION
 } from "./actionTypes";
 import Document from "../core/model/document";
 import { INode } from "../core/model/interfaces";
@@ -66,5 +67,10 @@ export const addJunction = (parentNode: any) => ({
 
 export const updateJunction = (payload: any) => ({
     type: UPDATE_JUNCTION,
+    payload: payload
+});
+
+export const updateNegation = (payload: any) => ({
+    type: UPDATE_NEGATION,
     payload: payload
 })
