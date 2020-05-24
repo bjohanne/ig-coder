@@ -23,7 +23,7 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
 				store.dispatch({type: GET_DOCUMENT_RESPONSE, payload: foundDocument});
 			} else { // Need to query the server
 				axios.get(`${appConfig.api.baseUrl}/documents/${action.document_id}`).then((response: AxiosResponse) => {
-					response.data.forest = [];	// Turn the forest back into a JS array (needed string on the server)
+					//response.data.forest = [];	// Turn the forest back into a JS array (needed string on the server)
 					store.dispatch({type: GET_DOCUMENT_RESPONSE, payload: response.data});
 				});
 			}
