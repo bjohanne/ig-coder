@@ -49,7 +49,7 @@ class DocumentsResource(Resource):
         return {"id": document_id, "name": "dummy", "description": "dummy", "forest": [root] }
 
 
-    @marshal_with(document_fields)
+    #@marshal_with(document_fields)
     def post(self):
         """
         Adds a new document to the list
@@ -62,7 +62,7 @@ class DocumentsResource(Resource):
             "id": next_doc,
             "name": args.name,
             "description": args.description,
-            "forest": json.loads(args.forest)
+            "forest": []
         }
         self.documents.append(document)
 
@@ -72,7 +72,7 @@ class DocumentsResource(Resource):
         return document
 
 
-    @marshal_with(document_fields)
+    #@marshal_with(document_fields)
     def patch(self):
         data = request.json        
         # save the document                
@@ -82,7 +82,7 @@ class DocumentsResource(Resource):
         # Maybe make a custom type for the forest.
         # return true if successful
         resp = create_graph(data)
-        return make_response({"message": "Collection updated"}, 204)
+        return make_response({"message": "Collection updated"}, 200)
 
     @marshal_with(document_fields)
     def put(self, document_id):

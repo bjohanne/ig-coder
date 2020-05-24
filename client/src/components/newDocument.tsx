@@ -25,7 +25,7 @@ export function NewDocumentComponent(props: any) {
 			toast.error('Please enter a document name.');
 		} else {
 			toast.dismiss();
-            createDocument({name: form.name, description: form.description, forest: "[]"});
+            createDocument({name: form.name, description: form.description, forest: []});
 			if (buttonEl && buttonEl.current) {
 				buttonEl.current.disabled = true;	// Disable the submit button to prevent multiple requests being sent
 			}
