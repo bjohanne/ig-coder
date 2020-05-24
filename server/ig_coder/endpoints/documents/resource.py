@@ -24,6 +24,7 @@ class DocumentsResource(Resource):
         Displays a document's details
         """
         nodes = get_document(document_id)
+        # TODO: Also need to get the anchor node that holds name and description, and set that instead of "dummy".
         root = None
         for node in nodes:
             properties = node[0]._properties
