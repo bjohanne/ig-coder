@@ -16,9 +16,19 @@ export interface INode {
     createdAt: Date,
     updatedAt: Date,
     children: INode[],   // Array of child nodes, more specified in the implementations
-    isDummy() : boolean//,
-    //find(targetId: number) : BaseNode
+    isDummy() : boolean
  }
+
+ /*
+  * The interface for the Document class, with forest optional.
+  * In the Document class implementation, forest is required.
+  */
+ export interface IDocument {
+	name: string,
+	description: string,
+	id: number,
+	forest?: INode[]
+}
 
 /**
  * The contract for the Component class

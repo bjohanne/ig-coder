@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { select, tree, hierarchy, TreeLayout } from "d3";
-import { INode } from "../../core/model/interfaces";
+import { INode, IDocument } from "../../core/model/interfaces";
 import { Modal } from 'reactstrap';
 import { preSetActiveNode } from "../../state/actions";
 import "./tree.css";
@@ -13,7 +13,7 @@ import { nodeColorScaler, strokeColorScaler } from "../../core/config/scales";
 
 interface Proptype {
     node: INode,
-    currentDocument: any,
+    currentDocument: IDocument,
     preSetActiveNode?: Function
 }
 
@@ -50,17 +50,8 @@ const TreeComponent = (props: Proptype) => {
         update(forestNode);
     };
 
-	/*
-		NOTE:
-		props.node is added to the below dependency array because without it,
-		the tree is not cleared before it is redrawn, resulting in the lines
-		becoming thicker and blacker each time.
-		In exchange, there's a warning in the console about adding createTreeModel
-		to the dependency array. To do that, we'd need to move the whole function inside this callback.
-		It's a tradeoff, and this is the better option.
-	*/
 	useEffect(() => {
-		createTreeModel(props.currentDocument.forest[0]);
+		createTreeModel(props.currentDocument.forest[0]);	// NOTE: This needs to be changed when allowing multiple trees per document
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.currentDocument])
 
@@ -105,11 +96,11 @@ const TreeComponent = (props: Proptype) => {
 				switch (d.data.nodeType) {
 					case NodeType.norm:
 						html = `<strong>Norm (entry)</strong><br/>` +
-							((d.data.entry) ? `"${d.data.entry.content.toString()}"` : `<em>No content</em>`);
+							((d.data.entry.content) ? `"${d.data.entry.content.toString()}"` : `<em>No content</em>`);
 						break;
 					case NodeType.convention:
 						html = `<strong>Convention (entry)</strong><br/>` +
-							((d.data.entry) ? `"${d.data.entry.content.toString()}"` : `<em>No content</em>`);
+							((d.data.entry.content) ? `"${d.data.entry.content.toString()}"` : `<em>No content</em>`);
 						break;
 					case NodeType.junction:
 						html = `<strong>Junction</strong><br/>` +
@@ -197,7 +188,7 @@ const TreeComponent = (props: Proptype) => {
     }
 
 	// This is the function called on node click, opening that node's modal.
-	// (It does so by setting the activeNode field in Redux state, which the Edit component responds to.)
+	// (It does so by setting the activeNode branch in Redux state, which the Edit component responds to.)
     const nodeToggle = (treeNode: any) => {
         if (props.preSetActiveNode) {
             props.preSetActiveNode({ node: treeNode, togglefunc: toggle, modalState: setModal });

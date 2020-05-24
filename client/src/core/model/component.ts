@@ -37,6 +37,19 @@ import { IComponent } from "./interfaces"
 		}
     }
 
+	/**
+	 * Static factory method that takes an object of the IComponent type
+	 * and creates a new Component object. Convenience for when you have long arguments.
+	 * If content is undefined, returns undefined.
+	 * @param data An object of type IComponent
+	 */
+	static fromData(data: IComponent) {
+		if (!data.content) {
+			return undefined;
+		}
+		return new this(data.content.main, data.content.prefix, data.content.suffix);
+    }
+
     /**
 	 * Set each part of the component individually.
 	 * Only the provided parameters are changed.

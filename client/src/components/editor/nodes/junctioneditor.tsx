@@ -77,8 +77,9 @@ const JunctionEditor = (props: any) => {
                     active.createSubcomponentNode(SubcomponentType.direct, Arg.left);
                     active.createSubcomponentNode(SubcomponentType.direct, Arg.right);
                 } else {
-                    active.deleteAllChildren();
-                }
+                    active.deleteChild(Arg.left);
+                    active.deleteChild(Arg.right);
+				}
                 setHasDirect(checked);
                 break;
             case "Indirect":
@@ -86,8 +87,9 @@ const JunctionEditor = (props: any) => {
                     active.createSubcomponentNode(SubcomponentType.indirect, Arg.left);
                     active.createSubcomponentNode(SubcomponentType.indirect, Arg.right);
                 } else {
-                    active.deleteAllChildren();
-                }
+                    active.deleteChild(Arg.left);
+                    active.deleteChild(Arg.right);
+				}
                 setHasIndirect(checked);
                 break;
             default:
@@ -134,7 +136,7 @@ const JunctionEditor = (props: any) => {
                     </div>
                     <div className={`checkbox ${(active.subcomponentType === SubcomponentType.activation ? "show" : "hide")}`}>
                         <label>Negation</label>                        
-                        <input type="checkbox" name="children" onChange={select} value="Negation" disabled={hasDirect || hasIndirect && !(hasConvention && hasNorm)}/>
+                        <input type="checkbox" name="children" onChange={select} value="Negation" disabled={(hasDirect || hasIndirect) && !(hasConvention && hasNorm)}/>
                     </div>                      
                     <div className={`checkbox ${(active.subcomponentType === SubcomponentType.direct ? "show" : "hide")}`}>
                         <label>Attributes</label>

@@ -1,10 +1,7 @@
-import BaseNode from "./base";
+import { BaseNode, NormNode, ConventionNode, JunctionNode } from "./";
 import { INode, IOneChild } from "../interfaces";
 import { NodeType, ComponentType, SubcomponentType, SubtreeType, Arg } from "../enums";
-
-import NormNode from "./norm";
-import ConventionNode from "./convention";
-import JunctionNode from "./junction";
+import { DataError, DataErrorType } from "../errors";
 
 /**
  * The Negation node has exactly one child and is placed above a node
@@ -35,7 +32,7 @@ export default class NegationNode extends BaseNode implements IOneChild {
     // Getter for the child
     getChild() : INode {
         if (this.children[0].isDummy()) {
-            throw new Error("The child of this Negation node is a dummy node");
+            throw new DataError(DataErrorType.NEG_GET_DUM);
         }
         return this.children[0];
     }
@@ -47,17 +44,19 @@ export default class NegationNode extends BaseNode implements IOneChild {
 	 * @param statement (Optional) The full text of the statement
      * @param origin (Optional) The ID of the node the new node is a reference to
      */
-    createNormOrConventionNode(type: Arg.norm | Arg.convention, statement?: string, origin?: number) {
-        this.children = [(type === Arg.norm) ? new NormNode(this.document, statement, this.id, origin)
-            : new ConventionNode(this.document, statement, this.id, origin)];
+    createNormOrConventionNode(type: Arg.norm | Arg.convention, statement?: string, origin?: number) : INode | undefined {
+        this.children[0] = (type === Arg.norm) ? new NormNode(this.document, statement, this.id, origin)
+            : new ConventionNode(this.document, statement, this.id, origin);
 		this.update();
+		return this.children[0];
     }
 
     /**
      * Creates a Junction node as child of this node.
      */
-    createJunctionNode() {
+    createJunctionNode() : INode | undefined {
         this.children[0] = new JunctionNode(this.document, this.id, this.subtree, this.componentType, this.subcomponentType);
 		this.update();
+		return this.children[0];
     }
 }

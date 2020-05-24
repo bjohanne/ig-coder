@@ -1,11 +1,7 @@
-import BaseNode from "./base";
+import { BaseNode, NormNode, ConventionNode, JunctionNode, NegationNode } from "./";
 import { INode, ITwoChildren } from "../interfaces";
 import { NodeType, SubtreeType, Arg } from "../enums";
-
-import NormNode from "./norm";
-import ConventionNode from "./convention";
-import JunctionNode from "./junction";
-import NegationNode from "./negation";
+import { DataError, DataErrorType } from "../errors";
 
 /**
  * Sanction nodes signify an "or else" relationship between its two children.
@@ -33,14 +29,14 @@ export default class SanctionNode extends BaseNode implements ITwoChildren {
 
     getLeft() : INode {
         if (this.children[0].isDummy()) {
-            throw new Error("Left child of this Sanction node is a dummy node");
+            throw new DataError(DataErrorType.SAN_GET_DUM_LEFT);
         }
         return this.children[0];
     }
 
     getRight() : INode {
         if (this.children[1].isDummy()) {
-            throw new Error("Right child of this Sanction node is a dummy node");
+            throw new DataError(DataErrorType.SAN_GET_DUM_RIGHT);
         }
         return this.children[1];
     }
@@ -53,30 +49,33 @@ export default class SanctionNode extends BaseNode implements ITwoChildren {
 	 * @param statement (Optional) The full text of the statement
 	 * @param origin (Optional) The ID of the node the new node is a reference to
 	 */
-	createNormOrConventionNode(type: Arg.norm | Arg.convention, position: Arg.left | Arg.right, statement?: string, origin?: number) {
+	createNormOrConventionNode(type: Arg.norm | Arg.convention, position: Arg.left | Arg.right, statement?: string, origin?: number) : INode | undefined {
 		let index = (position === Arg.left) ? 0 : 1;
 		this.children[index] = (type === Arg.norm) ? new NormNode(this.document, statement, this.id, origin)
 			: new ConventionNode(this.document, statement, this.id, origin);
 		this.update();
+		return this.children[index];
 	}
 
 	/**
 	 * Creates a Junction node as child of this node.
 	 * @param position Whether the new node should be the left or right child of this node
 	 */
-	createJunctionNode(position: Arg.left | Arg.right) {
+	createJunctionNode(position: Arg.left | Arg.right) : INode | undefined {
 		let index = (position === Arg.left) ? 0 : 1;
 		this.children[index] = new JunctionNode(this.document, this.id, this.subtree);
 		this.update();
+		return this.children[index];
 	}
 
 	/**
 	 * Creates a Negation node as child of this node.
 	 * @param position Whether the new node should be the left or right child of this node
 	 */
-	createNegationNode(position: Arg.left | Arg.right) {
+	createNegationNode(position: Arg.left | Arg.right) : INode | undefined {
 		let index = (position === Arg.left) ? 0 : 1;
 		this.children[index] = new NegationNode(this.document, this.id, this.subtree);
 		this.update();
+		return this.children[index];
 	}
 }
