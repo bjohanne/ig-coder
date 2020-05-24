@@ -5,7 +5,7 @@ import appConfig from "../core/config/appConfig";
 import {withRouter, Redirect} from 'react-router-dom';
 import {toast} from 'react-toastify';
 import usePrevious from '../core/helpers/usePrevious';
-import './newDocument.css'
+import './newDocument.css';
 
 export function NewDocumentComponent(props: any) {
     const {createDocument} = props;

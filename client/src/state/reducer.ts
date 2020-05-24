@@ -11,7 +11,7 @@ import {
     UPDATE_NEGATION
 } from "./actionTypes";
 
-import { NormNode, SanctionNode, JunctionNode, ComponentNode, SubcomponentNode, NegationNode } from '../core/model/nodes';
+import { NormNode, ConventionNode, SanctionNode, JunctionNode, ComponentNode, SubcomponentNode, NegationNode } from '../core/model/nodes';
 import { Arg, SubcomponentType, JunctionType } from '../core/model/enums';
 import { INode } from '../core/model/interfaces';
 
@@ -60,43 +60,41 @@ const reducer = (state: any = initialState, action: any) => {
             newDocument = Object.assign(new Document("", "", -1), currentDocument);
             return update(state, {currentDocument: {$set: newDocument }});
 
-        case ADD_ENTRY_TO_DOCUMENT:
-            if(state.currentDocument.forest.length === 0) { // NB: Change this when allowing multiple entries per document
-                let doc = new Document(state.currentDocument.name, state.currentDocument.description, state.currentDocument.id);
-                doc.createTree(action.payload.hasDeontic, action.payload.content);
-
+		case ADD_ENTRY_TO_DOCUMENT:
+			if(state.currentDocument.forest.length === 0) { // NB: Change this when allowing multiple entries per document
+				let doc = Document.fromData(state.currentDocument);
+				let entryType = (action.payload.hasDeontic) ? Arg.norm : Arg.convention;
+				doc.createTree(entryType, action.payload.content);
+				let root = (action.payload.hasDeontic) ? doc.getRoot() as NormNode : doc.getRoot() as ConventionNode;
+				root.createObject();
+				/*
 				// Below is development stuff - building an example tree to demonstrate the different node types
-				// doc.addSanctionNodeToTree(0);
-				// let root = doc.getRoot() as SanctionNode;
-				// let norm = root.getLeft() as NormNode;	// Actually a Convention node, maybe
-				// doc.turnOnNegation(norm, 0);
-				// norm.setEntry("The Program Manager may not initiate suspension or revocation proceedings against a certified operation.");
-				// norm.createObject();
-				// let attr = norm.getAttributes() as ComponentNode;
-				// attr.setContent("Program Manager", "The");
-				// let obj = norm.getObject() as ComponentNode;
-				// let dirObj = obj.getLeft() as SubcomponentNode;
-				// dirObj.createJunctionNode();
-				// let jun = dirObj.getChild() as JunctionNode;
-				// jun.setJunction(JunctionType.xor);
-				// jun.createSubcomponentNode(SubcomponentType.direct, Arg.left);
-				// jun.createSubcomponentNode(SubcomponentType.direct, Arg.right);
-				// let left = jun.getLeft() as SubcomponentNode;
-				// left.setContent("suspension");
-				// let right = jun.getRight() as SubcomponentNode;
-				// right.setContent("revocation proceedings");
-				// let indirObj = obj.getRight() as SubcomponentNode;
-				// indirObj.createSubcomponentNode(SubcomponentType.indirect, Arg.only);
-				// let only = indirObj.getChild() as SubcomponentNode;
-				// only.setContent("a certified operation");
-				// let aim = norm.getAim() as ComponentNode;
-				// aim.setContent("initiate");
+				doc.addSanctionNodeToTree(0);
+				let root = doc.getRoot() as SanctionNode;
+				let norm = root.getLeft() as NormNode;	// Actually a Convention node, maybe
+				doc.turnOnNegation(norm, 0);
+				norm.setEntry("The Program Manager may not initiate suspension or revocation proceedings against a certified operation.");
+				let obj = norm.createObject() as ComponentNode;
+				let attr = norm.getAttributes() as ComponentNode;
+				attr.setContent("Program Manager", "The");
+				let dirObj = obj.getLeft() as SubcomponentNode;
+				let jun = dirObj.createJunctionNode() as JunctionNode;
+				jun.setJunction(JunctionType.xor);
+				let left = jun.createSubcomponentNode(SubcomponentType.direct, Arg.left) as SubcomponentNode;
+				left.setContent("suspension");
+				let right = jun.createSubcomponentNode(SubcomponentType.direct, Arg.right) as SubcomponentNode;
+				right.setContent("revocation proceedings");
+				let indirObj = obj.getRight() as SubcomponentNode;
+				let only = indirObj.createSubcomponentNode(SubcomponentType.indirect, Arg.only) as SubcomponentNode;
+				only.setContent("a certified operation");
+				let aim = norm.getAim() as ComponentNode;
+				aim.setContent("initiate");
 				// End dev stuff
-
-                return update(state, { currentDocument: { $set: doc }});
-            } else {
-                return state;
-            }
+				*/
+				return update(state, { currentDocument: { $set: doc }});
+			} else {
+				return state;
+			}
         case SET_ACTIVE_NODE:            
             return update(state, { activeNode: { $set: action.payload }});    
         case CREATE_DOCUMENT_RESPONSE:
@@ -113,17 +111,24 @@ const reducer = (state: any = initialState, action: any) => {
                 return state;
             }
 
-			let dlist = action.payload.reducer.documents;
-			if (!dlist) {
-				dlist = [];	// If it's null/undefined, we want it to be an empty array
+			// Rehydrate documents array
+			let origList = action.payload.reducer.documents;
+			let dlist = [];
+			if (origList && origList.length > 0) {
+				origList.forEach((d: Document) => {
+					dlist.push(new Document(d.name, d.description, d.id, d.forest));
+				});
 			}
+
+			// Rehydrate current document
             let d = action.payload.reducer.currentDocument;
 	        let rebuiltDoc;
 			if (d) {
 				rebuiltDoc = new Document(d.name, d.description, d.id, d.forest);
 			}
 
-			// Rehydrate both the list of documents and the current document
+			console.log(dlist);
+
 		    return update(state, {documents: {$set: dlist}, currentDocument: { $set: rebuiltDoc }})
         default:
             return state;

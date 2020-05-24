@@ -7,7 +7,7 @@ import { updateEntry } from "../../../state/actions";
 import { buildEntrySubTree } from "../../../core/model/builder";
 import Chevron from "../../units/chevron";
 import { NodeType, ComponentType, SubcomponentType, SubtreeType } from "../../../core/model/enums";
-import ComponentNode from "../../../core/model/nodes/component";
+import { ComponentNode } from "../../../core/model/nodes/";
 
 /*
 	This is the Editor component for Norm and Convention nodes (entries).
@@ -55,6 +55,12 @@ const EntryEditor = (props: any) => {
 		return (parent && parent.data.nodeType === NodeType.negation);
 	}
 
+	const getHasObject = () : boolean => {
+		// Check if this node has an Object child
+		let activeNode = (props.activeNode && props.activeNode.node.data);
+		return (activeNode.children && typeof activeNode.children[1].nodeType !== "undefined");
+	}
+
 	const getHasSanction = () : boolean => {
 		// Check if parent's subtree is of type Sanction
 		let parent = (props.activeNode && props.activeNode.node.parent);
@@ -63,10 +69,15 @@ const EntryEditor = (props: any) => {
 
 	// State variables for Negation and Sanction status
 	const [isNegated, setIsNegated] = useState(getIsNegated());
+	const [hasObject, setHasObject] = useState(getHasObject());
 	const [hasSanction, setHasSanction] = useState(getHasSanction());
 
 	const changeIsNegated = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setIsNegated(e.target.checked);
+	}
+	
+	const changeHasObject = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setHasObject(e.target.checked);
 	}
 
 	const changeHasSanction = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,11 +160,11 @@ const EntryEditor = (props: any) => {
         (<><ModalBody>          
         <div className="container-fluid entry-editor">
             <div className="row">
-				<div className="col-md-2">
-					<button className="accordion" onClick={() => toggleAccordion("collapseTop", collapse.collapseTop)}>
-						<Chevron className={`${rotateTop}`} width={10} fill={"#777"} />
-						<strong className="accordion__title">{props.activeNode.node.data.nodeType} (entry)</strong> 
-					</button>
+				<div className="col-md-2 pl-4 py-4">
+					{/*<button className="accordion" onClick={() => toggleAccordion("collapseTop", collapse.collapseTop)}>*/}
+						{/*<Chevron className={`${rotateTop}`} width={10} fill={"#777"} />*/}
+						<strong className="accordion__title">{props.activeNode.node.data.nodeType} (entry)</strong>
+					{/*</button>*/}
 				</div>
 				<div className="col-md-10 d-flex justify-content-start align-items-center">
 					<Toggle
@@ -162,6 +173,13 @@ const EntryEditor = (props: any) => {
                         aria-labelledby='is-negated-label'
                         onChange={changeIsNegated} />
 					<span id='is-negated-label' className="ml-2">Negated</span>
+					<Toggle
+                        id='has-object-status'
+                        defaultChecked={hasObject}
+                        aria-labelledby='has-object-label'
+                        onChange={changeHasObject}
+						className="ml-5" />
+					<span id='has-sanction-label' className="ml-2">Has an Object component</span>
 					<Toggle
                         id='has-sanction-status'
                         defaultChecked={hasSanction}

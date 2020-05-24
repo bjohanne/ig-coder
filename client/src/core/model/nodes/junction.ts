@@ -1,12 +1,7 @@
-import BaseNode from "./base";
+import { BaseNode, NormNode, ConventionNode, NegationNode, ComponentNode, SubcomponentNode } from "./";
 import { INode, ITwoChildren } from "../interfaces";
 import { JunctionType, NodeType, ComponentType, SubcomponentType, SubtreeType, Arg } from "../enums";
-
-import NormNode from "./norm";
-import ConventionNode from "./convention";
-import NegationNode from "./negation";
-import ComponentNode from "./component";
-import SubcomponentNode from "./subcomponent";
+import { DataError, DataErrorType } from "../errors";
 
 /**
  * The Junction node is the main building block of horizontal nesting.
@@ -51,14 +46,14 @@ export default class JunctionNode extends BaseNode implements ITwoChildren {
 
 	getLeft() : INode {
 		if (this.children[0].isDummy()) {
-			throw new Error("Left child of this Junction node is a dummy node");
+			throw new DataError(DataErrorType.JUN_GET_DUM_LEFT);
 		}
 		return this.children[0];
 	}
 
 	getRight() : INode {
 		if (this.children[1].isDummy()) {
-			throw new Error("Right child of this Junction node is a dummy node");
+			throw new DataError(DataErrorType.JUN_GET_DUM_RIGHT);
 		}
 		return this.children[1];
 	}
@@ -71,31 +66,34 @@ export default class JunctionNode extends BaseNode implements ITwoChildren {
 	 * @param statement (Optional) The full text of the statement
 	 * @param origin (Optional) The ID of the node the new node is a reference to
 	 */
-	createNormOrConventionNode(type: Arg.norm | Arg.convention, position: Arg.left | Arg.right, statement?: string, origin?: number) {
+	createNormOrConventionNode(type: Arg.norm | Arg.convention, position: Arg.left | Arg.right, statement?: string, origin?: number) : INode | undefined {
 		let index = (position === Arg.left) ? 0 : 1;
 		this.children[index] = (type === Arg.norm) ? new NormNode(this.document, statement, this.id, origin)
 			: new ConventionNode(this.document, statement, this.id, origin);
 		this.update();
+		return this.children[index];
 	}
 
 	/**
 	 * Creates a Junction node as child of this node.
 	 * @param position Whether the new node should be the left or right child of this node
 	 */
-	createJunctionNode(position: Arg.left | Arg.right) {
+	createJunctionNode(position: Arg.left | Arg.right) : INode | undefined {
 		let index = (position === Arg.left) ? 0 : 1;
 		this.children[index] = new JunctionNode(this.document, this.id, this.subtree, this.componentType, this.subcomponentType);
 		this.update();
+		return this.children[index];
 	}
 
 	/**
 	 * Creates a Negation node as child of this node.
 	 * @param position Whether the new node should be the left or right child of this node
 	 */
-	createNegationNode(position: Arg.left | Arg.right) {
+	createNegationNode(position: Arg.left | Arg.right) : INode | undefined {
 		let index = (position === Arg.left) ? 0 : 1;
 		this.children[index] = new NegationNode(this.document, this.id, this.subtree, this.componentType, this.subcomponentType);
 		this.update();
+		return this.children[index];
 	}
 
 	/**
@@ -105,19 +103,20 @@ export default class JunctionNode extends BaseNode implements ITwoChildren {
 	 * @param position Whether the new node should be the left or right child of this node
 	 * @param origin (Optional) The ID of the node this node is a reference to
 	 */
-	createComponentNode(componentType: ComponentType, position: Arg.left | Arg.right, origin?: number) {
+	createComponentNode(componentType: ComponentType, position: Arg.left | Arg.right, origin?: number) : INode | undefined {
 		if (this.subtree !== SubtreeType.entry) {
-			throw new Error("Cannot create a Component node outside of a Norm/Convention subtree");
+			throw new DataError(DataErrorType.JUN_ADD_CMP_NO_NC);
 		}
 		if (this.subcomponentType) {
-			throw new Error("Cannot create a Component node as descendant of a Subcomponent node");
+			throw new DataError(DataErrorType.JUN_ADD_CMP_SUB);
 		}
 		if (this.componentType !== componentType) {
-			throw new Error("The provided component type does not match ancestor's component type");
+			throw new DataError(DataErrorType.JUN_CMP_MISMATCH);
 		}
 		let index = (position === Arg.left) ? 0 : 1;
 		this.children[index] = new ComponentNode(componentType, this.document, this.id, this.subtree, origin);
 		this.update();
+		return this.children[index];
 	}
 
 	/**
@@ -127,15 +126,16 @@ export default class JunctionNode extends BaseNode implements ITwoChildren {
 	 * @param position Whether the new node should be the left or right child of this node
 	 * @param origin (Optional) The ID of the node this node is a reference to
 	 */
-	createSubcomponentNode(subcomponentType: SubcomponentType, position: Arg.left | Arg.right, origin?: number) {
+	createSubcomponentNode(subcomponentType: SubcomponentType, position: Arg.left | Arg.right, origin?: number) : INode | undefined {
 		if (this.subtree !== SubtreeType.entry) {
-			throw new Error("Cannot create a Component node outside of a Norm/Convention subtree");
+			throw new DataError(DataErrorType.JUN_ADD_CMP_NO_NC);
 		}
 		if (this.subcomponentType !== subcomponentType) {
-			throw new Error("The provided subcomponent type does not match ancestor's subcomponent type");
+			throw new DataError(DataErrorType.JUN_SUB_MISMATCH);
 		}
 		let index = (position === Arg.left) ? 0 : 1;
 		this.children[index] = new SubcomponentNode(subcomponentType, this.document, this.id, this.subtree, origin);
 		this.update();
+		return this.children[index];
 	}
 }

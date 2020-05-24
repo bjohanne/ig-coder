@@ -1,6 +1,7 @@
 import { INode } from "../interfaces";
 import { NodeType, SubtreeType, Arg } from "../enums";
 import { NodeCounter } from "../document";
+import { DataError, DataErrorType } from "../errors";
 
 /**
  * The base node has the implementation of INode.
@@ -77,34 +78,31 @@ export default class BaseNode implements INode {
 		let index;    // The child's index in the parent's child array
 
 		if (this.nodeType === NodeType.norm || this.nodeType === NodeType.convention) {
-			throw new Error("Cannot delete fixed children of Norm and Convention nodes");
+			throw new DataError(DataErrorType.BAS_DEL_FIX);
         // Node types that have two non-fixed children
 		} else if (this.nodeType === NodeType.junction || this.nodeType === NodeType.sanction) {
 			if (childPos === Arg.only) {
-				throw new Error("Cannot delete only child of a Junction or Sanction node");
+				throw new DataError(DataErrorType.BAS_DEL_ONLY);
 			}
 			index = (childPos === Arg.left) ? 0 : 1;
 		} else { // The remaining three node types have one or no children
 			// A left or right child of a Component node must be a fixed child, which should not be deleted
 			if (childPos !== Arg.only) {
-				throw new Error("Cannot delete left or right child of a Component, Subcomponent or Negation node");
+				throw new DataError(DataErrorType.BAS_DEL_LR);
 			}
 			if (this.nodeType === NodeType.component) {
 				// In case this is called with Arg.left (0), also check the child in index 0 for type Subcomponent
 				if (this.children[0].nodeType === NodeType.subcomponent) {
-					throw new Error("Cannot delete Subcomponent child of a Component node");
+					throw new DataError(DataErrorType.BAS_DEL_SUB);
 				}
 			}
 			index = 0;
 		}
 
 		if (this.children[index].isDummy()) {
-			throw new Error("The specified child is a dummy node");
+			throw new DataError(DataErrorType.BAS_DEL_DUM);
 		}
+		// Should log this as a warning
 		this.children[index] = new BaseNode(this.document, this.id);
-    }
-    
-    deleteAllChildren() {
-        this.children = [];
     }
 }

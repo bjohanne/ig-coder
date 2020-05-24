@@ -5,6 +5,7 @@ import { BaseNode, NormNode, ConventionNode, JunctionNode, SanctionNode, Negatio
 import { NodeType, JunctionType, ComponentType, SubcomponentType, Arg } from '../../core/model/enums';
 import { Component } from '../../core/model/component';
 import { Entry } from "../../core/model/entry";
+import { DataError, DataErrorType } from "../../core/model/errors";
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -48,8 +49,7 @@ it('Basic statement test', () => {
     // Setup
     const statement = "The Program Manager may initiate suspension or revocation proceedings against a certified operation";
     const document = new Document("Program Manager Policy", "Description", documentId);
-    document.createTree(Arg.norm, statement);
-    let root = document.getRoot() as NormNode;
+    let root = document.createTree(Arg.norm, statement) as NormNode;
 
     /*
     Here are the steps to build the tree for this statement:
@@ -71,13 +71,11 @@ it('Basic statement test', () => {
     let aim = root.getAim() as ComponentNode;
     aim.setContent("initiate");
 
-	root.createObject();
-    let obj = root.getObject() as ComponentNode;
+	let obj = root.createObject() as ComponentNode;
     let dir = obj.getLeft() as SubcomponentNode;
     let indir = obj.getRight() as SubcomponentNode;
-    dir.createJunctionNode();
 
-    let dirJunction = dir.getChild() as JunctionNode;
+    let dirJunction = dir.createJunctionNode() as JunctionNode;
     dirJunction.setJunction(JunctionType.xor);
     dirJunction.createSubcomponentNode(SubcomponentType.direct, Arg.left);
     dirJunction.createSubcomponentNode(SubcomponentType.direct, Arg.right);
@@ -88,9 +86,7 @@ it('Basic statement test', () => {
     let dir2 = dirJunction.getRight() as SubcomponentNode;
     dir2.setContent("revocation proceedings");
 
-    indir.createSubcomponentNode(SubcomponentType.indirect);
-
-    let dirChild = indir.getChild() as SubcomponentNode;
+    let dirChild = indir.createSubcomponentNode(SubcomponentType.indirect) as SubcomponentNode;
     dirChild.setContent("certified operation", "a");
 });
 
@@ -99,9 +95,8 @@ it('Basic statement test', () => {
 it('Set and unset text content', () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
-    document.createTree(Arg.norm);
+    let root = document.createTree(Arg.norm) as NormNode;
 
-    let root = document.getRoot() as NormNode;
     let attr = root.getAttributes() as ComponentNode;
     expect(attr.component.content).toBeUndefined();
     attr.setContent("two", "one", "three");				// Setting content first time
@@ -120,9 +115,8 @@ it('Set and unset text content', () => {
 it('Delete a tree', () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
-    document.createTree(Arg.norm);
 
-    let root1 = document.getRoot() as NormNode;
+    let root1 = document.createTree(Arg.norm) as NormNode;
     expect(root1).toBeDefined();
     document.deleteTree(0);
     let root2 = document.getRoot() as NormNode;
@@ -134,9 +128,8 @@ it('Delete a tree', () => {
 it('Add and delete a Sanction node to/from a tree', () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
-    document.createTree(Arg.convention);
 
-    let root1 = document.getRoot() as ConventionNode;
+    let root1 = document.createTree(Arg.convention) as ConventionNode;
     expect(root1.nodeType).toEqual(NodeType.convention);
     document.addSanctionNodeToTree(0);
     let root2 = document.getRoot() as SanctionNode;
@@ -157,9 +150,8 @@ it('The subtree rule: no Component nodes outside of a Norm/Convention subtree', 
     document.addSanctionNodeToTree(0);
     let root = document.getRoot() as SanctionNode;
 
-    root.createJunctionNode(Arg.right);
-    let junction = root.getRight() as JunctionNode;
-    expect(() => { junction.createComponentNode(ComponentType.object, Arg.left) }).toThrow("subtree");
+    let junction = root.createJunctionNode(Arg.right) as JunctionNode;
+    expect(() => { junction.createComponentNode(ComponentType.object, Arg.left) }).toThrow(DataErrorType.JUN_ADD_CMP_NO_NC);
 });
 
 //------------------------------------------------------------------------------
@@ -167,14 +159,11 @@ it('The subtree rule: no Component nodes outside of a Norm/Convention subtree', 
 it('Create nested children of the same type', () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
-    document.createTree(Arg.convention);
 
-    let root = document.getRoot() as ConventionNode;
+    let root = document.createTree(Arg.convention) as ConventionNode;
     let attr = root.getAttributes() as ComponentNode;
-    attr.createJunctionNode();
-    let junction1 = attr.getChild() as JunctionNode;
-    junction1.createJunctionNode(Arg.left);
-    let junction2 = junction1.getLeft() as JunctionNode;
+    let junction1 = attr.createJunctionNode() as JunctionNode;
+    let junction2 = junction1.createJunctionNode(Arg.left) as JunctionNode;
 });
 
 //------------------------------------------------------------------------------
@@ -182,13 +171,12 @@ it('Create nested children of the same type', () => {
 it('Delete a node', () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
-    document.createTree(Arg.convention);
 
-    let root = document.getRoot() as ConventionNode;
+    let root = document.createTree(Arg.convention) as ConventionNode;
     let attr = root.getAttributes() as ComponentNode;
     attr.createJunctionNode();
     attr.deleteChild(Arg.only);
-    expect(() => { attr.getChild() }).toThrow("dummy"); // Newly deleted child should be a dummy node
+    expect(() => { attr.getChild() }).toThrow(DataErrorType.CMP_GET_DUM); // Newly deleted child should be a dummy node
 });
 
 //------------------------------------------------------------------------------
@@ -214,10 +202,9 @@ it('Find a node by ID', () => {
 it('Toggle negation of a root node', () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
-    document.createTree(Arg.norm);
+    let root = document.createTree(Arg.norm) as NormNode;
 
 	// Toggling negation of a root node
-    let root = document.getRoot() as NormNode;
 	document.turnOnNegation(root, 0);
 	expect(document.getRoot().nodeType === NodeType.negation);
 	document.turnOffNegation(root, 0);
@@ -234,13 +221,12 @@ it('Toggle negation of a non-root node', () => {
 	// Toggling negation of a non-root node
 	let root = document.getRoot() as NormNode;
 	let attr = root.getAttributes() as ComponentNode;
-	attr.createJunctionNode();
-    let junction = attr.getChild() as JunctionNode;
+    let junction = attr.createJunctionNode() as JunctionNode;
 	document.turnOnNegation(junction, 0);
 	let child = attr.getChild() as BaseNode;
 	expect(child.nodeType === NodeType.negation);
 	// Attempting to turn on negation of a Negation node, which is forbidden
-	expect(() => { document.turnOnNegation(child, 0) }).toThrow();
+	expect(() => { document.turnOnNegation(child, 0) }).toThrow(DataErrorType.DOC_TOG_NEG);
 	document.turnOffNegation(junction, 0);
 	expect(attr.getChild().nodeType === NodeType.junction);
 });

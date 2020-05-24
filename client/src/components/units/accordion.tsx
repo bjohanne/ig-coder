@@ -31,7 +31,7 @@ const Accordion = (props: any) => {
 
     const save = () => {
         // send as action and close - when the state gets updated with a new entry, it appears in the entries list
-        let payload = {documentId: props.documentId, content: entryContent, hasDeontic: hasDeontic};
+        let payload = {hasDeontic: hasDeontic, content: entryContent};
         props.addEntryToDocument(payload);
         props.close();
     };
