@@ -15,7 +15,6 @@ const Edit = (props: any) => {
     useEffect((): void => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		activeNode = props.activeNode.node.data;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.activeNode])
 
 	if (activeNode && activeNode.nodeType) {
