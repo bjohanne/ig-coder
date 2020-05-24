@@ -34,4 +34,8 @@ def create_document_anchor(id: int, name: str, description: str):
     db_access = DataAccess(uri=neo4j_bolt_uri, user="neo4j", password="igcoder")
     return db_access.create_document_anchor(id, name, description)
 
+def get_document(id: int):
+    db_access = DataAccess(uri=neo4j_bolt_uri, user="neo4j", password="igcoder")
+    return db_access.get_document(id)
+
 
