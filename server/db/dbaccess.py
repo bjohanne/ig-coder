@@ -46,7 +46,7 @@ class DataAccess(object):
         with self._driver.session() as session:
             session.run(create_nodes_statement.strip())
 
-    def create_document_anchor(self, id):
-        q = "CREATE (a {{ document: {0} }})".format(id)
+    def create_document_anchor(self, id, name, description):
+        q = "CREATE (a {{ document: {}, name: '{}', description: '{}' }})".format(id, name, description)
         with self._driver.session() as session:
             response = session.run(q)

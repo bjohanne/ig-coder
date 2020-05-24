@@ -48,7 +48,7 @@ class DocumentsResource(Resource):
         self.documents.append(document)
 
         # Create an "anchor" node for the document
-        create_document_anchor(next_doc)
+        create_document_anchor(next_doc, args.name, args.description)
 
         return document
 
