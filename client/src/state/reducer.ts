@@ -65,29 +65,33 @@ const reducer = (state: any = initialState, action: any) => {
             if(state.currentDocument.forest.length === 0) { // NB: Change this when allowing multiple entries per document
                 let doc = new Document(state.currentDocument.name, state.currentDocument.description, state.currentDocument.id);
                 doc.createTree(action.payload.hasDeontic ? Arg.norm : Arg.convention, action.payload.content);
+				let root = (action.payload.hasDeontic) ? doc.getRoot() as NormNode : doc.getRoot() as ConventionNode;
+				root.createObject();
 
+				/*
 				// Below is development stuff - building an example tree to demonstrate the different node types
-				// doc.addSanctionNodeToTree(0);
-				// let root = doc.getRoot() as SanctionNode;
-				// let norm = root.getLeft() as NormNode;	// Actually a Convention node, maybe
-				// doc.turnOnNegation(norm, 0);
-				// norm.setEntry("The Program Manager may not initiate suspension or revocation proceedings against a certified operation.");
-				// let obj = norm.createObject() as ComponentNode;
-				// let attr = norm.getAttributes() as ComponentNode;
-				// attr.setContent("Program Manager", "The");
-				// let dirObj = obj.getLeft() as SubcomponentNode;
-				// let jun = dirObj.createJunctionNode() as JunctionNode;
-				// jun.setJunction(JunctionType.xor);
-				// let left = jun.createSubcomponentNode(SubcomponentType.direct, Arg.left) as SubcomponentNode;
-				// left.setContent("suspension");
-				// let right = jun.createSubcomponentNode(SubcomponentType.direct, Arg.right) as SubcomponentNode;
-				// right.setContent("revocation proceedings");
-				// let indirObj = obj.getRight() as SubcomponentNode;
-				// let only = indirObj.createSubcomponentNode(SubcomponentType.indirect, Arg.only) as SubcomponentNode;
-				// only.setContent("a certified operation");
-				// let aim = norm.getAim() as ComponentNode;
-				// aim.setContent("initiate");
+				doc.addSanctionNodeToTree(0);
+				let root = doc.getRoot() as SanctionNode;
+				let norm = root.getLeft() as NormNode;	// Actually a Convention node, maybe
+				doc.turnOnNegation(norm, 0);
+				norm.setEntry("The Program Manager may not initiate suspension or revocation proceedings against a certified operation.");
+				let obj = norm.createObject() as ComponentNode;
+				let attr = norm.getAttributes() as ComponentNode;
+				attr.setContent("Program Manager", "The");
+				let dirObj = obj.getLeft() as SubcomponentNode;
+				let jun = dirObj.createJunctionNode() as JunctionNode;
+				jun.setJunction(JunctionType.xor);
+				let left = jun.createSubcomponentNode(SubcomponentType.direct, Arg.left) as SubcomponentNode;
+				left.setContent("suspension");
+				let right = jun.createSubcomponentNode(SubcomponentType.direct, Arg.right) as SubcomponentNode;
+				right.setContent("revocation proceedings");
+				let indirObj = obj.getRight() as SubcomponentNode;
+				let only = indirObj.createSubcomponentNode(SubcomponentType.indirect, Arg.only) as SubcomponentNode;
+				only.setContent("a certified operation");
+				let aim = norm.getAim() as ComponentNode;
+				aim.setContent("initiate");
 				// End dev stuff
+				*/
 
 				return update(state, { currentDocument: { $set: doc }});
 			} else {
