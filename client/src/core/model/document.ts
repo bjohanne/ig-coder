@@ -133,9 +133,9 @@ export default class Document implements IDocument {
 
 		while (stack.length) {
 			const node = stack.shift() as BaseNode;
-			node.createdAt = new Date(node.createdAt);
-			node.updatedAt = new Date(node.updatedAt);
-			node.children && stack.push(...node.children as BaseNode[]);	// Push the children to the stack, if any
+			if (node && node.createdAt) node.createdAt = new Date(node.createdAt);
+			if (node && node.updatedAt) node.updatedAt = new Date(node.updatedAt);
+			node && node.children && stack.push(...node.children as BaseNode[]);	// Push the children to the stack, if any
 		}
 	}
 
