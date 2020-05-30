@@ -1,12 +1,8 @@
-import { BaseNode } from "./base";
+import { BaseNode, ConventionNode, JunctionNode, NegationNode, SubcomponentNode } from "./";
 import { INode, IComponentAndSubNode, IOneChild, ITwoChildren } from "../interfaces";
 import { NodeType, ComponentType, SubcomponentType, SubtreeType, Arg } from "../enums";
 import { Component } from "../component";
-
-import ConventionNode from "./convention";
-import JunctionNode from "./junction";
-import NegationNode from "./negation";
-import SubcomponentNode from "./subcomponent";
+import { DataError, DataErrorType } from "../errors";
 
 /**
  * This type of node holds an ABDICO component: Attributes, Object, Deontic, Aim or Conditions.
@@ -55,13 +51,10 @@ export default class ComponentNode extends BaseNode implements IComponentAndSubN
      * Internal function that is called by all create*() functions.
      * Checks this node's number of children, which dictates how the child should be added.
      * When the child is added, this node's text content is also deleted.
-     * If called on an Object or Conditions node, which have fixed children, throws an error.
+	 * Assumes that it is legal to add the child under the current conditions - throws no errors.
      * @param node A reference to the node to be added as a child
      */
-    private addChild(node: INode) {
-        if (this.componentType === ComponentType.object || this.componentType === ComponentType.conditions) {
-            throw new Error("Cannot add children to Component nodes of type Object or Conditions");
-        }
+    private addChild(node: INode) : INode {
         if (this.children.length === 0) { // No nodes in the array, dummy or not
             this.children.push(node);
         } else if (this.children.length === 1) {
@@ -69,6 +62,7 @@ export default class ComponentNode extends BaseNode implements IComponentAndSubN
         }
         this.unsetContent(); // Delete this node's text content
 		this.update();
+		return node;
     }
 
     /**
@@ -80,7 +74,7 @@ export default class ComponentNode extends BaseNode implements IComponentAndSubN
      */
     setContent(content?: string, prefix?: string, suffix?: string) : void {
         if (this.componentType === ComponentType.object || this.componentType === ComponentType.conditions) {
-            throw new Error("Component nodes of type Object or Conditions cannot have text content");
+            throw new DataError(DataErrorType.CMP_OBJ_CND_TXT);
         } else if (typeof this.component !== "undefined") {
             this.component.set(content, prefix, suffix);
             this.children.length = 0;
@@ -100,27 +94,27 @@ export default class ComponentNode extends BaseNode implements IComponentAndSubN
 
     getChild() : INode {
         if (this.componentType !== ComponentType.attributes && this.componentType !== ComponentType.aim) {
-            throw new Error("Component type must be Attributes or Aim in order to get single child");
+            throw new DataError(DataErrorType.CMP_AIM_ATR_GET_ONLY);
         }
         if (this.children.length === 0) {
-            throw new Error("This Component node has no children");
+            throw new DataError(DataErrorType.CMP_GET_UNDEF);
         }
-        if (typeof this.children[0].nodeType === "undefined") {
-            throw new Error("The child of this Component node is a dummy node");
+        if (this.children[0].isDummy()) {
+            throw new DataError(DataErrorType.CMP_GET_DUM);
         }
         return this.children[0];
     }
 
     getLeft() : INode {
         if (this.componentType !== ComponentType.object && this.componentType !== ComponentType.conditions) {
-            throw new Error("Component type must be Object or Conditions in order to get left child");
+            throw new DataError(DataErrorType.CMP_OBJ_CND_GET_LR);
         }
         return this.children[0]; // Object and Conditions nodes have fixed children and cannot have dummy children
     }
 
     getRight() : INode {
         if (this.componentType !== ComponentType.object && this.componentType !== ComponentType.conditions) {
-            throw new Error("Component type must be Object or Conditions in order to get right child");
+            throw new DataError(DataErrorType.CMP_OBJ_CND_GET_LR);
         }
         return this.children[1]; // Object and Conditions nodes have fixed children and cannot have dummy children
     }
@@ -131,23 +125,22 @@ export default class ComponentNode extends BaseNode implements IComponentAndSubN
 	 * @param statement (Optional) The full text of the statement
      * @param origin (Optional) The ID of the node the new node is a reference to
      */
-    createNormOrConventionNode(type: Arg.norm | Arg.convention, statement?: string, origin?: number) {
+    createNormOrConventionNode(type: Arg.norm | Arg.convention, statement?: string, origin?: number) : INode | undefined {
         switch(this.componentType) {
             case ComponentType.attributes:
                 if (type === Arg.norm) {
-                    throw new Error("Component nodes of type Attributes cannot have Norm nodes as children");
+                    throw new DataError(DataErrorType.CMP_ATR_ADD_NRM);
                 } else {
-                    this.addChild(new ConventionNode(this.document, statement, this.id, origin));
+                    return this.addChild(new ConventionNode(this.document, statement, this.id, origin));
                 }
-                break;
             case ComponentType.object:
-                throw new Error("Component nodes of type Object cannot have Norm/Convention nodes as children");
+                throw new DataError(DataErrorType.CMP_OBJ_ADD);
             case ComponentType.deontic:
-                throw new Error("Component nodes of type Deontic cannot have children");
+                throw new DataError(DataErrorType.CMP_DNT_ADD);
             case ComponentType.aim:
-                throw new Error("Component nodes of type Aim cannot have Norm/Convention nodes as children");
+                throw new DataError(DataErrorType.CMP_AIM_ADD_NC);
             case ComponentType.conditions:
-                throw new Error("Component nodes of type Conditions cannot have Norm/Convention nodes as children");
+                throw new DataError(DataErrorType.CMP_CND_ADD);
             default:
         }
     }
@@ -155,20 +148,18 @@ export default class ComponentNode extends BaseNode implements IComponentAndSubN
     /**
      * Creates a Junction node as child of this node, if legal.
      */
-    createJunctionNode() {
+    createJunctionNode() : INode | undefined {
         switch(this.componentType) {
             case ComponentType.attributes:
-                this.addChild(new JunctionNode(this.id, this.document, this.subtree, this.componentType));
-                break;
+                return this.addChild(new JunctionNode(this.document, this.id, this.subtree, this.componentType));
             case ComponentType.object:
-                throw new Error("Component nodes of type Object cannot have Junction nodes as children");
+                throw new DataError(DataErrorType.CMP_OBJ_ADD);
             case ComponentType.deontic:
-                throw new Error("Component nodes of type Deontic cannot have children");
+                throw new DataError(DataErrorType.CMP_DNT_ADD);
             case ComponentType.aim:
-                this.addChild(new JunctionNode(this.id, this.document, this.subtree, this.componentType));
-                break;
+                return this.addChild(new JunctionNode(this.document, this.id, this.subtree, this.componentType));
             case ComponentType.conditions:
-                throw new Error("Component nodes of type Conditions cannot have Junction nodes as children");
+                throw new DataError(DataErrorType.CMP_CND_ADD);
             default:
         }
     }
@@ -176,20 +167,18 @@ export default class ComponentNode extends BaseNode implements IComponentAndSubN
     /**
      * Creates a Negation node as child of this node, if legal.
      */
-    createNegationNode() {
+    createNegationNode() : INode | undefined {
         switch(this.componentType) {
             case ComponentType.attributes:
-                this.addChild(new NegationNode(this.document, this.id, this.subtree, this.componentType));
-                break;
+                return this.addChild(new NegationNode(this.document, this.id, this.subtree, this.componentType));
             case ComponentType.object:
-                throw new Error("Component nodes of type Object cannot have Negation nodes as children");
+                throw new DataError(DataErrorType.CMP_OBJ_ADD);
             case ComponentType.deontic:
-                throw new Error("Component nodes of type Deontic cannot have children");
+                throw new DataError(DataErrorType.CMP_DNT_ADD);
             case ComponentType.aim:
-                this.addChild(new NegationNode(this.document, this.id, this.subtree, this.componentType));
-                break;
+                return this.addChild(new NegationNode(this.document, this.id, this.subtree, this.componentType));
             case ComponentType.conditions:
-                throw new Error("Component nodes of type Conditions cannot have Negation nodes as children");
+                throw new DataError(DataErrorType.CMP_CND_ADD);
             default:
         }
     }

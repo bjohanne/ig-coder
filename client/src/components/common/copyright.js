@@ -5,7 +5,7 @@ import React from "react";
 export default function CopyrightComponent(){
     return (
         <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright Â© '}
+            {'Copyright © '}
             <Link color="inherit" href="./">
                 IG Coder
             </Link>{' '}

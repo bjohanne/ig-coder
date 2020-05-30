@@ -1,6 +1,7 @@
 import { NodeType, ComponentType, JunctionType, SubtreeType } from "./enums";
-import { BaseNode } from "./nodes/base";
+import BaseNode from "./nodes/base";
 import ComponentNode from "./nodes/component";
+import { Entry } from "./entry";
 
 /**
  * The interface implemented by all nodes
@@ -14,8 +15,20 @@ export interface INode {
     origin?:  number,		// ID of the node this node is a reference to (optional)
     createdAt: Date,
     updatedAt: Date,
-    children: INode[]   // Array of child nodes, more specified in the implementations
+    children: INode[],   // Array of child nodes, more specified in the implementations
+    isDummy() : boolean
  }
+
+ /*
+  * The interface for the Document class, with forest optional.
+  * In the Document class implementation, forest is required.
+  */
+ export interface IDocument {
+	name: string,
+	description: string,
+	id: number,
+	forest?: INode[]
+}
 
 /**
  * The contract for the Component class
@@ -28,10 +41,18 @@ export interface INode {
     }
  }
 
+ /**
+ * The contract for the Entry class
+ */
+ export interface IEntry {
+    content?: string
+ }
+
 /**
  * Common members for Norm and Convention nodes
  */
  export interface INormAndConvention {
+     entry?: Entry,
      setEntry(statement: string) : void,
 	 unsetEntry() : void,
      getAttributes() : ComponentNode,

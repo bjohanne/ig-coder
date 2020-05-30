@@ -37,6 +37,19 @@ import { IComponent } from "./interfaces"
 		}
     }
 
+	/**
+	 * Static factory method that takes an object of the IComponent type
+	 * and creates a new Component object. Convenience for when you have long arguments.
+	 * If content is undefined, returns undefined.
+	 * @param data An object of type IComponent
+	 */
+	static fromData(data: IComponent) {
+		if (!data.content) {
+			return undefined;
+		}
+		return new this(data.content.main, data.content.prefix, data.content.suffix);
+    }
+
     /**
 	 * Set each part of the component individually.
 	 * Only the provided parameters are changed.
@@ -75,4 +88,32 @@ import { IComponent } from "./interfaces"
 			this.content = undefined;
 		}
 	}
- }
+
+	/*
+	 Concatenates the Component's prefix, main and suffix.
+	 If main is an empty string, the resulting string will have no superfluous spaces.
+	 */
+	string() : string {
+		let ret: string = "";
+
+		if (this.content) {
+			if (this.content.prefix) {
+				ret += this.content.prefix;
+				if (this.content.main) {
+					ret += " ";
+				}
+			}
+
+			ret += this.content.main;
+
+			if (this.content.suffix) {
+				if (this.content.main) {
+					ret += " ";
+				}
+				ret += this.content.suffix;
+			}
+		}
+		return ret;
+	}
+}
+

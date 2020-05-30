@@ -1,10 +1,11 @@
-import React, {useEffect, useState, useRef} from "react";
+import React, {useState, useRef} from "react";
 import {connect} from "react-redux";
 import {createDocument} from "../state/actions";
 import appConfig from "../core/config/appConfig";
 import {withRouter, Redirect} from 'react-router-dom';
 import {toast} from 'react-toastify';
-import './newDocument.css'
+import usePrevious from '../core/helpers/usePrevious';
+import './newDocument.css';
 
 export function NewDocumentComponent(props: any) {
     const {createDocument} = props;
@@ -24,8 +25,8 @@ export function NewDocumentComponent(props: any) {
 			toast.error('Please enter a document name.');
 		} else {
 			toast.dismiss();
-            createDocument({name: form.name, description: form.description, forest: "[]"});
-			if (buttonEl && buttonEl.current) {	// Null check for TypeScript
+            createDocument({name: form.name, description: form.description, forest: []});
+			if (buttonEl && buttonEl.current) {
 				buttonEl.current.disabled = true;	// Disable the submit button to prevent multiple requests being sent
 			}
 			setRedirect(true); // This is the trigger for redirecting
@@ -39,9 +40,6 @@ export function NewDocumentComponent(props: any) {
         });
     };
 
-    // When all these criteria are satisfied, redirect to the Document page.
-    // The submit button has been clicked; currentDocument exists in state; if there is a previous value for
-    //  currentDocument, it is different from the current value.
 	if (redirect && props.addedDocument && (!prevDocument || props.addedDocument.id !== prevDocument.id)) {
        return <Redirect to={{ pathname: `${appConfig.client.path}/documents/${props.addedDocument.id}` }} />;
     }
@@ -57,22 +55,11 @@ export function NewDocumentComponent(props: any) {
                     <textarea className="form-control" rows={6} name="description" placeholder="Document Description"
                               value={form.description} onChange={updateField}/>
                 </div>
-                <button className="btn btn-primary" ref={buttonEl} onClick={submitDocument}>Create New Document</button>
+                <button type="button" className="btn btn-primary" ref={buttonEl} onClick={submitDocument}>Create New Document</button>
             </div>
         </div>
     );
 }
-
-/*
- Custom hook to get the previous value of a prop. TODO: Maybe make this reusable (separate file)?
-*/
-const usePrevious = <T extends {}>(prop: T) => {
-	const ref = useRef<T>();
-	useEffect(() => {
-		ref.current = prop;
-	});
-	return ref.current;
-};
 
 const mapStateToProps = (state: any) => ({
     addedDocument: state.reducer.currentDocument

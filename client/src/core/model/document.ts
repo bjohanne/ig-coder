@@ -1,22 +1,17 @@
-import { INode } from "./interfaces";
-import { Arg } from "./enums";
-import { NormNode, ConventionNode, SanctionNode } from "./nodes";
-
-// Interface for a Document object with empty forest
-interface IEmptyDocument {
-	name: string,
-	description: string,
-	id: number
-}
+import { INode, IDocument } from "./interfaces";
+import { Arg, NodeType } from "./enums";
+import { BaseNode, NormNode, ConventionNode, SanctionNode, NegationNode } from "./nodes";
+// Import if needed: JunctionNode, ComponentNode, SubcomponentNode
+import { DataError, DataErrorType } from "./errors";
+import cloneDeep from 'lodash/cloneDeep';
 
 /**
  * A Document represents a policy. It contains a forest of all trees connected to it.
  * The Document class is responsible for keeping track of all node IDs within its forest.
  * Functions to validate, read and write data structures from/to the server are found in this class.
  */
-export default class Document {
+export default class Document implements IDocument {
     forest: INode[] = [];  // Array of all tree roots in the document, in chronological order
-	//current: any;	// For React useRef()
 
 	/**
 	 * Constructor with separate parameters for name, description and ID.
@@ -24,18 +19,38 @@ export default class Document {
 	 * @param description A free-text field describing the document
 	 * @param id The document's identifier, given by the server
 	 */
-    constructor(public name: string, public description: string, public id: number) {
+    constructor(public name: string, public description: string, public id: number, forest?: INode[]) {
         this.name = name;
         this.description = description;
         this.id = id;
+
+		// If the forest param is provided, need to recursively build the forest.
+		// This will be the single method of building/rebuilding a Document.
+        if (forest && forest.length > 0) {	// A forest array is provided and it is not empty
+            this.forest[0] = cloneDeep(forest[0]);
+			this.rebuildDates(0);
+
+			// For each level, starting with forest[0], create/assign the appropriate class.
+			// Then for each of the children, do the same (need a way to identify each class).
+
+			// This doesn't work, because it just creates new nodes, overwriting the tree.
+            /*let node = forest[0] as NormNode;
+            if (forest[0].nodeType === NodeType.norm) {                
+                this.createTree(Arg.norm, node.entry.content)
+            } else if (forest[0].nodeType === NodeType.convention) {
+                this.createTree(Arg.convention, node.entry.content);
+            }*/
+        }
     }
 
 	/**
-	 * Static factory method that takes an object containing name, description and ID.
+	 * Static factory method that takes an object containing name, description and ID
+	 * and creates a new Document object. Convenience for when you have long arguments.
+	 * Only use this for Documents without a forest.
 	 * @param data An object of type IEmptyDocument containing name, description and ID
 	 */
-	static fromData(data: IEmptyDocument) {
-		return new this(data.name, data.description, data.id);
+	static fromData(data: IDocument) {
+		return new this(data.name, data.description, data.id, data.forest);
     }
 
     /**
@@ -43,10 +58,31 @@ export default class Document {
      * or undefined if there are no trees in the forest.
      */
     getRoot() : INode | undefined {
-        if (this.forest.length >= 0) {
+        if (this.forest.length > 0) {
             return this.forest[0];
         }
         return undefined;
+    }
+
+    /**
+     * ?
+     */
+    updateNode(node: INode) : void {
+        let nodeStack: INode[] = [...this.forest];
+        let current = nodeStack.pop() || null;
+
+        while(current !== null) {
+            if(current.id === node.id) {
+                let children = current.children;
+                current = node;
+                current.children = children;
+            }
+            
+            if(current.children) {
+                nodeStack = nodeStack.concat(current.children);
+            }
+            current = nodeStack.pop() || null;
+        }
     }
 
     /**
@@ -57,10 +93,11 @@ export default class Document {
      * @param type Whether to create a Norm or Convention node
      * @param statement (Optional) The full text of the statement
      */
-    createTree(type: Arg.norm | Arg.convention, statement?: string) {
+    createTree(type: Arg.norm | Arg.convention, statement?: string) : INode {
         let node = (type === Arg.norm) ? new NormNode(this.id, statement)
             : new ConventionNode(this.id, statement);
-        this.forest.splice(0, 1, node);	// Replace element at index 0
+        this.forest.splice(0, 1, node);	// Replace 1 element at index 0
+		return this.forest[0];
     }
 
     /**
@@ -72,10 +109,64 @@ export default class Document {
      * @param The forest index of the tree to be deleted
      */
     deleteTree(index: number) {
+		// Should log this as a warning
 		if (this.forest[index]) {
 	        this.forest.splice(index, 1);
 		}
     }
+
+	/**
+	 * Iteratively rebuilds all Date objects in this document.
+	 * @param tree (Optional) The forest array index of the tree to search in.
+	 */
+	rebuildDates(tree?: number) {
+		if (tree && tree >= this.forest.length) {
+			throw new Error("Forest array index out of bounds");	// This should be handled/logged, but it's not a DataError
+		}
+
+		let stack;
+		if (typeof tree === "undefined") {	// Parameter "tree" is not provided
+			stack = [ ...this.forest as BaseNode[] ];	// Search the entire forest
+		} else {							// Parameter "tree" is provided - can be 0
+			stack = [ this.forest[tree] ];	// Search only in the provided tree
+		}
+
+		while (stack.length) {
+			const node = stack.shift() as BaseNode;
+			if (node && node.createdAt) node.createdAt = new Date(node.createdAt);
+			if (node && node.updatedAt) node.updatedAt = new Date(node.updatedAt);
+			node && node.children && stack.push(...node.children as BaseNode[]);	// Push the children to the stack, if any
+		}
+	}
+
+	/**
+	 * Find and return a node by ID.
+     * Iteratively searches for a node with the passed in ID, in the entire document's forest by default.
+	 * @param targetId The ID of the node to be retrieved.
+	 * @param tree (Optional) The forest array index of the tree to search in.
+	 * @return A reference to the node if found, undefined otherwise
+     */
+	find(targetId: number, tree?: number) : BaseNode | undefined {
+		if (tree && tree >= this.forest.length) {
+			throw new Error("Forest array index out of bounds");	// This should be handled/logged, but it's not a DataError
+		}
+
+		let stack;
+		if (typeof tree === "undefined") {	// Parameter "tree" is not provided
+			stack = [ ...this.forest as BaseNode[] ];	// Search the entire forest
+		} else {							// Parameter "tree" is provided - can be 0
+			stack = [ this.forest[tree] ];	// Search only in the provided tree
+		}
+
+		while (stack.length) {
+			const node = stack.shift() as BaseNode;
+			if (node.id === targetId) {
+				return node;
+			}
+			node.children && stack.push(...node.children as BaseNode[]);	// Push the children to the stack, if any
+		}
+		return undefined;
+	}
 
     /**
      * Creates a Sanction node and makes it the root of the given tree.
@@ -110,6 +201,87 @@ export default class Document {
         }
     }
 
+	/**
+	 * Toggle ON negation of the passed in node.
+	 * Adds a Negation node as parent of targetNode and hooks it into the tree.
+	 * @param targetNode The node that should get a Negation parent; must be either Norm, Convention or Junction
+	 * @param tree The forest array index of the tree targetNode is in
+	 */
+	turnOnNegation(targetNode: BaseNode, tree: number) {
+		if ( ![NodeType.norm, NodeType.convention, NodeType.junction].includes(targetNode.nodeType) ) {
+			throw new DataError(DataErrorType.DOC_TOG_NEG);
+		}
+
+		let parentId = targetNode.parent;
+		if (typeof parentId === "undefined") {	// targetNode is the root of its tree
+			let negationNode = new NegationNode(this.id); // Create a Negation node manually
+			negationNode.children[0] = targetNode;	// Hook targetNode in as child
+			negationNode.update();
+			targetNode.parent = negationNode.id;
+			this.forest[tree] = negationNode;			// Make the Negation node the new root of the tree
+		} else {
+			// Get the parent of targetNode. The new Negation node will go between it and targetNode
+			// Possible node types are all those that can have a Norm/Convention/Junction node as child
+			let parentNode = this.find(parentId, tree) as any;
+
+			// Find the index of parentNode's children array that currently holds targetNode
+			let childIndex = parentNode.children.indexOf(targetNode);
+			if (childIndex === -1) {
+				throw new DataError(DataErrorType.DOC_TOG_NEG_BAD_PARENT);
+			}
+
+			let negNode;
+			// Depending on the node type, call the appropriate createNegationNode() function
+			if (parentNode.nodeType === NodeType.junction || parentNode.nodeType === NodeType.sanction) {
+				if (childIndex === 0) {
+					parentNode.createNegationNode(Arg.left);
+					negNode = parentNode.getLeft();
+				} else {
+					parentNode.createNegationNode(Arg.right);
+					negNode = parentNode.getRight();
+				}
+			} else if (parentNode.nodeType === NodeType.component || parentNode.nodeType === NodeType.subcomponent) {
+				parentNode.createNegationNode();
+				negNode = parentNode.getChild();
+			}
+			// Hook it in
+			negNode.children[0] = targetNode;
+			negNode.update();
+			targetNode.parent = negNode.id;
+		}
+	}
+
+	/**
+	 * Toggle OFF negation of the passed in node.
+	 * Removes the parent Negation node of targetNode and mends the tree.
+	 * @param targetNode The child of the Negation node that should be removed; must be either Norm, Convention or Junction
+	 * @param tree The forest array index of the tree targetNode is in
+	 */
+	turnOffNegation(targetNode: BaseNode, tree: number) {
+		if ( ![NodeType.norm, NodeType.convention, NodeType.junction].includes(targetNode.nodeType) ) {
+			throw new DataError(DataErrorType.DOC_TOG_NEG);
+		}
+
+		let parentId = targetNode.parent;
+		let parentNode = this.find(parentId, tree);	// This is the Negation node we want to remove
+		let grandparentId = parentNode.parent;
+		
+		if (typeof grandparentId === "undefined") {	// The Negation node is the root of its tree
+			this.forest[tree] = targetNode;			// Make the Negation node's child the new root of the tree
+			targetNode.parent = undefined;
+		} else {
+			let grandparentNode = this.find(grandparentId, tree);
+			// Find the index of grandparentNode's children array that currently holds parentNode
+			let childIndex = grandparentNode.children.indexOf(parentNode);
+			if (childIndex === -1) {
+				throw new DataError(DataErrorType.DOC_TOG_NEG_BAD_PARENT);
+			} else {
+				grandparentNode[childIndex] = targetNode;	// Overwrite the Negation node (parentNode)
+				targetNode.parent = grandparentId;
+			}
+		}
+	}
+
     /**
      * Validate this document against the restrictions set in the specification.
      */
@@ -118,7 +290,7 @@ export default class Document {
     }
 
     /**
-     * Recursively re-build an ADICO tree fetched from the database
+     * Recursively re-build an ABDICO tree fetched from the database
      */
     fromJSON(jsonData: object) {
         // TODO
@@ -134,8 +306,8 @@ export default class Document {
 }
 
 /**
- * Keeps track of the current and next node ID in each document
- * Node IDs start at 1 because I've had issues passing the value 0
+ * Keeps track of the current and next node ID in each document.
+ * Node IDs start at 1 because I've had trouble passing the value 0
  * in functions to set the parent for new nodes.
  */
 export class NodeCounter {
@@ -154,6 +326,9 @@ export class NodeCounter {
         return NodeCounter.instance;
     }
 
+	/**
+	 * @param id ID of the Document in question
+	 */
     getNextNodeId(id: number) : number {
         if(typeof(this.documents[id]) !== "undefined") {
             this.documents[id] +=1;
@@ -163,6 +338,9 @@ export class NodeCounter {
         return this.documents[id];
     }
 
+	/**
+	 * @param id ID of the Document in question
+	 */
     getCurrentNodeId(id: number) : number {
         if(typeof(this.documents[id]) !== "undefined") {
             return this.documents[id];

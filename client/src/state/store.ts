@@ -10,9 +10,13 @@ let allReducers = combineReducers({
 
 const persistConfig = {
   key: 'root',
-  storage,
-  blacklist: ['currentDocument']
+  storage
 }
+
+/*
+,
+  blacklist: ['currentDocument']
+*/
  
 const persistedReducer = persistReducer(persistConfig, allReducers)
 

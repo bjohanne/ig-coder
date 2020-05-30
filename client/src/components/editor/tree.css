@@ -1,5 +1,4 @@
 .node circle {
-  fill: #fff;
   stroke: black;
   stroke-width: 2px;
 }
@@ -40,4 +39,9 @@ p.component {
         visibility: visible !important;
         opacity: 1 !important;
     }
+}
+
+.treeContainer {
+	width: 100%;
+	overflow-x: scroll;
 }

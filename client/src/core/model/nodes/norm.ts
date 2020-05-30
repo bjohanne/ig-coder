@@ -1,8 +1,8 @@
-import { BaseNode } from "./base";
-import ComponentNode from "./component";
+import { BaseNode, ComponentNode } from "./";
 import { Entry } from "../entry";
 import { NodeType, ComponentType, SubtreeType } from "../enums";
-import { INormAndConvention } from "../interfaces";
+import { INode, INormAndConvention } from "../interfaces";
+import { DataError, DataErrorType } from "../errors";
 
 /**
  * This is one of two node types that represent an Entry, the other being Convention.
@@ -51,6 +51,10 @@ export default class NormNode extends BaseNode implements INormAndConvention {
 		this.update();
 	}
 
+	hasObject() : boolean {
+		return (!this.children[1].isDummy());
+	}
+
     /* Getters for the children */
 
     getAttributes() : ComponentNode {
@@ -58,8 +62,8 @@ export default class NormNode extends BaseNode implements INormAndConvention {
     }
 
     getObject() : BaseNode {
-		if (typeof this.children[1].nodeType === "undefined") {
-			throw new Error("This Norm node does not have an Object child");
+		if (!this.hasObject()) {
+			throw new DataError(DataErrorType.NRM_GET_OBJ_UNDEF);
 		}
         return this.children[1];
     }
@@ -81,9 +85,10 @@ export default class NormNode extends BaseNode implements INormAndConvention {
 	 * Will overwrite any existing Object child without warning.
      * @param origin (Optional) The ID of the node this node is a reference to
      */
-	createObject(origin?: number) {
+	createObject(origin?: number) : INode | undefined {
 		this.children[1] = new ComponentNode(ComponentType.object, this.document, this.id, this.subtree, origin);
 		this.update();
+		return this.children[1];
 	}
 
 	/**

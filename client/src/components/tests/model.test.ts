@@ -1,28 +1,45 @@
 import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import Document from '../../core/model/document';
-import { NormNode, ConventionNode, JunctionNode, SanctionNode, NegationNode, ComponentNode, SubcomponentNode } from '../../core/model/nodes'
+import { BaseNode, NormNode, ConventionNode, JunctionNode, SanctionNode, NegationNode, ComponentNode, SubcomponentNode } from '../../core/model/nodes'
 import { NodeType, JunctionType, ComponentType, SubcomponentType, Arg } from '../../core/model/enums';
 import { Component } from '../../core/model/component';
 import { Entry } from "../../core/model/entry";
+import { DataError, DataErrorType } from "../../core/model/errors";
 
 Enzyme.configure({ adapter: new Adapter() });
+
+let documentId = 0; // ID to be incremented for each Document created in the tests
+
+beforeEach(() => {
+  documentId++;
+});
 
 /*
 Notes and guidelines for the data model
 - Always type assert the node type when getting a node. This is to ensure that specific functions exist on the node.
   It's also because many getters (getLeft(), getRight()) are agnostic about the type of the child.
+  Do it with "get() as <nodetype>".
 - All child creation functions will overwrite any existing descendants (in the given position) without warning.
 - Delete nodes with BaseNode.deleteChild().
   This will delete them in the tree structure, but variables pointing to them will still be valid.
   The actual data the variables point to will not be deleted until they all go out of scope.
 - Several node types are created with dummy children. These children are of the BaseNode class
-  and can be checked for using 'typeof <node>.nodeType === "undefined"'. All getter functions check for dummy nodes,
+  and can be checked for using BaseNode.isDummy(). All getter functions check for dummy nodes,
   and throw an error if one is found.
 - Component and Subcomponent nodes with a dummy child are considered leaf nodes.
 
   To print the entire document structure:
   console.log(JSON.stringify(document, null, 2));
+*/
+
+/*
+it('Template for tests', () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", documentId);
+
+    // Test here
+});
 */
 
 /**
@@ -31,10 +48,8 @@ Notes and guidelines for the data model
 it('Basic statement test', () => {
     // Setup
     const statement = "The Program Manager may initiate suspension or revocation proceedings against a certified operation";
-    const document = new Document("Program Manager Policy", "description is missing", 101);
-    const id = document.id;
-    document.createTree(Arg.norm, statement);
-    let root = document.getRoot() as NormNode;
+    const document = new Document("Program Manager Policy", "Description", documentId);
+    let root = document.createTree(Arg.norm, statement) as NormNode;
 
     /*
     Here are the steps to build the tree for this statement:
@@ -56,13 +71,11 @@ it('Basic statement test', () => {
     let aim = root.getAim() as ComponentNode;
     aim.setContent("initiate");
 
-	root.createObject();
-    let obj = root.getObject() as ComponentNode;
+	let obj = root.createObject() as ComponentNode;
     let dir = obj.getLeft() as SubcomponentNode;
     let indir = obj.getRight() as SubcomponentNode;
-    dir.createJunctionNode();
 
-    let dirJunction = dir.getChild() as JunctionNode;
+    let dirJunction = dir.createJunctionNode() as JunctionNode;
     dirJunction.setJunction(JunctionType.xor);
     dirJunction.createSubcomponentNode(SubcomponentType.direct, Arg.left);
     dirJunction.createSubcomponentNode(SubcomponentType.direct, Arg.right);
@@ -73,66 +86,147 @@ it('Basic statement test', () => {
     let dir2 = dirJunction.getRight() as SubcomponentNode;
     dir2.setContent("revocation proceedings");
 
-    indir.createSubcomponentNode(SubcomponentType.indirect);
-
-    let dirChild = indir.getChild() as SubcomponentNode;
+    let dirChild = indir.createSubcomponentNode(SubcomponentType.indirect) as SubcomponentNode;
     dirChild.setContent("certified operation", "a");
- });
+});
 
-/**
- * Tests miscellaneous functionality like node deletion and adding and deleting Sanction nodes.
- */
-it('Test for miscellaneous functionality', () => {
+//------------------------------------------------------------------------------
+
+it('Set and unset text content', () => {
     // Setup
-    const document = new Document("Test Policy", "description is missing", 102);
-    const id = document.id;
+    const document = new Document("Test Policy", "Description", documentId);
+    let root = document.createTree(Arg.norm) as NormNode;
+
+    let attr = root.getAttributes() as ComponentNode;
+    expect(attr.component.content).toBeUndefined();
+    attr.setContent("two", "one", "three");				// Setting content first time
+    expect(attr.component.content.main).toEqual("two");
+    expect(attr.component.content.prefix).toEqual("one");
+    expect(attr.component.content.suffix).toEqual("three");
+    attr.setContent(undefined, "ONE");					// A new value for content
+    expect(attr.component.content.main).toEqual("two");
+    expect(attr.component.content.prefix).toEqual("ONE");
+    attr.unsetContent();								// Unsetting content
+    expect(attr.component.content).toBeUndefined();
+});
+
+//------------------------------------------------------------------------------
+
+it('Delete a tree', () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", documentId);
+
+    let root1 = document.createTree(Arg.norm) as NormNode;
+    expect(root1).toBeDefined();
+    document.deleteTree(0);
+    let root2 = document.getRoot() as NormNode;
+    expect(root2).toBeUndefined();
+});
+
+//------------------------------------------------------------------------------
+
+it('Add and delete a Sanction node to/from a tree', () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", documentId);
+
+    let root1 = document.createTree(Arg.convention) as ConventionNode;
+    expect(root1.nodeType).toEqual(NodeType.convention);
+    document.addSanctionNodeToTree(0);
+    let root2 = document.getRoot() as SanctionNode;
+    expect(root2.nodeType).toEqual(NodeType.sanction);
+
+    document.deleteSanctionNodeFromTree(0);
+    let root3 = document.getRoot() as ConventionNode;
+    expect(root3.nodeType).toEqual(NodeType.convention);
+});
+
+//------------------------------------------------------------------------------
+
+it('The subtree rule: no Component nodes outside of a Norm/Convention subtree', () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", documentId);
     document.createTree(Arg.norm);
 
-	// Setting and unsetting text content
-	let root = document.getRoot();
-	let attr = root.getAttributes() as ComponentNode;
-	expect(attr.component.content).toBeUndefined();
-	attr.setContent("two", "one", "three");				// Setting content first time
-	expect(attr.component.content.main).toEqual("two");
-	expect(attr.component.content.prefix).toEqual("one");
-	expect(attr.component.content.suffix).toEqual("three");
-	attr.setContent(undefined, "ONE");					// A new value for content
-	expect(attr.component.content.main).toEqual("two");
-	expect(attr.component.content.prefix).toEqual("ONE");
-	attr.unsetContent();								// Unsetting content
-	expect(attr.component.content).toBeUndefined();
-
-    // Deleting a tree
-    root = document.getRoot();
-    expect(root).toBeDefined();
-    document.deleteTree(0);
-    root = document.getRoot();
-    expect(root).toBeUndefined();
-
-    // Adding a Sanction node to a tree
-    document.createTree(Arg.convention);
-    root = document.getRoot() as ConventionNode;
-    expect(root.nodeType).toEqual(NodeType.convention);
     document.addSanctionNodeToTree(0);
-    root = document.getRoot() as SanctionNode;
-    expect(root.nodeType).toEqual(NodeType.sanction);
+    let root = document.getRoot() as SanctionNode;
 
-	// The subtree rule: no Component nodes outside of a Norm/Convention subtree
-	root.createJunctionNode(Arg.right);
-	let junction = root.getRight() as JunctionNode;
-	expect(() => { junction.createComponentNode(ComponentType.norm, Arg.left) }).toThrow("subtree");
+    let junction = root.createJunctionNode(Arg.right) as JunctionNode;
+    expect(() => { junction.createComponentNode(ComponentType.object, Arg.left) }).toThrow(DataErrorType.JUN_ADD_CMP_NO_NC);
+});
 
-	// Deleting the Sanction node
-    document.deleteSanctionNodeFromTree(0);
+//------------------------------------------------------------------------------
 
+it('Create nested children of the same type', () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", documentId);
 
-    // Nested children of the same node type; child deletion
-    root = document.getRoot() as ConventionNode;
-    attr = root.getAttributes() as ComponentNode;
+    let root = document.createTree(Arg.convention) as ConventionNode;
+    let attr = root.getAttributes() as ComponentNode;
+    let junction1 = attr.createJunctionNode() as JunctionNode;
+    let junction2 = junction1.createJunctionNode(Arg.left) as JunctionNode;
+});
+
+//------------------------------------------------------------------------------
+
+it('Delete a node', () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", documentId);
+
+    let root = document.createTree(Arg.convention) as ConventionNode;
+    let attr = root.getAttributes() as ComponentNode;
     attr.createJunctionNode();
-    let junction1 = attr.getChild() as JunctionNode;
-    junction1.createJunctionNode(Arg.left);
-    let junction2 = junction1.getLeft() as JunctionNode;
     attr.deleteChild(Arg.only);
-    expect(() => { attr.getChild() }).toThrow("dummy"); // Newly deleted child should be a dummy node
+    expect(() => { attr.getChild() }).toThrow(DataErrorType.CMP_GET_DUM); // Newly deleted child should be a dummy node
+});
+
+//------------------------------------------------------------------------------
+
+it('Find a node by ID', () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", documentId);
+    document.createTree(Arg.norm);
+
+	// Without tree index
+    let node1 = document.find(9) as BaseNode;
+    expect(node1).toBeDefined();
+    expect(node1.id).toEqual(9);
+
+	// With tree index
+	let node2 = document.find(4, 0) as BaseNode;
+    expect(node2).toBeDefined();
+    expect(node2.id).toEqual(4);
+});
+
+//------------------------------------------------------------------------------
+
+it('Toggle negation of a root node', () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", documentId);
+    let root = document.createTree(Arg.norm) as NormNode;
+
+	// Toggling negation of a root node
+	document.turnOnNegation(root, 0);
+	expect(document.getRoot().nodeType === NodeType.negation);
+	document.turnOffNegation(root, 0);
+	expect(document.getRoot().nodeType === NodeType.norm);
+});
+
+//------------------------------------------------------------------------------
+
+it('Toggle negation of a non-root node', () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", documentId);
+    document.createTree(Arg.norm);
+
+	// Toggling negation of a non-root node
+	let root = document.getRoot() as NormNode;
+	let attr = root.getAttributes() as ComponentNode;
+    let junction = attr.createJunctionNode() as JunctionNode;
+	document.turnOnNegation(junction, 0);
+	let child = attr.getChild() as BaseNode;
+	expect(child.nodeType === NodeType.negation);
+	// Attempting to turn on negation of a Negation node, which is forbidden
+	expect(() => { document.turnOnNegation(child, 0) }).toThrow(DataErrorType.DOC_TOG_NEG);
+	document.turnOffNegation(junction, 0);
+	expect(attr.getChild().nodeType === NodeType.junction);
 });

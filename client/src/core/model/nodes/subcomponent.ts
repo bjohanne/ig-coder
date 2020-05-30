@@ -1,12 +1,8 @@
-import { BaseNode } from "./base";
+import { BaseNode, NormNode, ConventionNode, JunctionNode, NegationNode } from "./";
 import { INode, IComponentAndSubNode, IOneChild } from "../interfaces";
 import { NodeType, SubcomponentType, SubtreeType, Arg } from "../enums";
 import { Component } from "../component";
-
-import NormNode from "./norm";
-import ConventionNode from "./convention";
-import JunctionNode from "./junction";
-import NegationNode from "./negation";
+import { DataError, DataErrorType } from "../errors";
 
 /**
  * Subcomponent nodes represent subtypes of Object and Conditions components.
@@ -39,9 +35,10 @@ export default class SubcomponentNode extends BaseNode implements IComponentAndS
      * Internal function that is called by all create*() functions.
      * Checks this node's number of children, which dictates how the child should be added.
      * When the child is added, this node's text content is also deleted.
+	 * Assumes that it is legal to add the child under the current conditions - throws no errors.
      * @param node A reference to the node to be added as a child
      */
-    private addChild(node: INode) {
+    private addChild(node: INode) : INode {
         if (this.children.length === 0) { // No nodes in the array, dummy or not
             this.children.push(node);
         } else if (this.children.length === 1) {
@@ -49,6 +46,7 @@ export default class SubcomponentNode extends BaseNode implements IComponentAndS
         }
         this.unsetContent(); // Delete this node's text content
 		this.update();
+		return node;
     }
 
     /**
@@ -60,11 +58,11 @@ export default class SubcomponentNode extends BaseNode implements IComponentAndS
      */
     setContent(content?: string, prefix?: string, suffix?: string) : void {
         if (this.subcomponentType === SubcomponentType.activation || this.subcomponentType === SubcomponentType.execution) {
-            throw new Error("Cannot modify text content of Activation or Execution nodes");
+            throw new DataError(DataErrorType.SUB_CND_TXT);
         } else if (typeof this.component !== "undefined") {
             this.component.set(content, prefix, suffix);
             this.children.length = 0;
-			this.update;
+			this.update();
         }
     }
 
@@ -73,16 +71,16 @@ export default class SubcomponentNode extends BaseNode implements IComponentAndS
 	 */
 	unsetContent() : void {
 		this.component.unset();
-		this.update;
+		this.update();
 	}
 
     // Getter for the child
     getChild() : INode {
         if (this.children.length === 0) {
-            throw new Error("This Subcomponent node has no children");
+            throw new DataError(DataErrorType.SUB_GET_UNDEF);
         }
-        if (typeof this.children[0].nodeType === "undefined") {
-            throw new Error("The child of this Subcomponent node is a dummy node");
+        if (this.children[0].isDummy()) {
+            throw new DataError(DataErrorType.SUB_GET_DUM);
         }
         return this.children[0];
     }
@@ -93,30 +91,30 @@ export default class SubcomponentNode extends BaseNode implements IComponentAndS
 	 * @param statement (Optional) The full text of the statement
      * @param origin (Optional) The ID of the node the new node is a reference to
      */
-    createNormOrConventionNode(type: Arg.norm | Arg.convention, statement?: string, origin?: number) {
+    createNormOrConventionNode(type: Arg.norm | Arg.convention, statement?: string, origin?: number) : INode | undefined {
         if (type === Arg.norm) {
             if (this.subcomponentType === SubcomponentType.direct || this.subcomponentType === SubcomponentType.indirect) {
-                throw new Error("Subcomponent nodes of an Object subtype cannot have Norm nodes as children");
+                throw new DataError(DataErrorType.SUB_OBJ_ADD_NRM);
             } else {
-                this.addChild(new NormNode(this.document, statement, this.id, origin));
+                return this.addChild(new NormNode(this.document, statement, this.id, origin));
             }
         } else {
-            this.addChild(new ConventionNode(this.document, statement, this.id, origin));
+            return this.addChild(new ConventionNode(this.document, statement, this.id, origin));
         }
     }
 
     /**
      * Creates a Junction node as child of this node.
      */
-    createJunctionNode() {
-        this.addChild(new JunctionNode(this.id, this.document, this.subtree, undefined, this.subcomponentType));
+    createJunctionNode() : INode | undefined {
+        return this.addChild(new JunctionNode(this.document, this.id, this.subtree, undefined, this.subcomponentType));
     }
 
     /**
      * Creates a Negation node as child of this node.
      */
-    createNegationNode() {
-        this.addChild(new NegationNode(this.document, this.id, this.subtree, undefined, this.subcomponentType));
+    createNegationNode() : INode | undefined {
+        return this.addChild(new NegationNode(this.document, this.id, this.subtree, undefined, this.subcomponentType));
     }
 
     /**
@@ -126,10 +124,10 @@ export default class SubcomponentNode extends BaseNode implements IComponentAndS
      * @param subcomponentType The type of Subcomponent (Direct, Indirect)
      * @param origin (Optional) The ID of the node this node is a reference to
      */
-    createSubcomponentNode(subcomponentType: SubcomponentType.direct | SubcomponentType.indirect, origin?: number) {
+    createSubcomponentNode(subcomponentType: SubcomponentType.direct | SubcomponentType.indirect, origin?: number) : INode | undefined {
         if (this.subcomponentType === SubcomponentType.activation || this.subcomponentType === SubcomponentType.execution) {
-            throw new Error("Subcomponent nodes of a Conditions subtype cannot have Subcomponent nodes as children");
+            throw new DataError(DataErrorType.SUB_ADD_CND);
         }
-        this.addChild(new SubcomponentNode(subcomponentType, this.document, this.id, this.subtree, origin));
+        return this.addChild(new SubcomponentNode(subcomponentType, this.document, this.id, this.subtree, origin));
     }
 }

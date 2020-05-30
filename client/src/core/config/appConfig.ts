@@ -3,7 +3,7 @@ import environmentConfig from "./environmentConfig";
 class Config {
 
     api: { baseUrl: string } = {
-        baseUrl: "http://localhost:5000",
+        baseUrl: "http://localhost:5060",
     };
 
     client: { path: string } = {
