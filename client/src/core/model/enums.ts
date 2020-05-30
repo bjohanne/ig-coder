@@ -5,7 +5,8 @@ export enum NodeType {
     sanction     = "Sanction",
     negation     = "Negation",
     component    = "Component",
-    subcomponent = "Subcomponent"
+    subcomponent = "Subcomponent",
+    composite    = "Composite"
 }
 
 export enum JunctionType {

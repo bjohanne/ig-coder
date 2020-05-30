@@ -1,5 +1,5 @@
 from flask import jsonify
-from flask_restplus import Resource, reqparse, fields, marshal_with
+from flask_restplus import Resource, reqparse
 from nltk import WhitespaceTokenizer
 
 document_parser = reqparse.RequestParser()

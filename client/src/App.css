@@ -27,3 +27,164 @@
         transform: rotate(360deg);
     }
 }
+
+.node {
+    z-index: 1000;
+}
+
+.link {
+    z-index: 10;
+}
+
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+.accordion-title {
+    line-height: 3.25em;
+}
+
+.btn-square {
+    width: 5em;
+    height: 5em;
+    margin-top: .6em !important;
+}
+
+.entry-editor .row {
+    margin-top: .5em;
+}
+
+.modal-dialog {
+    min-width: 70% !important;
+}
+
+.modal-open {
+    padding-right: 0 !important;
+}
+
+.App-link {
+    color: #61dafb;
+}
+
+.toast-body {
+	padding-left: 8px;
+}
+.component-editor-entry-text {
+    padding: 1rem;
+    font-size: 1.25rem;
+}
+.component-editor-input-controls {
+
+    display: flex;
+}
+
+.nlp-controls {
+    margin-top: 2.5rem;
+    flex-grow: 2;
+}
+
+.nlp-controls > * {
+    margin-bottom: .5rem;
+}
+
+.nlp-wrap {
+    flex-grow: 3;
+}
+
+.nlp-controls, .nlp-wrap {
+    display: flex;
+    flex-direction: column;
+    margin-right: 1rem;
+}
+
+.ent, .pos {
+    display: flex;
+    margin: .25rem;
+    color: white;
+    cursor: pointer;
+    border: 3px solid #fff;
+    border-radius: .5rem;
+}
+
+.ent:hover, .pos:hover {
+    border: 3px solid #000;
+}
+
+.ents, .pos-tags {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.text-control-wrap {
+    display: flex;
+    flex-direction: row;
+}
+
+.text-control {
+    display: flex;
+    flex-grow: 1;
+}
+
+.sub-comp-wrap {
+    display: flex;
+    align-items: center;
+    margin-top: .25em;
+}
+
+#is-junc-label {
+    text-indent: 5px;
+}
+
+.ent-text, .pos-text {
+    padding: .5rem !important;
+    text-indent: .25rem;
+    min-width: 8rem;
+    font-size: 1.25em !important;
+}
+
+mark, .mark {
+    padding: 0 !important;
+}
+
+.radio-wrap {
+    display: flex;
+    flex-grow: 1;
+}
+
+.radio {
+    flex-grow: 1;
+}
+
+.radio label, .checkbox label {
+    font-size: 2em;
+}
+
+.radio input[type=radio], .checkbox input[type=checkbox] {
+    width: 30px;
+    height: 30px;
+}
+
+.checkbox-wrap {
+    display: flex;
+    flex-grow: 1;
+}
+.checkbox {
+    display: flex;
+    flex-grow: 1;
+}
+
+.hide {
+    display: none;
+}
+
+.radio label {
+    font-size: 2em;
+}
+
+.radio input[type=radio] {
+    width: 30px;
+    height: 30px;
+}

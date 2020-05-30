@@ -1,34 +1,40 @@
 import { INode } from "../interfaces";
-import { NodeType} from "../enums";
+import { NodeType, SubtreeType, Arg } from "../enums";
 import { NodeCounter } from "../document";
+import { DataError, DataErrorType } from "../errors";
 
 /**
  * The base node has the implementation of INode.
  * It is also used as dummy children for several node types.
  */
-export class BaseNode implements INode {
+export default class BaseNode implements INode {
     id!: number;
     document!: number;
     nodeType!: NodeType;
+	subtree?: SubtreeType;
     parent?: number;
     origin?: number;
-    children!: INode[];
     createdAt!: Date;
     updatedAt!: Date;
+    children!: INode[];
 
     /**
      * The base constructor for all nodes
      *
      * @param document The ID of the document this node belongs to
      * @param parent (Optional) The ID of the node this node is a child of (the parent's children array must be set separately)
+	 * @param subtree (Optional) The subtree this node is part of. Should be the same as its parent - used to pass that down.
      * @param origin (Optional) The ID of the node this node is a reference to
      */
-    constructor(document: number, parent?: number, origin?: number) {
+    constructor(document: number, parent?: number, subtree?: SubtreeType, origin?: number) {
         this.id = NodeCounter.getInstance().getNextNodeId(document);
         this.document = document;
         if (parent) {
             this.parent = parent;
         }
+		if (subtree) {
+			this.subtree = subtree;
+		}
         if (origin) {
             this.origin = origin;
         }
@@ -37,30 +43,66 @@ export class BaseNode implements INode {
     }
 
     /**
+     * Check whether this node is a dummy node, i.e. a BaseNode.
+     * (Defined here in order to be available to all node classes)
+     * Plain base nodes do not have the nodeType field.
+     * NB: The check must be done in this way, not simply "instanceof BaseNode",
+     * because that test counts inheritance => all node types pass.
+     */
+    isDummy() : boolean {
+        return (typeof this.nodeType === "undefined");
+    }
+
+	/**
+	 * Small abstraction/convenience to set the updatedAt field.
+	 * Called when a property on the node is modified or when a child is created on the node.
+	 */
+	update() {
+		this.updatedAt = new Date();
+	}
+
+	/**
      * The standard way of deleting a node.
      * If a node with the given ID is found in this node's children array,
-     * that child will be replaced with a dummy node, deleting the old data.
-     * If the node is not found, no nodes will be deleted because index will be -1 and no nodes can have the ID -1.
+     * that child will be replaced with a new dummy node, deleting the old data.
+     * If the node is not found, an error will be thrown and no nodes will be deleted.
+	 * Does not throw a specific error if called on a Deontic node, because componentType does not exist on BaseNode.
      * Like Document.deleteTree(), all the node's descendants are also deleted.
-     * Does not delete children that are automatically created (fixed children).
+     * Does not delete children that were automatically created (fixed children).
+	 *
+	 * To delete an Object child of a Norm/Convention, use instead deleteObject().
      *
-     * @param id The ID of the node to be deleted; must be a child of this node
+	 * @param childPos Which child to delete (left, right, only)
      */
-    deleteChild(id: number) {
-        if (this.nodeType === NodeType.norm || this.nodeType === NodeType.convention) {
-            throw new Error("Cannot delete fixed children of Norm and Convention nodes");
-        }
-        // Fixed children of Object and Conditions (Component) nodes are of type Subcomponent.
-        // The below code checks for that without accessing this.componentType, which is not present in BaseNode.
-        if (this.nodeType === NodeType.component) {
-            let child = this.children.find(node => node.id === id);
-            if (typeof child !== "undefined") {
-                if (child.nodeType === NodeType.subcomponent) {
-                    throw new Error("Cannot delete fixed Subcomponent children of Component nodes");
-                }
-            }
-        }
-        let index = this.children.findIndex(node => node.id === id);
-        this.children[index] = new BaseNode(this.document, this.id);
+	deleteChild(childPos: Arg.left | Arg.right | Arg.only) {
+		let index;    // The child's index in the parent's child array
+
+		if (this.nodeType === NodeType.norm || this.nodeType === NodeType.convention) {
+			throw new DataError(DataErrorType.BAS_DEL_FIX);
+        // Node types that have two non-fixed children
+		} else if (this.nodeType === NodeType.junction || this.nodeType === NodeType.sanction) {
+			if (childPos === Arg.only) {
+				throw new DataError(DataErrorType.BAS_DEL_ONLY);
+			}
+			index = (childPos === Arg.left) ? 0 : 1;
+		} else { // The remaining three node types have one or no children
+			// A left or right child of a Component node must be a fixed child, which should not be deleted
+			if (childPos !== Arg.only) {
+				throw new DataError(DataErrorType.BAS_DEL_LR);
+			}
+			if (this.nodeType === NodeType.component) {
+				// In case this is called with Arg.left (0), also check the child in index 0 for type Subcomponent
+				if (this.children[0].nodeType === NodeType.subcomponent) {
+					throw new DataError(DataErrorType.BAS_DEL_SUB);
+				}
+			}
+			index = 0;
+		}
+
+		if (this.children[index].isDummy()) {
+			throw new DataError(DataErrorType.BAS_DEL_DUM);
+		}
+		// Should log this as a warning
+		this.children[index] = new BaseNode(this.document, this.id);
     }
 }

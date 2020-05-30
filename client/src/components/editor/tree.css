@@ -1,0 +1,47 @@
+.node circle {
+  stroke: black;
+  stroke-width: 2px;
+}
+
+.node text {
+  font: 12px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: black;
+  stroke-width: 2px;
+}
+
+.tooltip-inner {
+  background: white;
+}
+
+.card-title {
+  color: black;
+}
+
+.col-8, .col-4 {
+  padding-right: 0;
+}
+
+.col-4 {
+  padding: 0;
+}
+
+p.component {
+  margin-bottom: 0;
+}
+
+.tooltipHover {
+    pointer-events: auto !important;
+    &:hover {
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+.treeContainer {
+	width: 100%;
+	overflow-x: scroll;
+}

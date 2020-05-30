@@ -1,34 +1,38 @@
-import React, {useEffect, useState} from "react";
+import React, {useState, useRef} from "react";
 import {connect} from "react-redux";
-import {addDocument} from "../state/actions";
+import {createDocument} from "../state/actions";
 import appConfig from "../core/config/appConfig";
-import {withRouter} from 'react-router-dom';
-import Document from "../core/model/document";
-
-import './newDocument.css'
+import {withRouter, Redirect} from 'react-router-dom';
+import {toast} from 'react-toastify';
+import usePrevious from '../core/helpers/usePrevious';
+import './newDocument.css';
 
 export function NewDocumentComponent(props: any) {
+    const {createDocument} = props;
+    const [form, setValues] = useState({name: "", description: ""});
+	const [redirect, setRedirect] = useState(false);	// Whether to redirect to the new document page
+	const prevDocument = usePrevious(props.addedDocument);
+
+	const buttonEl = useRef<HTMLButtonElement>(null);
+
     /**
      Submits the "Create New Document" form.
-     If the form is invalid (e.g. required fields not filled),
+     If a document name is not provided,
      the form is not submitted.
      */
-    const [form, setValues] = useState({name: "", description: ""});
-
-    const {addDocument} = props;
     const submitDocument = () => {
-        if (form.description !== "" && form.name !== "") {
-            const data: Document = new Document(form.name, form.description, 123);
-            addDocument(data);
+        if (form.name === "") {
+			toast.error('Please enter a document name.');
+		} else {
+			toast.dismiss();
+            createDocument({name: form.name, description: form.description, forest: []});
+			if (buttonEl && buttonEl.current) {
+				buttonEl.current.disabled = true;	// Disable the submit button to prevent multiple requests being sent
+			}
+			setRedirect(true); // This is the trigger for redirecting
         }
-        console.log(form)
     };
 
-    useEffect(() => {
-        if (props.addedDocument && props.addedDocument.id) { // A document has been set in state (not null)
-            props.history.push(`${appConfig.client.path}/documents/${props.addedDocument.id}`);
-        }
-    });
     const updateField = (e: any) => {
         setValues({
             ...form,
@@ -36,10 +40,13 @@ export function NewDocumentComponent(props: any) {
         });
     };
 
+	if (redirect && props.addedDocument && (!prevDocument || props.addedDocument.id !== prevDocument.id)) {
+       return <Redirect to={{ pathname: `${appConfig.client.path}/documents/${props.addedDocument.id}` }} />;
+    }
+
     return (
         <div className="card mx-auto" id="new-document-form">
             <div className="card-body p-5 text-center">
-
                 <div className="form-group">
                     <input type="text" className="form-control" name="name" placeholder="Document Name" required
                            value={form.name} onChange={updateField}/>
@@ -48,19 +55,18 @@ export function NewDocumentComponent(props: any) {
                     <textarea className="form-control" rows={6} name="description" placeholder="Document Description"
                               value={form.description} onChange={updateField}/>
                 </div>
-                <button className="btn btn-primary" onClick={submitDocument}>Create New Document</button>
-
+                <button type="button" className="btn btn-primary" ref={buttonEl} onClick={submitDocument}>Create New Document</button>
             </div>
         </div>
     );
 }
 
 const mapStateToProps = (state: any) => ({
-    addedDocument: state.reducer.document
+    addedDocument: state.reducer.currentDocument
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    addDocument: (documentData: any) => dispatch(addDocument(documentData))
+    createDocument: (documentData: any) => dispatch(createDocument(documentData))
 });
 
 export default connect(
