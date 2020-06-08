@@ -1,0 +1,45 @@
+version: "3.3"
+services:
+  db:
+      image: mariadb
+      container_name: db
+      ports:
+          - "5000:3306"
+      environment:
+          MYSQL_USER: user
+          MYSQL_PASSWORD_FILE: /run/secrets/mysql_pwd
+          MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_pwd
+      volumes:
+          - ./dbInit:/docker-entrypoint-initdb.d
+          - ./mysql/mariadb.cnf:/etc/mysql/mariadb.cnf
+          - ./mysql/50-mysql-clients.cnf:/etc/mysql/50-mysql-clients.cnf
+          - mysql:/var/lib/mysql
+      secrets:
+          - mysql_pwd
+          - mysql_root_pwd
+      networks:
+          - default
+  pma:
+      image: phpmyadmin/phpmyadmin
+      container_name: pma
+      environment:
+          MYSQL_USER: user
+          MYSQL_PASSWORD_FILE: /run/secrets/mysql_pwd
+          MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_pwd
+          PMA_HOST: db
+      ports:
+          - "3333:80"
+      volumes:
+          - ./pma/config.inc.php:/etc/phpmyadmin/config.inc.php
+      secrets:
+          - mysql_pwd
+          - mysql_root_pwd
+      networks:
+          - default
+secrets:
+      mysql_pwd:
+          file: ./mysql/mysql_pwd
+      mysql_root_pwd:
+          file: ./mysql/mysql_root_pwd
+volumes:
+  mysql:
