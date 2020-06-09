@@ -8,6 +8,7 @@ from .endpoints.tests.resource import TestsResource
 from .endpoints.documents.resource import DocumentsResource
 from .endpoints.nlp.resource import WordTokenizerResource
 from .endpoints.nlp_ner.resource import NamedEntityRecognitionResource
+from.endpoints.users.resource import UsersResource
 
 
 def create_app():
@@ -29,6 +30,7 @@ def create_app():
     api.add_resource(TestsResource, '/tests', '/tests/<int:test_id>')
     api.add_resource(DocumentsResource, '/documents', '/documents/<int:document_id>')
     api.add_resource(WordTokenizerResource, '/tokenize', '/tokenize')
+    api.add_resource(UsersResource,'/users','/users')
     api.add_resource(NamedEntityRecognitionResource, '/entities', '/entities')
 
     return app
