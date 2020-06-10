@@ -1,8 +1,7 @@
 from flask_restplus import Resource, reqparse, cors, fields, marshal_with, marshal
 from flask import make_response
 import json
-from ..database.db import add_user
-from ..database.db import get_user
+from sql_db.dbaccess import add_user, get_user
 
 user_fields = {
     'user_id': fields.Integer,
