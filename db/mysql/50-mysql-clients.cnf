@@ -1,0 +1,5 @@
+[mysql]
+## MySQL Client Configuration ##
+
+### This option is disabled by default ###
+### ssl-verify-server-cert ###
