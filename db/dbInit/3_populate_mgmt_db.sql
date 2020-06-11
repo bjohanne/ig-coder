@@ -27,30 +27,30 @@ USE mgmt;
 -- Known rows for table `MemberType`
 --
 
-INSERT INTO `MemberType` (`member_type_id`, `member_type`) VALUES
-(NULL, 'owner'),	# 1
-(NULL, 'member'),	# 2
-(NULL, 'guest');	# 3
+INSERT INTO `MemberType` (`member_type`) VALUES
+('owner'),	# 1
+('member'),	# 2
+('guest');	# 3
 
 --
 -- Known rows for table `OperationType`
 --
 
-INSERT INTO `OperationType` (`operation_type_id`, `operation_type`) VALUES
-(NULL, 'create_dataset'),	# 1
-(NULL, 'read'),			# 2
-(NULL, 'update'),		# 3
-(NULL, 'delete_project'),	# 4
-(NULL, 'delete_dataset');	# 5
+INSERT INTO `OperationType` (`operation_type`) VALUES
+('create_dataset'),	# 1
+('read'),			# 2
+('update'),		    # 3
+('delete_project'),	# 4
+('delete_dataset');	# 5
 
 --
 -- Known rows for table `Visibility`
 --
 
-INSERT INTO `Visibility` (`visibility_id`, `visibility`) VALUES
-(NULL, 'private'),	# 1
-(NULL, 'internal'),	# 2
-(NULL, 'public');	# 3
+INSERT INTO `Visibility` (`visibility`) VALUES
+('private'),	# 1
+('internal'),	# 2
+('public');	# 3
 
 --
 -- Known rows for table `DefaultProjectPermission`
@@ -75,4 +75,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-

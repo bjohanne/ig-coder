@@ -65,11 +65,10 @@ function RegisterContainer() {
     const addUserData=(userId)=>{
         var db = firebase.firestore();
         db.collection("users").add({
-                "userId":userId,
-                "firstName":state.firstname,
-                "lastName":state.lastname,
-                "email":state.username,
-                "privilege":0
+                "user_id":userId,
+                "first_name":state.firstname,
+                "last_name":state.lastname,
+                "email":state.username
             })
             .then(function(docRef) {
                 console.log("Document written with ID: ", docRef.id);
@@ -81,7 +80,7 @@ function RegisterContainer() {
 
     const getUserData=(userId)=>{
         var db = firebase.firestore();
-        db.collection("users").where("userId", "==", userId)
+        db.collection("users").where("user_id", "==", userId)
             .get()
             .then(function(querySnapshot) {
                 querySnapshot.forEach(function(doc) {
@@ -102,7 +101,7 @@ function RegisterContainer() {
         firebase.auth().createUserWithEmailAndPassword(state.username, state.pass)
             .then(data=>{
                 setSignup(true)
-                addUserData(data.user.uid)
+                addUserData(data.user.uid)  // Here's the Firebase user ID, need to send it to MySQL
                 //getUserData(data.user.uid)
                 setTimeout(()=>{
                     window.location = '/login'
