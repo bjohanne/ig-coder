@@ -1,0 +1,38 @@
+Docker Compose files for MariaDB and phpMyAdmin.
+
+MariaDB/MySQL: Config files are included in /mysql. Additionally, /mysql contains the passwords for the root user and a standard user of MariaDB ("user").
+
+phpMyAdmin: Accessible on port 3333 for viewing and editing the database.
+
+The containers should be running in the background. To see status:
+	docker-compose ps
+or
+	docker ps
+
+To stop:
+	docker-compose stop
+
+To run:
+	Foreground: docker-compose up
+	Background: docker-compose up -d
+
+To restart (alias in ~/.bashrc):
+	dc-rebuild
+
+SQL scripts in ./dbInit:
+1_phpmyadmin.sql	Sets up pma-internal tables.
+2_setup_mgmt_db.sql	Sets up tables for the main application database.
+3_populate_mgmt_db.sql	Adds known rows to fixed tables (member types, visibility levels etc.).
+9_mysql_secure....sql	Some queries from the original MSI script for increased security.
+
+Filenames are prefixed with a number to ensure they are run in the correct order.
+
+Do not overwrite scripts with phpMyAdmin exported SQL, as it does not yet support MySQL 8+ features and other edits have been made to them. These include but are not limited to:
+
+1_phpmyadmin.sql:
+	CREATE DATABASE phpmyadmin;
+	USE phpmyadmin;
+
+2_setup_mgmt_db.sql:
+	CREATE DATABASE mgmt;
+	USE mgmt;
