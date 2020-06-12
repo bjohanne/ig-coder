@@ -23,6 +23,7 @@ SQL scripts in ./dbInit:
 1_phpmyadmin.sql	Sets up pma-internal tables.
 2_setup_mgmt_db.sql	Sets up tables for the main application database.
 3_populate_mgmt_db.sql	Adds known rows to fixed tables (member types, visibility levels etc.).
+4_procedures_and_triggers.sql	Adds stored procedures and triggers to the application database.
 9_mysql_secure....sql	Some queries from the original MSI script for increased security.
 
 Filenames are prefixed with a number to ensure they are run in the correct order.

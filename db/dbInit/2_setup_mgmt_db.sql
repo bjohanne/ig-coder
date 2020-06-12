@@ -30,6 +30,8 @@ USE mgmt;
 
 CREATE TABLE `Dataset` (
   `dataset_id` mediumint(8) UNSIGNED NOT NULL,
+  `name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
   `project_id` mediumint(8) UNSIGNED NOT NULL,
   `visibility_id` mediumint(8) UNSIGNED NOT NULL,
   `created_time` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -118,7 +120,8 @@ CREATE TABLE `OperationType` (
 
 CREATE TABLE `Project` (
   `project_id` mediumint(8) UNSIGNED NOT NULL,
-  `project_name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
   `visibility_id` mediumint(8) UNSIGNED NOT NULL,
   `created_time` timestamp NOT NULL DEFAULT current_timestamp(),
   `modified_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -524,4 +527,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
