@@ -1,4 +1,4 @@
-CREATE USER 'user'@'localhost' IDENTIFIED BY 'pass';
+CREATE USER 'user'@'localhost' IDENTIFIED BY 'RV%6Ywfp6S&bf@';
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON `mgmt`.* TO 'user'@'localhost';
 
