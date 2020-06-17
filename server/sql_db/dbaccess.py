@@ -12,7 +12,7 @@ config = {
 }
 
 sql_add_user = ("CALL create_user(%(foreign_id)s,%(first_name)s,%(last_name)s)")
-sql_get_user = (("CALL get_user(%s)"))
+sql_get_user = ("CALL get_user(%s)")
 
 
 def get_user(user_id):
