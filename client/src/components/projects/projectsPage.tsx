@@ -1,11 +1,14 @@
 import React from "react";
+import {useState} from "react";
 import './projectsPage.css'
 import LeftTab from "../common/leftTab";
-import {Dialog,DialogActions,DialogContent,DialogContentText,DialogTitle,Button,TextField} from '@material-ui/core';
+import {Dialog,DialogActions,DialogContent,DialogContentText,DialogTitle,Button,TextField,AppBar,Toolbar,IconButton,Typography} from '@material-ui/core';
+
 import ListItem from "../common/listItem";
 function ProjectsPage(props: any) {
-    const [openNewProject, setOpenNewProject] = React.useState(false);
-    const [visibility, setVisibility]=React.useState(0);
+    const [openNewProject, setOpenNewProject] = useState(false);
+    const [visibility, setVisibility]=useState(0);
+
 
 
     const handleNewProject =(event)=>{
@@ -19,23 +22,7 @@ function ProjectsPage(props: any) {
         setVisibility(event.target.value)
     }
 
-    const handleMenuItem=(event)=>{
-        console.log(event.target)
-        switch (event.target.innerHTML) {
-            case 'Edit':
-                // @TODO add edit functionality
-                console.log('edit')
-                break;
-            case 'Delete':
-                // @TODO add Delete functionality
-                console.log('Delete')
-                break;
-            case 'Share':
-                // @TODO add Share functionality
-                console.log('Share')
-                break;
-        }
-    }
+
 
     return(
         <div className={'root'}>
@@ -156,22 +143,22 @@ function ProjectsPage(props: any) {
                                 <a href="#1" className="list-group-item list-group-item-action">
                                     <ListItem
                                         title={"project xxx-development 2020"}
-                                        type={"fsfsfjklasjfk ajkfjie jkjkfpa"}
+                                        type={"Project"}
                                         author={"Daniel Simith"}
                                         modified date={"Modified 4 days ago"}
-                                        handleMenuItem={handleMenuItem}
                                     />
                                 </a>
                                 <a href="#" className="list-group-item list-group-item-action">
                                     <ListItem
                                         title={"project xxx-development 2020"}
-                                        type={"fsfsfjklasjfk ajkfjie jkjkfpa"}
+                                        type={"Document"}
                                         author={"Daniel Simith"}
                                         modified date={"Modified 4 days ago"}
-                                        handleMenuItem={handleMenuItem}
                                     />
                                 </a>
                             </div>
+
+
                         </div>
                     </div>
                 </div>

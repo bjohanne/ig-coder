@@ -1,0 +1,17 @@
+.app-bar-title{
+    margin-left: 1rem;
+    flex: 1;
+}
+
+#share-dialog{
+    width: 50%;
+    margin-left: 50%;
+}
+
+#share-dialog .app-bar{
+    position: relative;
+}
+
+.shared-with{
+    color: brown;
+}
