@@ -246,20 +246,24 @@ ALTER TABLE `Dataset`
 --
 ALTER TABLE `DatasetMemberPermission`
   ADD PRIMARY KEY (`permission_id`),
+  ADD UNIQUE KEY `dmp_unique_combo` (`dataset_id`, `member_type_id`, `operation_type_id`),
   ADD KEY `dmp_permission_id` (`permission_id`),
   ADD KEY `dmp_dataset_id` (`dataset_id`),
   ADD KEY `dmp_member_type_id` (`member_type_id`),
-  ADD KEY `dmp_operation_type_id` (`operation_type_id`);
+  ADD KEY `dmp_operation_type_id` (`operation_type_id`),
+  ADD CHECK (`operation_type_id` IN (2, 3, 5));
 
 --
 -- Indexes for table `DatasetUserPermission`
 --
 ALTER TABLE `DatasetUserPermission`
   ADD PRIMARY KEY (`permission_id`),
+  ADD UNIQUE KEY `dup_unique_combo` (`dataset_id`, `user_id`, `operation_type_id`),
   ADD KEY `dup_permission_id` (`permission_id`),
   ADD KEY `dup_dataset_id` (`dataset_id`),
   ADD KEY `dup_user_id` (`user_id`),
-  ADD KEY `dup_operation_type_id` (`operation_type_id`);
+  ADD KEY `dup_operation_type_id` (`operation_type_id`),
+  ADD CHECK (`operation_type_id` IN (2, 3, 5));
 
 --
 -- Indexes for table `DefaultDatasetPermission`
@@ -305,6 +309,7 @@ ALTER TABLE `Project`
 --
 ALTER TABLE `ProjectMemberPermission`
   ADD PRIMARY KEY (`permission_id`),
+  ADD UNIQUE KEY `pmp_unique_combo` (`project_id`, `member_type_id`, `operation_type_id`),
   ADD KEY `pmp_permission_id` (`permission_id`),
   ADD KEY `pmp_project_id` (`project_id`),
   ADD KEY `pmp_member_type_id` (`member_type_id`),
@@ -315,6 +320,7 @@ ALTER TABLE `ProjectMemberPermission`
 --
 ALTER TABLE `ProjectUserPermission`
   ADD PRIMARY KEY (`permission_id`),
+  ADD UNIQUE KEY `pup_unique_combo` (`project_id`, `user_id`, `operation_type_id`),
   ADD KEY `pup_permission_id` (`permission_id`),
   ADD KEY `pup_project_id` (`project_id`),
   ADD KEY `pup_user_id` (`user_id`),
@@ -334,7 +340,7 @@ ALTER TABLE `Project_User`
 --
 ALTER TABLE `Statement`
   ADD PRIMARY KEY (`statement_id`),
-  ADD UNIQUE KEY `foreign_id` (`foreign_id`),
+  ADD UNIQUE KEY `s_foreign_id` (`foreign_id`),
   ADD KEY `s_statement_id` (`statement_id`),
   ADD KEY `s_dataset_id` (`dataset_id`);
 
@@ -343,7 +349,7 @@ ALTER TABLE `Statement`
 --
 ALTER TABLE `StatementVersion`
   ADD PRIMARY KEY (`version_id`),
-  ADD UNIQUE KEY `foreign_id` (`foreign_id`),
+  ADD UNIQUE KEY `sv_foreign_id` (`foreign_id`),
   ADD KEY `sv_version_id` (`version_id`),
   ADD KEY `sv_statement_id` (`statement_id`),
   ADD KEY `sv_user_id` (`user_id`);
@@ -353,7 +359,7 @@ ALTER TABLE `StatementVersion`
 --
 ALTER TABLE `User`
   ADD PRIMARY KEY (`user_id`),
-  ADD UNIQUE KEY `foreign_id` (`foreign_id`),
+  ADD UNIQUE KEY `u_foreign_id` (`foreign_id`),
   ADD KEY `u_user_id` (`user_id`);
 
 --

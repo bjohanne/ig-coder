@@ -1,4 +1,4 @@
-Docker Compose files for MariaDB and phpMyAdmin.
+'Docker Compose files for MariaDB and phpMyAdmin.
 
 MariaDB/MySQL: Config files are included in /mysql. Additionally, /mysql contains the passwords for the root user and a standard user of MariaDB ("user").
 
@@ -24,6 +24,7 @@ SQL scripts in ./dbInit:
 2_setup_mgmt_db.sql	Sets up tables for the main application database.
 3_populate_mgmt_db.sql	Adds known rows to fixed tables (member types, visibility levels etc.).
 4_procedures_and_triggers.sql	Adds stored procedures and triggers to the application database.
+5_development_test_data.sql	Adds dummy User, Project and Dataset entities for development purposes.
 9_mysql_secure....sql	Some queries from the original MSI script for increased security.
 
 Filenames are prefixed with a number to ensure they are run in the correct order.
