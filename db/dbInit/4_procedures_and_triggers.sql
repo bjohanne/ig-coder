@@ -410,6 +410,17 @@ CREATE PROCEDURE `help_get_dataset_visibility` (IN `dataset_id` MEDIUMINT UNSIGN
     SQL SECURITY INVOKER
 SELECT d.`visibility_id` INTO visibility_id FROM `Dataset` d WHERE d.`dataset_id` = dataset_id$$
 
+-- --------------------------------------------------------
+-- Permission checkers
+-- --------------------------------------------------------
+
+# Operation types:
+# 1: 'create_dataset'
+# 2: 'read'
+# 3: 'update'
+# 4: 'delete_project'
+# 5: 'delete_dataset'
+
 # Base check: Project permission
 CREATE PROCEDURE `permcheck_project` (IN `user_id` MEDIUMINT UNSIGNED, IN `project_id` MEDIUMINT UNSIGNED, IN `operation_type_id` MEDIUMINT UNSIGNED, IN `member_type_id` MEDIUMINT UNSIGNED,
     OUT `result` TINYINT(1))  READS SQL DATA
@@ -441,17 +452,6 @@ ELSE
 	END IF;
 END IF;
 END$$
-
--- --------------------------------------------------------
--- Permission checkers
--- --------------------------------------------------------
-
-# Operation types:
-# 1: 'create_dataset'
-# 2: 'read'
-# 3: 'update'
-# 4: 'delete_project'
-# 5: 'delete_dataset'
 
 # Check: Create dataset
 CREATE PROCEDURE `permcheck_create_dataset` (IN `user_id` MEDIUMINT UNSIGNED, IN `project_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  READS SQL DATA
