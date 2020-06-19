@@ -52,7 +52,7 @@ END IF;
 END$$
 
 # Create project
-CREATE PROCEDURE `create_project` (IN `name` VARCHAR(150) CHARSET utf8mb4, IN `description` VARCHAR(500), IN `visibility_id` MEDIUMINT UNSIGNED, IN `user_id` MEDIUMINT UNSIGNED)  MODIFIES SQL DATA
+CREATE PROCEDURE `create_project` (IN `name` VARCHAR(150) CHARSET utf8mb4, IN `description` VARCHAR(500) CHARSET utf8mb4, IN `visibility_id` MEDIUMINT UNSIGNED, IN `user_id` MEDIUMINT UNSIGNED)  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 INSERT INTO `Project` (`name`, `description`, `visibility_id`) VALUES (name, description, visibility_id);
@@ -65,7 +65,7 @@ CREATE PROCEDURE `create_user` (IN `foreign_id` VARCHAR(48) CHARSET utf8mb4, IN 
 INSERT INTO `User` (`foreign_id`, `first_name`, `last_name`) VALUES (foreign_id, first_name, last_name)$$
 
 # Create statement
-CREATE PROCEDURE `create_statement` (IN `foreign_id` VARCHAR(48) CHARSET utf8mb4, IN `dataset_id` MEDIUMINT UNSIGNED, IN `user_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  MODIFIES SQL DATA
+CREATE PROCEDURE `create_statement` (IN `foreign_id` MEDIUMINT UNSIGNED, IN `dataset_id` MEDIUMINT UNSIGNED, IN `user_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 CALL permcheck_update_dataset(user_id, dataset_id, @inner_result);
@@ -79,7 +79,7 @@ END$$
 
 
 # Create statement version
-CREATE PROCEDURE `create_statement_version` (IN `foreign_id` VARCHAR(48) CHARSET utf8mb4, IN `statement_id` MEDIUMINT UNSIGNED, IN `user_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT (1))  MODIFIES SQL DATA
+CREATE PROCEDURE `create_statement_version` (IN `foreign_id` MEDIUMINT UNSIGNED, IN `statement_id` MEDIUMINT UNSIGNED, IN `user_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_dataset_of_statement(statement_id, @dataset_id);
@@ -293,7 +293,6 @@ END IF;
 END$$
 
 # Disable user
-DELETE dmp FROM `DatasetMemberPermission` dmp WHERE dmp.`dataset_id` = dataset_id AND dmp.`member_type_id` = member_type_id AND dmp.`operation_type_id` = operation_type_id$$
 CREATE PROCEDURE `disable_user` (IN `user_id` MEDIUMINT UNSIGNED)  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 UPDATE `User` u SET u.`disabled` = 1 WHERE u.`user_id` = user_id$$
