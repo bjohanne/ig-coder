@@ -3,18 +3,16 @@ from mysql.connector import errorcode
 import sys
 
 config = {
-    'user': 'root',
-    'password': '6j20UF4h$H&fCj',
+    'user': 'user',
+    'password': 'RV%6Ywfp6S&bf@',
     'host': '10.212.137.212',
     'database': 'mgmt',
     'port': '5000',
     'raise_on_warnings': True
 }
 
-sql_add_user = ("INSERT INTO User "
-                "(foreign_id, first_name, last_name, disabled, privileged, created_time, modified_time) "
-                "VALUES (%(foreign_id)s,%(first_name)s,%(last_name)s, %(disabled)s, %(privileged)s, %(created_time)s, %(modified_time)s)")
-sql_get_user = (("SELECT * FROM User WHERE user_id = %s"))
+sql_add_user = ("CALL create_user(%(foreign_id)s,%(first_name)s,%(last_name)s)")
+sql_get_user = ("CALL get_user(%s)")
 
 
 def get_user(user_id):
@@ -36,7 +34,7 @@ def get_db_execute(sql, data):
         return res
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Something is wrong with your user name or password")
+            print("Something is wrong with your username or password")
         elif err.errno == errorcode.ER_BAD_DB_ERROR:
             print("Database does not exist")
         else:
@@ -63,7 +61,7 @@ def add_db_execute(sql, data):
         return None
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Something is wrong with your user name or password")
+            print("Something is wrong with your username or password")
         elif err.errno == errorcode.ER_BAD_DB_ERROR:
             print("Database does not exist")
         else:
