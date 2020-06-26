@@ -6,17 +6,16 @@ import {
     SAVE_DOCUMENT_REQUEST,
     PRE_SET_ACTIVE_NODE,
     SET_ACTIVE_NODE
-} from "./actionTypes";
-import {Middleware, MiddlewareAPI} from "redux";
-import axios, {AxiosResponse} from "axios";
-import {toast} from 'react-toastify';
-import appConfig from "../core/config/appConfig";
-import { INormAndConvention } from "../core/model/interfaces";
+} from "./actions";
+import { Middleware, MiddlewareAPI } from "redux";
+import axios, { AxiosResponse } from "axios";
+import appConfig from "../../core/config/appConfig";
+import { INormAndConvention } from "../../core/model/interfaces";
 
 export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: any) => (action: any) => {
     switch (action.type) {
         case GET_DOCUMENT:
-			let storeDocuments = store.getState().reducer.documents;
+			let storeDocuments = store.getState().documentReducer.documents;
 			let foundDocument = storeDocuments.find((document: any) => document.id === Number(action.document_id));
 
 			if (foundDocument) { // A document with the provided ID already exists in state
@@ -36,8 +35,9 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
             break;
         case SAVE_DOCUMENT_REQUEST:
             axios.patch(`${appConfig.api.baseUrl}/documents`, action.payload).then((response) => {
-                let toaster = response.status === 200 ? toast.success : toast.error;
-                toaster('Document saved!');
+                //let toaster = response.status === 200 ? toast.success : toast.error;
+                //toaster('Document saved!');
+                // TODO: Render a Snackbar in the Document component, and wait for the response there
             });
             break;
         case PRE_SET_ACTIVE_NODE:
@@ -46,7 +46,6 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
                 action.payload.togglefunc();
                 return;
             }
-
             // extract the entry text, pass it to the endpoint
             let parent = action.payload.node.parent.data as INormAndConvention;
             let data = { entry: parent.entry.content }

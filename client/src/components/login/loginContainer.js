@@ -35,7 +35,7 @@ class LoginContainer extends React.Component {
         event.preventDefault()
         console.log(event)
         firebase.auth().signInWithEmailAndPassword(this.state.username, this.state.pass)
-            .then(data=> {
+            .then(data => {
                     localStorage.setItem('usertoken', data.user.getIdToken())
                     window.location = '/';
                 }
@@ -44,10 +44,12 @@ class LoginContainer extends React.Component {
                 // Handle Errors here.
                 var errorCode = error.code;
                 var errorMessage = error.message;
+                console.log(errorCode);
+                console.log(errorMessage);
                 this.setState(
                     {
                         isFail: true,
-                        failText:errorMessage
+                        failText: errorMessage
                     }
                 )
             });

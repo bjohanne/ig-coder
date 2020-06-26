@@ -1,5 +1,4 @@
 import update from 'immutability-helper';
-import Document from "../core/model/document";
 import {
     GET_DOCUMENT_RESPONSE,
     CREATE_DOCUMENT_RESPONSE,
@@ -9,11 +8,12 @@ import {
     ADD_JUNCTION,
     UPDATE_JUNCTION,
     UPDATE_NEGATION
-} from "./actionTypes";
+} from "./actions";
 
-import { NormNode, ConventionNode, SanctionNode, JunctionNode, ComponentNode, SubcomponentNode, NegationNode } from '../core/model/nodes';
-import { Arg, SubcomponentType, JunctionType } from '../core/model/enums';
-import { INode } from '../core/model/interfaces';
+import Document from "../../core/model/document";
+import { NormNode, ConventionNode, JunctionNode, NegationNode } from '../../core/model/nodes';
+import { Arg } from '../../core/model/enums';
+import { INode } from '../../core/model/interfaces';
 
 interface IInitialState {
     documents: Array<Document>,
@@ -27,7 +27,7 @@ const initialState: IInitialState = {
     activeNode: null
 };
 
-const reducer = (state: any = initialState, action: any) => {
+const documentReducer = (state: any = initialState, action: any) => {
     let currentDocument: Document;
     let newDocument: Document;
     let node: INode;
@@ -53,10 +53,10 @@ const reducer = (state: any = initialState, action: any) => {
             newDocument = Object.assign(new Document("", "", -1), currentDocument);
             return update(state, {currentDocument: {$set: newDocument }});
 
-        case UPDATE_NEGATION: 
+        case UPDATE_NEGATION:
             let negationNode = action.payload.node as NegationNode;
             currentDocument = state.currentDocument as Document;
-            currentDocument.forest[0].updatedAt = new Date();            
+            currentDocument.forest[0].updatedAt = new Date();
             currentDocument.updateNode(negationNode);
             newDocument = Object.assign(new Document("", "", -1), currentDocument);
             return update(state, {currentDocument: {$set: newDocument }});
@@ -97,14 +97,14 @@ const reducer = (state: any = initialState, action: any) => {
 			} else {
 				return state;
 			}
-        case SET_ACTIVE_NODE:            
-            return update(state, { activeNode: { $set: action.payload }});    
+        case SET_ACTIVE_NODE:
+            return update(state, { activeNode: { $set: action.payload }});
         case CREATE_DOCUMENT_RESPONSE:
 			let document = new Document(action.payload.name, action.payload.description, action.payload.id);
             return update(state, {documents: {$push: [document]}, currentDocument: {$set: document}});
-        case UPDATE_ENTRY:            
+        case UPDATE_ENTRY:
             state.currentDocument.updateNode(action.payload);
-            let nDoc = Object.assign(new Document("", "", -1), state.currentDocument);            
+            let nDoc = Object.assign(new Document("", "", -1), state.currentDocument);
             return update(state, {currentDocument: { $set: nDoc } });
         case "persist/REHYDRATE":
 			// This is a "manual override" for rehydrating Redux state from local storage. Happens on page load/refresh.
@@ -114,7 +114,7 @@ const reducer = (state: any = initialState, action: any) => {
             }
 
 			// Rehydrate documents array
-			let origList = action.payload.reducer.documents;
+			let origList = action.payload.documentReducer.documents;
 			let dlist = [];
 			if (origList && origList.length > 0) {
 				origList.forEach((d: Document) => {
@@ -123,7 +123,7 @@ const reducer = (state: any = initialState, action: any) => {
 			}
 
 			// Rehydrate current document
-            let d = action.payload.reducer.currentDocument;
+            let d = action.payload.documentReducer.currentDocument;
 	        let rebuiltDoc;
 			if (d) {
 				rebuiltDoc = new Document(d.name, d.description, d.id, d.forest);
@@ -137,4 +137,4 @@ const reducer = (state: any = initialState, action: any) => {
     }
 };
 
-export default reducer;
+export default documentReducer;

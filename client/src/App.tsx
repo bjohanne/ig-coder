@@ -19,15 +19,13 @@ import NewDocumentComponent from "./components/newDocument";
 import LoginContainer from "./components/login/loginContainer";
 import RegisterContainer from "./components/register/registerContainer";
 import NotFoundComponent from "./components/notFound";
-import {ToastContainer} from 'react-toastify';
-
-// Styles
-import 'react-toastify/dist/ReactToastify.css';
 
 // Config
-import appConfig from "./core/config/appConfig";
+import appConfig, { firebaseConfig } from "./core/config/appConfig";
 import * as firebase from "firebase/app";
-import {firebaseConfig} from "./core/config/appConfig";
+import axios from "axios";
+axios.defaults.baseURL = appConfig.api.baseUrl;
+axios.defaults.timeout = 1000;
 
 function App() {
 	firebase.initializeApp(firebaseConfig);
@@ -47,18 +45,6 @@ function App() {
 						</Switch>
 					</Router>
 				</div>
-				{/* Default toaster settings */}
-				<ToastContainer
-					bodyClassName="toast-body"
-					position="bottom-center"
-					autoClose={3500}
-					hideProgressBar={true}
-					newestOnTop={false}
-					closeOnClick={true}
-					pauseOnFocusLoss={true}
-					pauseOnHover={true}
-					draggable={false}
-				/>
                 <ReactTooltip delayHide={1000} effect="solid" />
 			</PersistGate>
         </Provider>

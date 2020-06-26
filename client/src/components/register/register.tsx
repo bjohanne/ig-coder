@@ -1,29 +1,32 @@
 import React from "react";
+import { Link } from 'react-router-dom';
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import Spinner from "react-bootstrap/Spinner";
 import FormHelperText from "@material-ui/core/FormHelperText";
 
 function RegisterComponent(props: any) {
     return (
-        <div className="Container">
-            <div className="row text-center">
-                <div className="col-md-12">
+        <Container>
+            <Row className="text-center">
+                <Col>
                     <h1 className="home-title">
                         Sign up
                     </h1>
-                </div>
-            </div>
+                </Col>
+            </Row>
 
-            <div className="row">
-                <div className='col'></div>
+            <Row>
+                <Col sm={2} md={3}></Col>
 
-                <div className='col-md-4'>
+                <Col sm={8} md={6}>
                     <Form onSubmit={props.handleSubmit}>
-                        <div className="row">
-                            <div className="col">
+                        <Row>
+                            <Col>
                                 <Form.Group controlId="formFirstName">
                                     <Form.Label>First name</Form.Label>
                                     <Form.Control
@@ -36,8 +39,8 @@ function RegisterComponent(props: any) {
                                         autoFocus
                                     />
                                 </Form.Group>
-                            </div>
-                            <div className="col">
+                            </Col>
+                            <Col>
                                 <Form.Group controlId="formLastName">
                                     <Form.Label>Last name</Form.Label>
                                     <Form.Control
@@ -49,8 +52,9 @@ function RegisterComponent(props: any) {
                                         onChange={props.handleChange}
                                     />
                                 </Form.Group>
-                            </div>
-                        </div>
+                            </Col>
+                        </Row>
+
                         <Form.Group controlId="formBasicEmail">
                             <Form.Label>Email address</Form.Label>
                             <Form.Control
@@ -62,9 +66,9 @@ function RegisterComponent(props: any) {
                                 onChange={props.handleChange}
                             />
                         </Form.Group>
+
                         <Form.Group controlId="formBasicPassword">
                             <Form.Label>Password</Form.Label>
-
                             <InputGroup className="mb-3">
                                 <Form.Control
                                     type={props.data.showPassword ? 'text' : 'password'}
@@ -77,12 +81,12 @@ function RegisterComponent(props: any) {
                                 <InputGroup.Append>
                                     <Button variant="secondary"
                                             onClick={props.handleClickShowPassword}
+                                            style={{width:"70px"}}
                                     >
                                         {props.data.showPassword ? 'Hide' : 'Show'}
                                     </Button>
                                 </InputGroup.Append>
                             </InputGroup>
-
                         </Form.Group>
 
                         <Form.Group controlId="formConfirmPassword">
@@ -100,34 +104,36 @@ function RegisterComponent(props: any) {
                                 <InputGroup.Append>
                                     <Button variant="secondary"
                                             onClick={props.handleClickShowPassword}
+                                            style={{width:"70px"}}
                                     >
                                         {props.data.showPassword ? 'Hide' : 'Show'}
                                     </Button>
-
                                 </InputGroup.Append>
-
                             </InputGroup>
-                            <FormHelperText id="component-error-text" style={{display:props.data.isFail?'block':'none'}} error={props.data.isFail}>{props.data.failText}</FormHelperText>
+
+                            <FormHelperText
+                                id="component-error-text"
+                                style={{display:props.data.isFail?'block':'none'}}
+                                error={props.data.isFail}>{props.data.failText}
+                            </FormHelperText>
                         </Form.Group>
 
                         <Row className="d-flex align-items-center">
-                            <Col>
-                            <Button variant='outline-dark' type="submit" className="ml-auto w-75">
-                                Sign up
-                            </Button>
+                            <Col xs={12} sm={5} lg={4} className="mb-3 mb-sm-0">
+                                <Button variant="primary" type="submit" className="w-100" ref={props.submitButton}>
+                                    Sign up
+                                    {props.loading && <Spinner animation="border" variant="light" size="sm" className="ml-3" />}
+                                </Button>
                             </Col>
-
-                            <Col xs={0}>
-                            <a href='./login' className="ml-auto">Already have an account? Sign in</a>
+                            <Col xs={12} sm={7} lg={8}>
+                                <Link to="./login">Already have an account? Sign in</Link>
                             </Col>
                         </Row>
                     </Form>
-                </div>
-
-                <div className='col'></div>
-            </div>
-
-        </div>
+                </Col>
+                <Col sm={2} md={3}></Col>
+            </Row>
+        </Container>
     );
 }
 

@@ -1,10 +1,14 @@
 import React, {useState, useRef} from "react";
 import {connect} from "react-redux";
-import {createDocument} from "../state/actions";
-import appConfig from "../core/config/appConfig";
 import {withRouter, Redirect} from 'react-router-dom';
-import {toast} from 'react-toastify';
+import {createDocument} from "../state/documents/actions";
+import appConfig from "../core/config/appConfig";
 import usePrevious from '../core/helpers/usePrevious';
+
+import Card from "react-bootstrap/Card";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import SnackbarComponent from "./common/snackbar";
 import './newDocument.css';
 
 export function NewDocumentComponent(props: any) {
@@ -12,25 +16,21 @@ export function NewDocumentComponent(props: any) {
     const [form, setValues] = useState({name: "", description: ""});
 	const [redirect, setRedirect] = useState(false);	// Whether to redirect to the new document page
 	const prevDocument = usePrevious(props.addedDocument);
+    const buttonEl = useRef(null);
 
-	const buttonEl = useRef<HTMLButtonElement>(null);
+    const [snackbar,setSnackbar] = useState(false);
 
     /**
      Submits the "Create New Document" form.
-     If a document name is not provided,
-     the form is not submitted.
      */
-    const submitDocument = () => {
-        if (form.name === "") {
-			toast.error('Please enter a document name.');
-		} else {
-			toast.dismiss();
-            createDocument({name: form.name, description: form.description, forest: []});
-			if (buttonEl && buttonEl.current) {
-				buttonEl.current.disabled = true;	// Disable the submit button to prevent multiple requests being sent
-			}
-			setRedirect(true); // This is the trigger for redirecting
-        }
+    const submitDocument = (event) => {
+        event.preventDefault();
+        setSnackbar(true);
+        createDocument({name: form.name, description: form.description, forest: []});   // Here we want to chain a .then to do the redirect
+		if (buttonEl && buttonEl.current) {
+			buttonEl.current.disabled = true;	// Disable the submit button to prevent multiple requests being sent
+		}
+		setRedirect(true); // This is the trigger for redirecting
     };
 
     const updateField = (e: any) => {
@@ -45,24 +45,29 @@ export function NewDocumentComponent(props: any) {
     }
 
     return (
-        <div className="card mx-auto" id="new-document-form">
-            <div className="card-body p-5 text-center">
-                <div className="form-group">
-                    <input type="text" className="form-control" name="name" placeholder="Document Name" required
-                           value={form.name} onChange={updateField}/>
-                </div>
-                <div className="form-group">
-                    <textarea className="form-control" rows={6} name="description" placeholder="Document Description"
-                              value={form.description} onChange={updateField}/>
-                </div>
-                <button type="button" className="btn btn-primary" ref={buttonEl} onClick={submitDocument}>Create New Document</button>
-            </div>
+        <div>
+            <SnackbarComponent state={snackbar} onClose={()=>setSnackbar(false)} severity="success" displayText="Creating document..."/>
+            <Card className="mx-auto" id="new-document-form">
+                <Card.Body className="p-5 text-center">
+                    <Form onSubmit={submitDocument}>
+                        <Form.Group>
+                            <Form.Control type="text" name="name" placeholder="Document Name" required
+                                   value={form.name} onChange={updateField}/>
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Control as="textarea" rows={6} name="description" placeholder="Document Description"
+                                      value={form.description} onChange={updateField}/>
+                        </Form.Group>
+                        <Button type="submit" variant="primary" ref={buttonEl}>Create New Document</Button>
+                    </Form>
+                </Card.Body>
+            </Card>
         </div>
     );
 }
 
 const mapStateToProps = (state: any) => ({
-    addedDocument: state.reducer.currentDocument
+    addedDocument: state.documentReducer.currentDocument
 });
 
 const mapDispatchToProps = (dispatch: any) => ({

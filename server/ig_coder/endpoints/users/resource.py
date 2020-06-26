@@ -33,7 +33,6 @@ class UsersResource(Resource):
         return res
 
     def post(self):
-        print(user_parser_post)
         args = user_parser_post.parse_args()
         error = add_user(args)
         if not error:

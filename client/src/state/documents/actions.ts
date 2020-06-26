@@ -1,19 +1,26 @@
-import {
-    GET_DOCUMENT,
-    GET_DOCUMENT_RESPONSE,
-    CREATE_DOCUMENT,
-    CREATE_DOCUMENT_RESPONSE,
-    ADD_ENTRY_TO_DOCUMENT,
-    SAVE_DOCUMENT_REQUEST,
-    SET_ACTIVE_NODE,
-    UPDATE_ENTRY,
-    PRE_SET_ACTIVE_NODE,
-    ADD_JUNCTION,
-    UPDATE_JUNCTION,
-    UPDATE_NEGATION
-} from "./actionTypes";
-import Document from "../core/model/document";
-import { INode } from "../core/model/interfaces";
+import Document from "../../core/model/document";
+import { INode } from "../../core/model/interfaces";
+
+
+export const GET_DOCUMENT = "GET_DOCUMENT";
+export const GET_DOCUMENT_RESPONSE = "GET_DOCUMENT_RESPONSE";
+
+export const CREATE_DOCUMENT = "CREATE_DOCUMENT";
+export const CREATE_DOCUMENT_RESPONSE = "CREATE_DOCUMENT_RESPONSE";
+
+export const ADD_ENTRY_TO_DOCUMENT = "ADD_ENTRY_TO_DOCUMENT";
+export const ADD_ENTRY_WITH_TOKENIZATION = "ADD_ENTRY_WITH_TOKENIZATION";
+
+export const SAVE_DOCUMENT_REQUEST = "SAVE_DOCUMENT_REQUEST";
+
+export const PRE_SET_ACTIVE_NODE = "PRE_SET_ACTIVE_NODE";
+export const SET_ACTIVE_NODE = "SET_ACTIVE_NODE";
+export const UPDATE_ENTRY = "UPDATE_ENTRY";
+
+export const ADD_JUNCTION = "ADD_JUNCTION";
+export const UPDATE_JUNCTION = "UPDATE_JUNCTION";
+export const UPDATE_NEGATION = "UPDATE_NEGATION";
+
 
 export const getDocument = (document_id: number) => ({
     type: GET_DOCUMENT,

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { ModalBody } from 'reactstrap';
+import ModalBody from 'react-bootstrap/ModalBody';
 import { componentColorScaler } from "../../../core/config/scales";
 import { connect } from "react-redux";
 import { NegationNode } from "../../../core/model/nodes";
 import { INode } from "../../../core/model/interfaces";
 import { NodeType, Arg } from "../../../core/model/enums";
-import { updateNegation } from "../../../state/actions";
+import { updateNegation } from "../../../state/documents/actions";
 
-const NegationEditor = (props: any) => {  
+const NegationEditor = (props: any) => {
 
     let active = props.activeNode.node.data as NegationNode;
     const [hasConvention, setHasConvention] = useState(false);
@@ -25,11 +25,11 @@ const NegationEditor = (props: any) => {
             setHasConvention(false);
         }
     }, [active.children])
-        
+
     let currentComponentColor = componentColorScaler("NegationNode");
 
-    const select = (value: string) => {    
-        let checked: boolean;   
+    const select = (value: string) => {
+        let checked: boolean;
 
         switch(value) {
             case "Norm":
@@ -51,34 +51,34 @@ const NegationEditor = (props: any) => {
                 setHasConvention(checked);
                 break;
             default:
-                break;                
+                break;
 
 
         }
     }
 
     const saveAndClose = () => {
-        props.updateNegation({ node: active });   
-        props.close()   
+        props.updateNegation({ node: active });
+        props.close()
     }
-    
-    return (        
-        props.activeNode && 
+
+    return (
+        props.activeNode &&
         (<ModalBody><div className="modal-wrapper">
             <h4 style={{ padding: "1rem", color: "#fff", backgroundColor: currentComponentColor.toString() }}>{props.activeNode.node.data.junctionType} ({props.activeNode.node.data.id})</h4>
             <div className="text-control-wrap">
-            <button className="btn-primary btn" style={{margin:5}} onClick={() => select("Norm")} disabled={hasConvention}>Add Norm</button>  
-            <button className="btn-primary btn" style={{margin:5}} onClick={() => select("Convention")} disabled={hasNorm}>Add Convention</button>  
+            <button className="btn-primary btn" style={{margin:5}} onClick={() => select("Norm")} disabled={hasConvention}>Add Norm</button>
+            <button className="btn-primary btn" style={{margin:5}} onClick={() => select("Convention")} disabled={hasNorm}>Add Convention</button>
 
         </div>
-        <button className="btn-primary btn" style={{margin:5}} onClick={() => saveAndClose()}>Save</button>           
-    </div></ModalBody>) 
+        <button className="btn-primary btn" style={{margin:5}} onClick={() => saveAndClose()}>Save</button>
+    </div></ModalBody>)
     )
 }
 
 
 const mapStateToProps = (state: any) => ({
-    activeNode: state.reducer.activeNode
+    activeNode: state.documentReducer.activeNode
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
