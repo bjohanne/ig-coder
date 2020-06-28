@@ -1,7 +1,7 @@
 import React from "react";
 import {connect} from "react-redux";
 import {useState,useEffect} from "react"
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import './navbar.css';
 import {IconButton,Menu,MenuItem,Fade,ListItemIcon,Typography} from "@material-ui/core";
 import {AccountCircle, Delete} from '@material-ui/icons'
@@ -10,7 +10,7 @@ import * as firebase from "firebase/app";
 
 function Navbar(props: any) {
     const [anchorEl, setAnchorEl]=useState(null)
-
+    let history=useHistory()
     // useEffect(()=>{
     //     var user = firebase.auth().currentUser;
     //     console.log('currentuser:'+user)
@@ -34,8 +34,7 @@ function Navbar(props: any) {
         setAnchorEl(null)
         firebase.auth().signOut().then(function() {
             props.updateLoginState(false)
-            window.location.href = "/";
-
+            history.push('/')
         }).catch(function(error) {
             console.log('sign out error: '+error)
         });
