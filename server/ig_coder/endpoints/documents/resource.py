@@ -16,6 +16,7 @@ document_parser.add_argument('name', type=str, required=True, location=['json'],
 document_parser.add_argument('description', type=str, required=False, location=['json'], help='Description must be a string')
 document_parser.add_argument('forest', type=str, required=False, location=['json'], help='Forest must be a string')
 
+
 class DocumentsResource(Resource):
     documents = []  # Temporary storage for documents until database is set up
 
@@ -49,29 +50,26 @@ class DocumentsResource(Resource):
             # handle forest
         return {"id": document_id, "name": "dummy", "description": "dummy", "forest": [root] }
 
-
     #@marshal_with(document_fields)
     def post(self):
         """
         Adds a new document to the list
         """
         args = document_parser.parse_args()
-        id = len(self.documents) + 1    # Temporary solution for incrementing - does not work with deletion of documents!
         next_doc = get_next_doc_id()
-        document = {
+        doc = {
             "document": next_doc,
             "id": next_doc,
             "name": args.name,
             "description": args.description,
             "forest": []
         }
-        self.documents.append(document)
+        self.documents.append(doc)
 
         # Create an "anchor" node for the document
         create_document_anchor(next_doc, args.name, args.description)
 
-        return document
-
+        return make_response(doc)
 
     #@marshal_with(document_fields)
     def patch(self):

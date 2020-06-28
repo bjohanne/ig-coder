@@ -10,6 +10,8 @@ import {
     UPDATE_NEGATION
 } from "./actions";
 
+import { PROCESS_BEGIN, PROCESS_SUCCESS, PROCESS_ERROR } from "../apiRequest/actions";
+
 import Document from "../../core/model/document";
 import { NormNode, ConventionNode, JunctionNode, NegationNode } from '../../core/model/nodes';
 import { Arg } from '../../core/model/enums';
@@ -18,13 +20,17 @@ import { INode } from '../../core/model/interfaces';
 interface IInitialState {
     documents: Array<Document>,
     currentDocument: Document | null
-    activeNode: any
+    activeNode: any,
+    loading: boolean,
+    error: any
 }
 
 const initialState: IInitialState = {
     documents: [],
     currentDocument: null,
-    activeNode: null
+    activeNode: null,
+    loading: false,
+    error: null
 };
 
 const documentReducer = (state: any = initialState, action: any) => {
@@ -32,11 +38,29 @@ const documentReducer = (state: any = initialState, action: any) => {
     let newDocument: Document;
     let node: INode;
     switch (action.type) {
+        case PROCESS_BEGIN:
+            return update(state, {
+                loading: {$set: true},
+                error: {$set: null}
+            });
+        case PROCESS_SUCCESS:
+            return update(state, {
+                loading: {$set: false},
+                error: {$set: null}
+            });
+        case PROCESS_ERROR:
+            return update(state, {
+                loading: {$set: false},
+                error: {$set: action.error}
+            });
         case GET_DOCUMENT_RESPONSE:
-			// Here, we could check whether the existing currentDocument is identical to the new one.
-            // But maybe such a comparison is expensive, and we might as well just always overwrite.
+			// Here we could check whether the existing currentDocument is identical to the new one.
+            // But maybe such a comparison is expensive, and we might as well always overwrite.
+            // Why not just compare IDs?
             currentDocument = new Document(action.payload.name, action.payload.description, action.payload.id, action.payload.forest);
             return update(state, {currentDocument: {$set: currentDocument}});
+        case CREATE_DOCUMENT_RESPONSE:
+            return update(state, {documents: {$push: [action.doc]}, currentDocument: {$set: action.doc}});
         case ADD_JUNCTION:
             node = action.payload as INode;
             currentDocument = state.currentDocument as Document;
@@ -99,9 +123,6 @@ const documentReducer = (state: any = initialState, action: any) => {
 			}
         case SET_ACTIVE_NODE:
             return update(state, { activeNode: { $set: action.payload }});
-        case CREATE_DOCUMENT_RESPONSE:
-			let document = new Document(action.payload.name, action.payload.description, action.payload.id);
-            return update(state, {documents: {$push: [document]}, currentDocument: {$set: document}});
         case UPDATE_ENTRY:
             state.currentDocument.updateNode(action.payload);
             let nDoc = Object.assign(new Document("", "", -1), state.currentDocument);
@@ -128,8 +149,6 @@ const documentReducer = (state: any = initialState, action: any) => {
 			if (d) {
 				rebuiltDoc = new Document(d.name, d.description, d.id, d.forest);
 			}
-
-			console.log(dlist);
 
 		    return update(state, {documents: {$set: dlist}, currentDocument: { $set: rebuiltDoc }})
         default:

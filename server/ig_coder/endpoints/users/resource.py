@@ -30,12 +30,12 @@ class UsersResource(Resource):
         # Note when creating a tuple with only one element, ',' is required otherwise tuple will be recognized as string
         res = get_user((user_id,))
         # return the query result as dictionary format
-        return res
+        return make_response(res)
 
     def post(self):
         args = user_parser_post.parse_args()
         error = add_user(args)
         if not error:
-            return {'message': 'Insert user data successful!'}, 200
+            return make_response({'message': 'Insert user data successful!'}, 200)
         else:
-            return {'errors': {"error_id":error.errno,'msg':error.msg}, 'message': 'Insert Fail!'}, 400
+            return make_response({'errors': {"error_id": error.errno, 'msg': error.msg}, 'message': 'Insert Fail!'}, 400)

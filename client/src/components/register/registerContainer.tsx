@@ -8,11 +8,11 @@ import "firebase/firestore";
 
 import RegisterComponent from "./register";
 import SnackbarComponent from "../common/snackbar";
-import {userRegBegin, userRegSuccess, userRegError} from "../../state/users/actions";
+import {processBegin, processSuccess, processError} from "../../state/apiRequest/actions";
 import {sendServerRequest} from "../../state/apiRequest/actions";
 
 function RegisterContainer(props: any) {
-    const {userRegBegin, userRegSuccess, userRegError, sendServerRequest} = props;
+    const {processBegin, processSuccess, processError, sendServerRequest} = props;
 
     let history = useHistory()  // For redirecting
 
@@ -103,7 +103,7 @@ function RegisterContainer(props: any) {
 
     const registerUser=()=>{
         disableSubmitButton();
-        userRegBegin();
+        processBegin();
         // Register the user with Firebase Authentication
         firebase.auth().createUserWithEmailAndPassword(state.username, state.pass)
         .then(data=>{
@@ -130,19 +130,19 @@ function RegisterContainer(props: any) {
                     // Success!
                     setSnackbar(true)
                     setTimeout(()=>{
-                        userRegSuccess();
+                        processSuccess();
                         history.push("/login"); // Can't use the Redirect component here
                     }, 1000)    // Wait a second so the user can read the snackbar message
                 }, (error: AxiosError) => {
                     // Errors with the SQL DB
-                    userRegError(error);
+                    processError(error);
                     displayError("Sorry, a database error occured.");
                     enableSubmitButton(); // Reenable the submit button so the user can try again
                 });
             })
             .catch((error)=>{
                 // Errors with Firestore
-                userRegError(error);
+                processError(error);
                 displayError("Sorry, a database error occured.");
                 enableSubmitButton(); // Reenable the submit button so the user can try again
             });
@@ -150,7 +150,7 @@ function RegisterContainer(props: any) {
         })
         .catch((error)=>{
             // Errors with Firebase Auth (that can be displayed to the user)
-            userRegError(error);
+            processError(error);
             displayError(error.message);
             enableSubmitButton(); // Reenable the submit button so the user can try again
         });
@@ -178,9 +178,9 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    userRegBegin: () => { return dispatch(userRegBegin()) },
-    userRegSuccess: () => { return dispatch(userRegSuccess()) },
-    userRegError: (error: any) => { return dispatch(userRegError(error)) },
+    processBegin: () => { return dispatch(processBegin()) },
+    processSuccess: () => { return dispatch(processSuccess()) },
+    processError: (error: any) => { return dispatch(processError(error)) },
     sendServerRequest: (request: AxiosRequestConfig) => { return dispatch(sendServerRequest(request)) }
 });
 

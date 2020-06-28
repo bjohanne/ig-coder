@@ -1,11 +1,12 @@
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
+import { PROCESS_BEGIN, PROCESS_SUCCESS, PROCESS_ERROR } from "../apiRequest/actions";
+
 import Document from "../../core/model/document";
 import { INode } from "../../core/model/interfaces";
-
 
 export const GET_DOCUMENT = "GET_DOCUMENT";
 export const GET_DOCUMENT_RESPONSE = "GET_DOCUMENT_RESPONSE";
 
-export const CREATE_DOCUMENT = "CREATE_DOCUMENT";
 export const CREATE_DOCUMENT_RESPONSE = "CREATE_DOCUMENT_RESPONSE";
 
 export const ADD_ENTRY_TO_DOCUMENT = "ADD_ENTRY_TO_DOCUMENT";
@@ -32,14 +33,22 @@ export const getDocumentResponse = (payload: Document) => ({
     payload: payload
 });
 
-export const createDocument = (payload: any) => ({
-    type: CREATE_DOCUMENT,
-    payload: payload
-});
+export const createDocument = (request: AxiosRequestConfig) => {
+    return (dispatch) => {
+        dispatch({type: PROCESS_BEGIN, request});
+        return axios(request)
+        .then((response: AxiosResponse) => {
+            dispatch({type: CREATE_DOCUMENT_RESPONSE, payload: response.data});
+            dispatch({type: PROCESS_SUCCESS, response});
+        }, (error: AxiosError) => {
+            dispatch({type: PROCESS_ERROR, error});
+        });
+    }
+};
 
-export const createDocumentResponse = (payload: Document) => ({
+export const createDocumentResponse = (payload: {name: string, description: string, id: number}) => ({
     type: CREATE_DOCUMENT_RESPONSE,
-    payload: payload
+    payload
 });
 
 export const addEntryToDocument = ((entry: { documentId: number, content: string, hasDeontic: boolean }) => ({

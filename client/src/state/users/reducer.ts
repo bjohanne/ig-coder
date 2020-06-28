@@ -1,5 +1,5 @@
 import update from 'immutability-helper';
-import { USER_REG_BEGIN, USER_REG_SUCCESS, USER_REG_ERROR } from '../users/actions';
+import { PROCESS_BEGIN, PROCESS_SUCCESS, PROCESS_ERROR } from "../apiRequest/actions";
 
 const INITIAL_STATE = {
     loading: false,
@@ -8,17 +8,17 @@ const INITIAL_STATE = {
 
 const userReducer = (state: any = INITIAL_STATE, action: any) => {
     switch (action.type) {
-        case USER_REG_BEGIN:
+        case PROCESS_BEGIN:
             return update(state, {
                 loading: {$set: true},
                 error: {$set: null}
             });
-        case USER_REG_SUCCESS:
+        case PROCESS_SUCCESS:
             return update(state, {
                 loading: {$set: false},
                 error: {$set: null}
             });
-        case USER_REG_ERROR:
+        case PROCESS_ERROR:
             return update(state, {
                 loading: {$set: false},
                 error: {$set: action.error}

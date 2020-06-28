@@ -5,7 +5,6 @@ import storage from "redux-persist/lib/storage"; // defaults to localStorage for
 
 import { documentMiddleware } from "./documents/middleware";
 import documentReducer from "./documents/reducer";
-import { userMiddleware } from "./users/middleware";
 import userReducer from "./users/reducer";
 
 const persistConfig = {
@@ -18,7 +17,7 @@ const rootReducer = combineReducers({
     userReducer
 });
 
-const allMiddlewares = [documentMiddleware, userMiddleware];
+const allMiddlewares = [documentMiddleware];
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
