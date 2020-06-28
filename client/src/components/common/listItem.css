@@ -15,3 +15,12 @@
 .shared-with{
     color: brown;
 }
+
+#share-dialog .share-dialog-content{
+    padding-top: 1rem;
+}
+
+#share-dialog .col-1{
+    padding-right: 0px;
+    max-width: 5%;
+}

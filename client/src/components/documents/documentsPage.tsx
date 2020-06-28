@@ -1,24 +1,51 @@
 import React from "react";
 import {useState} from "react";
-import './projectsPage.css'
+import './documentsPage.css'
 import LeftTab from "../common/leftTab";
 import {
-    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-    Button, TextField, AppBar, Toolbar, IconButton, Typography, Tabs, Tab,
-    Breadcrumbs, Link
+    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, AppBar, Toolbar, IconButton,
+    Typography, Tabs, Tab, Breadcrumbs, Link
 } from '@material-ui/core';
 import ListItem from "../common/listItem";
 
-function ProjectsPage(props: any) {
+function DocumentsPage(props: any) {
     const [openNewProject, setOpenNewProject] = useState(false);
     const [visibility, setVisibility] = useState(0);
 
     let title
-    let fakedata = []
+    var fakedata = [
+        {
+            title: "Le preferait retombait direction si ce battirent",
+            des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
+                "Très parce que car dire parce que pour vin fromage et aussi car.",
+            type: "project",
+            author: "Jenna Fields",
+            date: 3
+        },
+        {
+            title: "Preparer en as habitent interdit premiere galopent",
+            des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
+                "Très parce que car dire parce que pour vin fromage et aussi car.",
+            type: "project",
+            author: "Esme Daniels",
+            date: 4
+        },
+        {
+            title: "Agissait roc susciter par triomphe eau",
+            des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
+                "Très parce que car dire parce que pour vin fromage et aussi car.",
+            type: "project",
+            author: "Hasan Carver",
+            date: 1
+        },
+    ]
     const tab = props.match.params.tab
+    const projectId = props.match.params.projectid
+    console.log(tab)
+    console.log(projectId)
     switch (tab) {
-        case 'myprojects':
-            title = 'All My Projects';
+        case 'all':
+            title = 'All Documents';
             fakedata = [
                 {
                     title: "Le preferait retombait direction si ce battirent",
@@ -46,8 +73,8 @@ function ProjectsPage(props: any) {
                 },
             ]
             break
-        case 'shared':
-            title = 'All Shared With Me';
+        case 'recent':
+            title = 'Recent Documents';
             fakedata = [
                 {
                     title: "Tuvasta voi karilla vai anastaa",
@@ -75,35 +102,8 @@ function ProjectsPage(props: any) {
                 },
             ]
             break
-        case 'public':
-            title = 'All Public Projects';
-            fakedata = [
-                {
-                    title: "Le preferait retombait direction si ce battirent",
-                    des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
-                        "Très parce que car dire parce que pour vin fromage et aussi car.",
-                    type: "project",
-                    author: "Jenna Fields",
-                    date: 3
-                },
-                {
-                    title: "Preparer en as habitent interdit premiere galopent",
-                    des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
-                        "Très parce que car dire parce que pour vin fromage et aussi car.",
-                    type: "project",
-                    author: "Esme Daniels",
-                    date: 4
-                },
-                {
-                    title: "Agissait roc susciter par triomphe eau",
-                    des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
-                        "Très parce que car dire parce que pour vin fromage et aussi car.",
-                    type: "project",
-                    author: "Hasan Carver",
-                    date: 1
-                },
-            ]
-            break
+        default:
+            break;
     }
 
     const handleNewProject = (event) => {
@@ -117,39 +117,43 @@ function ProjectsPage(props: any) {
         setVisibility(event.target.value)
     }
 
-    const handleClick = (event) => {
-        console.log("handleClick")
-    }
 
     return (
         <div className={'root'}>
             <div className={'Container'}>
                 <div className={"row-auto"}>
-                    <Breadcrumbs aria-label="breadcrumb" className={'bread-crumbs'}>
-                        <Link color="inherit" href="/" onClick={handleClick} className={"link"}>
+                    <Breadcrumbs aria-label="breadcrumb">
+                        <Link color="inherit" href="/" className={"link"}>
                             Home
                         </Link>
-                        <Typography color="textPrimary" className={"link"}>
+                        <Link
+                            color="inherit"
+                            href="/projects/myprojects"
+                            className={"link"}
+                        >
                             My projects
+                        </Link>
+                        <Typography color="textPrimary" className={"link"}>
+                            {projectId}
                         </Typography>
                     </Breadcrumbs>
                 </div>
                 <div className="row">
                     <div className="col-auto mr-auto">
-                        <h3>MY PROJECTS</h3>
+                        <h3>{projectId}</h3>
                     </div>
                     <div className="col-auto">
-                        <button type="button" className="btn btn-success" onClick={handleNewProject}
-                                data-target="#exampleModalCenter">New Project
+                        <button type="button" className="btn btn-primary" onClick={handleNewProject}
+                                data-target="#exampleModalCenter">New Document
                         </button>
                         <Dialog open={openNewProject} onClose={handleClose} aria-labelledby="form-dialog-title">
-                            <DialogTitle id="form-dialog-title">New Project</DialogTitle>
+                            <DialogTitle id="form-dialog-title">New Document</DialogTitle>
                             <DialogContent>
                                 <TextField
                                     autoFocus
                                     margin="dense"
                                     id="name"
-                                    label="Project name"
+                                    label="Document name"
                                     type="email"
                                     variant="outlined"
                                     fullWidth
@@ -193,9 +197,9 @@ function ProjectsPage(props: any) {
                 <div className="row">
                     <div className="col-3 " id={"lefttab"}>
                         <div className="list-group">
-                            <a href="./myprojects" className="list-group-item list-group-item-action"
-                               style={tab === 'myprojects' ? {backgroundColor: '#EBEDEF'} : {backgroundColor: 'None'}}>
-                                <LeftTab title={"My projects"} des={'All my projects'}>
+                            <a href="./all" className="list-group-item list-group-item-action"
+                               style={tab === 'all' ? {backgroundColor: '#EBEDEF'} : {backgroundColor: 'None'}}>
+                                <LeftTab title={"My documents"} des={'All my documents'}>
                                     <svg className="bi bi-person" width="2em" height="2em" viewBox="0 0 16 16"
                                          fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                         <path fillRule="evenodd"
@@ -203,9 +207,9 @@ function ProjectsPage(props: any) {
                                     </svg>
                                 </LeftTab>
                             </a>
-                            <a href="./shared" className="list-group-item list-group-item-action"
-                               style={tab === 'shared' ? {backgroundColor: '#EBEDEF'} : {backgroundColor: 'None'}}>
-                                <LeftTab title={"Shared with me"} des={'Projects and documents shared with you'}>
+                            <a href="./recent" className="list-group-item list-group-item-action"
+                               style={tab === 'recent' ? {backgroundColor: '#EBEDEF'} : {backgroundColor: 'None'}}>
+                                <LeftTab title={"Recent documents"} des={'Browse documents recently opened'}>
                                     <svg className="bi bi-folder-symlink" width="2em" height="2em" viewBox="0 0 16 16"
                                          fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                         <path
@@ -214,16 +218,6 @@ function ProjectsPage(props: any) {
                                               d="M13.81 4H2.19a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4zM2.19 3A2 2 0 0 0 .198 5.181l.637 7A2 2 0 0 0 2.826 14h10.348a2 2 0 0 0 1.991-1.819l.637-7A2 2 0 0 0 13.81 3H2.19z"/>
                                         <path
                                             d="M8.616 10.24l3.182-1.969a.443.443 0 0 0 0-.742l-3.182-1.97c-.27-.166-.616.036-.616.372V6.7c-.857 0-3.429 0-4 4.8 1.429-2.7 4-2.4 4-2.4v.769c0 .336.346.538.616.371z"/>
-                                    </svg>
-                                </LeftTab>
-                            </a>
-                            <a href="./public" className="list-group-item list-group-item-action"
-                               style={tab === 'public' ? {backgroundColor: '#EBEDEF'} : {backgroundColor: 'None'}}>
-                                <LeftTab title={"Public projects"} des={'Browse all public projects'}>
-                                    <svg className="bi bi-collection" width="2em" height="2em" viewBox="0 0 16 16"
-                                         fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <path fillRule="evenodd"
-                                              d="M14.5 13.5h-13A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5zm-13 1A1.5 1.5 0 0 1 0 13V6a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 16 6v7a1.5 1.5 0 0 1-1.5 1.5h-13zM2 3a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 0-1h-11A.5.5 0 0 0 2 3zm2-2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7A.5.5 0 0 0 4 1z"/>
                                     </svg>
                                 </LeftTab>
                             </a>
@@ -255,7 +249,7 @@ function ProjectsPage(props: any) {
                                 {
                                     fakedata.map(data => {
                                         return (
-                                            <a href={`./project/${data.title}/all`} key={data.title}
+                                            <a href="#1" key={data.title}
                                                className="list-group-item list-group-item-action">
                                                 <ListItem
                                                     title={data.title}
@@ -276,4 +270,4 @@ function ProjectsPage(props: any) {
     );
 }
 
-export default ProjectsPage;
+export default DocumentsPage;

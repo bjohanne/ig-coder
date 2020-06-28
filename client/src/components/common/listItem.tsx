@@ -2,7 +2,8 @@ import React, {useState} from "react";
 import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import {AppBar, Dialog, IconButton, Toolbar, Typography,Divider,FormControlLabel,Checkbox} from "@material-ui/core";
+import {AppBar,IconButton, Toolbar, Typography,Divider,FormControlLabel,Checkbox,RadioGroup,Radio} from "@material-ui/core";
+import {Dialog, DialogTitle,DialogContent,DialogContentText,DialogActions} from "@material-ui/core"
 import CloseIcon from '@material-ui/icons/Close';
 import './listItem.css'
 import PersonList from "./personList";
@@ -10,10 +11,22 @@ import PersonList from "./personList";
 export default function MyListItem(props:any) {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [shareOpen, setShareOpen] = useState(false)
+    const [deleteOpen, setDeleteOpen]=useState(false)
+    const[radioItem, setRadioItem]=useState('member')
+
+    const deleteProjectNote='If you click DELETE, this project and all of its documents will be deleted.' +
+        '                        Please note that this action can not be revoked. If you want to continue, click DELETE; otherwise, click CANCEL.'
+
+    const deleteDocumentNote='If you click DELETE, this document will be deleted.' +
+        '                        Please note that this action can not be revoked. If you want to continue, click DELETE; otherwise, click CANCEL.'
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
         event.preventDefault()
+    }
+
+    const handleRadioItem=(event)=>{
+         setRadioItem(event.target.value)
     }
 
     const handleMenuItem=(event)=>{
@@ -24,11 +37,10 @@ export default function MyListItem(props:any) {
                 console.log('edit')
                 break;
             case 'Delete':
-                // @TODO add Delete functionality
                 console.log('Delete')
+                setDeleteOpen(true)
                 break;
             case 'Share':
-                // @TODO add Share functionality
                 console.log('Share')
                 setShareOpen(true)
                 break;
@@ -39,6 +51,7 @@ export default function MyListItem(props:any) {
     const handleClose = () => {
         setAnchorEl(null);
         setShareOpen(false)
+        setDeleteOpen(false)
     };
 
     const title=props.title
@@ -79,6 +92,7 @@ export default function MyListItem(props:any) {
                             open={Boolean(anchorEl)}
                             onClose={handleClose}
                         >
+                            <MenuItem onClick={handleMenuItem}><small onClick={handleClose}>Open</small></MenuItem>
                             <MenuItem onClick={handleMenuItem}><small onClick={handleClose}>Edit</small></MenuItem>
                             <MenuItem onClick={handleMenuItem}><small onClick={handleClose}>Delete</small></MenuItem>
                             <MenuItem onClick={handleMenuItem}><small onClick={handleClose}>Share</small></MenuItem>
@@ -90,7 +104,12 @@ export default function MyListItem(props:any) {
                 </div>
             </div>
 
-            {/*Share Dialog*/}
+
+            {
+                /**
+                 * 'Share Dialog' of this list item
+                 */
+            }
             <Dialog fullScreen open={shareOpen} onClose={handleClose} id={"share-dialog"} >
                 <AppBar className={"app-bar"}>
                     <Toolbar>
@@ -112,17 +131,31 @@ export default function MyListItem(props:any) {
                         </Button>
                     </Toolbar>
                 </AppBar>
-                <div className={'container'}>
+                <div className={'container share-dialog-content'}>
                     <div className={'row'}>
                         <div className={'col'}>
                             <small className={'shared-with'}>Shared with</small>
                             <PersonList></PersonList>
                         </div>
-                        <Divider orientation={'vertical'}/>
+
+                        <div className={'col-1'}>
+                            <Divider orientation={'vertical'} />
+                        </div>
+
                         <div className={'col'}>
-                            <small>Tom Daley</small>
-                            <Divider/>
-                            <h6>Granted permissions</h6>
+                            <div className={'row'}>
+                                <small>Tom Daley</small>
+
+                            </div>
+                            <div className={'row'}>
+                                <RadioGroup aria-label="membership" name="gender1" value={radioItem} onChange={handleRadioItem}>
+                                    <FormControlLabel value="member" control={<Radio />} label="Member" />
+                                    <FormControlLabel value="guest" control={<Radio />} label="Guest" />
+                                </RadioGroup>
+                            </div>
+                            <div className={'row'}>
+                                <h6>Granted permissions</h6>
+                            </div>
                             <div className={'row'}>
                                 <FormControlLabel
                                     control={
@@ -166,6 +199,33 @@ export default function MyListItem(props:any) {
 
                     </div>
                 </div>
+            </Dialog>
+
+            {
+                /**
+                 * 'Delete Dialog' of this list item
+                 */
+            }
+            <Dialog
+                open={deleteOpen}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{`Do you want to delete this ${props.type}?`}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        {props.type==='project'?deleteProjectNote:deleteDocumentNote}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="primary" autoFocus>
+                        CANCEL
+                    </Button>
+                    <Button onClick={handleClose} color="primary">
+                        DELETE
+                    </Button>
+                </DialogActions>
             </Dialog>
         </div>
     )

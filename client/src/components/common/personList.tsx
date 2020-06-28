@@ -9,7 +9,7 @@ export default function PersonList(props:any) {
         <div>
             <List>
                 {namelist.map((name)=>
-                    <ListItem>
+                    <ListItem key={name}>
                         <ListItemAvatar>
                             <Avatar>
                                 {name[0].toUpperCase()}
