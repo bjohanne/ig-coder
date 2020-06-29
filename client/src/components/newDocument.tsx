@@ -1,8 +1,8 @@
-import React, {useState, useRef} from "react";
+import React, {useState, useRef, useEffect} from "react";
 import {connect} from "react-redux";
 import {createDocument} from "../state/actions";
 import appConfig from "../core/config/appConfig";
-import {withRouter, Redirect} from 'react-router-dom';
+import {withRouter, Redirect, useHistory} from 'react-router-dom';
 import {toast} from 'react-toastify';
 import usePrevious from '../core/helpers/usePrevious';
 import './newDocument.css';
@@ -15,11 +15,24 @@ export function NewDocumentComponent(props: any) {
 
 	const buttonEl = useRef<HTMLButtonElement>(null);
 
+
+    let history=useHistory()
+    /**
+     * judge whether a user is not logged in before mounting
+     * redirect the link to homepage if not
+     */
+    useEffect(()=>{
+        if(!props.loginState){
+            history.push('/')
+        }
+    },[])
+
     /**
      Submits the "Create New Document" form.
      If a document name is not provided,
      the form is not submitted.
      */
+
     const submitDocument = () => {
         if (form.name === "") {
 			toast.error('Please enter a document name.');
@@ -62,7 +75,8 @@ export function NewDocumentComponent(props: any) {
 }
 
 const mapStateToProps = (state: any) => ({
-    addedDocument: state.reducer.currentDocument
+    addedDocument: state.reducer.currentDocument,
+    loginState: state.reducer.loginState
 });
 
 const mapDispatchToProps = (dispatch: any) => ({

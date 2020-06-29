@@ -1,21 +1,35 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {useState} from "react";
 import './documentsPage.css'
 import LeftTab from "../common/leftTab";
+import { useHistory } from "react-router-dom";
 import {
     Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, AppBar, Toolbar, IconButton,
     Typography, Tabs, Tab, Breadcrumbs, Link
 } from '@material-ui/core';
 import ListItem from "../common/listItem";
+import {connect} from "react-redux";
 
 function DocumentsPage(props: any) {
     const [openNewProject, setOpenNewProject] = useState(false);
     const [visibility, setVisibility] = useState(0);
+    let history =  useHistory()
+
+    /**
+     * judge whether a user is not logged in before mounting
+     * redirect the link to homepage if not
+     */
+    useEffect(()=>{
+        if(!props.loginState){
+            history.push('/')
+        }
+    },[])
 
     let title
-    var fakedata = [
+    var fakedatas = [
+        [
         {
-            title: "Le preferait retombait direction si ce battirent",
+            title: "画ロジェクト像の投票",
             des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
                 "Très parce que car dire parce que pour vin fromage et aussi car.",
             type: "project",
@@ -23,7 +37,7 @@ function DocumentsPage(props: any) {
             date: 3
         },
         {
-            title: "Preparer en as habitent interdit premiere galopent",
+            title: "娯楽とスポーツ",
             des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
                 "Très parce que car dire parce que pour vin fromage et aussi car.",
             type: "project",
@@ -31,14 +45,42 @@ function DocumentsPage(props: any) {
             date: 4
         },
         {
-            title: "Agissait roc susciter par triomphe eau",
+            title: "元素記号はEs",
             des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
                 "Très parce que car dire parce que pour vin fromage et aussi car.",
             type: "project",
             author: "Hasan Carver",
             date: 1
         },
+    ],
+        [
+            {
+                title: "熊谷氏の後裔とされる",
+                des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
+                    "Très parce que car dire parce que pour vin fromage et aussi car.",
+                type: "document",
+                author: "Luke Mccann",
+                date: 3
+            },
+            {
+                title: "日本の氏族の一つ",
+                des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
+                    "Très parce que car dire parce que pour vin fromage et aussi car.",
+                type: "document",
+                author: "William Marsh",
+                date: 4
+            },
+            {
+                title: "ウィキメディアプロジェクト",
+                des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
+                    "Très parce que car dire parce que pour vin fromage et aussi car.",
+                type: "document",
+                author: "Raphael Tran",
+                date: 1
+            },
+        ]
     ]
+    let fakedata=fakedatas[0]
     const tab = props.match.params.tab
     const projectId = props.match.params.projectid
     console.log(tab)
@@ -46,68 +88,20 @@ function DocumentsPage(props: any) {
     switch (tab) {
         case 'all':
             title = 'All Documents';
-            fakedata = [
-                {
-                    title: "Le preferait retombait direction si ce battirent",
-                    des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
-                        "Très parce que car dire parce que pour vin fromage et aussi car.",
-                    type: "project",
-                    author: "Jenna Fields",
-                    date: 3
-                },
-                {
-                    title: "Preparer en as habitent interdit premiere galopent",
-                    des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
-                        "Très parce que car dire parce que pour vin fromage et aussi car.",
-                    type: "project",
-                    author: "Esme Daniels",
-                    date: 4
-                },
-                {
-                    title: "Agissait roc susciter par triomphe eau",
-                    des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
-                        "Très parce que car dire parce que pour vin fromage et aussi car.",
-                    type: "project",
-                    author: "Hasan Carver",
-                    date: 1
-                },
-            ]
+            fakedata = fakedatas[0]
             break
         case 'recent':
             title = 'Recent Documents';
-            fakedata = [
-                {
-                    title: "Tuvasta voi karilla vai anastaa",
-                    des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
-                        "Très parce que car dire parce que pour vin fromage et aussi car.",
-                    type: "project",
-                    author: "Luke Mccann",
-                    date: 3
-                },
-                {
-                    title: "Se kajutta kalassa sisassa he",
-                    des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
-                        "Très parce que car dire parce que pour vin fromage et aussi car.",
-                    type: "document",
-                    author: "William Marsh",
-                    date: 4
-                },
-                {
-                    title: "He paivalla et te ja tupaanne saavansa",
-                    des: "Que du coup très carrément manger du coup voir manger tout voila devoir omelette. " +
-                        "Très parce que car dire parce que pour vin fromage et aussi car.",
-                    type: "document",
-                    author: "Raphael Tran",
-                    date: 1
-                },
-            ]
+            fakedata = fakedatas[1]
             break
         default:
             break;
     }
 
     const handleNewProject = (event) => {
-        setOpenNewProject(true)
+        //setOpenNewProject(true)
+        history.push('/documents/new')
+
     }
     const handleClose = () => {
         setOpenNewProject(false);
@@ -200,24 +194,28 @@ function DocumentsPage(props: any) {
                             <a href="./all" className="list-group-item list-group-item-action"
                                style={tab === 'all' ? {backgroundColor: '#EBEDEF'} : {backgroundColor: 'None'}}>
                                 <LeftTab title={"My documents"} des={'All my documents'}>
-                                    <svg className="bi bi-person" width="2em" height="2em" viewBox="0 0 16 16"
-                                         fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <svg width="2em" height="2em" viewBox="0 0 16 16"
+                                         className="bi bi-file-earmark-text" fill="currentColor"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M4 1h5v1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6h1v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z"/>
+                                        <path d="M9 4.5V1l5 5h-3.5A1.5 1.5 0 0 1 9 4.5z"/>
                                         <path fillRule="evenodd"
-                                              d="M13 14s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h10zm-9.995-.944v-.002.002zM3.022 13h9.956a.274.274 0 0 0 .014-.002l.008-.002c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664a1.05 1.05 0 0 0 .022.004zm9.974.056v-.002.002zM8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                              d="M5 11.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
                                     </svg>
                                 </LeftTab>
                             </a>
                             <a href="./recent" className="list-group-item list-group-item-action"
                                style={tab === 'recent' ? {backgroundColor: '#EBEDEF'} : {backgroundColor: 'None'}}>
                                 <LeftTab title={"Recent documents"} des={'Browse documents recently opened'}>
-                                    <svg className="bi bi-folder-symlink" width="2em" height="2em" viewBox="0 0 16 16"
+                                    <svg width="2em" height="2em" viewBox="0 0 16 16" className="bi bi-clock-history"
                                          fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M9.828 4a3 3 0 0 1-2.12-.879l-.83-.828A1 1 0 0 0 6.173 2H2.5a1 1 0 0 0-1 .981L1.546 4h-1L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3v1z"/>
                                         <path fillRule="evenodd"
-                                              d="M13.81 4H2.19a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4zM2.19 3A2 2 0 0 0 .198 5.181l.637 7A2 2 0 0 0 2.826 14h10.348a2 2 0 0 0 1.991-1.819l.637-7A2 2 0 0 0 13.81 3H2.19z"/>
-                                        <path
-                                            d="M8.616 10.24l3.182-1.969a.443.443 0 0 0 0-.742l-3.182-1.97c-.27-.166-.616.036-.616.372V6.7c-.857 0-3.429 0-4 4.8 1.429-2.7 4-2.4 4-2.4v.769c0 .336.346.538.616.371z"/>
+                                              d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.95.313a7.023 7.023 0 0 0-.179-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1 .025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-.964 1.205c.122-.122.239-.248.35-.378l.758.653a8.073 8.073 0 0 1-.401.432l-.707-.707z"/>
+                                        <path fillRule="evenodd"
+                                              d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"/>
+                                        <path fillRule="evenodd"
+                                              d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>
                                     </svg>
                                 </LeftTab>
                             </a>
@@ -269,5 +267,7 @@ function DocumentsPage(props: any) {
         </div>
     );
 }
-
-export default DocumentsPage;
+const mapStateToProps = (state: any) => ({
+    loginState: state.reducer.loginState
+});
+export default connect(mapStateToProps,null)(DocumentsPage)

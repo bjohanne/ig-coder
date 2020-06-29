@@ -145,9 +145,9 @@ export default function MyListItem(props:any) {
                         <div className={'col'}>
                             <div className={'row'}>
                                 <small>Tom Daley</small>
-
+                                <br/>
                             </div>
-                            <div className={'row'}>
+                            <div className={'row'} style={{display:type==='project'?'block':'None'}}>
                                 <RadioGroup aria-label="membership" name="gender1" value={radioItem} onChange={handleRadioItem}>
                                     <FormControlLabel value="member" control={<Radio />} label="Member" />
                                     <FormControlLabel value="guest" control={<Radio />} label="Guest" />
@@ -156,43 +156,64 @@ export default function MyListItem(props:any) {
                             <div className={'row'}>
                                 <h6>Granted permissions</h6>
                             </div>
-                            <div className={'row'}>
+                            <div className={'row'} style={{display:type==='project'?'block':'None'}}>
                                 <FormControlLabel
                                     control={
                                         <Checkbox
-                                            checked={false}
-
+                                            // checked={false}
                                             name="checkedF"
                                             color="primary"
                                         />
                                     }
-                                    label="View document"
+                                    label="Create document"
                                 />
                             </div>
                             <div className={'row'}>
                                 <FormControlLabel
                                     control={
                                         <Checkbox
-                                            checked={false}
-
+                                            // checked={false}
                                             name="checkedF"
                                             color="primary"
                                         />
                                     }
-                                    label="Edit document"
+                                    label="Read"
                                 />
                             </div>
                             <div className={'row'}>
                                 <FormControlLabel
                                     control={
                                         <Checkbox
-                                            checked={false}
-
+                                            // checked={false}
+                                            name="checkedF"
+                                            color="primary"
+                                        />
+                                    }
+                                    label="Update"
+                                />
+                            </div>
+                            <div className={'row'} style={{display:type==='project'?'block':'None'}}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            // checked={false}
                                             name="checkedF"
                                             color="primary"
                                         />
                                     }
                                     label="Delete project"
+                                />
+                            </div>
+                            <div className={'row'} style={{display:!(type==='project')?'block':'None'}}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            // checked={false}
+                                            name="checkedF"
+                                            color="primary"
+                                        />
+                                    }
+                                    label="Delete document"
                                 />
                             </div>
                         </div>
