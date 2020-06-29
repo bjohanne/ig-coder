@@ -18,6 +18,7 @@ jsonschema==3.0.2
 MarkupSafe==1.1.1
 more-itertools==7.2.0
 mysql-connector-python==8.0.20
+neo4j==1.7.6
 nltk==3.4.5
 packaging==19.2
 pluggy==0.13.0

@@ -1,6 +1,6 @@
 from flask_restplus import Resource, reqparse, cors, fields, marshal_with, marshal
 from flask import make_response, request, jsonify, Response
-from graph_db.traverse import create_graph, get_next_doc_id, create_document_anchor, get_document
+from graph_db.traverse import create_graph, get_next_doc_id, get_document, create_document_anchor, get_document_anchor
 
 import json
 
@@ -25,7 +25,6 @@ class DocumentsResource(Resource):
         Displays a document's details
         """
         nodes = get_document(document_id)
-        # TODO: Also need to get the anchor node that holds name and description, and set that instead of "dummy".
         root = None
         for node in nodes:
             properties = node[0]._properties
@@ -48,7 +47,15 @@ class DocumentsResource(Resource):
             if 'component' in properties:
                 properties['component'] = json.loads(properties['component'].replace("'", "\""))
             # handle forest
-        return {"id": document_id, "name": "dummy", "description": "dummy", "forest": [root] }
+
+        # Ensure forest is an empty array if it has no nodes
+        forest = [] if root is None else [root]
+
+        # Get name and description from anchor node
+        anchor = get_document_anchor(document_id)
+        name = anchor[0].get('name')
+        description = anchor[0].get('description')
+        return {"id": document_id, "name": name, "description": description, "forest": forest}
 
     #@marshal_with(document_fields)
     def post(self):

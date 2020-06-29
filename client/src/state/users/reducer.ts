@@ -1,9 +1,11 @@
 import update from 'immutability-helper';
 import { PROCESS_BEGIN, PROCESS_SUCCESS, PROCESS_ERROR } from "../apiRequest/actions";
+import { LOGIN_USER, LOGOUT_USER } from "./actions";
 
 const INITIAL_STATE = {
     loading: false,
-    error: null
+    error: null,
+    token: null
 };
 
 const userReducer = (state: any = INITIAL_STATE, action: any) => {
@@ -22,6 +24,14 @@ const userReducer = (state: any = INITIAL_STATE, action: any) => {
             return update(state, {
                 loading: {$set: false},
                 error: {$set: action.error}
+            });
+        case LOGIN_USER:
+            return update(state, {
+                token: {$set: action.token}
+            });
+        case LOGOUT_USER:
+            return update(state, {
+                token: {$set: null}
             });
         default:
             return state;

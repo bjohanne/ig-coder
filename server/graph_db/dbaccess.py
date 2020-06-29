@@ -1,6 +1,7 @@
 from neo4j import GraphDatabase
 from datetime import datetime
 
+
 class DataAccess(object):
     def __init__(self, uri, user, password):
         self._driver = GraphDatabase.driver(uri, auth=(user, password))
@@ -47,11 +48,18 @@ class DataAccess(object):
             session.run(create_nodes_statement.strip())
 
     def get_document(self, id):
-        statement = "MATCH (n) WHERE n.document = \"{0}\" RETURN n".format(id)
+        q = """ MATCH (n) WHERE n.document = "{0}" AND NOT n:Anchor RETURN n """.format(id)
         with self._driver.session() as session:
-            return [node for node in session.run(statement)]
+            return [node for node in session.run(q)]
 
     def create_document_anchor(self, id, name, description):
-        q = "CREATE (a {{ document: {}, name: '{}', description: '{}' }})".format(id, name, description)
+        q = """ CREATE (n:Anchor {{ document: '{}', name: '{}', description: '{}' }}) """.format(id, name, description)
         with self._driver.session() as session:
             response = session.run(q)
+
+    def get_document_anchor(self, id):
+        q = """ MATCH (n:Anchor) WHERE n.document = "{0}" RETURN n """.format(id)
+        with self._driver.session() as session:
+            response = session.run(q)
+            record = response.single()
+            return record

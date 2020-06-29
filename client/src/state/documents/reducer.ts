@@ -54,9 +54,7 @@ const documentReducer = (state: any = initialState, action: any) => {
                 error: {$set: action.error}
             });
         case GET_DOCUMENT_RESPONSE:
-			// Here we could check whether the existing currentDocument is identical to the new one.
-            // But maybe such a comparison is expensive, and we might as well always overwrite.
-            // Why not just compare IDs?
+			// This is dispatched by GET_DOCUMENT whether the document already exists in state or not.
             currentDocument = new Document(action.payload.name, action.payload.description, action.payload.id, action.payload.forest);
             return update(state, {currentDocument: {$set: currentDocument}});
         case CREATE_DOCUMENT_RESPONSE:

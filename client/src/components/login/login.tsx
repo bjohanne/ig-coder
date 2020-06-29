@@ -6,6 +6,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
+import Spinner from "react-bootstrap/Spinner";
 import FormHelperText from "@material-ui/core/FormHelperText";
 
 function LoginComponent(props: any) {
@@ -71,8 +72,9 @@ function LoginComponent(props: any) {
 
                         <Row className="d-flex align-items-center">
                             <Col xs={12} sm={5} lg={4} className="mb-3 mb-sm-0">
-                                <Button variant="primary" type="submit" className="w-100">
+                                <Button variant="primary" type="submit" className="w-100" ref={props.submitButton}>
                                     Sign in
+                                    {props.loading && <Spinner animation="border" variant="light" size="sm" className="ml-3" />}
                                 </Button>
                             </Col>
                             <Col xs={12} sm={7} lg={8}>

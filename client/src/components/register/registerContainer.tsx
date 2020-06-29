@@ -8,13 +8,10 @@ import "firebase/firestore";
 
 import RegisterComponent from "./register";
 import SnackbarComponent from "../common/snackbar";
-import {processBegin, processSuccess, processError} from "../../state/apiRequest/actions";
-import {sendServerRequest} from "../../state/apiRequest/actions";
+import {sendServerRequest, processBegin, processSuccess, processError} from "../../state/apiRequest/actions";
 
 function RegisterContainer(props: any) {
     const {processBegin, processSuccess, processError, sendServerRequest} = props;
-
-    let history = useHistory()  // For redirecting
 
     const [state, setState]=useState({
         firstname:'',
@@ -27,9 +24,9 @@ function RegisterContainer(props: any) {
         failText:'',
         showPassword: false
     })
-    const [snackbar,setSnackbar] = useState(false);
-
-    const submitButton = useRef(null);
+    const [snackbar,setSnackbar] = useState(false)
+    const history = useHistory()
+    const submitButton = useRef(null)
 
     const handleChange = (event) => {
         const {name, value} = event.target
@@ -131,7 +128,7 @@ function RegisterContainer(props: any) {
                     setSnackbar(true)
                     setTimeout(()=>{
                         processSuccess();
-                        history.push("/login"); // Can't use the Redirect component here
+                        history.push("/login");
                     }, 1000)    // Wait a second so the user can read the snackbar message
                 }, (error: AxiosError) => {
                     // Errors with the SQL DB
@@ -178,9 +175,9 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    processBegin: () => { return dispatch(processBegin()) },
-    processSuccess: () => { return dispatch(processSuccess()) },
-    processError: (error: any) => { return dispatch(processError(error)) },
+    processBegin: () => dispatch(processBegin()),
+    processSuccess: () => dispatch(processSuccess()),
+    processError: (error: any) => dispatch(processError(error)),
     sendServerRequest: (request: AxiosRequestConfig) => { return dispatch(sendServerRequest(request)) }
 });
 

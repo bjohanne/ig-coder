@@ -1,6 +1,3 @@
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
-import { PROCESS_BEGIN, PROCESS_SUCCESS, PROCESS_ERROR } from "../apiRequest/actions";
-
 import Document from "../../core/model/document";
 import { INode } from "../../core/model/interfaces";
 
@@ -32,19 +29,6 @@ export const getDocumentResponse = (payload: Document) => ({
     type: GET_DOCUMENT_RESPONSE,
     payload: payload
 });
-
-export const createDocument = (request: AxiosRequestConfig) => {
-    return (dispatch) => {
-        dispatch({type: PROCESS_BEGIN, request});
-        return axios(request)
-        .then((response: AxiosResponse) => {
-            dispatch({type: CREATE_DOCUMENT_RESPONSE, payload: response.data});
-            dispatch({type: PROCESS_SUCCESS, response});
-        }, (error: AxiosError) => {
-            dispatch({type: PROCESS_ERROR, error});
-        });
-    }
-};
 
 export const createDocumentResponse = (payload: {name: string, description: string, id: number}) => ({
     type: CREATE_DOCUMENT_RESPONSE,
