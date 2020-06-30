@@ -1,5 +1,4 @@
 import update from 'immutability-helper';
-import Document from "../core/model/document";
 import {
     GET_DOCUMENT_RESPONSE,
     CREATE_DOCUMENT_RESPONSE,
@@ -8,42 +7,58 @@ import {
     UPDATE_ENTRY,
     ADD_JUNCTION,
     UPDATE_JUNCTION,
-    UPDATE_NEGATION,
-    CHANGE_LOGIN_STATE
-} from "./actionTypes";
+    UPDATE_NEGATION
+} from "./actions";
 
-import { NormNode, ConventionNode, SanctionNode, JunctionNode, ComponentNode, SubcomponentNode, NegationNode } from '../core/model/nodes';
-import { Arg, SubcomponentType, JunctionType } from '../core/model/enums';
-import { INode } from '../core/model/interfaces';
+import { PROCESS_BEGIN, PROCESS_SUCCESS, PROCESS_ERROR } from "../apiRequest/actions";
+
+import Document from "../../core/model/document";
+import { NormNode, ConventionNode, JunctionNode, NegationNode } from '../../core/model/nodes';
+import { Arg } from '../../core/model/enums';
+import { INode } from '../../core/model/interfaces';
 
 interface IInitialState {
     documents: Array<Document>,
     currentDocument: Document | null
     activeNode: any,
-    loginState:boolean,
+    loading: boolean,
+    error: any
 }
 
 const initialState: IInitialState = {
     documents: [],
     currentDocument: null,
     activeNode: null,
-    loginState:false
+    loading: false,
+    error: null
 };
 
-const reducer = (state: any = initialState, action: any) => {
+const documentReducer = (state: any = initialState, action: any) => {
     let currentDocument: Document;
     let newDocument: Document;
     let node: INode;
     switch (action.type) {
-        case CHANGE_LOGIN_STATE:
-            console.log("CHANGE_LOGIN_STATE "+action.payload)
-            return update(state,{loginState:{$set:action.payload}})
-
+        case PROCESS_BEGIN:
+            return update(state, {
+                loading: {$set: true},
+                error: {$set: null}
+            });
+        case PROCESS_SUCCESS:
+            return update(state, {
+                loading: {$set: false},
+                error: {$set: null}
+            });
+        case PROCESS_ERROR:
+            return update(state, {
+                loading: {$set: false},
+                error: {$set: action.error}
+            });
         case GET_DOCUMENT_RESPONSE:
-			// Here, we could check whether the existing currentDocument is identical to the new one.
-            // But maybe such a comparison is expensive, and we might as well just always overwrite.
+			// This is dispatched by GET_DOCUMENT whether the document already exists in state or not.
             currentDocument = new Document(action.payload.name, action.payload.description, action.payload.id, action.payload.forest);
             return update(state, {currentDocument: {$set: currentDocument}});
+        case CREATE_DOCUMENT_RESPONSE:
+            return update(state, {documents: {$push: [action.doc]}, currentDocument: {$set: action.doc}});
         case ADD_JUNCTION:
             node = action.payload as INode;
             currentDocument = state.currentDocument as Document;
@@ -106,9 +121,6 @@ const reducer = (state: any = initialState, action: any) => {
 			}
         case SET_ACTIVE_NODE:
             return update(state, { activeNode: { $set: action.payload }});
-        case CREATE_DOCUMENT_RESPONSE:
-			let document = new Document(action.payload.name, action.payload.description, action.payload.id);
-            return update(state, {documents: {$push: [document]}, currentDocument: {$set: document}});
         case UPDATE_ENTRY:
             state.currentDocument.updateNode(action.payload);
             let nDoc = Object.assign(new Document("", "", -1), state.currentDocument);
@@ -120,10 +132,8 @@ const reducer = (state: any = initialState, action: any) => {
                 return state;
             }
 
-            console.log(action.payload)
-
 			// Rehydrate documents array
-			let origList = action.payload.reducer.documents;
+			let origList = action.payload.documentReducer.documents;
 			let dlist = [];
 			if (origList && origList.length > 0) {
 				origList.forEach((d: Document) => {
@@ -132,18 +142,16 @@ const reducer = (state: any = initialState, action: any) => {
 			}
 
 			// Rehydrate current document
-            let d = action.payload.reducer.currentDocument;
+            let d = action.payload.documentReducer.currentDocument;
 	        let rebuiltDoc;
 			if (d) {
 				rebuiltDoc = new Document(d.name, d.description, d.id, d.forest);
 			}
 
-			console.log(dlist);
-
-		    return update(state, {documents: {$set: dlist}, currentDocument: { $set: rebuiltDoc },loginState:{$set: action.payload.reducer.loginState}})
+		    return update(state, {documents: {$set: dlist}, currentDocument: { $set: rebuiltDoc }})
         default:
             return state;
     }
 };
 
-export default reducer;
+export default documentReducer;

@@ -1,43 +1,40 @@
 import {
     GET_DOCUMENT,
     GET_DOCUMENT_RESPONSE,
-    CREATE_DOCUMENT,
     CREATE_DOCUMENT_RESPONSE,
     SAVE_DOCUMENT_REQUEST,
     PRE_SET_ACTIVE_NODE,
     SET_ACTIVE_NODE
-} from "./actionTypes";
-import {Middleware, MiddlewareAPI} from "redux";
-import axios, {AxiosResponse} from "axios";
-import {toast} from 'react-toastify';
-import appConfig from "../core/config/appConfig";
-import { INormAndConvention } from "../core/model/interfaces";
+} from "./actions";
+import { Middleware, MiddlewareAPI } from "redux";
+import axios, { AxiosResponse } from "axios";
+import appConfig from "../../core/config/appConfig";
+import Document from "../../core/model/document";
+import { INormAndConvention } from "../../core/model/interfaces";
 
 export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: any) => (action: any) => {
     switch (action.type) {
         case GET_DOCUMENT:
-			let storeDocuments = store.getState().reducer.documents;
+			let storeDocuments = store.getState().documentReducer.documents;
 			let foundDocument = storeDocuments.find((document: any) => document.id === Number(action.document_id));
 
 			if (foundDocument) { // A document with the provided ID already exists in state
 				store.dispatch({type: GET_DOCUMENT_RESPONSE, payload: foundDocument});
 			} else { // Need to query the server
 				axios.get(`${appConfig.api.baseUrl}/documents/${action.document_id}`).then((response: AxiosResponse) => {
-					//response.data.forest = [];	// Turn the forest back into a JS array (needed string on the server)
+					//response.data.forest = [];	// Turn the forest back into a JS array
 					store.dispatch({type: GET_DOCUMENT_RESPONSE, payload: response.data});
 				});
 			}
 			break;
-        case CREATE_DOCUMENT:
-            axios.post(`${appConfig.api.baseUrl}/documents`, action.payload).then((response) => {
-				response.data.forest = [];	// Turn the forest back into a JS array (needed string on the server)
-                store.dispatch({type: CREATE_DOCUMENT_RESPONSE, payload: response.data});
-            });
+        case CREATE_DOCUMENT_RESPONSE:
+            action.doc = new Document(action.payload.name, action.payload.description, action.payload.id);
             break;
         case SAVE_DOCUMENT_REQUEST:
             axios.patch(`${appConfig.api.baseUrl}/documents`, action.payload).then((response) => {
-                let toaster = response.status === 200 ? toast.success : toast.error;
-                toaster('Document saved!');
+                //let toaster = response.status === 200 ? toast.success : toast.error;
+                //toaster('Document saved!');
+                // TODO: Render a Snackbar in the Document component, and wait for the response there
             });
             break;
         case PRE_SET_ACTIVE_NODE:
@@ -46,7 +43,6 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
                 action.payload.togglefunc();
                 return;
             }
-
             // extract the entry text, pass it to the endpoint
             let parent = action.payload.node.parent.data as INormAndConvention;
             let data = { entry: parent.entry.content }

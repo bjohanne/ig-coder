@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { select, tree, hierarchy, TreeLayout } from "d3";
 import { INode, IDocument } from "../../core/model/interfaces";
-import { Modal } from 'reactstrap';
-import { preSetActiveNode } from "../../state/actions";
+import Modal from 'react-bootstrap/Modal';
+import { preSetActiveNode } from "../../state/documents/actions";
 import "./tree.css";
 import Edit from "./edit";
 import { NodeType, ComponentType } from "../../core/model/enums";
@@ -46,7 +46,7 @@ const TreeComponent = (props: Proptype) => {
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         }
         treeLayout = tree<INode>().size([height, width]);
-        
+
         update(forestNode);
     };
 
@@ -205,7 +205,7 @@ const TreeComponent = (props: Proptype) => {
 					ref={n => (svgNode = n)} />
 			</div>
             <span>{props.currentDocument.forest[0].updatedAt.toLocaleString()}</span>
-            <Modal isOpen={modal} toggle={toggle} className="modal-open">
+            <Modal show={modal} onHide={() => setModal(false)} className="modal-open">
                 <Edit close={toggle} />
             </Modal>
         </div>
@@ -213,7 +213,7 @@ const TreeComponent = (props: Proptype) => {
 }
 
 const mapStateToProps = (state: any) => ({
-    currentDocument: state.reducer.currentDocument
+    currentDocument: state.documentReducer.currentDocument
 });
 
 const mapDispatchToProps = (dispatch: any) => ({

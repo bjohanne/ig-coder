@@ -6,10 +6,12 @@ import {
 import {connect} from "react-redux";
 
 function HomeComponent(props: any) {
-
+    const loginState=!Boolean(props.token===null)
+    console.log(props.token)
+    console.log(loginState)
     return (
         <div className="home-root text-center">
-            <div className="row" style={{display:props.loginState?"block":'none'}}>
+            <div className="row" style={{display:loginState?"block":'none'}}>
                 <div className="col-md-12">
                     <span className="home-title">
                         The making of IG Coder
@@ -20,7 +22,7 @@ function HomeComponent(props: any) {
                     </Link>
                 </div>
             </div>
-            <div className={"row"} style={{display:!props.loginState?"block":'none'}}>
+            <div className={"row"} style={{display:!loginState?"block":'none'}}>
                 <div className={'col'}>
                     <h1 className="home-sub-title">YOU ARE NOT SIGNED IN, PLEASE LOGIN FIRST!</h1>
                     <img src={"https://media.giphy.com/media/MC6eSuC3yypCU/giphy.gif"} alt={''}/>
@@ -31,7 +33,7 @@ function HomeComponent(props: any) {
 }
 
 const mapStateToProps = (state: any) => ({
-    loginState: state.reducer.loginState
+    token: state.userReducer.token
 });
 
 export default connect(mapStateToProps,null)(HomeComponent);

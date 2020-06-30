@@ -1,7 +1,7 @@
 import React, {useState, useRef} from "react";
 import ReactDOM from 'react-dom';
 import {connect} from "react-redux";
-import {addEntryToDocument} from "../../state/actions";
+import {addEntryToDocument} from "../../state/documents/actions";
 import Chevron from "./chevron";
 import Toggle from "react-toggle";
 import "./accordion.css";

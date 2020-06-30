@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import { updateJunction } from "../../../state/actions";
-import { ModalBody } from 'reactstrap';
+import { updateJunction } from "../../../state/documents/actions";
+import ModalBody from 'react-bootstrap/ModalBody';
 import { JunctionNode, SubcomponentNode } from "../../../core/model/nodes";
 import { JunctionType, NodeType, Arg, SubcomponentType } from "../../../core/model/enums";
 import { componentColorScaler } from "../../../core/config/scales";
 import { INode } from "../../../core/model/interfaces";
 
-const JunctionEditor = (props: any) => {  
+const JunctionEditor = (props: any) => {
     let active = props.activeNode.node.data as JunctionNode;
     const [hasNegate, setHasNegate] = useState(false);
     const [hasConvention, setHasConvention] = useState(false);
@@ -41,11 +41,11 @@ const JunctionEditor = (props: any) => {
 
     const onChange = (value: string) => {
         const jType: JunctionType = (JunctionType)[value.toLowerCase()];
-        setJunctionType(jType);        
+        setJunctionType(jType);
     }
 
-    const close = () => {        
-        props.updateJunction({ node: active, junctionType: junctionType });      
+    const close = () => {
+        props.updateJunction({ node: active, junctionType: junctionType });
         props.activeNode.modalState(false);
     }
 
@@ -93,16 +93,16 @@ const JunctionEditor = (props: any) => {
                 setHasIndirect(checked);
                 break;
             default:
-                break;                
+                break;
 
 
         }
     }
 
     let currentComponentColor = componentColorScaler(active.junctionType);
-    
-    return (        
-        props.activeNode && 
+
+    return (
+        props.activeNode &&
         (<ModalBody><div className="modal-wrapper">
             <h4 style={{ padding: "1rem", color: "#fff", backgroundColor: currentComponentColor.toString() }}>{props.activeNode.node.data.junctionType} ({props.activeNode.node.data.id})</h4>
             <div className="text-control-wrap">
@@ -135,9 +135,9 @@ const JunctionEditor = (props: any) => {
                         <input type="checkbox" name="children" onChange={select} value="Convention" disabled={(hasDirect || hasIndirect || hasNorm)}/>
                     </div>
                     <div className={`checkbox ${(active.subcomponentType === SubcomponentType.activation ? "show" : "hide")}`}>
-                        <label>Negation</label>                        
+                        <label>Negation</label>
                         <input type="checkbox" name="children" onChange={select} value="Negation" disabled={(hasDirect || hasIndirect) && !(hasConvention && hasNorm)}/>
-                    </div>                      
+                    </div>
                     <div className={`checkbox ${(active.subcomponentType === SubcomponentType.direct ? "show" : "hide")}`}>
                         <label>Attributes</label>
                         <input type="checkbox" name="children" onChange={select} value="Direct" disabled={(hasNegate || hasNorm || hasConvention || hasIndirect)}/>
@@ -145,18 +145,18 @@ const JunctionEditor = (props: any) => {
                     <div className={`checkbox ${(active.subcomponentType === SubcomponentType.indirect ? "show" : "hide")}`}>
                         <label>Objects</label>
                         <input type="checkbox" name="children" onChange={select} value="Indirect" disabled={(hasNegate || hasNorm || hasConvention || hasDirect)}/>
-                    </div>                    
-                  
+                    </div>
+
                 </div>
             </div>
         </div>
-        <button className="btn-primary btn" style={{margin:5}} onClick={close}>Save</button>           
-    </div></ModalBody>) 
+        <button className="btn-primary btn" style={{margin:5}} onClick={close}>Save</button>
+    </div></ModalBody>)
     )
 }
 
 const mapStateToProps = (state: any) => ({
-    activeNode: state.reducer.activeNode
+    activeNode: state.documentReducer.activeNode
 });
 
 const mapDispatchToProps = (dispatch: any) => ({

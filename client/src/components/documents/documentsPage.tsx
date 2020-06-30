@@ -15,16 +15,6 @@ function DocumentsPage(props: any) {
     const [visibility, setVisibility] = useState(0);
     let history =  useHistory()
 
-    /**
-     * judge whether a user is not logged in before mounting
-     * redirect the link to homepage if not
-     */
-    useEffect(()=>{
-        if(!props.loginState){
-            history.push('/')
-        }
-    },[])
-
     let title
     var fakedatas = [
         [
@@ -267,7 +257,4 @@ function DocumentsPage(props: any) {
         </div>
     );
 }
-const mapStateToProps = (state: any) => ({
-    loginState: state.reducer.loginState
-});
-export default connect(mapStateToProps,null)(DocumentsPage)
+export default connect(null,null)(DocumentsPage)

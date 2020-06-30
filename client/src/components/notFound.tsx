@@ -2,26 +2,24 @@ import React from "react";
 import {
     Link
 } from 'react-router-dom';
-import appConfig from "../core/config/appConfig";
 
 function NotFoundComponent(props: any) {
     return (
         <div>
-            <h1>Oops, looks like you're a bit lost</h1>
+            <h1>Oops!</h1>
             <hr/>
             <div className="row">
                 <div className="col-md-6">
                     <p>Dear policy coder,</p>
-                    <br/>
                     <p>
-                        We are terribly sorry, but it appears this page you seek is missing from our website.
+                        We're terribly sorry, but it appears the page you seek is missing from our website.<br/>
                         Before you head back into the wild web, please double check (!) to be sure you have entered
-                        the right URL.
+                        the right URL.<br/>
                         If you're sure it's correct, feel free to email us right now and complain. In the meantime,
-                        here's a catgif for you to enjoy.
+                        here's a cat gif for you to enjoy.
                     </p>
-                    <Link to={{pathname: `${appConfig.client.path}/`}}>
-                        <button className="btn btn-dark">Back To Homepage</button>
+                    <Link to="/">
+                        <button className="btn btn-dark">Back to homepage</button>
                     </Link>
                 </div>
                 <div className="col-md-6 text-center">

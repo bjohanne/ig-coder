@@ -5,8 +5,8 @@ import { Link, useHistory } from "react-router-dom";
 import './navbar.css';
 import {IconButton,Menu,MenuItem,Fade,ListItemIcon,Typography} from "@material-ui/core";
 import {AccountCircle, Delete} from '@material-ui/icons'
-import {updateLoginState} from "../../state/actions";
 import * as firebase from "firebase/app";
+import {logoutUser} from "../../state/users/actions";
 
 function Navbar(props: any) {
     const [anchorEl, setAnchorEl]=useState(null)
@@ -33,7 +33,7 @@ function Navbar(props: any) {
     const handleSignout=()=>{
         setAnchorEl(null)
         firebase.auth().signOut().then(function() {
-            props.updateLoginState(false)
+            props.logoutUser()
             history.push('/')
         }).catch(function(error) {
             console.log('sign out error: '+error)
@@ -43,7 +43,7 @@ function Navbar(props: any) {
 
 
     }
-    const loginState=props.loginState
+    const loginState=!Boolean(props.token===null)
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light navbar-wrapper">
@@ -120,11 +120,11 @@ function Navbar(props: any) {
     );
 }
 const mapStateToProps = (state: any) => ({
-    loginState: state.reducer.loginState
+    token: state.userReducer.token
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    updateLoginState: (loginState: any) => dispatch(updateLoginState(loginState))
+    logoutUser: () => dispatch(logoutUser())
 });
 
 export default connect(mapStateToProps,mapDispatchToProps)(Navbar);

@@ -1,29 +1,30 @@
 import React from "react";
+import { Link } from 'react-router-dom';
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
+import Spinner from "react-bootstrap/Spinner";
 import FormHelperText from "@material-ui/core/FormHelperText";
 
 function LoginComponent(props: any) {
     return (
-        <div className="Container">
-            <div className="row text-center">
-                <div className="col-md-12">
+        <Container>
+            <Row className="text-center">
+                <Col>
                     <h1 className="home-title">
                         Sign in
                     </h1>
-                </div>
-            </div>
+                </Col>
+            </Row>
 
-            <div className="row">
-                <div className='col-md-4'>
-                </div>
+            <Row>
+                <Col sm={2} md={3}></Col>
 
-                <div className='col-md-4'>
-
-                    <Form>
+                <Col sm={8} md={6}>
+                    <Form onSubmit={props.handleSubmit}>
                         <Form.Group controlId="formBasicEmail">
                             <Form.Label>Email address</Form.Label>
                             <Form.Control
@@ -54,12 +55,14 @@ function LoginComponent(props: any) {
                                     <Button
                                         variant="secondary"
                                         onClick={props.handleClickShowPassword}
+                                        style={{width:"70px"}}
                                     >
                                         {props.data.showPassword ? 'Hide' : 'Show'}
                                     </Button>
                                 </InputGroup.Append>
-                                <FormHelperText id="component-error-text" style={{display:props.data.isFail?'block':'none'}} error={props.data.isFail}>{props.data.failText}</FormHelperText>
                             </InputGroup>
+
+                            <FormHelperText id="component-error-text" style={{display:props.data.isFail?'block':'none'}} error={props.data.isFail}>{props.data.failText}</FormHelperText>
 
                             <Form.Group controlId="formBasicCheckbox">
                                 <Form.Check type="checkbox" label="Remember me" />
@@ -68,29 +71,21 @@ function LoginComponent(props: any) {
                         </Form.Group>
 
                         <Row className="d-flex align-items-center">
-                            <Col>
-                            <Button
-                                variant='outline-dark'
-                                type="submit"
-                                className="ml-auto w-75"
-                                onClick={props.handleSubmit}
-                            >
-                                Sign in
-                            </Button>
+                            <Col xs={12} sm={5} lg={4} className="mb-3 mb-sm-0">
+                                <Button variant="primary" type="submit" className="w-100" ref={props.submitButton}>
+                                    Sign in
+                                    {props.loading && <Spinner animation="border" variant="light" size="sm" className="ml-3" />}
+                                </Button>
                             </Col>
-
-                            <Col xs={0} >
-                            <a href='./register' className="ml-auto">Don't have an account? Sign up</a>
+                            <Col xs={12} sm={7} lg={8}>
+                                <Link to="/register">Don't have an account? Sign up</Link>
                             </Col>
                         </Row>
                     </Form>
-                </div>
-            </div>
-
-                <div className='col-md-4'>
-                </div>
-
-        </div>
+                </Col>
+                <Col sm={2} md={3}></Col>
+            </Row>
+        </Container>
     );
 }
 

@@ -1,7 +1,6 @@
 import environmentConfig from "./environmentConfig";
 
 class Config {
-
     api: { baseUrl: string } = {
         baseUrl: "http://localhost:5060",
     };
@@ -9,8 +8,8 @@ class Config {
     client: { path: string } = {
         path: "/"
     };
-
 }
+
 export const firebaseConfig = {
     apiKey: "AIzaSyDp4mEwWmkLs2Q1cd9Tce_Totro0rw3nBI",
     authDomain: "ig-coder.firebaseapp.com",

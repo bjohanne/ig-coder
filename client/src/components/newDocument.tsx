@@ -1,49 +1,62 @@
 import React, {useState, useRef, useEffect} from "react";
 import {connect} from "react-redux";
-import {createDocument} from "../state/actions";
-import appConfig from "../core/config/appConfig";
-import {withRouter, Redirect, useHistory} from 'react-router-dom';
-import {toast} from 'react-toastify';
+import {withRouter, Redirect} from 'react-router-dom';
+import { AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
+import Card from "react-bootstrap/Card";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import Spinner from "react-bootstrap/Spinner";
+
+import {sendServerRequest, processBegin, processSuccess, processError} from "../state/apiRequest/actions";
+import {createDocumentResponse} from "../state/documents/actions";
 import usePrevious from '../core/helpers/usePrevious';
 import './newDocument.css';
 
 export function NewDocumentComponent(props: any) {
-    const {createDocument} = props;
+    const {
+        processBegin,
+        processSuccess,
+        processError,
+        sendServerRequest,
+        createDocumentResponse,
+        currentDocument
+    } = props;
     const [form, setValues] = useState({name: "", description: ""});
-	const [redirect, setRedirect] = useState(false);	// Whether to redirect to the new document page
-	const prevDocument = usePrevious(props.addedDocument);
-
-	const buttonEl = useRef<HTMLButtonElement>(null);
-
-
-    let history=useHistory()
-    /**
-     * judge whether a user is not logged in before mounting
-     * redirect the link to homepage if not
-     */
-    useEffect(()=>{
-        if(!props.loginState){
-            history.push('/')
-        }
-    },[])
+    const [redirect, setRedirect] = useState(false);
+	const prevDocument = usePrevious(currentDocument);
+    const submitButton = useRef(null);
 
     /**
      Submits the "Create New Document" form.
      If a document name is not provided,
      the form is not submitted.
      */
-
-    const submitDocument = () => {
-        if (form.name === "") {
-			toast.error('Please enter a document name.');
-		} else {
-			toast.dismiss();
-            createDocument({name: form.name, description: form.description, forest: []});
-			if (buttonEl && buttonEl.current) {
-				buttonEl.current.disabled = true;	// Disable the submit button to prevent multiple requests being sent
-			}
-			setRedirect(true); // This is the trigger for redirecting
+    const handleSubmit = (event: any) => {
+        event.preventDefault();
+        if (submitButton && submitButton.current) {
+            submitButton.current.disabled = true;	// Disable the submit button to prevent multiple requests being sent
         }
+        processBegin();
+        sendServerRequest({
+            url: "/documents",
+            method: "post",
+            data: {
+                name: form.name,
+                description: form.description,
+                forest: []
+            }
+        })
+        .then((response: AxiosResponse) => {
+            setRedirect(true);
+            createDocumentResponse(response.data);
+            processSuccess();
+        }, (error: AxiosError) => {
+            processError(error);
+            setRedirect(false);
+            if (submitButton && submitButton.current) {
+                submitButton.current.disabled = false;  // Reenable the submit button so the user can try again
+            }
+        });
     };
 
     const updateField = (e: any) => {
@@ -53,34 +66,49 @@ export function NewDocumentComponent(props: any) {
         });
     };
 
-	if (redirect && props.addedDocument && (!prevDocument || props.addedDocument.id !== prevDocument.id)) {
-       return <Redirect to={{ pathname: `${appConfig.client.path}/documents/${props.addedDocument.id}` }} />;
+    /**
+        This block runs each time the component renders, and controls whether to redirect.
+     */
+    if (redirect && currentDocument && (!prevDocument || currentDocument.id !== prevDocument.id)) {
+        return <Redirect to={{ pathname: `/documents/${currentDocument.id}` }} />;
     }
 
     return (
-        <div className="card mx-auto" id="new-document-form">
-            <div className="card-body p-5 text-center">
-                <div className="form-group">
-                    <input type="text" className="form-control" name="name" placeholder="Document Name" required
-                           value={form.name} onChange={updateField}/>
-                </div>
-                <div className="form-group">
-                    <textarea className="form-control" rows={6} name="description" placeholder="Document Description"
-                              value={form.description} onChange={updateField}/>
-                </div>
-                <button type="button" className="btn btn-primary" ref={buttonEl} onClick={submitDocument}>Create New Document</button>
-            </div>
+        <div>
+            <Card className="mx-auto" id="new-document-form">
+                <Card.Body className="p-5 text-center">
+                    <Form onSubmit={handleSubmit}>
+                        <Form.Group>
+                            <Form.Control type="text" name="name" placeholder="Document Name" required
+                                   value={form.name} onChange={updateField}/>
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Control as="textarea" rows={6} name="description" placeholder="Document Description"
+                                      value={form.description} onChange={updateField}/>
+                        </Form.Group>
+                        <Button type="submit" variant="primary" ref={submitButton} style={{"width":"230px"}}>
+                            Create New Document
+                            {props.loading && <Spinner animation="border" variant="light" size="sm" className="ml-3" />}
+                        </Button>
+                    </Form>
+                </Card.Body>
+            </Card>
         </div>
     );
 }
 
 const mapStateToProps = (state: any) => ({
-    addedDocument: state.reducer.currentDocument,
-    loginState: state.reducer.loginState
+    currentDocument: state.documentReducer.currentDocument,
+    loading: state.documentReducer.loading,
+    error: state.documentReducer.error
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    createDocument: (documentData: any) => dispatch(createDocument(documentData))
+    processBegin: () => dispatch(processBegin()),
+    processSuccess: () => dispatch(processSuccess()),
+    processError: (error: any) => dispatch(processError(error)),
+    sendServerRequest: (request: AxiosRequestConfig) => { return dispatch(sendServerRequest(request)) },
+    createDocumentResponse: (response) => dispatch(createDocumentResponse(response))
 });
 
 export default connect(

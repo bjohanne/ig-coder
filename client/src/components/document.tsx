@@ -1,7 +1,7 @@
 import './document.css'
 import React, {useEffect} from "react";
 import {connect} from "react-redux";
-import {getDocument, saveDocumentRequest} from "../state/actions";
+import {getDocument, saveDocumentRequest} from "../state/documents/actions";
 import NewEntryEditor from "./editor/newEntry";
 import Accordion from "./units/accordion";
 import Document from "../core/model/document";
@@ -26,11 +26,11 @@ export function DocumentComponent(props: IDocumentEditorProps) {
         }
 	}, [getDocument, id, props.currentDocument]);
 
-    
+
     const save = () => {
         props.saveDocumentRequest(props.currentDocument);
     };
-    
+
     return (
         props.currentDocument &&
         <div className="card">
@@ -40,7 +40,7 @@ export function DocumentComponent(props: IDocumentEditorProps) {
                         <h2 className="card-title">{props.currentDocument.name}</h2>
                         <small className="text-muted">{props.currentDocument.description}</small>
                     </div>
-                    <div className="col-md-6 text-right">                        
+                    <div className="col-md-6 text-right">
                         <NewEntryEditor
                             toggle={(show: any) => <button type="button" className="btn btn-primary"
                                                            onClick={show}>Create New Entry</button>}
@@ -55,7 +55,7 @@ export function DocumentComponent(props: IDocumentEditorProps) {
 
                 <div className="card-body" id="node-100000">
                 {(props.currentDocument.forest && props.currentDocument.forest.length &&
-                props.currentDocument.forest.map((root: INode) => <div key={root.id}><TreeComponent node={root}/></div>)) 
+                props.currentDocument.forest.map((root: INode) => <div key={root.id}><TreeComponent node={root}/></div>))
                 ||
                 <h4 className="text-center">No entries to display</h4>
                 }
@@ -69,14 +69,14 @@ export function DocumentComponent(props: IDocumentEditorProps) {
                             <button type="button" className="btn btn-primary" onClick={save}>Save Document</button>
                         </div>
                     </div>
-                </div> 
+                </div>
             </div>
         </div>
     );
 }
 
 const mapStateToProps = (state: any) => ({
-    currentDocument: state.reducer.currentDocument
+    currentDocument: state.documentReducer.currentDocument
 });
 
 const mapDispatchToProps = (dispatch: any) => ({

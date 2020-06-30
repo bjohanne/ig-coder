@@ -9,22 +9,10 @@ import {
 } from '@material-ui/core';
 import ListItem from "../common/listItem";
 import {connect} from "react-redux";
-import {useHistory} from "react-router";
 
 function ProjectsPage(props: any) {
     const [openNewProject, setOpenNewProject] = useState(false);
     const [visibility, setVisibility] = useState(0);
-    let history=useHistory()
-
-    /**
-     * judge whether a user is not logged in before mounting
-     * redirect the link to homepage if not
-     */
-    useEffect(()=>{
-        if(!props.loginState){
-            history.push('/')
-        }
-    },[])
 
     let title
     let fakedata = []
@@ -289,7 +277,4 @@ function ProjectsPage(props: any) {
     );
 }
 
-const mapStateToProps = (state: any) => ({
-    loginState: state.reducer.loginState
-});
-export default connect(mapStateToProps,null)(ProjectsPage)
+export default connect(null,null)(ProjectsPage)

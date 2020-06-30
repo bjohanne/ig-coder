@@ -1,32 +1,32 @@
-import {createStore, combineReducers, applyMiddleware, compose} from "redux";
+import { createStore, combineReducers, applyMiddleware } from "redux";
 import { persistStore, persistReducer } from "redux-persist";
+import thunk from 'redux-thunk';
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
-import reducer from "./reducer";
-import {documentMiddleware} from "./middleware";
 import { composeWithDevTools } from 'redux-devtools-extension';
 
-let allReducers = combineReducers({
-    reducer
-});
+import { documentMiddleware } from "./documents/middleware";
+import documentReducer from "./documents/reducer";
+import userReducer from "./users/reducer";
 
 const persistConfig = {
-  key: 'root',
-  storage
+    key: 'root',
+    storage
 }
 
-/*
-,
-  blacklist: ['currentDocument']
-*/
+const rootReducer = combineReducers({
+    documentReducer,
+    userReducer
+});
 
-const persistedReducer = persistReducer(persistConfig, allReducers)
+const allMiddlewares = [documentMiddleware];
 
-const middleWares = [documentMiddleware];
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
+ // It's important that thunk comes first, otherwise async actions won't work
 const store = createStore(
     persistedReducer,
     composeWithDevTools(
-        applyMiddleware(...middleWares),
+        applyMiddleware(thunk, ...allMiddlewares),
     )
 );
 
