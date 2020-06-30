@@ -1,6 +1,7 @@
 import update from 'immutability-helper';
 import { PROCESS_BEGIN, PROCESS_SUCCESS, PROCESS_ERROR } from "../apiRequest/actions";
 import { LOGIN_USER, LOGOUT_USER } from "./actions";
+import Document from "../../core/model/document";
 
 const INITIAL_STATE = {
     loading: false,
@@ -33,6 +34,15 @@ const userReducer = (state: any = INITIAL_STATE, action: any) => {
             return update(state, {
                 token: {$set: null}
             });
+        case "persist/REHYDRATE":
+            // This is a "manual override" for rehydrating Redux state from local storage. Happens on page load/refresh.
+
+            if (!action.payload) {
+                return state;
+            }
+            console.log(action)
+
+            return update(state, {token: {$set: action.payload}})
         default:
             return state;
     };

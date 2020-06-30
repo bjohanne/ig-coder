@@ -1,0 +1,63 @@
+.root{
+    background: white;
+    border-radius: 1rem;
+    padding: 1rem;
+}
+.vertical-line{
+    border-left-color: lightgrey;
+    border-left-style: solid;
+    border-left-width: 1px;
+    width: 12px;
+    height: 100%;
+}
+.horizontal-line{
+    border-bottom-color: lightgrey;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    padding-right: -15px;
+    width: 99%;
+    height: 100%;
+}
+
+.search {
+    position: relative;
+}
+
+.search input {
+    text-indent: .10rem;
+    font-size: x-small;
+}
+
+.search .oi-magnifying-glass {
+    position: absolute;
+    top: 9px;
+    right: 5px;
+    font-size: 10px;
+}
+
+.list-group .list-group-item{
+    border-style: hidden;
+}
+
+#verticalline{
+    padding: 0;
+}
+#lefttab{
+    padding-right: 0;
+}
+#lefttab .list-group-item{
+    padding: 0;
+}
+#select-visibility{
+    margin-bottom: 0;
+    margin-top: 1rem;
+}
+
+#file-list .list-group-item{
+    border-width: 1px;
+    border-color: lightgrey;
+    border-bottom-style: solid;
+    border-radius: 0;
+    margin-bottom: 1px;
+}
+

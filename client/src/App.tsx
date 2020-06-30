@@ -19,7 +19,8 @@ import NewDocumentComponent from "./components/newDocument";
 import LoginContainer from "./components/login/loginContainer";
 import RegisterContainer from "./components/register/registerContainer";
 import NotFoundComponent from "./components/notFound";
-
+import ProjectsPage from "./components/projects/projectsPage";
+import DocumentsPage from "./components/documents/documentsPage";
 // Config
 import appConfig, { firebaseConfig } from "./core/config/appConfig";
 import * as firebase from "firebase/app";
@@ -41,6 +42,8 @@ function App() {
 							<Route exact path={`${appConfig.client.path}/documents/:id`} component={DocumentComponent}/>
 							<Route exact path={`${appConfig.client.path}/login`} component={LoginContainer}/>
 							<Route exact path={`${appConfig.client.path}/register`} component={RegisterContainer}/>
+							<Route exact path={`${appConfig.client.path}/projects/:tab`} component={ProjectsPage}/>
+							<Route exact path={`${appConfig.client.path}/projects/project/:projectid/:tab`} component={DocumentsPage}/>
 							<Route path='*' component={NotFoundComponent} />
 						</Switch>
 					</Router>

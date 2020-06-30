@@ -1,4 +1,4 @@
-import React, {useState, useRef} from "react";
+import React, {useState, useRef, useEffect} from "react";
 import {connect} from "react-redux";
 import {withRouter, Redirect} from 'react-router-dom';
 import { AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
@@ -28,6 +28,8 @@ export function NewDocumentComponent(props: any) {
 
     /**
      Submits the "Create New Document" form.
+     If a document name is not provided,
+     the form is not submitted.
      */
     const handleSubmit = (event: any) => {
         event.preventDefault();
