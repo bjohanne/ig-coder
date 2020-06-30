@@ -10,7 +10,7 @@ import {
     PRE_SET_ACTIVE_NODE,
     ADD_JUNCTION,
     UPDATE_JUNCTION,
-    UPDATE_NEGATION
+    UPDATE_NEGATION, CHANGE_LOGIN_STATE
 } from "./actionTypes";
 import Document from "../core/model/document";
 import { INode } from "../core/model/interfaces";
@@ -73,4 +73,9 @@ export const updateJunction = (payload: any) => ({
 export const updateNegation = (payload: any) => ({
     type: UPDATE_NEGATION,
     payload: payload
+})
+
+export const updateLoginState=(payload:any)=>({
+    type:CHANGE_LOGIN_STATE,
+    payload:payload
 })

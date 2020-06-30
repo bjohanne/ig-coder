@@ -28,6 +28,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import appConfig from "./core/config/appConfig";
 import * as firebase from "firebase/app";
 import {firebaseConfig} from "./core/config/appConfig";
+import ProjectsPage from "./components/projects/projectsPage";
+import DocumentsPage from "./components/documents/documentsPage";
 
 function App() {
 	firebase.initializeApp(firebaseConfig);
@@ -43,6 +45,8 @@ function App() {
 							<Route exact path={`${appConfig.client.path}/documents/:id`} component={DocumentComponent}/>
 							<Route exact path={`${appConfig.client.path}/login`} component={LoginContainer}/>
 							<Route exact path={`${appConfig.client.path}/register`} component={RegisterContainer}/>
+							<Route exact path={`${appConfig.client.path}/projects/:tab`} component={ProjectsPage}/>
+							<Route exact path={`${appConfig.client.path}/projects/project/:projectid/:tab`} component={DocumentsPage}/>
 							<Route path='*' component={NotFoundComponent} />
 						</Switch>
 					</Router>

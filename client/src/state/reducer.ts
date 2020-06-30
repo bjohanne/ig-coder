@@ -8,7 +8,8 @@ import {
     UPDATE_ENTRY,
     ADD_JUNCTION,
     UPDATE_JUNCTION,
-    UPDATE_NEGATION
+    UPDATE_NEGATION,
+    CHANGE_LOGIN_STATE
 } from "./actionTypes";
 
 import { NormNode, ConventionNode, SanctionNode, JunctionNode, ComponentNode, SubcomponentNode, NegationNode } from '../core/model/nodes';
@@ -18,13 +19,15 @@ import { INode } from '../core/model/interfaces';
 interface IInitialState {
     documents: Array<Document>,
     currentDocument: Document | null
-    activeNode: any
+    activeNode: any,
+    loginState:boolean,
 }
 
 const initialState: IInitialState = {
     documents: [],
     currentDocument: null,
-    activeNode: null
+    activeNode: null,
+    loginState:false
 };
 
 const reducer = (state: any = initialState, action: any) => {
@@ -32,6 +35,10 @@ const reducer = (state: any = initialState, action: any) => {
     let newDocument: Document;
     let node: INode;
     switch (action.type) {
+        case CHANGE_LOGIN_STATE:
+            console.log("CHANGE_LOGIN_STATE "+action.payload)
+            return update(state,{loginState:{$set:action.payload}})
+
         case GET_DOCUMENT_RESPONSE:
 			// Here, we could check whether the existing currentDocument is identical to the new one.
             // But maybe such a comparison is expensive, and we might as well just always overwrite.
@@ -53,10 +60,10 @@ const reducer = (state: any = initialState, action: any) => {
             newDocument = Object.assign(new Document("", "", -1), currentDocument);
             return update(state, {currentDocument: {$set: newDocument }});
 
-        case UPDATE_NEGATION: 
+        case UPDATE_NEGATION:
             let negationNode = action.payload.node as NegationNode;
             currentDocument = state.currentDocument as Document;
-            currentDocument.forest[0].updatedAt = new Date();            
+            currentDocument.forest[0].updatedAt = new Date();
             currentDocument.updateNode(negationNode);
             newDocument = Object.assign(new Document("", "", -1), currentDocument);
             return update(state, {currentDocument: {$set: newDocument }});
@@ -97,14 +104,14 @@ const reducer = (state: any = initialState, action: any) => {
 			} else {
 				return state;
 			}
-        case SET_ACTIVE_NODE:            
-            return update(state, { activeNode: { $set: action.payload }});    
+        case SET_ACTIVE_NODE:
+            return update(state, { activeNode: { $set: action.payload }});
         case CREATE_DOCUMENT_RESPONSE:
 			let document = new Document(action.payload.name, action.payload.description, action.payload.id);
             return update(state, {documents: {$push: [document]}, currentDocument: {$set: document}});
-        case UPDATE_ENTRY:            
+        case UPDATE_ENTRY:
             state.currentDocument.updateNode(action.payload);
-            let nDoc = Object.assign(new Document("", "", -1), state.currentDocument);            
+            let nDoc = Object.assign(new Document("", "", -1), state.currentDocument);
             return update(state, {currentDocument: { $set: nDoc } });
         case "persist/REHYDRATE":
 			// This is a "manual override" for rehydrating Redux state from local storage. Happens on page load/refresh.
@@ -112,6 +119,8 @@ const reducer = (state: any = initialState, action: any) => {
             if (!action.payload) {
                 return state;
             }
+
+            console.log(action.payload)
 
 			// Rehydrate documents array
 			let origList = action.payload.reducer.documents;
@@ -131,7 +140,7 @@ const reducer = (state: any = initialState, action: any) => {
 
 			console.log(dlist);
 
-		    return update(state, {documents: {$set: dlist}, currentDocument: { $set: rebuiltDoc }})
+		    return update(state, {documents: {$set: dlist}, currentDocument: { $set: rebuiltDoc },loginState:{$set: action.payload.reducer.loginState}})
         default:
             return state;
     }

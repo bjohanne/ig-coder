@@ -3,6 +3,8 @@ import LoginComponent from "./login";
 import * as firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
+import {updateLoginState} from "../../state/actions";
+import {connect} from "react-redux";
 
 class LoginContainer extends React.Component {
     state = {
@@ -35,8 +37,8 @@ class LoginContainer extends React.Component {
         event.preventDefault()
         console.log(event)
         firebase.auth().signInWithEmailAndPassword(this.state.username, this.state.pass)
-            .then(data=> {
-                    localStorage.setItem('usertoken', data.user.getIdToken())
+            .then(data => {
+                    this.props.updateLoginState(true)
                     window.location = '/';
                 }
             )
@@ -64,4 +66,10 @@ class LoginContainer extends React.Component {
     }
 }
 
-export default LoginContainer
+const mapDispatchToProps = (dispatch) => ({
+    updateLoginState: (loginState) => dispatch(updateLoginState(loginState))
+});
+
+
+export default connect(null,mapDispatchToProps)(LoginContainer);
+

@@ -1,0 +1,19 @@
+.left-tb-root{
+    padding: 1rem;
+}
+
+.title{
+    margin-bottom: -5px;
+}
+
+.des{
+    font-size: small;
+    width: 150px;
+}
+.container .col-2{
+    padding: 0;
+}
+
+.container .col{
+    padding-right: 0;
+}
