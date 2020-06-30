@@ -1,6 +1,6 @@
 from flask_restplus import Resource, reqparse, cors, fields, marshal_with, marshal
 from flask import make_response, request, jsonify, Response
-from db.traverse import create_graph, get_next_doc_id, create_document_anchor, get_document
+from graph_db.traverse import create_graph, get_next_doc_id, create_document_anchor, get_document
 
 import json
 

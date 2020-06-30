@@ -1,5 +1,5 @@
 import json
-from db.dbaccess import DataAccess
+from graph_db.dbaccess import DataAccess
 
 neo4j_bolt_uri = "bolt://10.212.137.212:7687"
 
