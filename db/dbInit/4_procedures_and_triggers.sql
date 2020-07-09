@@ -203,7 +203,44 @@ SELECT * FROM `User` u WHERE u.`user_id` = user_id$$
 # Get all users
 CREATE PROCEDURE `get_all_users` ()  READS SQL DATA
     SQL SECURITY INVOKER
-SELECT * FROM `User` u$$
+SELECT * FROM `User`$$
+
+# Get all public projects
+CREATE PROCEDURE `get_all_projects_public` ()  READS SQL DATA
+    SQL SECURITY INVOKER
+SELECT * FROM `Project` p WHERE p.`visibility_id` = 3$$
+
+# Get all internal projects
+CREATE PROCEDURE `get_all_projects_internal` ()  READS SQL DATA
+    SQL SECURITY INVOKER
+SELECT * FROM `Project` p WHERE p.`visibility_id` = 2$$
+
+# Get all projects for a member
+CREATE PROCEDURE `get_all_projects_with_member` (IN `user_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+    SQL SECURITY INVOKER
+SELECT p.* FROM `Project` p INNER JOIN `Project_User` pu ON p.`project_id` = pu.`project_id`
+WHERE pu.`user_id` = user_id$$
+
+# Get all projects shared with a user
+CREATE PROCEDURE `get_all_projects_shared` (IN `user_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+    SQL SECURITY INVOKER
+SELECT p.* FROM `Project` p INNER JOIN `ProjectUserPermission` pup ON p.`project_id` = pup.`project_id`
+WHERE pup.`user_id` = user_id AND pup.`operation_type_id` = 2$$
+
+# Get all datasets of a project
+CREATE PROCEDURE `get_all_datasets_of_project` (IN `project_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+    SQL SECURITY INVOKER
+SELECT * FROM `Dataset` d WHERE d.`project_id` = project_id$$
+
+# Get all statements of a dataset
+CREATE PROCEDURE `get_all_statements_of_dataset` (IN `dataset_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+    SQL SECURITY INVOKER
+SELECT * FROM `Statement` s WHERE s.`dataset_id` = dataset_id$$
+
+# Get all versions of a statement
+CREATE PROCEDURE `get_all_versions_of_statement` (IN `statement_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+    SQL SECURITY INVOKER
+SELECT * FROM `StatementVersion` sv WHERE sv.`statement_id` = statement_id$$
 
 -- --------------------------------------------------------
 -- Updaters
@@ -570,15 +607,11 @@ END$$
 
 CREATE TRIGGER `dataset_default_permissions` AFTER INSERT ON `Dataset`
  FOR EACH ROW INSERT INTO `DatasetMemberPermission` (`dataset_id`, `member_type_id`, `operation_type_id`)
-SELECT d.`dataset_id`, ddp.`member_type_id`, ddp.`operation_type_id` FROM DefaultDatasetPermission ddp
-INNER JOIN Dataset d
-WHERE d.`dataset_id` = NEW.`dataset_id`$$
+SELECT NEW.`dataset_id`, ddp.`member_type_id`, ddp.`operation_type_id` FROM DefaultDatasetPermission ddp$$
 
 CREATE TRIGGER `project_default_permissions` AFTER INSERT ON `Project`
  FOR EACH ROW INSERT INTO `ProjectMemberPermission` (`project_id`, `member_type_id`, `operation_type_id`)
-SELECT p.`project_id`, dpp.`member_type_id`, dpp.`operation_type_id` FROM DefaultProjectPermission dpp
-INNER JOIN Project p
-WHERE p.`project_id` = NEW.`project_id`$$
+SELECT NEW.`project_id`, dpp.`member_type_id`, dpp.`operation_type_id` FROM DefaultProjectPermission dpp$$
 
 -- --------------------------------------------------------
 
