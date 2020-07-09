@@ -200,6 +200,11 @@ CREATE PROCEDURE `get_user` (IN `user_id` MEDIUMINT UNSIGNED)  READS SQL DATA
     SQL SECURITY INVOKER
 SELECT * FROM `User` u WHERE u.`user_id` = user_id$$
 
+# Get all users
+CREATE PROCEDURE `get_all_users` ()  READS SQL DATA
+    SQL SECURITY INVOKER
+SELECT * FROM `User` u$$
+
 -- --------------------------------------------------------
 -- Updaters
 -- --------------------------------------------------------
