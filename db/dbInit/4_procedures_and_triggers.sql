@@ -34,10 +34,11 @@ DELIMITER $$
 -- --------------------------------------------------------
 
 # Create dataset
-CREATE PROCEDURE `create_dataset` (IN `name` VARCHAR(150) CHARSET utf8mb4, IN `description` VARCHAR(500) CHARSET utf8mb4, IN `project_id` MEDIUMINT UNSIGNED, IN `visibility_id` MEDIUMINT UNSIGNED,
+CREATE PROCEDURE `create_dataset` (IN `name` VARCHAR(150), IN `description` VARCHAR(500), IN `project_id` MEDIUMINT UNSIGNED, IN `visibility_id` MEDIUMINT UNSIGNED,
     IN `user_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+#CALL help_get_user_id(user_uuid, @user_id);
 CALL permcheck_create_dataset(user_id, project_id, @inner_result);
 IF @inner_result IS TRUE THEN
 	IF visibility_id IS NULL THEN
@@ -52,7 +53,7 @@ END IF;
 END$$
 
 # Create project
-CREATE PROCEDURE `create_project` (IN `name` VARCHAR(150) CHARSET utf8mb4, IN `description` VARCHAR(500) CHARSET utf8mb4, IN `visibility_id` MEDIUMINT UNSIGNED, IN `user_id` MEDIUMINT UNSIGNED)  MODIFIES SQL DATA
+CREATE PROCEDURE `create_project` (IN `name` VARCHAR(150), IN `description` VARCHAR(500), IN `visibility_id` MEDIUMINT UNSIGNED, IN `user_id` MEDIUMINT UNSIGNED)  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 INSERT INTO `Project` (`name`, `description`, `visibility_id`) VALUES (name, description, visibility_id);
@@ -60,7 +61,7 @@ INSERT INTO `Project_User` (`project_id`, `user_id`, `member_type_id`) VALUES (l
 END$$
 
 # Create user
-CREATE PROCEDURE `create_user` (IN `foreign_id` VARCHAR(48) CHARSET utf8mb4, IN `first_name` VARCHAR(75) CHARSET utf8mb4, IN `last_name` VARCHAR(75) CHARSET utf8mb4)  MODIFIES SQL DATA
+CREATE PROCEDURE `create_user` (IN `foreign_id` VARCHAR(48), IN `first_name` VARCHAR(75), IN `last_name` VARCHAR(75))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 INSERT INTO `User` (`foreign_id`, `first_name`, `last_name`) VALUES (foreign_id, first_name, last_name)$$
 
@@ -140,8 +141,7 @@ CREATE PROCEDURE `create_dataset_member_permission` (IN `dataset_id` MEDIUMINT U
     OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
-CALL help_get_project_of_dataset(dataset_id, @project_id);
-CALL help_get_membership(user_id_actor, @project_id, @membership);
+CALL help_get_membership_of_dataset(user_id_actor, dataset_id, @membership);
 IF @membership = 1 THEN
 	INSERT INTO `DatasetMemberPermission` (`dataset_id`, `member_type_id`, `operation_type_id`) VALUES (dataset_id, member_type_id, operation_type_id);
 	SET result = TRUE;
@@ -155,8 +155,7 @@ CREATE PROCEDURE `create_dataset_user_permission` (IN `dataset_id` MEDIUMINT UNS
     OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
-CALL help_get_project_of_dataset(dataset_id, @project_id);
-CALL help_get_membership(user_id_actor, @project_id, @membership);
+CALL help_get_membership_of_dataset(user_id_actor, dataset_id, @membership);
 IF @membership = 1 THEN
 	INSERT INTO `DatasetUserPermission` (`dataset_id`, `user_id`, `operation_type_id`) VALUES (dataset_id, user_id_perm, operation_type_id);
 	SET result = TRUE;
@@ -195,6 +194,73 @@ ELSE
 END IF;
 END$$
 
+# Read all public projects
+CREATE PROCEDURE `read_all_projects_public` ()  READS SQL DATA
+    SQL SECURITY INVOKER
+SELECT * FROM `Project` p WHERE p.`visibility_id` = 3$$
+
+# Read all public or internal projects
+CREATE PROCEDURE `read_all_projects_public_internal` (IN `user_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+    SQL SECURITY INVOKER
+BEGIN
+IF user_id IS NOT NULL THEN
+	SELECT * FROM `Project` p WHERE p.`visibility_id` = 3 OR p.`visibility_id` = 2;
+ELSE
+	SELECT * FROM `Project` p WHERE p.`visibility_id` = 3;
+END IF;
+END$$
+
+# Read all projects a user is member of
+CREATE PROCEDURE `read_all_projects_member` (IN `user_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+    SQL SECURITY INVOKER
+SELECT p.* FROM `Project` p INNER JOIN `Project_User` pu ON p.`project_id` = pu.`project_id`
+WHERE pu.`user_id` = user_id AND p.`visibility_id` = 1
+AND EXISTS(SELECT * FROM `ProjectMemberPermission` pmp WHERE pmp.`project_id` = p.`project_id` AND pmp.`member_type_id` = pu.`member_type_id` AND pmp.`operation_type_id` = 2)$$
+
+# Read all projects shared with a user
+CREATE PROCEDURE `read_all_projects_shared` (IN `user_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+    SQL SECURITY INVOKER
+SELECT * FROM `Project` p WHERE p.`visibility_id` = 1
+AND EXISTS(SELECT * FROM `ProjectUserPermission` pup WHERE pup.`project_id` = p.`project_id` AND pup.`user_id` = user_id AND pup.`operation_type_id` = 2)$$
+
+# Read all datasets of a project
+CREATE PROCEDURE `read_all_datasets_of_project` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+    SQL SECURITY INVOKER
+BEGIN
+CALL help_get_membership(user_id, project_id, @membership);
+SELECT * FROM `Dataset` d WHERE d.`project_id` = project_id
+AND ((EXISTS(SELECT * FROM `DatasetMemberPermission` dmp WHERE dmp.`dataset_id` = d.`dataset_id` AND dmp.`member_type_id` = @membership AND dmp.`operation_type_id` = 2)
+	OR EXISTS(SELECT * FROM `DatasetUserPermission` dup WHERE dup.`dataset_id` = d.`dataset_id` AND dup.`user_id` = user_id AND dup.`operation_type_id` = 2))
+OR (user_id IS NOT NULL AND d.`visibility_id` = 2)
+OR d.`visibility_id` = 3);
+END$$
+
+# Read all statements of a dataset
+CREATE PROCEDURE `read_all_statements_of_dataset` (IN `dataset_id` MEDIUMINT UNSIGNED, IN `user_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+    SQL SECURITY INVOKER
+BEGIN
+CALL help_get_membership_of_dataset(user_id, dataset_id, @membership);
+SELECT s.* FROM `Statement` s INNER JOIN `Dataset` d ON s.`dataset_id` = d.`dataset_id` WHERE s.`dataset_id` = dataset_id
+AND ((EXISTS(SELECT * FROM `DatasetMemberPermission` dmp WHERE dmp.`dataset_id` = dataset_id AND dmp.`member_type_id` = @membership AND dmp.`operation_type_id` = 2)
+	OR EXISTS(SELECT * FROM `DatasetUserPermission` dup WHERE dup.`dataset_id` = dataset_id AND dup.`user_id` = user_id AND dup.`operation_type_id` = 2))
+OR (user_id IS NOT NULL AND d.`visibility_id` = 2)
+OR d.`visibility_id` = 3);
+END$$
+
+# Read all versions of a statement
+CREATE PROCEDURE `read_all_versions_of_statement` (IN `statement_id` MEDIUMINT UNSIGNED, IN `user_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+    SQL SECURITY INVOKER
+BEGIN
+CALL help_get_dataset_of_statement(statement_id, @dataset_id);
+CALL help_get_membership_of_dataset(user_id, @dataset_id, @membership);
+SELECT sv.* FROM `StatementVersion` sv INNER JOIN `Statement` s ON sv.`statement_id` = s.`statement_id` INNER JOIN `Dataset` d ON s.`dataset_id` = d.`dataset_id`
+WHERE sv.`statement_id` = statement_id
+AND ((EXISTS(SELECT * FROM `DatasetMemberPermission` dmp WHERE dmp.`dataset_id` = @dataset_id AND dmp.`member_type_id` = @membership AND dmp.`operation_type_id` = 2)
+	OR EXISTS(SELECT * FROM `DatasetUserPermission` dup WHERE dup.`dataset_id` = @dataset_id AND dup.`user_id` = user_id AND dup.`operation_type_id` = 2))
+OR (user_id IS NOT NULL AND d.`visibility_id` = 2)
+OR d.`visibility_id` = 3);
+END$$
+
 # Get user
 CREATE PROCEDURE `get_user` (IN `user_id` MEDIUMINT UNSIGNED)  READS SQL DATA
     SQL SECURITY INVOKER
@@ -205,49 +271,12 @@ CREATE PROCEDURE `get_all_users` ()  READS SQL DATA
     SQL SECURITY INVOKER
 SELECT * FROM `User`$$
 
-# Get all public projects
-CREATE PROCEDURE `get_all_projects_public` ()  READS SQL DATA
-    SQL SECURITY INVOKER
-SELECT * FROM `Project` p WHERE p.`visibility_id` = 3$$
-
-# Get all internal projects
-CREATE PROCEDURE `get_all_projects_internal` ()  READS SQL DATA
-    SQL SECURITY INVOKER
-SELECT * FROM `Project` p WHERE p.`visibility_id` = 2$$
-
-# Get all projects for a member
-CREATE PROCEDURE `get_all_projects_with_member` (IN `user_id` MEDIUMINT UNSIGNED)  READS SQL DATA
-    SQL SECURITY INVOKER
-SELECT p.* FROM `Project` p INNER JOIN `Project_User` pu ON p.`project_id` = pu.`project_id`
-WHERE pu.`user_id` = user_id$$
-
-# Get all projects shared with a user
-CREATE PROCEDURE `get_all_projects_shared` (IN `user_id` MEDIUMINT UNSIGNED)  READS SQL DATA
-    SQL SECURITY INVOKER
-SELECT p.* FROM `Project` p INNER JOIN `ProjectUserPermission` pup ON p.`project_id` = pup.`project_id`
-WHERE pup.`user_id` = user_id AND pup.`operation_type_id` = 2$$
-
-# Get all datasets of a project
-CREATE PROCEDURE `get_all_datasets_of_project` (IN `project_id` MEDIUMINT UNSIGNED)  READS SQL DATA
-    SQL SECURITY INVOKER
-SELECT * FROM `Dataset` d WHERE d.`project_id` = project_id$$
-
-# Get all statements of a dataset
-CREATE PROCEDURE `get_all_statements_of_dataset` (IN `dataset_id` MEDIUMINT UNSIGNED)  READS SQL DATA
-    SQL SECURITY INVOKER
-SELECT * FROM `Statement` s WHERE s.`dataset_id` = dataset_id$$
-
-# Get all versions of a statement
-CREATE PROCEDURE `get_all_versions_of_statement` (IN `statement_id` MEDIUMINT UNSIGNED)  READS SQL DATA
-    SQL SECURITY INVOKER
-SELECT * FROM `StatementVersion` sv WHERE sv.`statement_id` = statement_id$$
-
 -- --------------------------------------------------------
 -- Updaters
 -- --------------------------------------------------------
 
 # Update dataset
-CREATE PROCEDURE `update_dataset` (IN `name` VARCHAR(150) CHARSET utf8mb4, IN `description` VARCHAR(500) CHARSET utf8mb4, IN `visibility_id` MEDIUMINT UNSIGNED, IN `dataset_id` MEDIUMINT UNSIGNED,
+CREATE PROCEDURE `update_dataset` (IN `name` VARCHAR(150), IN `description` VARCHAR(500), IN `visibility_id` MEDIUMINT UNSIGNED, IN `dataset_id` MEDIUMINT UNSIGNED,
     IN `user_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
@@ -261,7 +290,7 @@ END IF;
 END$$
 
 # Update project
-CREATE PROCEDURE `update_project` (IN `name` VARCHAR(150) CHARSET utf8mb4, IN `description` VARCHAR(500) CHARSET utf8mb4, IN `visibility_id` MEDIUMINT UNSIGNED, IN `project_id` MEDIUMINT UNSIGNED,
+CREATE PROCEDURE `update_project` (IN `name` VARCHAR(150), IN `description` VARCHAR(500), IN `visibility_id` MEDIUMINT UNSIGNED, IN `project_id` MEDIUMINT UNSIGNED,
     IN `user_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
@@ -275,7 +304,7 @@ END IF;
 END$$
 
 # Update user
-CREATE PROCEDURE `update_user` (IN `first_name` VARCHAR(75) CHARSET utf8mb4, IN `last_name` VARCHAR(75) CHARSET utf8mb4, IN `user_id` MEDIUMINT UNSIGNED)  MODIFIES SQL DATA
+CREATE PROCEDURE `update_user` (IN `first_name` VARCHAR(75), IN `last_name` VARCHAR(75), IN `user_id` MEDIUMINT UNSIGNED)  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 UPDATE `User` u SET u.`first_name` = first_name, u.`last_name` = last_name WHERE u.`user_id` = user_id$$
 
@@ -397,8 +426,7 @@ CREATE PROCEDURE `delete_dataset_member_permission` (IN `dataset_id` MEDIUMINT U
     OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
-CALL help_get_project_of_dataset(dataset_id, @project_id);
-CALL help_get_membership(user_id_actor, @project_id, @membership);
+CALL help_get_membership_of_dataset(user_id_actor, dataset_id, @membership);
 IF @membership = 1 THEN
 	DELETE dmp FROM `DatasetMemberPermission` dmp WHERE dmp.`dataset_id` = dataset_id AND dmp.`member_type_id` = member_type_id AND dmp.`operation_type_id` = operation_type_id;
 	SET result = TRUE;
@@ -412,8 +440,7 @@ CREATE PROCEDURE `delete_dataset_user_permission` (IN `dataset_id` MEDIUMINT UNS
     OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
-CALL help_get_project_of_dataset(dataset_id, @project_id);
-CALL help_get_membership(user_id_actor, @project_id, @membership);
+CALL help_get_membership_of_dataset(user_id_actor, dataset_id, @membership);
 IF @membership = 1 THEN
 	DELETE dup FROM `DatasetUserPermission` dup WHERE dup.`dataset_id` = dataset_id AND dup.`user_id` = user_id_perm AND dup.`operation_type_id` = operation_type_id;
 	SET result = TRUE;
@@ -430,6 +457,12 @@ END$$
 CREATE PROCEDURE `help_get_membership` (IN `user_id` MEDIUMINT UNSIGNED, IN `project_id` MEDIUMINT UNSIGNED, OUT `membership` MEDIUMINT UNSIGNED)  READS SQL DATA
     SQL SECURITY INVOKER
 SELECT pu.`member_type_id` INTO membership FROM `Project_User` pu WHERE pu.`user_id` = user_id AND pu.`project_id` = project_id$$
+
+# Helper: Get user membership given a dataset
+CREATE PROCEDURE `help_get_membership_of_dataset` (IN `user_id` MEDIUMINT UNSIGNED, IN `dataset_id` MEDIUMINT UNSIGNED, OUT `membership` MEDIUMINT UNSIGNED)  READS SQL DATA
+    SQL SECURITY INVOKER
+SELECT pu.`member_type_id` INTO membership FROM `Project_User` pu INNER JOIN `Dataset` d ON pu.`project_id` = d.`project_id`
+WHERE pu.`user_id` = user_id AND d.`dataset_id` = dataset_id$$
 
 # Helper: Get the project ID for a dataset ID
 CREATE PROCEDURE `help_get_project_of_dataset` (IN `dataset_id` MEDIUMINT UNSIGNED, OUT `project_id` MEDIUMINT UNSIGNED)  READS SQL DATA
@@ -451,6 +484,11 @@ CREATE PROCEDURE `help_get_dataset_visibility` (IN `dataset_id` MEDIUMINT UNSIGN
     SQL SECURITY INVOKER
 SELECT d.`visibility_id` INTO visibility_id FROM `Dataset` d WHERE d.`dataset_id` = dataset_id$$
 
+# Helper: Get the ID of a user by UUID
+CREATE PROCEDURE `help_get_user_id` (IN `user_uuid` VARCHAR(48), OUT `user_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+    SQL SECURITY INVOKER
+SELECT u.`user_id` INTO user_id FROM `User` u WHERE u.`foreign_id` = user_uuid$$
+
 -- --------------------------------------------------------
 -- Permission checkers
 -- --------------------------------------------------------
@@ -459,8 +497,7 @@ SELECT d.`visibility_id` INTO visibility_id FROM `Dataset` d WHERE d.`dataset_id
 # 1: 'create_dataset'
 # 2: 'read'
 # 3: 'update'
-# 4: 'delete_project'
-# 5: 'delete_dataset'
+# 4: 'delete'
 
 # Base check: Project permission
 CREATE PROCEDURE `permcheck_project` (IN `user_id` MEDIUMINT UNSIGNED, IN `project_id` MEDIUMINT UNSIGNED, IN `operation_type_id` MEDIUMINT UNSIGNED, IN `member_type_id` MEDIUMINT UNSIGNED,
@@ -509,15 +546,9 @@ CREATE PROCEDURE `permcheck_read_dataset` (IN `user_id` MEDIUMINT UNSIGNED, IN `
 BEGIN
 CALL help_get_dataset_visibility(dataset_id, @dataset_visibility);
 IF @dataset_visibility = 1 THEN		# Private visibility
-	CALL help_get_project_of_dataset(dataset_id, @project_id);
-	CALL help_get_membership(user_id, @project_id, @membership);
-	CALL permcheck_project(user_id, @project_id, 2, @membership, @project_result);
-	IF @project_result IS TRUE THEN
-		SET result = TRUE;
-	ELSE
-		CALL permcheck_dataset(user_id, dataset_id, 2, @membership, @dataset_result);
-		SET result = @dataset_result;
-	END IF;
+	CALL help_get_membership_of_dataset(user_id, dataset_id, @membership);
+	CALL permcheck_dataset(user_id, dataset_id, 2, @membership, @dataset_result);
+	SET result = @dataset_result;
 ELSEIF @dataset_visibility = 2 THEN	# Internal visibility
 	IF user_id IS NOT NULL THEN	# User is logged in
 		SET result = TRUE;
@@ -528,6 +559,7 @@ ELSEIF @dataset_visibility = 3 THEN	# Public visibility
 	SET result = TRUE;
 ELSE					# Visibility invalid, error
 	SET result = FALSE;
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid visibility_id for Dataset - not in (1, 2, 3)';
 END IF;
 END$$
 
@@ -535,30 +567,18 @@ END$$
 CREATE PROCEDURE `permcheck_update_dataset` (IN `user_id` MEDIUMINT UNSIGNED, IN `dataset_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
-CALL help_get_project_of_dataset(dataset_id, @project_id);
-CALL help_get_membership(user_id, @project_id, @membership);
-CALL permcheck_project(user_id, @project_id, 3, @membership, @project_result);
-IF @project_result IS TRUE THEN
-	SET result = TRUE;
-ELSE
-	CALL permcheck_dataset(user_id, dataset_id, 3, @membership, @dataset_result);
-	SET result = @dataset_result;
-END IF;
+CALL help_get_membership_of_dataset(user_id, dataset_id, @membership);
+CALL permcheck_dataset(user_id, dataset_id, 3, @membership, @dataset_result);
+SET result = @dataset_result;
 END$$
 
 # Check: Delete dataset
 CREATE PROCEDURE `permcheck_delete_dataset` (IN `user_id` MEDIUMINT UNSIGNED, IN `dataset_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
-CALL help_get_project_of_dataset(dataset_id, @project_id);
-CALL help_get_membership(user_id, @project_id, @membership);
-CALL permcheck_project(user_id, @project_id, 5, @membership, @project_result);
-IF @project_result IS TRUE THEN
-	SET result = TRUE;
-ELSE
-	CALL permcheck_dataset(user_id, dataset_id, 5, @membership, @dataset_result);
-	SET result = @dataset_result;
-END IF;
+CALL help_get_membership_of_dataset(user_id, dataset_id, @membership);
+CALL permcheck_dataset(user_id, dataset_id, 4, @membership, @dataset_result);
+SET result = @dataset_result;
 END$$
 
 # Check: Read project
@@ -566,7 +586,7 @@ CREATE PROCEDURE `permcheck_read_project` (IN `user_id` MEDIUMINT UNSIGNED, IN `
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_project_visibility(project_id, @project_visibility);
-IF @project_visibility = 1 THEN
+IF @project_visibility = 1 THEN		# Private visibility
 	CALL help_get_membership(user_id, project_id, @membership);
 	CALL permcheck_project(user_id, project_id, 2, @membership, @inner_result);
 	SET result = @inner_result;
@@ -580,6 +600,7 @@ ELSEIF @project_visibility = 3 THEN     # Public visibility
         SET result = TRUE;
 ELSE                                    # Visibility invalid, error
         SET result = FALSE;
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid visibility_id for Project - not in (1, 2, 3)';
 END IF;
 END$$
 

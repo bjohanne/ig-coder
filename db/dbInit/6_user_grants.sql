@@ -22,8 +22,16 @@ GRANT EXECUTE ON PROCEDURE `mgmt`.`delete_project_user_permission` TO 'user'@'%'
 GRANT EXECUTE ON PROCEDURE `mgmt`.`delete_statement` TO 'user'@'%';
 GRANT EXECUTE ON PROCEDURE `mgmt`.`disable_user` TO 'user'@'%';
 GRANT EXECUTE ON PROCEDURE `mgmt`.`enable_user` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `mgmt`.`get_all_users` TO 'user'@'%';
 GRANT EXECUTE ON PROCEDURE `mgmt`.`get_user` TO 'user'@'%';
 GRANT EXECUTE ON PROCEDURE `mgmt`.`make_project_owner` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `mgmt`.`read_all_datasets_of_project` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `mgmt`.`read_all_projects_member` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `mgmt`.`read_all_projects_public` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `mgmt`.`read_all_projects_public_internal` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `mgmt`.`read_all_projects_shared` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `mgmt`.`read_all_statements_of_dataset` TO 'user'@'%';
+GRANT EXECUTE ON PROCEDURE `mgmt`.`read_all_versions_of_statement` TO 'user'@'%';
 GRANT EXECUTE ON PROCEDURE `mgmt`.`read_dataset` TO 'user'@'%';
 GRANT EXECUTE ON PROCEDURE `mgmt`.`read_project` TO 'user'@'%';
 GRANT EXECUTE ON PROCEDURE `mgmt`.`update_dataset` TO 'user'@'%';

@@ -251,7 +251,7 @@ ALTER TABLE `DatasetMemberPermission`
   ADD KEY `dmp_dataset_id` (`dataset_id`),
   ADD KEY `dmp_member_type_id` (`member_type_id`),
   ADD KEY `dmp_operation_type_id` (`operation_type_id`),
-  ADD CHECK (`operation_type_id` IN (2, 3, 5));
+  ADD CHECK (`operation_type_id` IN (2, 3, 4));
 
 --
 -- Indexes for table `DatasetUserPermission`
@@ -263,7 +263,7 @@ ALTER TABLE `DatasetUserPermission`
   ADD KEY `dup_dataset_id` (`dataset_id`),
   ADD KEY `dup_user_id` (`user_id`),
   ADD KEY `dup_operation_type_id` (`operation_type_id`),
-  ADD CHECK (`operation_type_id` IN (2, 3, 5));
+  ADD CHECK (`operation_type_id` IN (2, 3, 4));
 
 --
 -- Indexes for table `DefaultDatasetPermission`
@@ -272,7 +272,7 @@ ALTER TABLE `DefaultDatasetPermission`
   ADD PRIMARY KEY (`member_type_id`, `operation_type_id`),
   ADD KEY `ddp_member_type_id` (`member_type_id`),
   ADD KEY `ddp_operation_type_id` (`operation_type_id`),
-  ADD CHECK (`operation_type_id` IN (2, 3, 5));
+  ADD CHECK (`operation_type_id` IN (2, 3, 4));
 
 --
 -- Indexes for table `DefaultProjectPermission`
