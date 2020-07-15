@@ -81,7 +81,7 @@ END IF;
 END$$
 
 # Create statement version
-CREATE PROCEDURE `create_statement_version` (IN `foreign_id` MEDIUMINT UNSIGNED, IN `statement_id` MEDIUMINT UNSIGNED, IN `user_UUid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
+CREATE PROCEDURE `create_statement_version` (IN `foreign_id` MEDIUMINT UNSIGNED, IN `statement_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
@@ -96,12 +96,12 @@ END IF;
 END$$
 
 # Create project member
-CREATE PROCEDURE `create_project_member` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_uuid_actor` VARCHAR(48), IN `user_uuid_object` VARCHAR(48), IN `member_type_id` MEDIUMINT UNSIGNED,
+CREATE PROCEDURE `create_project_member` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_uuid_object` VARCHAR(48), IN `member_type_id` MEDIUMINT UNSIGNED, IN `user_uuid_actor` VARCHAR(48),
     OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
-CALL help_get_user_id(user_uuid_actor, @user_id_actor);
 CALL help_get_user_id(user_uuid_object, @user_id_object);
+CALL help_get_user_id(user_uuid_actor, @user_id_actor);
 CALL help_get_membership(@user_id_actor, project_id, @membership_actor);
 IF @membership_actor = 1 OR (@membership_actor = 2 AND member_type_id IN (2, 3)) THEN
 	DELETE pu FROM `Project_User` pu WHERE pu.`project_id` = project_id AND pu.`user_id` = @user_id_object;
@@ -337,13 +337,13 @@ CREATE PROCEDURE `enable_user` (IN `user_uuid` VARCHAR(48))  MODIFIES SQL DATA
 UPDATE `User` u SET u.`disabled` = 0 WHERE u.`foreign_id` = user_uuid$$
 
 # Promote project member to owner
-CREATE PROCEDURE `make_project_owner` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_uuid_actor` VARCHAR(48), IN `user_uuid_object` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
+CREATE PROCEDURE `make_project_owner` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_uuid_object` VARCHAR(48), IN `user_uuid_actor` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
-CALL help_get_user_id(user_uuid_actor, @user_id_actor);
 CALL help_get_user_id(user_uuid_object, @user_id_object);
-CALL help_get_membership(@user_id_actor, project_id, @membership_actor);
+CALL help_get_user_id(user_uuid_actor, @user_id_actor);
 CALL help_get_membership(@user_id_object, project_id, @membership_object);
+CALL help_get_membership(@user_id_actor, project_id, @membership_actor);
 IF @membership_actor = 1 AND @membership_object IN (1, 2, 3) THEN
 	DELETE pu FROM `Project_User` pu WHERE pu.`project_id` = project_id AND pu.`user_id` = @user_id_object;
 	INSERT INTO `Project_User` (`project_id`, `user_id`, `member_type_id`) VALUES (project_id, @user_id_object, 1);
@@ -406,11 +406,11 @@ END IF;
 END$$
 
 # Delete project member
-CREATE PROCEDURE `delete_project_member` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_uuid_actor` VARCHAR(48), IN `user_uuid_object` VARCHAR(48))  MODIFIES SQL DATA
+CREATE PROCEDURE `delete_project_member` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_uuid_object` VARCHAR(48), IN `user_uuid_actor` VARCHAR(48))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
-CALL help_get_user_id(user_uuid_actor, @user_id_actor);
 CALL help_get_user_id(user_uuid_object, @user_id_object);
+CALL help_get_user_id(user_uuid_actor, @user_id_actor);
 CALL help_get_membership(@user_id_actor, project_id, @membership_actor);
 IF @membership_actor = 1 THEN
 	DELETE pu FROM `Project_User` pu WHERE pu.`project_id` = project_id AND pu.`user_id` = @user_id_object;
