@@ -4,7 +4,7 @@ import json
 from sql_db.dbaccess import add_user, get_user
 
 user_fields = {
-    'user_id': fields.Integer,
+    'user_uuid': fields.String,
     'foreign_id': fields.String,
     'first_name': fields.String,
     'last_name': fields.String
@@ -18,17 +18,17 @@ user_parser_post.add_argument('last_name', type=str, required=True, location=['j
 
 # Used to handle the GET request
 user_parser_get = reqparse.RequestParser()
-user_parser_get.add_argument('user_id', type=int, required=True, location=['args'], help='user_id is required')
+user_parser_get.add_argument('user_uuid', type=str, required=True, location=['args'], help='user_uuid is required')
 
 
 class UsersResource(Resource):
 
     @marshal_with(user_fields)
     def get(self):
-        user_id = user_parser_get.parse_args()['user_id']
+        user_uuid = user_parser_get.parse_args()['user_uuid']
         # pass the query parameters by using tuple
         # Note when creating a tuple with only one element, ',' is required otherwise tuple will be recognized as string
-        res = get_user((user_id,))
+        res = get_user(user_uuid)
         # return the query result as dictionary format
         return make_response(res)
 
