@@ -11,12 +11,12 @@ config = {
     'raise_on_warnings': True
 }
 
-sql_add_user = ("CALL create_user(%(foreign_id)s,%(first_name)s,%(last_name)s)")
-sql_get_user = ("CALL get_user(%s)")
+sql_add_user = "CALL create_user(%(foreign_id)s,%(first_name)s,%(last_name)s)"
+sql_get_user = "CALL get_user(%s)"
 
 
 def get_user(user_id):
-    return get_db_execute(sql_get_user, user_id)[0]
+    return get_db_execute(sql_get_user, user_id)
 
 
 def get_db_execute(sql, data):
@@ -31,7 +31,7 @@ def get_db_execute(sql, data):
         res = []
         for result in rv:
             res.append(dict(zip(row_headers, result)))
-        return res
+        return res[0]
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("Something is wrong with your username or password")
@@ -55,7 +55,7 @@ def add_db_execute(sql, data):
     try:
         cnx = mysql.connector.connect(**config)
         cursor = cnx.cursor()
-        cursor.execute(sql, (data))
+        cursor.execute(sql, data)
         # Make sure data is committed to the database
         cnx.commit()
         return None
