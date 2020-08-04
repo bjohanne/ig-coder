@@ -1,7 +1,6 @@
-from flask_restplus import Resource, reqparse, cors, fields, marshal_with, marshal
+from flask_restplus import Resource, reqparse, fields, marshal_with
 from flask import make_response
-import json
-from sql_db.dbaccess import add_user, get_user
+from db.mysql.dbaccess import add_user, get_user
 
 user_fields = {
     'user_uuid': fields.String,

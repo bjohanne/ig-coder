@@ -1,0 +1,308 @@
+---
+swagger: "2.0"
+basePath: /v1
+info:
+  description: This is the client-server API for IG Coder.
+  version: 1.0.0
+  title: IG Coder API
+  contact:
+    email: johabog@stud.ntnu.no
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+tags:
+- name: Users
+- name: Projects
+paths:
+  /users:
+    get:
+      tags:
+      - Users
+      summary: gets data about all users
+      description: |
+        Get information about all users - Firebase UUID, full name, whether their account is disabled, whether they are a system administrator, what time their account was created and what time their data was last modified.
+      operationId: api.users.get_all
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        "200":
+          description: data about all users
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User_Get_Response'
+    post:
+      tags:
+      - Users
+      summary: creates a user
+      description: |
+        Adds a new user that has been authenticated with Firebase Auth.
+      operationId: api.users.post
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: user_data
+        description: Data to create a user of
+        required: true
+        schema:
+          $ref: '#/definitions/User_Post_Body'
+      responses:
+        "201":
+          description: item created
+        "400":
+          description: invalid input, object invalid
+        "409":
+          description: item already exists
+  /users/{user_id}:
+    get:
+      tags:
+      - Users
+      summary: gets data about a user
+      description: |
+        By passing in a valid user ID, you can get all that user's information - Firebase UUID, full name, whether their account is disabled, whether they are a system administrator, what time their account was created and what time their data was last modified.
+      operationId: api.users.get
+      produces:
+      - application/json
+      parameters:
+      - name: user_id
+        in: path
+        description: the user's ID in the SQL database
+        required: true
+        type: string
+        format: uuid
+      responses:
+        "200":
+          description: data about the requested user
+          schema:
+            $ref: '#/definitions/User_Get_Response'
+        "400":
+          description: bad input parameter
+    put:
+      tags:
+      - Users
+      summary: updates a user
+      description: |
+        Can be used to update a user's first and last name as well as set their disabled status.
+      operationId: api.users.put
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: user_id
+        in: path
+        description: the user's ID in the SQL database
+        required: true
+        type: string
+        format: uuid
+      - in: body
+        name: user_data
+        description: The new first name, last name and/or disabled status the user should get
+        required: true
+        schema:
+          $ref: '#/definitions/User_Put_Body'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: invalid input, object invalid
+  /projects:
+    post:
+      tags:
+      - Projects
+      summary: creates a new project
+      description: |
+        Creates a new project from the passed in arguments.
+      operationId: api.projects.post
+      parameters:
+      - in: body
+        name: project_data
+        description: Data to create a project belonging to one user
+        required: true
+        schema:
+          $ref: '#/definitions/Project_Post_Body'
+      responses:
+        "200":
+          description: OK
+  /projects/{project_id}:
+    get:
+      tags:
+      - Projects
+      summary: gets data about a project
+      description: |
+        Get data about a project.
+      operationId: api.projects.get
+      produces:
+      - application/json
+      parameters:
+      - name: project_id
+        in: path
+        description: the project's ID in the SQL database
+        required: true
+        type: integer
+        minimum: 0
+        format: int32
+      responses:
+        "200":
+          description: data about the requested user
+          schema:
+            $ref: '#/definitions/User_Get_Response'
+        "400":
+          description: bad input parameter
+    put:
+      tags:
+      - Projects
+      summary: updates a project
+      description: |
+        Update a project.
+      operationId: api.projects.put
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - name: project_id
+        in: path
+        description: the project's ID in the SQL database
+        required: true
+        type: integer
+        minimum: 0
+        format: int32
+      - in: body
+        name: project_data
+        description: The new data the project should get
+        required: true
+        schema:
+          $ref: '#/definitions/User_Put_Body'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: invalid input, object invalid
+    delete:
+      tags:
+      - Projects
+      summary: deletes a project
+      description: |
+        Delete a project.
+      operationId: api.projects.delete
+      produces:
+      - application/json
+      parameters:
+      - name: project_id
+        in: path
+        description: the project's ID in the SQL database
+        required: true
+        type: integer
+        minimum: 0
+        format: int32
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: invalid input, object invalid
+definitions:
+  User_Post_Body:
+    type: object
+    required:
+    - first_name
+    - foreign_id
+    - last_name
+    properties:
+      foreign_id:
+        type: string
+        format: uuid
+        example: d290f1ee-6c54-4b01-90e6-d701748f0851
+      first_name:
+        type: string
+        example: John
+      last_name:
+        type: string
+        example: Smith
+  User_Get_Response:
+    type: object
+    required:
+    - user_id
+    - foreign_id
+    - first_name
+    - last_name
+    - disabled
+    - privileged
+    - created_time
+    - modified_time
+    properties:
+      user_id:
+        type: integer
+        format: int32
+        example: 20
+        minimum: 0
+      foreign_id:
+        type: string
+        format: uuid
+        example: d290f1ee-6c54-4b01-90e6-d701748f0851
+      first_name:
+        type: string
+        example: John
+      last_name:
+        type: string
+        example: Smith
+      disabled:
+        type: integer
+        minimum: 0
+        maximum: 1
+        example: 0
+      privileged:
+        type: integer
+        minimum: 0
+        maximum: 1
+        example: 0
+      created_time:
+        type: string
+        format: date-time
+        example: 2016-08-29T09:12:33.001Z
+      modified_time:
+        type: string
+        format: date-time
+        example: 2016-08-29T09:12:33.001Z
+  User_Put_Body:
+    type: object
+    properties:
+      firstName:
+        type: string
+        example: John
+      lastName:
+        type: string
+        example: Smith
+      disabled:
+        type: integer
+        minimum: 0
+        maximum: 1
+        example: 0
+  Project_Post_Body:
+    type: object
+    required:
+    - description
+    - name
+    - user_id
+    - visibility
+    properties:
+      user_id:
+        type: integer
+        format: int32
+        example: 20
+        minimum: 0
+      name:
+        type: string
+        example: Cool project
+      description:
+        type: string
+        example: This is a project
+      visibility:
+        type: integer
+        format: int8
+        example: 2
+        minimum: 0
