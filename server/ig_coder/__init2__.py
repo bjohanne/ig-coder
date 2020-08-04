@@ -33,4 +33,10 @@ def create_app():
     api.add_resource(UsersResource,'/users','/users')
     api.add_resource(NamedEntityRecognitionResource, '/entities', '/entities')
 
+    import connexion
+
+    app = connexion.FlaskApp(__name__, specification_dir='openapi/')
+    app.add_api('my_api.yaml')
+    app.run(port=8080)
+
     return app
