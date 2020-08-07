@@ -425,6 +425,7 @@ definitions:
     type: object
     required:
     - name
+    - description
     - user_id
     - visibility_id
     properties:
@@ -510,6 +511,7 @@ definitions:
     type: object
     required:
     - name
+    - description
     - project_id
     - visibility_id
     properties:

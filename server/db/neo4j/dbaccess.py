@@ -34,7 +34,7 @@ class DataAccess(object):
                     if "nodeType" not in child:
                         continue
 
-                    statements.append("MERGE (Document{4}{0})-[:child_of]->(Document{4}{1})".format(child["id"], item["id"], child["nodeType"], item["nodeType"], item["document"]))
+                    statements.append("MERGE (Document{4}{0})-[:child_of]->(Document{4}{1})".format(child["id"],item["id"], child["nodeType"], item["nodeType"], item["document"]))
                 del item["children"]
 
             dict_args_list = []
@@ -47,18 +47,19 @@ class DataAccess(object):
         with self._driver.session() as session:
             session.run(create_nodes_statement.strip())
 
-    def get_document(self, id):
-        q = """ MATCH (n) WHERE n.document = "{0}" AND NOT n:Anchor RETURN n """.format(id)
+    def get_document(self, document_id):
+        q = """ MATCH (n) WHERE n.document = "{0}" AND NOT n:Anchor RETURN n """.format(document_id)
         with self._driver.session() as session:
             return [node for node in session.run(q)]
 
-    def create_document_anchor(self, id, name, description):
-        q = """ CREATE (n:Anchor {{ document: '{}', name: '{}', description: '{}' }}) """.format(id, name, description)
+    def create_document_anchor(self, document_id, name, description):
+        q = """ CREATE (n:Anchor {{ document: '{}', name: '{}', description: '{}' }}) """\
+            .format(document_id, name, description)
         with self._driver.session() as session:
-            response = session.run(q)
+            session.run(q)
 
-    def get_document_anchor(self, id):
-        q = """ MATCH (n:Anchor) WHERE n.document = "{0}" RETURN n """.format(id)
+    def get_document_anchor(self, document_id):
+        q = """ MATCH (n:Anchor) WHERE n.document = "{0}" RETURN n """.format(document_id)
         with self._driver.session() as session:
             response = session.run(q)
             record = response.single()

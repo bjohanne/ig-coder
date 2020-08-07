@@ -1,9 +1,10 @@
-from models.user import add_user
 from mysql.connector import errorcode
+from db.mysql import execute_no_result_set
 
 
 def post(user_data):
-    error = add_user(user_data)
+    args = list(user_data.values())
+    error = execute_no_result_set("create_user", args)
     if not error:
         return 201
     else:
