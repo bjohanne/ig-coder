@@ -59,7 +59,7 @@ CREATE PROCEDURE `create_project` (IN `name` VARCHAR(150), IN `description` VARC
 BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
 INSERT INTO `Project` (`name`, `description`, `visibility_id`) VALUES (name, description, visibility_id);
-SELECT * FROM `Document` WHERE `document_id` = last_insert_id();
+SELECT * FROM `Project` WHERE `project_id` = last_insert_id();
 INSERT INTO `Project_User` (`project_id`, `user_id`, `member_type_id`) VALUES (last_insert_id(), @user_id, 1); # Last insert ID is that of the Project, not the ProjectMemberPermission created by the trigger on Project
 END$$
 
