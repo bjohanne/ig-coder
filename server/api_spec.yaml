@@ -13,6 +13,7 @@ info:
 tags:
 - name: Users
 - name: Projects
+- name: Documents
 paths:
   /users:
     get:
@@ -27,11 +28,13 @@ paths:
       parameters: []
       responses:
         "200":
-          description: data about all users
+          description: OK
           schema:
             type: array
             items:
-              $ref: '#/definitions/User_Get_Response'
+              $ref: '#/definitions/User'
+        "204":
+          description: No users exist
     post:
       tags:
       - Users
@@ -52,11 +55,11 @@ paths:
           $ref: '#/definitions/User_Post_Body'
       responses:
         "201":
-          description: item created
+          description: User created
         "400":
-          description: invalid input, object invalid
+          description: Bad request. User data invalid.
         "409":
-          description: item already exists
+          description: User ID already exists
   /users/{user_id}:
     get:
       tags:
@@ -76,18 +79,20 @@ paths:
         format: uuid
       responses:
         "200":
-          description: data about the requested user
+          description: OK
           schema:
-            $ref: '#/definitions/User_Get_Response'
+            $ref: '#/definitions/User'
         "400":
-          description: bad input parameter
-    put:
+          description: Bad request. User ID invalid.
+        "404":
+          description: User ID not found
+    patch:
       tags:
       - Users
       summary: updates a user
       description: |
         Can be used to update a user's first and last name as well as set their disabled status.
-      operationId: api.users.put
+      operationId: api.users.patch
       consumes:
       - application/json
       produces:
@@ -104,12 +109,14 @@ paths:
         description: The new first name, last name and/or disabled status the user should get
         required: true
         schema:
-          $ref: '#/definitions/User_Put_Body'
+          $ref: '#/definitions/User_Patch_Body'
       responses:
         "200":
           description: OK
         "400":
-          description: invalid input, object invalid
+          description: Bad request. User data invalid.
+        "404":
+          description: User ID not found
   /projects:
     post:
       tags:
@@ -126,15 +133,22 @@ paths:
         schema:
           $ref: '#/definitions/Project_Post_Body'
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Project created
+          schema:
+            type: integer
+            minimum: 0
+            format: int32
+            example: 20
+        "400":
+          description: Bad request. Project data invalid.
   /projects/{project_id}:
     get:
       tags:
       - Projects
       summary: gets data about a project
       description: |
-        Get data about a project.
+        Get information about a project - name, description, visibility level, what time it was created and what time its data was last modified.
       operationId: api.projects.get
       produces:
       - application/json
@@ -148,18 +162,20 @@ paths:
         format: int32
       responses:
         "200":
-          description: data about the requested user
+          description: OK
           schema:
-            $ref: '#/definitions/User_Get_Response'
+            $ref: '#/definitions/Project'
         "400":
-          description: bad input parameter
-    put:
+          description: Bad request. Project ID invalid.
+        "404":
+          description: Project ID not found
+    patch:
       tags:
       - Projects
       summary: updates a project
       description: |
-        Update a project.
-      operationId: api.projects.put
+        Can be used to update a project's name, description and visibility level.
+      operationId: api.projects.patch
       consumes:
       - application/json
       produces:
@@ -177,18 +193,20 @@ paths:
         description: The new data the project should get
         required: true
         schema:
-          $ref: '#/definitions/User_Put_Body'
+          $ref: '#/definitions/Project_Patch_Body'
       responses:
         "200":
           description: OK
         "400":
-          description: invalid input, object invalid
+          description: Bad request. Project data invalid.
+        "404":
+          description: Project ID not found
     delete:
       tags:
       - Projects
       summary: deletes a project
       description: |
-        Delete a project.
+        Deletes a project along with all its documents.
       operationId: api.projects.delete
       produces:
       - application/json
@@ -204,26 +222,95 @@ paths:
         "200":
           description: OK
         "400":
-          description: invalid input, object invalid
+          description: Bad request. Project ID invalid.
+        "404":
+          description: Project ID not found
+  /documents:
+    post:
+      tags:
+        - Documents
+      summary: creates a new document
+      description: |
+        Creates a new document from the passed in arguments.
+      operationId: api.documents.post
+      parameters:
+        - in: body
+          name: document_data
+          description: Data to create a document
+          required: true
+          schema:
+            $ref: '#/definitions/Document_Post_Body'
+      responses:
+        "201":
+          description: Document created
+          schema:
+            type: integer
+            minimum: 0
+            format: int32
+            example: 20
+        "400":
+          description: Bad request. Document data invalid.
+  /documents/{document_id}:
+    get:
+      tags:
+        - Documents
+      summary: gets data about a document
+      description: |
+        Get information about a document - name, description, visibility level, what time it was created and what time its data was last modified.
+      operationId: api.documents.get
+      produces:
+        - application/json
+      parameters:
+        - name: document_id
+          in: path
+          description: the document's ID in the SQL database
+          required: true
+          type: integer
+          minimum: 0
+          format: int32
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Document'
+        "400":
+          description: Bad request. Document ID invalid.
+        "404":
+          description: Document ID not found
+    patch:
+      tags:
+        - Documents
+      summary: updates a document
+      description: |
+        Can be used to update a document's name, description and visibility level.
+      operationId: api.documents.patch
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: document_id
+          in: path
+          description: the document's ID in the SQL database
+          required: true
+          type: integer
+          minimum: 0
+          format: int32
+        - in: body
+          name: document_data
+          description: The new data the document should get
+          required: true
+          schema:
+            $ref: '#/definitions/Document_Patch_Body'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request. Document data invalid.
+        "404":
+          description: Document ID not found
 definitions:
-  User_Post_Body:
-    type: object
-    required:
-    - first_name
-    - foreign_id
-    - last_name
-    properties:
-      foreign_id:
-        type: string
-        format: uuid
-        example: d290f1ee-6c54-4b01-90e6-d701748f0851
-      first_name:
-        type: string
-        example: John
-      last_name:
-        type: string
-        example: Smith
-  User_Get_Response:
+  User:
     type: object
     required:
     - user_id
@@ -268,7 +355,24 @@ definitions:
         type: string
         format: date-time
         example: 2016-08-29T09:12:33.001Z
-  User_Put_Body:
+  User_Post_Body:
+    type: object
+    required:
+    - first_name
+    - foreign_id
+    - last_name
+    properties:
+      foreign_id:
+        type: string
+        format: uuid
+        example: d290f1ee-6c54-4b01-90e6-d701748f0851
+      first_name:
+        type: string
+        example: John
+      last_name:
+        type: string
+        example: Smith
+  User_Patch_Body:
     type: object
     properties:
       firstName:
@@ -282,27 +386,162 @@ definitions:
         minimum: 0
         maximum: 1
         example: 0
-  Project_Post_Body:
+  Project:
     type: object
     required:
-    - description
+    - project_id
     - name
-    - user_id
-    - visibility
+    - description
+    - visibility_id
+    - created_time
+    - modified_time
     properties:
-      user_id:
+      project_id:
         type: integer
         format: int32
         example: 20
         minimum: 0
       name:
         type: string
-        example: Cool project
+        example: My Project
       description:
         type: string
         example: This is a project
-      visibility:
+      visibility_id:
         type: integer
         format: int8
+        minimum: 1
+        maximum: 3
         example: 2
+      created_time:
+        type: string
+        format: date-time
+        example: 2016-08-29T09:12:33.001Z
+      modified_time:
+        type: string
+        format: date-time
+        example: 2016-08-29T09:12:33.001Z
+  Project_Post_Body:
+    type: object
+    required:
+    - name
+    - user_id
+    - visibility_id
+    properties:
+      user_id:
+        type: integer
+        format: int32
         minimum: 0
+        example: 20
+      name:
+        type: string
+        example: My Project
+      description:
+        type: string
+        example: This is a project
+      visibility_id:
+        type: integer
+        format: int8
+        minimum: 1
+        maximum: 3
+        example: 2
+  Project_Patch_Body:
+    type: object
+    properties:
+      name:
+        type: string
+        example: My Project
+      description:
+        type: string
+        example: This is a project
+      visibility_id:
+        type: integer
+        format: int8
+        minimum: 1
+        maximum: 3
+        example: 2
+  Document:
+    type: object
+    required:
+    - document_id
+    - name
+    - description
+    - project_id
+    - visibility_id
+    - forest
+    - created_time
+    - modified_time
+    properties:
+      document_id:
+        type: integer
+        format: int32
+        example: 20
+        minimum: 0
+      name:
+        type: string
+        example: My Document
+      description:
+        type: string
+        example: This is a document
+      project_id:
+        type: integer
+        format: int32
+        example: 20
+        minimum: 0
+      visibility_id:
+        type: integer
+        format: int8
+        minimum: 1
+        maximum: 3
+        example: 2
+      forest:
+        type: array
+        items:
+          type: object
+      created_time:
+        type: string
+        format: date-time
+        example: 2016-08-29T09:12:33.001Z
+      modified_time:
+        type: string
+        format: date-time
+        example: 2016-08-29T09:12:33.001Z
+  Document_Post_Body:
+    type: object
+    required:
+    - name
+    - project_id
+    - visibility_id
+    properties:
+      name:
+        type: string
+        example: My Document
+      description:
+        type: string
+        example: This is a document
+      project_id:
+        type: integer
+        format: int32
+        minimum: 0
+        example: 20
+      visibility_id:
+        type: integer
+        format: int8
+        minimum: 1
+        maximum: 3
+        example: 2
+  Document_Patch_Body:
+    type: object
+    properties:
+      name:
+        type: string
+        example: My Document
+      description:
+        type: string
+        example: This is a document
+      visibility_id:
+        type: integer
+        format: int8
+        minimum: 1
+        maximum: 3
+        example: 2

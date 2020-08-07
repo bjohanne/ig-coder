@@ -1,2 +1,2 @@
 def delete(project_id):
-    return project_id
+    return 'Not Implemented', 501

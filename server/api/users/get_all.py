@@ -1,2 +1,2 @@
 def get_all():
-    return "Hi!", 200
+    return 'Not Implemented', 501
