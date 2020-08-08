@@ -1,13 +1,15 @@
 from db.neo4j import get_document, get_document_anchor
-from db.mysql import execute_get_single_result_set
+from db.mysql import execute_one_result_set_permission
 import json
 
 
 def get(document_id):
     # First, get the document from the SQL DB
-    args = (document_id, "abc123", 0)
-    document = execute_get_single_result_set("read_document", args)
-    # TODO: Find out how to fetch out parameters from procedures.
+    args = (document_id, "abc123", 0)   # NB: Hardcoded user ID for now
+    (document, permission) = execute_one_result_set_permission("read_document", args)
+    print(document)
+    print(permission)
+    return 200
 
     nodes = get_document(document_id)
     root = None
@@ -33,6 +35,9 @@ def get(document_id):
             properties['component'] = json.loads(properties['component'].replace("'", "\""))
         # handle forest
 
+    # TODO: Add forest to document if root is not None
+    # TODO: Differentiate between exception and document ID not found
+
     # Ensure forest is an empty array if it has no nodes
     forest = [] if root is None else [root]
 
@@ -40,4 +45,5 @@ def get(document_id):
     anchor = get_document_anchor(document_id)
     name = anchor[0].get('name')
     description = anchor[0].get('description')
-    return {"id": document_id, "name": name, "description": description, "forest": forest}
+
+    return document, 200

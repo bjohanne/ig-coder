@@ -136,10 +136,11 @@ paths:
         "201":
           description: Project created
           schema:
-            type: integer
-            minimum: 0
-            format: int32
-            example: 20
+            $ref: '#/definitions/Project'
+            #type: integer
+            #minimum: 0
+            #format: int32
+            #example: 20
         "400":
           description: Bad request. Project data invalid.
   /projects/{project_id}:
@@ -244,10 +245,11 @@ paths:
         "201":
           description: Document created
           schema:
-            type: integer
-            minimum: 0
-            format: int32
-            example: 20
+            $ref: '#/definitions/Document'
+            #type: integer
+            #minimum: 0
+            #format: int32
+            #example: 20
         "400":
           description: Bad request. Document data invalid.
   /documents/{document_id}:
