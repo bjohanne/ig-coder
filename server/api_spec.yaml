@@ -137,10 +137,6 @@ paths:
           description: Project created
           schema:
             $ref: '#/definitions/Project'
-            #type: integer
-            #minimum: 0
-            #format: int32
-            #example: 20
         "400":
           description: Bad request. Project data invalid.
   /projects/{project_id}:
@@ -168,6 +164,8 @@ paths:
             $ref: '#/definitions/Project'
         "400":
           description: Bad request. Project ID invalid.
+        "403":
+          description: Permission not granted
         "404":
           description: Project ID not found
     patch:
@@ -200,6 +198,8 @@ paths:
           description: OK
         "400":
           description: Bad request. Project data invalid.
+        "403":
+          description: Permission not granted
         "404":
           description: Project ID not found
     delete:
@@ -224,6 +224,8 @@ paths:
           description: OK
         "400":
           description: Bad request. Project ID invalid.
+        "403":
+          description: Permission not granted
         "404":
           description: Project ID not found
   /documents:
@@ -246,12 +248,10 @@ paths:
           description: Document created
           schema:
             $ref: '#/definitions/Document'
-            #type: integer
-            #minimum: 0
-            #format: int32
-            #example: 20
         "400":
           description: Bad request. Document data invalid.
+        "403":
+          description: Permission not granted
   /documents/{document_id}:
     get:
       tags:
@@ -277,6 +277,8 @@ paths:
             $ref: '#/definitions/Document'
         "400":
           description: Bad request. Document ID invalid.
+        "403":
+          description: Permission not granted
         "404":
           description: Document ID not found
     patch:
@@ -309,6 +311,8 @@ paths:
           description: OK
         "400":
           description: Bad request. Document data invalid.
+        "403":
+          description: Permission not granted
         "404":
           description: Document ID not found
 definitions:

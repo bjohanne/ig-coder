@@ -1,4 +1,4 @@
-from db.mysql import execute_multi_result_set_no_permission
+from db.mysql_db import execute_multi_result_set_no_permission
 
 
 def get_all():

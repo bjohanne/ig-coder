@@ -1,5 +1,6 @@
 import mysql.connector
 from mysql.connector import errorcode
+from collections import namedtuple
 from exceptions import DuplicateObjectError
 
 config = {
@@ -10,6 +11,9 @@ config = {
     'port': '5000',
     'raise_on_warnings': True
 }
+
+# Named tuple for the function that returns both a result set and permission boolean
+result_tuple = namedtuple("res", ["result_set", "permission"])
 
 access_denied_msg = "Something is wrong with your username or password"
 bad_db_msg = "Database does not exist"
@@ -59,15 +63,13 @@ def execute_no_result_set_permission(proc_name, args):
     cursor = cnx.cursor()
     try:
         cursor.callproc(proc_name, args)
-        # Get output parameter
+        # Get output parameter, which is always the last argument as defined in the database API
         cursor.execute("SELECT " + "@_" + proc_name + "_arg" + str(len(args)))
         permission = cursor.fetchone()
         cnx.commit()
         return permission[0]
     except mysql.connector.Error as err:
         return handle_error(err)
-    except IndexError:
-        return False
     finally:
         cursor.close()
         cnx.close()
@@ -96,8 +98,6 @@ def execute_one_result_set_no_permission(proc_name, args):
         return results[0]
     except mysql.connector.Error as err:
         return handle_error(err)
-    except IndexError:
-        return False
     finally:
         cursor.close()
         cnx.close()
@@ -106,8 +106,8 @@ def execute_one_result_set_no_permission(proc_name, args):
 def execute_one_result_set_permission(proc_name, args):
     """
     Calls a procedure that selects one result set and produces a permission boolean.
-    Returns a list consisting of [0] the result set and [1] the permission boolean if successful,
-    False if error.
+    Returns a named tuple consisting of the result set and the permission boolean if successful,
+    False if error. If permission is not granted, the result set is empty.
     """
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor()
@@ -117,21 +117,21 @@ def execute_one_result_set_permission(proc_name, args):
         result_sets = []
         for result_set in cursor.stored_results():
             result_sets.append(result_set)
-        # extract column names and values
-        columns = [x[0] for x in result_sets[0].description]   # Single result set - index 0
-        values = result_sets[0].fetchall()   # Single result set - index 0
-        # zip the columns and values together into a dict
         results = []
-        for value in values:
-            results.append(dict(zip(columns, value)))
-        # Get output parameter
+        if result_sets:
+            # extract column names and values
+            columns = [x[0] for x in result_sets[0].description]   # Single result set - index 0
+            values = result_sets[0].fetchall()   # Single result set - index 0
+            # zip the columns and values together into a dict
+            for value in values:
+                results.append(dict(zip(columns, value)))
+        # get the permission boolean in the output parameter,
+        # which is always the last argument as defined in the database API
         cursor.execute("SELECT " + "@_" + proc_name + "_arg" + str(len(args)))
         permission = cursor.fetchone()
-        return results[0], permission[0]
+        return result_tuple((results[0] if results else None), permission[0])
     except mysql.connector.Error as err:
         return handle_error(err)
-    except IndexError:
-        return False
     finally:
         cursor.close()
         cnx.close()
@@ -163,8 +163,6 @@ def execute_multi_result_set_no_permission(proc_name, args):
         return results
     except mysql.connector.Error as err:
         return handle_error(err)
-    except IndexError:
-        return False
     finally:
         cursor.close()
         cnx.close()

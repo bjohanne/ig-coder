@@ -184,6 +184,9 @@ END$$
 CREATE PROCEDURE `read_document` (IN `document_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+IF NOT EXISTS(SELECT * FROM `Document` d WHERE d.`document_id` = document_id) THEN
+	SIGNAL SQLSTATE 45000 SET MESSAGE_TEXT = 'Document ID does not exist', MYSQL_ERRNO = ER_SIGNAL_NOT_FOUND;
+END IF;
 CALL help_get_user_id(user_uuid, @user_id);
 CALL permcheck_read_document(@user_id, document_id, @inner_result);
 IF @inner_result IS TRUE THEN
@@ -198,6 +201,9 @@ END$$
 CREATE PROCEDURE `read_project` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+IF NOT EXISTS(SELECT * FROM `Project` p WHERE p.`project_id` = project_id) THEN
+	SIGNAL SQLSTATE 45000 SET MESSAGE_TEXT = 'Project ID does not exist', MYSQL_ERRNO = ER_SIGNAL_NOT_FOUND;
+END IF;
 CALL help_get_user_id(user_uuid, @user_id);
 CALL permcheck_read_project(@user_id, project_id, @inner_result);
 IF @inner_result IS TRUE THEN
@@ -287,7 +293,12 @@ END$$
 # Get user
 CREATE PROCEDURE `get_user` (IN `user_uuid` VARCHAR(48))  READS SQL DATA
     SQL SECURITY INVOKER
-SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid$$
+BEGIN
+IF NOT EXISTS(SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid) THEN
+	SIGNAL SQLSTATE 45000 SET MESSAGE_TEXT = 'User foreign_id does not exist', MYSQL_ERRNO = ER_SIGNAL_NOT_FOUND;
+END IF;
+SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid;
+END$$
 
 # Get all users
 CREATE PROCEDURE `get_all_users` ()  READS SQL DATA
@@ -303,6 +314,9 @@ CREATE PROCEDURE `update_document` (IN `name` VARCHAR(150), IN `description` VAR
     IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+IF NOT EXISTS(SELECT * FROM `Document` d WHERE d.`document_id` = document_id) THEN
+	SIGNAL SQLSTATE 45000 SET MESSAGE_TEXT = 'Document ID does not exist', MYSQL_ERRNO = ER_SIGNAL_NOT_FOUND;
+END IF;
 CALL help_get_user_id(user_uuid, @user_id);
 CALL permcheck_update_document(@user_id, document_id, @inner_result);
 IF @inner_result IS TRUE THEN
@@ -318,6 +332,9 @@ CREATE PROCEDURE `update_project` (IN `name` VARCHAR(150), IN `description` VARC
     IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+IF NOT EXISTS(SELECT * FROM `Project` p WHERE p.`project_id` = project_id) THEN
+	SIGNAL SQLSTATE 45000 SET MESSAGE_TEXT = 'Project ID does not exist', MYSQL_ERRNO = ER_SIGNAL_NOT_FOUND;
+END IF;
 CALL help_get_user_id(user_uuid, @user_id);
 CALL permcheck_update_project(@user_id, project_id, @inner_result);
 IF @inner_result IS TRUE THEN
@@ -331,12 +348,22 @@ END$$
 # Update user
 CREATE PROCEDURE `update_user` (IN `first_name` VARCHAR(75), IN `last_name` VARCHAR(75), IN `user_uuid` VARCHAR(48))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
-UPDATE `User` u SET u.`first_name` = first_name, u.`last_name` = last_name WHERE u.`foreign_id` = user_uuid$$
+BEGIN
+IF NOT EXISTS(SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid) THEN
+	SIGNAL SQLSTATE 45000 SET MESSAGE_TEXT = 'User foreign_id does not exist', MYSQL_ERRNO = ER_SIGNAL_NOT_FOUND;
+END IF;
+UPDATE `User` u SET u.`first_name` = first_name, u.`last_name` = last_name WHERE u.`foreign_id` = user_uuid;
+END$$
 
 # Enable user
 CREATE PROCEDURE `enable_user` (IN `user_uuid` VARCHAR(48))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
-UPDATE `User` u SET u.`disabled` = 0 WHERE u.`foreign_id` = user_uuid$$
+BEGIN
+IF NOT EXISTS(SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid) THEN
+	SIGNAL SQLSTATE 45000 SET MESSAGE_TEXT = 'User foreign_id does not exist', MYSQL_ERRNO = ER_SIGNAL_NOT_FOUND;
+END IF;
+UPDATE `User` u SET u.`disabled` = 0 WHERE u.`foreign_id` = user_uuid;
+END$$
 
 # Promote project member to owner
 CREATE PROCEDURE `make_project_owner` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_uuid_object` VARCHAR(48), IN `user_uuid_actor` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
@@ -363,6 +390,9 @@ END$$
 CREATE PROCEDURE `delete_document` (IN `document_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+IF NOT EXISTS(SELECT * FROM `Document` d WHERE d.`document_id` = document_id) THEN
+	SIGNAL SQLSTATE 45000 SET MESSAGE_TEXT = 'Document ID does not exist', MYSQL_ERRNO = ER_SIGNAL_NOT_FOUND;
+END IF;
 CALL help_get_user_id(user_uuid, @user_id);
 CALL permcheck_delete_document(@user_id, document_id, @inner_result);
 IF @inner_result IS TRUE THEN
@@ -377,6 +407,9 @@ END$$
 CREATE PROCEDURE `delete_project` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+IF NOT EXISTS(SELECT * FROM `Project` p WHERE p.`project_id` = project_id) THEN
+	SIGNAL SQLSTATE 45000 SET MESSAGE_TEXT = 'Project ID does not exist', MYSQL_ERRNO = ER_SIGNAL_NOT_FOUND;
+END IF;
 CALL help_get_user_id(user_uuid, @user_id);
 CALL permcheck_delete_project(@user_id, project_id, @inner_result);
 IF @inner_result IS TRUE THEN
@@ -390,12 +423,20 @@ END$$
 # Disable user
 CREATE PROCEDURE `disable_user` (IN `user_uuid` VARCHAR(48))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
-UPDATE `User` u SET u.`disabled` = 1 WHERE u.`foreign_id` = user_uuid$$
+BEGIN
+IF NOT EXISTS(SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid) THEN
+	SIGNAL SQLSTATE 45000 SET MESSAGE_TEXT = 'User foreign_id does not exist', MYSQL_ERRNO = ER_SIGNAL_NOT_FOUND;
+END IF;
+UPDATE `User` u SET u.`disabled` = 1 WHERE u.`foreign_id` = user_uuid;
+END$$
 
 # Delete statement
 CREATE PROCEDURE `delete_statement` (IN `statement_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+IF NOT EXISTS(SELECT * FROM `Statement` s WHERE s.`statement_id` = statement_id) THEN
+	SIGNAL SQLSTATE 45000 SET MESSAGE_TEXT = 'Statement ID does not exist', MYSQL_ERRNO = ER_SIGNAL_NOT_FOUND;
+END IF;
 CALL help_get_user_id(user_uuid, @user_id);
 CALL help_get_document_of_statement(statement_id, @document_id);
 CALL permcheck_update_document(@user_id, @document_id, @inner_result);
@@ -592,7 +633,7 @@ ELSEIF @document_visibility = 3 THEN	# Public visibility
 	SET result = TRUE;
 ELSE					# Visibility invalid, error
 	SET result = FALSE;
-	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid visibility_id for Document - not in (1, 2, 3)';
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid visibility_id for Document - not in (1, 2, 3)', MYSQL_ERRNO = ER_SIGNAL_EXCEPTION;
 END IF;
 END$$
 
@@ -633,7 +674,7 @@ ELSEIF @project_visibility = 3 THEN     # Public visibility
         SET result = TRUE;
 ELSE                                    # Visibility invalid, error
         SET result = FALSE;
-	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid visibility_id for Project - not in (1, 2, 3)';
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid visibility_id for Project - not in (1, 2, 3)', MYSQL_ERRNO = ER_SIGNAL_EXCEPTION;
 END IF;
 END$$
 
