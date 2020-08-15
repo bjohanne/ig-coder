@@ -320,7 +320,11 @@ END IF;
 CALL help_get_user_id(user_uuid, @user_id);
 CALL permcheck_update_document(@user_id, document_id, @inner_result);
 IF @inner_result IS TRUE THEN
-	UPDATE `Document` d SET d.`name` = name, d.`description` = description, d.`visibility_id` = visibility_id WHERE d.`document_id` = document_id;
+	UPDATE `Document` d SET
+		d.`name` = IF(name IS NOT NULL, name, d.`name`),
+		d.`description` = IF(description IS NOT NULL, description, d.`description`),
+		d.`visibility_id` = IF(visibility_id IS NOT NULL, visibility_id, d.`visibility_id`)
+	WHERE d.`document_id` = document_id;
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
@@ -338,7 +342,11 @@ END IF;
 CALL help_get_user_id(user_uuid, @user_id);
 CALL permcheck_update_project(@user_id, project_id, @inner_result);
 IF @inner_result IS TRUE THEN
-	UPDATE `Project` p SET p.`name` = name, p.`description` = description, p.`visibility_id` = visibility_id WHERE p.`project_id` = project_id;
+	UPDATE `Project` p SET
+		p.`name` = IF(name IS NOT NULL, name, p.`name`),
+		p.`description` = IF(description IS NOT NULL, description, p.`description`),
+		p.`visibility_id` = IF(visibility_id IS NOT NULL, visibility_id, p.`visibility_id`)
+	WHERE p.`project_id` = project_id;
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
@@ -352,7 +360,10 @@ BEGIN
 IF NOT EXISTS(SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid) THEN
 	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User foreign_id does not exist', MYSQL_ERRNO = '02000';
 END IF;
-UPDATE `User` u SET u.`first_name` = first_name, u.`last_name` = last_name WHERE u.`foreign_id` = user_uuid;
+UPDATE `User` u SET
+	u.`first_name` = IF(first_name IS NOT NULL, first_name, d.`first_name`),
+	u.`last_name` = IF(last_name IS NOT NULL, last_name, d.`last_name`)
+WHERE u.`foreign_id` = user_uuid;
 END$$
 
 # Enable user
