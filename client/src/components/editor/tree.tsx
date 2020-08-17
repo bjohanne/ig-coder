@@ -213,7 +213,7 @@ const TreeComponent = (props: Proptype) => {
 }
 
 const mapStateToProps = (state: any) => ({
-    currentDocument: state.documentReducer.currentDocument
+    currentDocument: state.documents.currentDocument
 });
 
 const mapDispatchToProps = (dispatch: any) => ({

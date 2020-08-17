@@ -1,6 +1,7 @@
 import update from 'immutability-helper';
 import {
     GET_DOCUMENT_RESPONSE,
+    GET_DOCUMENT_RESPONSE_FETCHED,
     CREATE_DOCUMENT_RESPONSE,
     ADD_ENTRY_TO_DOCUMENT,
     SET_ACTIVE_NODE,
@@ -10,55 +11,55 @@ import {
     UPDATE_NEGATION
 } from "./actions";
 
-import { PROCESS_BEGIN, PROCESS_SUCCESS, PROCESS_ERROR } from "../apiRequest/actions";
+import { API_CALL_BEGIN, API_CALL_SUCCESS, API_CALL_ERROR } from "../apiCall/actions";
 
 import Document from "../../core/model/document";
 import { NormNode, ConventionNode, JunctionNode, NegationNode } from '../../core/model/nodes';
 import { Arg } from '../../core/model/enums';
 import { INode } from '../../core/model/interfaces';
 
-interface IInitialState {
-    documents: Array<Document>,
-    currentDocument: Document | null
+interface IDocumentState {
+    documentList: Array<Document>,
+    currentDocument: Document | null,
     activeNode: any,
-    loading: boolean,
+    loading: Boolean,
     error: any
 }
 
-const initialState: IInitialState = {
-    documents: [],
+const initialState: IDocumentState = {
+    documentList: [],
     currentDocument: null,
     activeNode: null,
     loading: false,
     error: null
 };
 
-const documentReducer = (state: any = initialState, action: any) => {
+const documents = (state: IDocumentState = initialState, action: any) => {
     let currentDocument: Document;
     let newDocument: Document;
     let node: INode;
     switch (action.type) {
-        case PROCESS_BEGIN:
+        case API_CALL_BEGIN:
             return update(state, {
                 loading: {$set: true},
                 error: {$set: null}
             });
-        case PROCESS_SUCCESS:
+        case API_CALL_SUCCESS:
             return update(state, {
                 loading: {$set: false},
                 error: {$set: null}
             });
-        case PROCESS_ERROR:
+        case API_CALL_ERROR:
             return update(state, {
                 loading: {$set: false},
                 error: {$set: action.error}
             });
         case GET_DOCUMENT_RESPONSE:
-			// This is dispatched by GET_DOCUMENT whether the document already exists in state or not.
-            currentDocument = new Document(action.payload.name, action.payload.description, action.payload.id, action.payload.forest);
-            return update(state, {currentDocument: {$set: currentDocument}});
+            return update(state, {currentDocument: {$set: action.payload}});
+        case GET_DOCUMENT_RESPONSE_FETCHED:
+            return update(state, {documentList: {$push: [action.payload]}, currentDocument: {$set: action.payload}});
         case CREATE_DOCUMENT_RESPONSE:
-            return update(state, {documents: {$push: [action.doc]}, currentDocument: {$set: action.doc}});
+            return update(state, {documentList: {$push: [action.doc]}, currentDocument: {$set: action.doc}});
         case ADD_JUNCTION:
             node = action.payload as INode;
             currentDocument = state.currentDocument as Document;
@@ -128,12 +129,16 @@ const documentReducer = (state: any = initialState, action: any) => {
         case "persist/REHYDRATE":
 			// This is a "manual override" for rehydrating Redux state from local storage. Happens on page load/refresh.
 
+            if (action.key !== "documents") {
+                return state;
+            }
+
             if (!action.payload) {
                 return state;
             }
 
 			// Rehydrate documents array
-			let origList = action.payload.documentReducer.documents;
+			let origList = action.payload.documentList;
 			let dlist = [];
 			if (origList && origList.length > 0) {
 				origList.forEach((d: Document) => {
@@ -142,16 +147,16 @@ const documentReducer = (state: any = initialState, action: any) => {
 			}
 
 			// Rehydrate current document
-            let d = action.payload.documentReducer.currentDocument;
+            let d = action.payload.currentDocument;
 	        let rebuiltDoc;
 			if (d) {
 				rebuiltDoc = new Document(d.name, d.description, d.id, d.forest);
 			}
 
-		    return update(state, {documents: {$set: dlist}, currentDocument: { $set: rebuiltDoc }})
+		    return update(state, {documentList: {$set: dlist}, currentDocument: { $set: rebuiltDoc }})
         default:
             return state;
     }
 };
 
-export default documentReducer;
+export default documents;

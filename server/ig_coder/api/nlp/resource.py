@@ -1,4 +1,3 @@
-from flask import jsonify
 from flask_restplus import Resource, reqparse
 from nltk import WhitespaceTokenizer
 

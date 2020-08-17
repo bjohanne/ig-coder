@@ -1,8 +1,11 @@
-import Document from "../../core/model/document";
 import { INode } from "../../core/model/interfaces";
+
+import axios, { AxiosResponse } from "axios";
+import { API_CALL_BEGIN, API_CALL_SUCCESS, API_CALL_ERROR } from "../apiCall/actions";
 
 export const GET_DOCUMENT = "GET_DOCUMENT";
 export const GET_DOCUMENT_RESPONSE = "GET_DOCUMENT_RESPONSE";
+export const GET_DOCUMENT_RESPONSE_FETCHED = "GET_DOCUMENT_RESPONSE_FETCHED";
 
 export const CREATE_DOCUMENT_RESPONSE = "CREATE_DOCUMENT_RESPONSE";
 
@@ -23,16 +26,6 @@ export const UPDATE_NEGATION = "UPDATE_NEGATION";
 export const getDocument = (document_id: number) => ({
     type: GET_DOCUMENT,
     document_id: document_id
-});
-
-export const getDocumentResponse = (payload: Document) => ({
-    type: GET_DOCUMENT_RESPONSE,
-    payload: payload
-});
-
-export const createDocumentResponse = (payload: {name: string, description: string, id: number}) => ({
-    type: CREATE_DOCUMENT_RESPONSE,
-    payload
 });
 
 export const addEntryToDocument = ((entry: { documentId: number, content: string, hasDeontic: boolean }) => ({
@@ -63,7 +56,7 @@ export const updateEntry = (node: any) => ({
 export const addJunction = (parentNode: any) => ({
     type: ADD_JUNCTION,
     payload: parentNode
-})
+});
 
 export const updateJunction = (payload: any) => ({
     type: UPDATE_JUNCTION,
@@ -73,4 +66,36 @@ export const updateJunction = (payload: any) => ({
 export const updateNegation = (payload: any) => ({
     type: UPDATE_NEGATION,
     payload: payload
-})
+});
+
+export const createDocument = (name, description, onSuccess, onError) => async dispatch => {
+    dispatch({ type: API_CALL_BEGIN });
+    axios({
+        url: "/documents",
+        method: "post",
+        data: {
+            name,
+            description,
+            forest: []
+        }
+    })
+    .then((response: AxiosResponse) => {
+        dispatch({
+            type: CREATE_DOCUMENT_RESPONSE,
+            payload: response.data
+        });
+        dispatch({
+            type: API_CALL_SUCCESS,
+            payload: "Document created!"
+        });
+        onSuccess(response.data.id);
+    })
+    .catch(() => {
+        let errorMsg = "Something went wrong, we couldn't create the document. Please try again.";
+        dispatch({
+            type: API_CALL_ERROR,
+            payload: errorMsg
+        });
+        onError(errorMsg);
+    });
+};

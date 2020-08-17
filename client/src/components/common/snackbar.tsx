@@ -1,29 +1,41 @@
 import React from "react";
+import {connect} from "react-redux";
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import {closeSnackbar} from "../../state/ui/actions";
 
 /*
-    Reusable Material UI snackbar.
+    Material UI snackbar.
 
-    Import this component to add a snackbar to another component. Render this component,
-    and pass the props `state`, `onClose`, `severity` and `displayText`.
-    state: A React useState() variable that manages the state of the Snackbar
-    onClose: A function that calls state's setState(false)
-    severity: A string out of {"success", "info", "warning", "error"}
-    displayText: The text to display in the snackbar body
+    This component is used in App.tsx to handle all snackbars (only one at a time).
+    If we want to show multiple snackbars at once, snackbar stacking isn't supported
+    out of the box.
 */
 
-export default function SnackbarComponent(props) {
-
-    const Alert = (props) => {
-        return <MuiAlert elevation={6} variant="filled" {...props} />;
-    }
+export function SnackbarComponent(props) {
+    const {snackbarOpen, snackbarMessage, snackbarColor, snackbarDuration, closeSnackbar} = props;
 
     return (
-        <Snackbar open={props.state} autoHideDuration={5000} onClose={props.onClose}>
-            <Alert onClose={props.onClose} severity={props.severity}>
-                {props.displayText}
-            </Alert>
+        <Snackbar open={snackbarOpen} autoHideDuration={snackbarDuration} onClose={closeSnackbar}>
+            <MuiAlert elevation={6} variant="filled" severity={snackbarColor} onClose={closeSnackbar}>
+                {snackbarMessage}
+            </MuiAlert>
         </Snackbar>
     )
 }
+
+const mapStateToProps = (state: any) => ({
+    snackbarOpen: state.ui.snackbarOpen,
+    snackbarMessage: state.ui.snackbarMessage,
+    snackbarColor: state.ui.snackbarColor,
+    snackbarDuration: state.ui.snackbarDuration
+});
+
+const mapDispatchToProps = (dispatch: any) => ({
+    closeSnackbar: () => dispatch(closeSnackbar())
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(SnackbarComponent);

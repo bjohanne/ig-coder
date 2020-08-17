@@ -1,6 +1,6 @@
 import requests
 
-URL = "http://127.0.0.1:5000/documents"
+URL = "http://127.0.0.1:5060/documents"
 
 
 def test_get_without_id():
