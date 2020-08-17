@@ -13,7 +13,7 @@ config = {
 }
 
 # Named tuple for all execute functions to distinguish between an empty result or false permission
-# and error (return False)
+# and an error having occurred (return False)
 result_tuple = namedtuple("res", ["result_set", "permission"])
 
 access_denied_msg = "Something is wrong with your username or password"
