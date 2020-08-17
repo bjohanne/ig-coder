@@ -1,7 +1,7 @@
 import mysql.connector
 from mysql.connector import errorcode
 from collections import namedtuple
-from exceptions import DuplicateObjectError
+from exceptions import DuplicateObjectError, ObjectNotFoundError
 
 config = {
     'user': 'user',
@@ -12,7 +12,8 @@ config = {
     'raise_on_warnings': True
 }
 
-# Named tuple for the function that returns both a result set and permission boolean
+# Named tuple for all execute functions to distinguish between an empty result or false permission
+# and error (return False)
 result_tuple = namedtuple("res", ["result_set", "permission"])
 
 access_denied_msg = "Something is wrong with your username or password"
@@ -26,6 +27,8 @@ def handle_error(error):
         print(bad_db_msg)
     elif error.errno == errorcode.ER_DUP_ENTRY:
         raise DuplicateObjectError
+    elif error.errno == 2000:   # ER_SIGNAL_NOT_FOUND but without leading 0
+        raise ObjectNotFoundError
     else:
         print(error)
     return False
@@ -39,14 +42,14 @@ def handle_error(error):
 def execute_no_result_set_no_permission(proc_name, args):
     """
     Calls a procedure that does not select a result set and does not produce a permission boolean.
-    Returns True if successful, False if error. (This is for consistency with the other execute functions.)
+    Returns an empty result_tuple if successful, False if error.
     """
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor()
     try:
         cursor.callproc(proc_name, args)
         cnx.commit()
-        return True
+        return result_tuple(None, None)  # This is distinct from False and consistent with the other execute functions.
     except mysql.connector.Error as err:
         return handle_error(err)
     finally:
@@ -57,7 +60,7 @@ def execute_no_result_set_no_permission(proc_name, args):
 def execute_no_result_set_permission(proc_name, args):
     """
     Calls a procedure that does not select a result set and produces a permission boolean.
-    Returns the permission boolean if successful, False if error.
+    Returns a result_tuple containing the permission boolean if successful, False if error.
     """
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor()
@@ -67,7 +70,7 @@ def execute_no_result_set_permission(proc_name, args):
         cursor.execute("SELECT " + "@_" + proc_name + "_arg" + str(len(args)))
         permission = cursor.fetchone()
         cnx.commit()
-        return permission[0]
+        return result_tuple(None, permission[0])
     except mysql.connector.Error as err:
         return handle_error(err)
     finally:
@@ -78,7 +81,7 @@ def execute_no_result_set_permission(proc_name, args):
 def execute_one_result_set_no_permission(proc_name, args):
     """
     Calls a procedure that selects one result set and does not produce a permission boolean.
-    Returns the result set if successful, False if error.
+    Returns a result_tuple containing the result set if successful, False if error.
     """
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor()
@@ -95,7 +98,7 @@ def execute_one_result_set_no_permission(proc_name, args):
         results = []
         for value in values:
             results.append(dict(zip(columns, value)))
-        return results[0]
+        return result_tuple(results[0], None)
     except mysql.connector.Error as err:
         return handle_error(err)
     finally:
@@ -106,7 +109,7 @@ def execute_one_result_set_no_permission(proc_name, args):
 def execute_one_result_set_permission(proc_name, args):
     """
     Calls a procedure that selects one result set and produces a permission boolean.
-    Returns a named tuple consisting of the result set and the permission boolean if successful,
+    Returns a result_tuple consisting of the result set and the permission boolean if successful,
     False if error. If permission is not granted, the result set is empty.
     """
     cnx = mysql.connector.connect(**config)
@@ -140,7 +143,7 @@ def execute_one_result_set_permission(proc_name, args):
 def execute_multi_result_set_no_permission(proc_name, args):
     """
     Calls a procedure that selects multiple result sets and does not produce a permission boolean.
-    Returns a list of result sets if successful, False if error.
+    Returns a result_tuple containing the list of result sets if successful, False if error.
     """
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor()
@@ -160,7 +163,7 @@ def execute_multi_result_set_no_permission(proc_name, args):
             # zip the columns and values together into a dict
             for value in value_lists[index]:
                 results.append(dict(zip(column_lists[index], value)))
-        return results
+        return result_tuple(results, None)
     except mysql.connector.Error as err:
         return handle_error(err)
     finally:

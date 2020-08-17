@@ -3,10 +3,12 @@ from exceptions import DuplicateObjectError
 
 
 def post(user_data):
+    args = list(user_data.values())
     try:
-        args = list(user_data.values())
-        is_success = execute_no_result_set_no_permission("create_user", args)
-        if is_success:
+        res = execute_no_result_set_no_permission("create_user", args)
+        if res:
             return 'User created', 201
+        else:
+            return 'Something went wrong', 500
     except DuplicateObjectError:
         return 'User ID already exists', 409

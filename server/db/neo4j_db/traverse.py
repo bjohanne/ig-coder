@@ -28,10 +28,9 @@ def get_next_doc_id():
     return db_access.get_next_doc_id()
 
 
-def create_graph(json: dict):
-    data = json
+def create_graph(forest: dict):
     db_access = DataAccess(uri=neo4j_bolt_uri, user=neo4j_user, password=neo4j_pass)
-    for tree in data["forest"]:
+    for tree in forest:
         db_access.create_nodes(traversal(tree))
 
 

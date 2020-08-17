@@ -2,8 +2,11 @@ from db.mysql_db import execute_multi_result_set_no_permission
 
 
 def get_all():
-    users = execute_multi_result_set_no_permission("get_all_users", ())
-    if users:
-        return users, 200
+    res = execute_multi_result_set_no_permission("get_all_users", ())
+    if res:
+        if len(res.result_set):
+            return res.result_set, 200
+        else:
+            return 'No users exist', 204
     else:
-        return 'No users exist', 204
+        return 'Something went wrong', 500

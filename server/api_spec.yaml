@@ -57,7 +57,7 @@ paths:
         "201":
           description: User created
         "400":
-          description: Bad request. User data invalid.
+          description: User data invalid
         "409":
           description: User ID already exists
   /users/{user_id}:
@@ -83,7 +83,7 @@ paths:
           schema:
             $ref: '#/definitions/User'
         "400":
-          description: Bad request. User ID invalid.
+          description: User ID invalid
         "404":
           description: User ID not found
     patch:
@@ -114,7 +114,7 @@ paths:
         "200":
           description: OK
         "400":
-          description: Bad request. User data invalid.
+          description: User ID and/or data invalid
         "404":
           description: User ID not found
   /projects:
@@ -138,7 +138,7 @@ paths:
           schema:
             $ref: '#/definitions/Project'
         "400":
-          description: Bad request. Project data invalid.
+          description: Project data invalid
   /projects/{project_id}:
     get:
       tags:
@@ -163,7 +163,7 @@ paths:
           schema:
             $ref: '#/definitions/Project'
         "400":
-          description: Bad request. Project ID invalid.
+          description: Project ID invalid
         "403":
           description: Permission not granted
         "404":
@@ -197,7 +197,7 @@ paths:
         "200":
           description: OK
         "400":
-          description: Bad request. Project data invalid.
+          description: Project ID and/or data invalid
         "403":
           description: Permission not granted
         "404":
@@ -223,7 +223,7 @@ paths:
         "200":
           description: OK
         "400":
-          description: Bad request. Project ID invalid.
+          description: Project ID invalid
         "403":
           description: Permission not granted
         "404":
@@ -249,7 +249,7 @@ paths:
           schema:
             $ref: '#/definitions/Document'
         "400":
-          description: Bad request. Document data invalid.
+          description: Document data invalid
         "403":
           description: Permission not granted
   /documents/{document_id}:
@@ -276,7 +276,7 @@ paths:
           schema:
             $ref: '#/definitions/Document'
         "400":
-          description: Bad request. Document ID invalid.
+          description: Document ID invalid
         "403":
           description: Permission not granted
         "404":
@@ -310,7 +310,7 @@ paths:
         "200":
           description: OK
         "400":
-          description: Bad request. Document data invalid.
+          description: Document ID and/or data invalid
         "403":
           description: Permission not granted
         "404":
@@ -553,3 +553,7 @@ definitions:
         minimum: 1
         maximum: 3
         example: 2
+      forest:
+        type: array
+        items:
+          type: object

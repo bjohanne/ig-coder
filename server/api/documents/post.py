@@ -14,3 +14,5 @@ def post(document_data):
             return res.result_set, 201
         else:
             return 'Permission not granted', 403
+    else:
+        return 'Something went wrong', 500
