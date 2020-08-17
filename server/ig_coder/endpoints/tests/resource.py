@@ -9,7 +9,6 @@ test_parser = reqparse.RequestParser()
 
 
 class TestsResource(Resource):
-    @cors.crossdomain(origin='*')
     def get(self, test_id=None):
         """
         returns a list of conferences

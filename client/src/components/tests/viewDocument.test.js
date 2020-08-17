@@ -1,7 +1,7 @@
 import React from 'react';
 import Enzyme, {shallow, mount} from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import {DocumentComponent} from '../document';
+import {ViewDocumentComponent} from '../documents/viewDocument';
 
 Enzyme.configure({adapter: new Adapter()});
 
@@ -17,10 +17,11 @@ function setup() {
                 id: 1
             }
         },
-        getDocument: jest.fn()
+        getDocument: jest.fn(),
+        saveDocumentRequest: jest.fn(),
     };
 
-    const wrapper = shallow(<DocumentComponent {...props} />);
+    const wrapper = shallow(<ViewDocumentComponent {...props} />);
 
     return {
         props,
@@ -28,7 +29,7 @@ function setup() {
     };
 }
 
-it('renders with static content', () => {
+it("renders with static content", () => {
     const {props, wrapper} = setup();
     expect(wrapper.length).toEqual(1);  // Exactly 1 React node is rendered
     expect(wrapper.contains(props.currentDocument.name)).toBe(true); // The document name is displayed

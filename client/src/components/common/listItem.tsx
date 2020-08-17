@@ -15,10 +15,10 @@ export default function MyListItem(props:any) {
     const[radioItem, setRadioItem]=useState('member')
 
     const deleteProjectNote='If you click DELETE, this project and all of its documents will be deleted.' +
-        '                        Please note that this action can not be revoked. If you want to continue, click DELETE; otherwise, click CANCEL.'
+        '                        Please note that this action cannot be undone. If you want to continue, click DELETE; otherwise, click CANCEL.'
 
     const deleteDocumentNote='If you click DELETE, this document will be deleted.' +
-        '                        Please note that this action can not be revoked. If you want to continue, click DELETE; otherwise, click CANCEL.'
+        '                        Please note that this action cannot be undone. If you want to continue, click DELETE; otherwise, click CANCEL.'
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);

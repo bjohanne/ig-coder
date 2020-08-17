@@ -114,7 +114,7 @@ const SubComponentEditor = (props: any) => {
 }
 
 const mapStateToProps = (state: any) => ({
-    activeNode: state.documentReducer.activeNode
+    activeNode: state.documents.activeNode
 });
 
 const mapDispatchToProps = (dispatch: any) => ({

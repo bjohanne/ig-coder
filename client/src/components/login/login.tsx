@@ -9,7 +9,7 @@ import Container from "react-bootstrap/Container";
 import Spinner from "react-bootstrap/Spinner";
 import FormHelperText from "@material-ui/core/FormHelperText";
 
-function LoginComponent(props: any) {
+function LoginComponent(props) {
     return (
         <Container>
             <Row className="text-center">
@@ -62,26 +62,37 @@ function LoginComponent(props: any) {
                                 </InputGroup.Append>
                             </InputGroup>
 
-                            <FormHelperText id="component-error-text" style={{display:props.data.isFail?'block':'none'}} error={props.data.isFail}>{props.data.failText}</FormHelperText>
+                            <FormHelperText
+                                id="component-error-text"
+                                style={{display:props.data.isFail?'block':'none'}}
+                                error={props.data.isFail}>{props.data.failText}
+                            </FormHelperText>
 
                             <Form.Group controlId="formBasicCheckbox">
-                                <Form.Check type="checkbox" label="Remember me" />
+                                <Form.Check
+                                    type="checkbox"
+                                    defaultChecked={props.data.isRemember}
+                                    onChange={props.handleChange}
+                                    name="isRemember"
+                                    label="Remember me"
+                                />
                             </Form.Group>
 
                         </Form.Group>
 
-                        <Row className="d-flex align-items-center">
+                        <Row className="d-flex align-items-center mb-1 mb-sm-3">
                             <Col xs={12} sm={5} lg={4} className="mb-3 mb-sm-0">
                                 <Button variant="primary" type="submit" className="w-100" ref={props.submitButton}>
                                     Sign in
-                                    {props.loading && <Spinner animation="border" variant="light" size="sm" className="ml-3" />}
+                                    {props.loading && <Spinner animation="border" variant="light" size="sm"
+                                        className="ml-3" role="status" />}
                                 </Button>
-                            </Col>
-                            <Col xs={12} sm={7} lg={8}>
-                                <Link to="/register">Don't have an account? Sign up</Link>
                             </Col>
                         </Row>
                     </Form>
+
+                    <p className="mb-2"><Link to="/register">Don't have an account? Sign up</Link></p>
+                    <p><Link to="/resetpass">Forgot password?</Link></p>
                 </Col>
                 <Col sm={2} md={3}></Col>
             </Row>
