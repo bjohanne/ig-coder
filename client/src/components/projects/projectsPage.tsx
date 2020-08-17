@@ -1,22 +1,33 @@
 import React from "react";
 import {useState, useEffect} from "react";
-import './projectsPage.css'
+import {withRouter, Link} from "react-router-dom";
+import "./projectsPage.css";
 import LeftTab from "../common/leftTab";
-import {
-    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-    Button, TextField, AppBar, Toolbar, IconButton, Typography, Tabs, Tab,
-    Breadcrumbs, Link
-} from '@material-ui/core';
+import { Typography, Breadcrumbs } from '@material-ui/core';
 import ListItem from "../common/listItem";
 import {connect} from "react-redux";
+import pageTitles from "../../core/config/pageTitles";
+import NewProjectContainer from "./newProjectContainer";
 
-function ProjectsPage(props: any) {
-    const [openNewProject, setOpenNewProject] = useState(false);
-    const [visibility, setVisibility] = useState(0);
+function ProjectsPage(props) {
+    useEffect(() => {
+        document.title = pageTitles.prefix + pageTitles.myProjects;
+    });
+
+    const { match: { params: {tab}} } = props;
+
+    const [newProjectDialog, setNewProjectDialog] = useState(false);
+
+    const openNewProjectDialog = () => {
+        setNewProjectDialog(true)
+
+    }
+    const closeNewProjectDialog = () => {
+        setNewProjectDialog(false);
+    }
 
     let title
     let fakedata = []
-    const tab = props.match.params.tab
     switch (tab) {
         case 'myprojects':
             title = 'All My Projects';
@@ -107,27 +118,12 @@ function ProjectsPage(props: any) {
             break
     }
 
-    const handleNewProject = (event) => {
-        setOpenNewProject(true)
-    }
-    const handleClose = () => {
-        setOpenNewProject(false);
-    }
-
-    const handleVisibility = (event) => {
-        setVisibility(event.target.value)
-    }
-
-    const handleClick = (event) => {
-        console.log("handleClick")
-    }
-
     return (
         <div className={'root'}>
             <div className={'Container'}>
                 <div className={"row-auto"}>
                     <Breadcrumbs aria-label="breadcrumb" className={'bread-crumbs'}>
-                        <Link color="inherit" href="/" onClick={handleClick} className={"link"}>
+                        <Link to="/">
                             Home
                         </Link>
                         <Typography color="textPrimary" className={"link"}>
@@ -140,61 +136,16 @@ function ProjectsPage(props: any) {
                         <h3>MY PROJECTS</h3>
                     </div>
                     <div className="col-auto">
-                        <button type="button" className="btn btn-success" onClick={handleNewProject}
+                        <button type="button" className="btn btn-primary" onClick={openNewProjectDialog}
                                 data-target="#exampleModalCenter">New Project
                         </button>
-                        <Dialog open={openNewProject} onClose={handleClose} aria-labelledby="form-dialog-title">
-                            <DialogTitle id="form-dialog-title">New Project</DialogTitle>
-                            <DialogContent>
-                                <TextField
-                                    autoFocus
-                                    margin="dense"
-                                    id="name"
-                                    label="Project name"
-                                    type="email"
-                                    variant="outlined"
-                                    fullWidth
-                                />
-                                <div className="form-group" id={"select-visibility"}>
-                                    <select
-                                        className="form-control"
-                                        placeholder={'select visibility for document'}
-                                        onChange={handleVisibility}
-                                        value={visibility}
-                                    >
-                                        <option value={0} disabled={true}>---Select visibility for the project---
-                                        </option>
-                                        <option value={1}>Private</option>
-                                        <option value={2}>Internal</option>
-                                        <option value={3}>Public</option>
-                                    </select>
-                                </div>
-                                <TextField
-                                    margin="dense"
-                                    id="des"
-                                    label="Description"
-                                    type="email"
-                                    fullWidth
-                                    multiline={true}
-                                    rows={4}
-                                    variant="outlined"
-                                />
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={handleClose} color="primary">
-                                    Cancel
-                                </Button>
-                                <Button onClick={handleClose} color="primary">
-                                    Confirm
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
+                        <NewProjectContainer dialogOpen={newProjectDialog} handleClose={closeNewProjectDialog}/>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-3 " id={"lefttab"}>
                         <div className="list-group">
-                            <a href="./myprojects" className="list-group-item list-group-item-action"
+                            <Link to="./myprojects" className="list-group-item list-group-item-action"
                                style={tab === 'myprojects' ? {backgroundColor: '#EBEDEF'} : {backgroundColor: 'None'}}>
                                 <LeftTab title={"My projects"} des={'All my projects'}>
                                     <svg className="bi bi-person" width="2em" height="2em" viewBox="0 0 16 16"
@@ -203,8 +154,8 @@ function ProjectsPage(props: any) {
                                               d="M13 14s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h10zm-9.995-.944v-.002.002zM3.022 13h9.956a.274.274 0 0 0 .014-.002l.008-.002c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664a1.05 1.05 0 0 0 .022.004zm9.974.056v-.002.002zM8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
                                     </svg>
                                 </LeftTab>
-                            </a>
-                            <a href="./shared" className="list-group-item list-group-item-action"
+                            </Link>
+                            <Link to="./shared" className="list-group-item list-group-item-action"
                                style={tab === 'shared' ? {backgroundColor: '#EBEDEF'} : {backgroundColor: 'None'}}>
                                 <LeftTab title={"Shared with me"} des={'Projects and documents shared with you'}>
                                     <svg className="bi bi-folder-symlink" width="2em" height="2em" viewBox="0 0 16 16"
@@ -217,8 +168,8 @@ function ProjectsPage(props: any) {
                                             d="M8.616 10.24l3.182-1.969a.443.443 0 0 0 0-.742l-3.182-1.97c-.27-.166-.616.036-.616.372V6.7c-.857 0-3.429 0-4 4.8 1.429-2.7 4-2.4 4-2.4v.769c0 .336.346.538.616.371z"/>
                                     </svg>
                                 </LeftTab>
-                            </a>
-                            <a href="./public" className="list-group-item list-group-item-action"
+                            </Link>
+                            <Link to="./public" className="list-group-item list-group-item-action"
                                style={tab === 'public' ? {backgroundColor: '#EBEDEF'} : {backgroundColor: 'None'}}>
                                 <LeftTab title={"Public projects"} des={'Browse all public projects'}>
                                     <svg className="bi bi-collection" width="2em" height="2em" viewBox="0 0 16 16"
@@ -227,7 +178,7 @@ function ProjectsPage(props: any) {
                                               d="M14.5 13.5h-13A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5zm-13 1A1.5 1.5 0 0 1 0 13V6a1.5 1.5 0 0 1 1.5-1.5h13A1.5 1.5 0 0 1 16 6v7a1.5 1.5 0 0 1-1.5 1.5h-13zM2 3a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 0-1h-11A.5.5 0 0 0 2 3zm2-2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7A.5.5 0 0 0 4 1z"/>
                                     </svg>
                                 </LeftTab>
-                            </a>
+                            </Link>
                         </div>
 
                     </div>
@@ -253,21 +204,19 @@ function ProjectsPage(props: any) {
 
                         <div className="row-auto">
                             <div className="list-group" id={'file-list'}>
-                                {
-                                    fakedata.map(data => {
-                                        return (
-                                            <a href={`./project/${data.title}/all`} key={data.title}
-                                               className="list-group-item list-group-item-action">
-                                                <ListItem
-                                                    title={data.title}
-                                                    type={data.type}
-                                                    author={data.author}
-                                                    modified date={"Modified " + data.date + " days ago"}
-                                                />
-                                            </a>
-                                        )
-                                    })
-                                }
+                                {fakedata.map(data => {
+                                    return (
+                                        <Link to={`./project/${data.title}/all`} key={data.title}
+                                           className="list-group-item list-group-item-action">
+                                            <ListItem
+                                                title={data.title}
+                                                type={data.type}
+                                                author={data.author}
+                                                modified date={"Modified " + data.date + " days ago"}
+                                            />
+                                        </Link>
+                                    )
+                                })}
                             </div>
                         </div>
                     </div>
@@ -277,4 +226,4 @@ function ProjectsPage(props: any) {
     );
 }
 
-export default connect(null,null)(ProjectsPage)
+export default connect(null,null)(withRouter(ProjectsPage))

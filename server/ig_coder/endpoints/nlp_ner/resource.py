@@ -4,6 +4,7 @@ import spacy
 
 nlp = spacy.load("en_core_web_sm")
 
+
 class NamedEntityRecognitionResource(Resource):
 
     def post(self):

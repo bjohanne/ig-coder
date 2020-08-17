@@ -1,19 +1,30 @@
-import React, {useEffect} from "react";
-import {useState} from "react";
-import './documentsPage.css'
+import React from "react";
+import {useState, useEffect} from "react";
+import {withRouter, Link} from "react-router-dom";
+import "./documentsPage.css";
 import LeftTab from "../common/leftTab";
-import { useHistory } from "react-router-dom";
-import {
-    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, AppBar, Toolbar, IconButton,
-    Typography, Tabs, Tab, Breadcrumbs, Link
-} from '@material-ui/core';
+import { Typography, Breadcrumbs } from '@material-ui/core';
 import ListItem from "../common/listItem";
 import {connect} from "react-redux";
+import pageTitles from "../../core/config/pageTitles";
+import NewDocumentContainer from "./newDocumentContainer";
 
-function DocumentsPage(props: any) {
-    const [openNewProject, setOpenNewProject] = useState(false);
-    const [visibility, setVisibility] = useState(0);
-    let history =  useHistory()
+function DocumentsPage(props) {
+    useEffect(() => {
+        document.title = pageTitles.prefix + pageTitles.myDocuments;
+    });
+
+    const { match: { params: {tab, projectid}} } = props;
+
+    const [newDocumentDialog, setNewDocumentDialog] = useState(false);
+
+    const openNewDocumentDialog = () => {
+        setNewDocumentDialog(true)
+
+    }
+    const closeNewDocumentDialog = () => {
+        setNewDocumentDialog(false);
+    }
 
     let title
     var fakedatas = [
@@ -71,10 +82,6 @@ function DocumentsPage(props: any) {
         ]
     ]
     let fakedata=fakedatas[0]
-    const tab = props.match.params.tab
-    const projectId = props.match.params.projectid
-    console.log(tab)
-    console.log(projectId)
     switch (tab) {
         case 'all':
             title = 'All Documents';
@@ -88,100 +95,37 @@ function DocumentsPage(props: any) {
             break;
     }
 
-    const handleNewProject = (event) => {
-        //setOpenNewProject(true)
-        history.push('/documents/new')
-
-    }
-    const handleClose = () => {
-        setOpenNewProject(false);
-    }
-
-    const handleVisibility = (event) => {
-        setVisibility(event.target.value)
-    }
-
-
     return (
         <div className={'root'}>
             <div className={'Container'}>
                 <div className={"row-auto"}>
                     <Breadcrumbs aria-label="breadcrumb">
-                        <Link color="inherit" href="/" className={"link"}>
+                        <Link to="/">
                             Home
                         </Link>
-                        <Link
-                            color="inherit"
-                            href="/projects/myprojects"
-                            className={"link"}
-                        >
+                        <Link to="/projects/myprojects">
                             My projects
                         </Link>
                         <Typography color="textPrimary" className={"link"}>
-                            {projectId}
+                            {projectid}
                         </Typography>
                     </Breadcrumbs>
                 </div>
                 <div className="row">
                     <div className="col-auto mr-auto">
-                        <h3>{projectId}</h3>
+                        <h3>{projectid}</h3>
                     </div>
                     <div className="col-auto">
-                        <button type="button" className="btn btn-primary" onClick={handleNewProject}
+                        <button type="button" className="btn btn-primary" onClick={openNewDocumentDialog}
                                 data-target="#exampleModalCenter">New Document
                         </button>
-                        <Dialog open={openNewProject} onClose={handleClose} aria-labelledby="form-dialog-title">
-                            <DialogTitle id="form-dialog-title">New Document</DialogTitle>
-                            <DialogContent>
-                                <TextField
-                                    autoFocus
-                                    margin="dense"
-                                    id="name"
-                                    label="Document name"
-                                    type="email"
-                                    variant="outlined"
-                                    fullWidth
-                                />
-                                <div className="form-group" id={"select-visibility"}>
-                                    <select
-                                        className="form-control"
-                                        placeholder={'select visibility for document'}
-                                        onChange={handleVisibility}
-                                        value={visibility}
-                                    >
-                                        <option value={0} disabled={true}>---Select visibility for the project---
-                                        </option>
-                                        <option value={1}>Private</option>
-                                        <option value={2}>Internal</option>
-                                        <option value={3}>Public</option>
-                                    </select>
-                                </div>
-                                <TextField
-                                    margin="dense"
-                                    id="des"
-                                    label="Description"
-                                    type="email"
-                                    fullWidth
-                                    multiline={true}
-                                    rows={4}
-                                    variant="outlined"
-                                />
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={handleClose} color="primary">
-                                    Cancel
-                                </Button>
-                                <Button onClick={handleClose} color="primary">
-                                    Confirm
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
+                        <NewDocumentContainer dialogOpen={newDocumentDialog} handleClose={closeNewDocumentDialog}/>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-3 " id={"lefttab"}>
                         <div className="list-group">
-                            <a href="./all" className="list-group-item list-group-item-action"
+                            <Link to="./all" className="list-group-item list-group-item-action"
                                style={tab === 'all' ? {backgroundColor: '#EBEDEF'} : {backgroundColor: 'None'}}>
                                 <LeftTab title={"My documents"} des={'All my documents'}>
                                     <svg width="2em" height="2em" viewBox="0 0 16 16"
@@ -194,8 +138,8 @@ function DocumentsPage(props: any) {
                                               d="M5 11.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
                                     </svg>
                                 </LeftTab>
-                            </a>
-                            <a href="./recent" className="list-group-item list-group-item-action"
+                            </Link>
+                            <Link to="./recent" className="list-group-item list-group-item-action"
                                style={tab === 'recent' ? {backgroundColor: '#EBEDEF'} : {backgroundColor: 'None'}}>
                                 <LeftTab title={"Recent documents"} des={'Browse documents recently opened'}>
                                     <svg width="2em" height="2em" viewBox="0 0 16 16" className="bi bi-clock-history"
@@ -208,7 +152,7 @@ function DocumentsPage(props: any) {
                                               d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>
                                     </svg>
                                 </LeftTab>
-                            </a>
+                            </Link>
                         </div>
 
                     </div>
@@ -234,21 +178,19 @@ function DocumentsPage(props: any) {
 
                         <div className="row-auto">
                             <div className="list-group" id={'file-list'}>
-                                {
-                                    fakedata.map(data => {
-                                        return (
-                                            <a href="#1" key={data.title}
-                                               className="list-group-item list-group-item-action">
-                                                <ListItem
-                                                    title={data.title}
-                                                    type={data.type}
-                                                    author={data.author}
-                                                    modified date={"Modified " + data.date + " days ago"}
-                                                />
-                                            </a>
-                                        )
-                                    })
-                                }
+                                {fakedata.map(data => {
+                                    return (
+                                        <Link to="#1" key={data.title}
+                                           className="list-group-item list-group-item-action">
+                                            <ListItem
+                                                title={data.title}
+                                                type={data.type}
+                                                author={data.author}
+                                                modified date={"Modified " + data.date + " days ago"}
+                                            />
+                                        </Link>
+                                    )
+                                })}
                             </div>
                         </div>
                     </div>
@@ -257,4 +199,4 @@ function DocumentsPage(props: any) {
         </div>
     );
 }
-export default connect(null,null)(DocumentsPage)
+export default connect(null,null)(withRouter(DocumentsPage))

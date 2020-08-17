@@ -1,13 +1,14 @@
 import {
     GET_DOCUMENT,
     GET_DOCUMENT_RESPONSE,
+    GET_DOCUMENT_RESPONSE_FETCHED,
     CREATE_DOCUMENT_RESPONSE,
     SAVE_DOCUMENT_REQUEST,
     PRE_SET_ACTIVE_NODE,
     SET_ACTIVE_NODE
 } from "./actions";
 import { Middleware, MiddlewareAPI } from "redux";
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosResponse, AxiosError } from "axios";
 import appConfig from "../../core/config/appConfig";
 import Document from "../../core/model/document";
 import { INormAndConvention } from "../../core/model/interfaces";
@@ -15,16 +16,21 @@ import { INormAndConvention } from "../../core/model/interfaces";
 export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: any) => (action: any) => {
     switch (action.type) {
         case GET_DOCUMENT:
-			let storeDocuments = store.getState().documentReducer.documents;
+			let storeDocuments = store.getState().documents.documentList;
 			let foundDocument = storeDocuments.find((document: any) => document.id === Number(action.document_id));
+            let doc;
 
 			if (foundDocument) { // A document with the provided ID already exists in state
-				store.dispatch({type: GET_DOCUMENT_RESPONSE, payload: foundDocument});
+                doc = Document.fromData(foundDocument);
+				store.dispatch({type: GET_DOCUMENT_RESPONSE, payload: doc});
 			} else { // Need to query the server
-				axios.get(`${appConfig.api.baseUrl}/documents/${action.document_id}`).then((response: AxiosResponse) => {
-					//response.data.forest = [];	// Turn the forest back into a JS array
-					store.dispatch({type: GET_DOCUMENT_RESPONSE, payload: response.data});
-				});
+				axios.get(`${appConfig.api.baseUrl}/documents/${action.document_id}`)
+                .then((response: AxiosResponse) => {
+                    doc = Document.fromData(response.data);
+                    store.dispatch({type: GET_DOCUMENT_RESPONSE_FETCHED, payload: doc});
+				})
+                .catch((error: AxiosError) => {
+                });
 			}
 			break;
         case CREATE_DOCUMENT_RESPONSE:
@@ -34,7 +40,7 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
             axios.patch(`${appConfig.api.baseUrl}/documents`, action.payload).then((response) => {
                 //let toaster = response.status === 200 ? toast.success : toast.error;
                 //toaster('Document saved!');
-                // TODO: Render a Snackbar in the Document component, and wait for the response there
+                // TODO: Render a Snackbar and wait for the response there
             });
             break;
         case PRE_SET_ACTIVE_NODE:

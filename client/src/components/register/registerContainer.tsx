@@ -1,63 +1,62 @@
-import React, {useState, useRef} from "react";
-import {withRouter, useHistory} from 'react-router-dom';
+import React, {useState, useRef, useEffect} from "react";
+import {withRouter} from 'react-router-dom';
 import {connect} from "react-redux";
-import { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import * as firebase from "firebase/app";
+import firebase from "../../core/config/firebase";
 import "firebase/auth";
 import "firebase/firestore";
 
 import RegisterComponent from "./register";
-import SnackbarComponent from "../common/snackbar";
-import {sendServerRequest, processBegin, processSuccess, processError} from "../../state/apiRequest/actions";
+import {ISignUpData} from "../../core/config/interfaces";
+import pageTitles from "../../core/config/pageTitles";
+import {signUp} from "../../state/user/actions";
+import {openSnackbar} from "../../state/ui/actions";
 
-function RegisterContainer(props: any) {
-    const {processBegin, processSuccess, processError, sendServerRequest} = props;
+function RegisterContainer(props) {
+    useEffect(() => {
+        document.title = pageTitles.prefix + pageTitles.register;
+    });
+
+    const {loading, signUp, openSnackbar} = props;
 
     const [state, setState]=useState({
-        firstname:'',
-        lastname:'',
+        firstname: "",
+        lastname: "",
         username: "",
         pass: "",
-        passConfirm:"",
-        isSamePass:true,
-        isFail:false,
-        failText:'',
+        passConfirm: "",
+        isSamePass: true,
+        isFail: false,
+        failText: "",
         showPassword: false
     })
-    const [snackbar,setSnackbar] = useState(false)
-    const history = useHistory()
     const submitButton = useRef(null)
 
     const handleChange = (event) => {
         const {name, value} = event.target
-        setState(
-            state=>({
-                ...state,
-                [name]: value,
-                isFail:false,
-                isSamePass:true
-            })
-        )
+        setState({
+            ...state,
+            [name]: value,
+            isFail:false,
+            isSamePass:true
+        })
+        enableSubmitButton()
     }
 
     const handleClickShowPassword = (event) => {
-        setState(
-            state=>({
-                ...state,
-                showPassword:!state.showPassword
-            })
-        )
+        setState({
+            ...state,
+            showPassword:!state.showPassword
+        })
     }
 
     const verifyPassSame=()=>{
-        setState(
-            state=>({
-                ...state,
-                isFail:state.pass!==state.passConfirm,
-                failText:'The passwords do not match.',
-            })
-        )
-        return state.pass===state.passConfirm
+        let isValid = state.pass===state.passConfirm
+        setState({
+            ...state,
+            isFail:!isValid,
+            failText:'The passwords do not match.',
+        })
+        return isValid
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -89,68 +88,11 @@ function RegisterContainer(props: any) {
     }
 
     const displayError=(errorMessage)=>{
-        setState(
-            state=>({
-                ...state,
-                isFail: true,
-                failText: errorMessage
-            })
-        )
-    }
-
-    const registerUser=()=>{
-        disableSubmitButton();
-        processBegin();
-        // Register the user with Firebase Authentication
-        firebase.auth().createUserWithEmailAndPassword(state.username, state.pass)
-        .then(data=>{
-            // Send some of the user data to the Firestore database
-            const db = firebase.firestore();
-            db.collection("users").add({
-                    "user_id":data.user.uid,
-                    "first_name":state.firstname,
-                    "last_name":state.lastname,
-                    "email":state.username
-            })
-            .then((docRef)=>{
-                // Send some of the user data to the SQL database
-                sendServerRequest({
-                    url: "/users",
-                    method: "post",
-                    data: {
-                        "foreign_id": data.user.uid,
-                        "first_name": state.firstname,
-                        "last_name": state.lastname
-                    }
-                })
-                .then((response: AxiosResponse) => {
-                    // Success!
-                    setSnackbar(true)
-                    setTimeout(()=>{
-                        processSuccess();
-                        history.push("/login");
-                    }, 1000)    // Wait a second so the user can read the snackbar message
-                }, (error: AxiosError) => {
-                    // Errors with the SQL DB
-                    processError(error);
-                    displayError("Sorry, a database error occured.");
-                    enableSubmitButton(); // Reenable the submit button so the user can try again
-                });
-            })
-            .catch((error)=>{
-                // Errors with Firestore
-                processError(error);
-                displayError("Sorry, a database error occured.");
-                enableSubmitButton(); // Reenable the submit button so the user can try again
-            });
-
+        setState({
+            ...state,
+            isFail: true,
+            failText: errorMessage
         })
-        .catch((error)=>{
-            // Errors with Firebase Auth (that can be displayed to the user)
-            processError(error);
-            displayError(error.message);
-            enableSubmitButton(); // Reenable the submit button so the user can try again
-        });
     }
 
     const handleSubmit=(event)=>{
@@ -158,27 +100,40 @@ function RegisterContainer(props: any) {
         if(!verifyPassSame()){
             return
         }
-        registerUser()
+        disableSubmitButton();
+        signUp({
+                username: state.username,
+                password: state.pass,
+                firstname: state.firstname,
+                lastname: state.lastname
+            },
+            () => {
+                openSnackbar();
+            },
+            (errorMsg) => {
+                displayError(errorMsg);
+                enableSubmitButton();
+            }
+        );
     }
 
     return (
-        <div>
-            <SnackbarComponent state={snackbar} onClose={()=>setSnackbar(false)} severity="success" displayText="Sign up successful! Taking you to Sign in page..."/>
-            <RegisterComponent data={state} handleChange={handleChange} handleSubmit={handleSubmit} handleClickShowPassword={handleClickShowPassword}
-                loading={props.loading} submitButton={submitButton}/>
-        </div>
+        <>
+            <RegisterComponent data={state} handleChange={handleChange} handleSubmit={handleSubmit}
+                handleClickShowPassword={handleClickShowPassword}
+                loading={loading} submitButton={submitButton}/>
+        </>
     )
 }
 
 const mapStateToProps = (state: any) => ({
-    loading: state.userReducer.loading
+    loading: state.user.loading
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    processBegin: () => dispatch(processBegin()),
-    processSuccess: () => dispatch(processSuccess()),
-    processError: (error: any) => dispatch(processError(error)),
-    sendServerRequest: (request: AxiosRequestConfig) => { return dispatch(sendServerRequest(request)) }
+    signUp: (data: ISignUpData, onSuccess, onError) =>
+        dispatch(signUp(data, onSuccess, onError)),
+    openSnackbar: () => dispatch(openSnackbar())
 });
 
 export default connect(

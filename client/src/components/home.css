@@ -2,10 +2,6 @@
     padding: 10rem;
 }
 
-.home-title {
-    margin: 2.5rem 0;
-}
-
-.home-sub-title {
+.home-title .home-sub-title {
     margin: 2.5rem 0;
 }
