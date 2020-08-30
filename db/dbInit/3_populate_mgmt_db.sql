@@ -37,7 +37,7 @@ INSERT INTO `MemberType` (`member_type_id`, `member_type`) VALUES
 --
 
 INSERT INTO `OperationType` (`operation_type_id`, `operation_type`) VALUES
-(1, 'create_dataset'),
+(1, 'create_document'),
 (2, 'read'),
 (3, 'update'),
 (4, 'delete');
@@ -61,11 +61,11 @@ INSERT INTO `DefaultProjectPermission` (`member_type_id`, `operation_type_id`) V
 (3, 2);				# Guest can read
 
 --
--- Known rows for table `DefaultDatasetPermission`
+-- Known rows for table `DefaultDocumentPermission`
 --
 
-INSERT INTO `DefaultDatasetPermission` (`member_type_id`, `operation_type_id`) VALUES
-(1, 2), (1, 3), (1, 4),	# Owner has all permissions that apply to datasets (Read, Update, Delete)
+INSERT INTO `DefaultDocumentPermission` (`member_type_id`, `operation_type_id`) VALUES
+(1, 2), (1, 3), (1, 4),	# Owner has all permissions that apply to documents (Read, Update, Delete)
 (2, 2), (2, 3),		# Member can read and update
 (3, 2);			# Guest can read
 

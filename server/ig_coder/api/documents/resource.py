@@ -1,6 +1,6 @@
-from flask_restplus import Resource, reqparse, cors, fields, marshal_with, marshal
-from flask import make_response, request, jsonify, Response
-from graph_db.traverse import create_graph, get_next_doc_id, get_document, create_document_anchor, get_document_anchor
+from flask_restplus import Resource, reqparse, fields, marshal_with
+from flask import make_response, request
+from db.neo4j_db import create_graph, get_next_doc_id, get_document, create_document_anchor, get_document_anchor
 
 import json
 

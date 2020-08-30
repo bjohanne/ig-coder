@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 USE mgmt;
 
 --
--- Dummy User, Project and Dataset for development
+-- Dummy User, Project and Document for development
 --
 
 INSERT INTO `User` (`foreign_id`, `first_name`, `last_name`) VALUES
@@ -36,8 +36,8 @@ INSERT INTO `User` (`foreign_id`, `first_name`, `last_name`) VALUES
 INSERT INTO `Project` (`name`, `description`, `visibility_id`) VALUES
 ('My Project', 'A dummy project', 1);   # Private visibility
 
-INSERT INTO `Dataset` (`name`, `description`, `project_id`, `visibility_id`) VALUES
-('My Dataset', 'A dummy dataset', 1, 1);	# Private visibility
+INSERT INTO `Document` (`name`, `description`, `project_id`, `visibility_id`) VALUES
+('My Document', 'A dummy document', 1, 1);	# Private visibility
 
 INSERT INTO `Project_User` (`project_id`, `user_id`, `member_type_id`) VALUES
 (1, 1, 1);	# User1 is an owner of the project

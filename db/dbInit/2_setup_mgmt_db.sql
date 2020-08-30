@@ -25,56 +25,10 @@ CREATE DATABASE mgmt;
 USE mgmt;
 
 --
--- Table structure for table `Dataset`
+-- Table structure for table `DefaultDocumentPermission`
 --
 
-CREATE TABLE `Dataset` (
-  `dataset_id` mediumint(8) UNSIGNED NOT NULL,
-  `name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `project_id` mediumint(8) UNSIGNED NOT NULL,
-  `visibility_id` mediumint(8) UNSIGNED NOT NULL,
-  `created_time` timestamp NOT NULL DEFAULT current_timestamp(),
-  `modified_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `DatasetMemberPermission`
---
-
-CREATE TABLE `DatasetMemberPermission` (
-  `permission_id` mediumint(8) UNSIGNED NOT NULL,
-  `dataset_id` mediumint(8) UNSIGNED NOT NULL,
-  `member_type_id` mediumint(8) UNSIGNED NOT NULL,
-  `operation_type_id` mediumint(8) UNSIGNED NOT NULL,
-  `created_time` timestamp NOT NULL DEFAULT current_timestamp(),
-  `modified_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `DatasetUserPermission`
---
-
-CREATE TABLE `DatasetUserPermission` (
-  `permission_id` mediumint(8) UNSIGNED NOT NULL,
-  `dataset_id` mediumint(8) UNSIGNED NOT NULL,
-  `user_id` mediumint(8) UNSIGNED NOT NULL,
-  `operation_type_id` mediumint(8) UNSIGNED NOT NULL,
-  `created_time` timestamp NOT NULL DEFAULT current_timestamp(),
-  `modified_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `DefaultDatasetPermission`
---
-
-CREATE TABLE `DefaultDatasetPermission` (
+CREATE TABLE `DefaultDocumentPermission` (
   `member_type_id` mediumint(8) UNSIGNED NOT NULL,
   `operation_type_id` mediumint(8) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -88,6 +42,52 @@ CREATE TABLE `DefaultDatasetPermission` (
 CREATE TABLE `DefaultProjectPermission` (
   `member_type_id` mediumint(8) UNSIGNED NOT NULL,
   `operation_type_id` mediumint(8) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Document`
+--
+
+CREATE TABLE `Document` (
+  `document_id` mediumint(8) UNSIGNED NOT NULL,
+  `name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `project_id` mediumint(8) UNSIGNED NOT NULL,
+  `visibility_id` mediumint(8) UNSIGNED NOT NULL,
+  `created_time` timestamp NOT NULL DEFAULT current_timestamp(),
+  `modified_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `DocumentMemberPermission`
+--
+
+CREATE TABLE `DocumentMemberPermission` (
+  `permission_id` mediumint(8) UNSIGNED NOT NULL,
+  `document_id` mediumint(8) UNSIGNED NOT NULL,
+  `member_type_id` mediumint(8) UNSIGNED NOT NULL,
+  `operation_type_id` mediumint(8) UNSIGNED NOT NULL,
+  `created_time` timestamp NOT NULL DEFAULT current_timestamp(),
+  `modified_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `DocumentUserPermission`
+--
+
+CREATE TABLE `DocumentUserPermission` (
+  `permission_id` mediumint(8) UNSIGNED NOT NULL,
+  `document_id` mediumint(8) UNSIGNED NOT NULL,
+  `user_id` mediumint(8) UNSIGNED NOT NULL,
+  `operation_type_id` mediumint(8) UNSIGNED NOT NULL,
+  `created_time` timestamp NOT NULL DEFAULT current_timestamp(),
+  `modified_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -180,7 +180,7 @@ CREATE TABLE `Project_User` (
 CREATE TABLE `Statement` (
   `statement_id` mediumint(8) UNSIGNED NOT NULL,
   `foreign_id` mediumint(8) UNSIGNED NOT NULL,
-  `dataset_id` mediumint(8) UNSIGNED NOT NULL,
+  `document_id` mediumint(8) UNSIGNED NOT NULL,
   `created_time` timestamp NOT NULL DEFAULT current_timestamp(),
   `modified_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -233,42 +233,9 @@ CREATE TABLE `Visibility` (
 --
 
 --
--- Indexes for table `Dataset`
+-- Indexes for table `DefaultDocumentPermission`
 --
-ALTER TABLE `Dataset`
-  ADD PRIMARY KEY (`dataset_id`),
-  ADD KEY `d_dataset_id` (`dataset_id`),
-  ADD KEY `d_project_id` (`project_id`),
-  ADD KEY `d_visibility_id` (`visibility_id`);
-
---
--- Indexes for table `DatasetMemberPermission`
---
-ALTER TABLE `DatasetMemberPermission`
-  ADD PRIMARY KEY (`permission_id`),
-  ADD UNIQUE KEY `dmp_unique_combo` (`dataset_id`, `member_type_id`, `operation_type_id`),
-  ADD KEY `dmp_permission_id` (`permission_id`),
-  ADD KEY `dmp_dataset_id` (`dataset_id`),
-  ADD KEY `dmp_member_type_id` (`member_type_id`),
-  ADD KEY `dmp_operation_type_id` (`operation_type_id`),
-  ADD CHECK (`operation_type_id` IN (2, 3, 4));
-
---
--- Indexes for table `DatasetUserPermission`
---
-ALTER TABLE `DatasetUserPermission`
-  ADD PRIMARY KEY (`permission_id`),
-  ADD UNIQUE KEY `dup_unique_combo` (`dataset_id`, `user_id`, `operation_type_id`),
-  ADD KEY `dup_permission_id` (`permission_id`),
-  ADD KEY `dup_dataset_id` (`dataset_id`),
-  ADD KEY `dup_user_id` (`user_id`),
-  ADD KEY `dup_operation_type_id` (`operation_type_id`),
-  ADD CHECK (`operation_type_id` IN (2, 3, 4));
-
---
--- Indexes for table `DefaultDatasetPermission`
---
-ALTER TABLE `DefaultDatasetPermission`
+ALTER TABLE `DefaultDocumentPermission`
   ADD PRIMARY KEY (`member_type_id`, `operation_type_id`),
   ADD KEY `ddp_member_type_id` (`member_type_id`),
   ADD KEY `ddp_operation_type_id` (`operation_type_id`),
@@ -281,6 +248,39 @@ ALTER TABLE `DefaultProjectPermission`
   ADD PRIMARY KEY (`member_type_id`, `operation_type_id`),
   ADD KEY `dpp_member_type_id` (`member_type_id`),
   ADD KEY `dpp_operation_type_id` (`operation_type_id`);
+
+--
+-- Indexes for table `Document`
+--
+ALTER TABLE `Document`
+  ADD PRIMARY KEY (`document_id`),
+  ADD KEY `d_document_id` (`document_id`),
+  ADD KEY `d_project_id` (`project_id`),
+  ADD KEY `d_visibility_id` (`visibility_id`);
+
+--
+-- Indexes for table `DocumentMemberPermission`
+--
+ALTER TABLE `DocumentMemberPermission`
+  ADD PRIMARY KEY (`permission_id`),
+  ADD UNIQUE KEY `dmp_unique_combo` (`document_id`, `member_type_id`, `operation_type_id`),
+  ADD KEY `dmp_permission_id` (`permission_id`),
+  ADD KEY `dmp_document_id` (`document_id`),
+  ADD KEY `dmp_member_type_id` (`member_type_id`),
+  ADD KEY `dmp_operation_type_id` (`operation_type_id`),
+  ADD CHECK (`operation_type_id` IN (2, 3, 4));
+
+--
+-- Indexes for table `DocumentUserPermission`
+--
+ALTER TABLE `DocumentUserPermission`
+  ADD PRIMARY KEY (`permission_id`),
+  ADD UNIQUE KEY `dup_unique_combo` (`document_id`, `user_id`, `operation_type_id`),
+  ADD KEY `dup_permission_id` (`permission_id`),
+  ADD KEY `dup_document_id` (`document_id`),
+  ADD KEY `dup_user_id` (`user_id`),
+  ADD KEY `dup_operation_type_id` (`operation_type_id`),
+  ADD CHECK (`operation_type_id` IN (2, 3, 4));
 
 --
 -- Indexes for table `MemberType`
@@ -342,7 +342,7 @@ ALTER TABLE `Statement`
   ADD PRIMARY KEY (`statement_id`),
   ADD UNIQUE KEY `s_foreign_id` (`foreign_id`),
   ADD KEY `s_statement_id` (`statement_id`),
-  ADD KEY `s_dataset_id` (`dataset_id`);
+  ADD KEY `s_document_id` (`document_id`);
 
 --
 -- Indexes for table `StatementVersion`
@@ -374,21 +374,21 @@ ALTER TABLE `Visibility`
 --
 
 --
--- AUTO_INCREMENT for table `Dataset`
+-- AUTO_INCREMENT for table `Document`
 --
-ALTER TABLE `Dataset`
-  MODIFY `dataset_id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `Document`
+  MODIFY `document_id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `DatasetMemberPermission`
+-- AUTO_INCREMENT for table `DocumentMemberPermission`
 --
-ALTER TABLE `DatasetMemberPermission`
+ALTER TABLE `DocumentMemberPermission`
   MODIFY `permission_id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `DatasetUserPermission`
+-- AUTO_INCREMENT for table `DocumentUserPermission`
 --
-ALTER TABLE `DatasetUserPermission`
+ALTER TABLE `DocumentUserPermission`
   MODIFY `permission_id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
@@ -450,32 +450,9 @@ ALTER TABLE `Visibility`
 --
 
 --
--- Constraints for table `Dataset`
+-- Constraints for table `DefaultDocumentPermission`
 --
-ALTER TABLE `Dataset`
-  ADD CONSTRAINT `d_project_id` FOREIGN KEY (`project_id`) REFERENCES `Project` (`project_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `d_visibility_id` FOREIGN KEY (`visibility_id`) REFERENCES `Visibility` (`visibility_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-
---
--- Constraints for table `DatasetMemberPermission`
---
-ALTER TABLE `DatasetMemberPermission`
-  ADD CONSTRAINT `dmp_dataset_id` FOREIGN KEY (`dataset_id`) REFERENCES `Dataset` (`dataset_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `dmp_member_type_id` FOREIGN KEY (`member_type_id`) REFERENCES `MemberType` (`member_type_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `dmp_operation_type_id` FOREIGN KEY (`operation_type_id`) REFERENCES `OperationType` (`operation_type_id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `DatasetUserPermission`
---
-ALTER TABLE `DatasetUserPermission`
-  ADD CONSTRAINT `dup_dataset_id` FOREIGN KEY (`dataset_id`) REFERENCES `Dataset` (`dataset_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `dup_operation_type_id` FOREIGN KEY (`operation_type_id`) REFERENCES `OperationType` (`operation_type_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `dup_user_id` FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `DefaultDatasetPermission`
---
-ALTER TABLE `DefaultDatasetPermission`
+ALTER TABLE `DefaultDocumentPermission`
   ADD CONSTRAINT `ddp_member_type_id` FOREIGN KEY (`member_type_id`) REFERENCES `MemberType` (`member_type_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `ddp_operation_type_id` FOREIGN KEY (`operation_type_id`) REFERENCES `OperationType` (`operation_type_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -485,6 +462,29 @@ ALTER TABLE `DefaultDatasetPermission`
 ALTER TABLE `DefaultProjectPermission`
   ADD CONSTRAINT `dpp_member_type_id` FOREIGN KEY (`member_type_id`) REFERENCES `MemberType` (`member_type_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `dpp_operation_type_id` FOREIGN KEY (`operation_type_id`) REFERENCES `OperationType` (`operation_type_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `Document`
+--
+ALTER TABLE `Document`
+  ADD CONSTRAINT `d_project_id` FOREIGN KEY (`project_id`) REFERENCES `Project` (`project_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `d_visibility_id` FOREIGN KEY (`visibility_id`) REFERENCES `Visibility` (`visibility_id`) ON DELETE NO ACTION ON UPDATE CASCADE;
+
+--
+-- Constraints for table `DocumentMemberPermission`
+--
+ALTER TABLE `DocumentMemberPermission`
+  ADD CONSTRAINT `dmp_document_id` FOREIGN KEY (`document_id`) REFERENCES `Document` (`document_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `dmp_member_type_id` FOREIGN KEY (`member_type_id`) REFERENCES `MemberType` (`member_type_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `dmp_operation_type_id` FOREIGN KEY (`operation_type_id`) REFERENCES `OperationType` (`operation_type_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `DocumentUserPermission`
+--
+ALTER TABLE `DocumentUserPermission`
+  ADD CONSTRAINT `dup_document_id` FOREIGN KEY (`document_id`) REFERENCES `Document` (`document_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `dup_operation_type_id` FOREIGN KEY (`operation_type_id`) REFERENCES `OperationType` (`operation_type_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `dup_user_id` FOREIGN KEY (`user_id`) REFERENCES `User` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `Project`
@@ -520,7 +520,7 @@ ALTER TABLE `Project_User`
 -- Constraints for table `Statement`
 --
 ALTER TABLE `Statement`
-  ADD CONSTRAINT `s_dataset_id` FOREIGN KEY (`dataset_id`) REFERENCES `Dataset` (`dataset_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `s_document_id` FOREIGN KEY (`document_id`) REFERENCES `Document` (`document_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `StatementVersion`

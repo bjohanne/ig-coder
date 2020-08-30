@@ -33,19 +33,20 @@ DELIMITER $$
 -- Creators
 -- --------------------------------------------------------
 
-# Create dataset
-CREATE PROCEDURE `create_dataset` (IN `name` VARCHAR(150), IN `description` VARCHAR(500), IN `project_id` MEDIUMINT UNSIGNED, IN `visibility_id` MEDIUMINT UNSIGNED,
+# Create document
+CREATE PROCEDURE `create_document` (IN `name` VARCHAR(150), IN `description` VARCHAR(500), IN `project_id` MEDIUMINT UNSIGNED, IN `visibility_id` MEDIUMINT UNSIGNED,
     IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
-CALL permcheck_create_dataset(@user_id, project_id, @inner_result);
+CALL permcheck_create_document(@user_id, project_id, @inner_result);
 IF @inner_result IS TRUE THEN
 	IF visibility_id IS NULL THEN
 		CALL help_get_project_visibility(project_id, @project_visibility);
 		SET visibility_id = @project_visibility;
 	END IF;
-	INSERT INTO `Dataset` (`name`, `description`, `project_id`, `visibility_id`) VALUES (name, description, project_id, visibility_id);
+	INSERT INTO `Document` (`name`, `description`, `project_id`, `visibility_id`) VALUES (name, description, project_id, visibility_id);
+    SELECT * FROM `Document` WHERE `document_id` = last_insert_id();
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
@@ -58,6 +59,7 @@ CREATE PROCEDURE `create_project` (IN `name` VARCHAR(150), IN `description` VARC
 BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
 INSERT INTO `Project` (`name`, `description`, `visibility_id`) VALUES (name, description, visibility_id);
+SELECT * FROM `Project` WHERE `project_id` = last_insert_id();
 INSERT INTO `Project_User` (`project_id`, `user_id`, `member_type_id`) VALUES (last_insert_id(), @user_id, 1); # Last insert ID is that of the Project, not the ProjectMemberPermission created by the trigger on Project
 END$$
 
@@ -67,13 +69,13 @@ CREATE PROCEDURE `create_user` (IN `foreign_id` VARCHAR(48), IN `first_name` VAR
 INSERT INTO `User` (`foreign_id`, `first_name`, `last_name`) VALUES (foreign_id, first_name, last_name)$$
 
 # Create statement
-CREATE PROCEDURE `create_statement` (IN `foreign_id` MEDIUMINT UNSIGNED, IN `dataset_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
+CREATE PROCEDURE `create_statement` (IN `foreign_id` MEDIUMINT UNSIGNED, IN `document_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
-CALL permcheck_update_dataset(@user_id, dataset_id, @inner_result);
+CALL permcheck_update_document(@user_id, document_id, @inner_result);
 IF @inner_result IS TRUE THEN
-	INSERT INTO `Statement` (`foreign_id`, `dataset_id`) VALUES (foreign_id, dataset_id);
+	INSERT INTO `Statement` (`foreign_id`, `document_id`) VALUES (foreign_id, document_id);
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
@@ -85,8 +87,8 @@ CREATE PROCEDURE `create_statement_version` (IN `foreign_id` MEDIUMINT UNSIGNED,
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
-CALL help_get_dataset_of_statement(statement_id, @dataset_id);
-CALL permcheck_update_dataset(@user_id, @dataset_id, @inner_result);
+CALL help_get_document_of_statement(statement_id, @document_id);
+CALL permcheck_update_document(@user_id, @document_id, @inner_result);
 IF @inner_result IS TRUE THEN
 	INSERT INTO `StatementVersion` (`foreign_id`, `statement_id`, `user_id`) VALUES (foreign_id, statement_id, @user_id);
 	SET result = TRUE;
@@ -143,31 +145,31 @@ ELSE
 END IF;
 END$$
 
-# Create permission (dataset, member)
-CREATE PROCEDURE `create_dataset_member_permission` (IN `dataset_id` MEDIUMINT UNSIGNED, IN `member_type_id` MEDIUMINT UNSIGNED, IN `operation_type_id` MEDIUMINT UNSIGNED, IN `user_uuid_actor` VARCHAR(48),
+# Create permission (document, member)
+CREATE PROCEDURE `create_document_member_permission` (IN `document_id` MEDIUMINT UNSIGNED, IN `member_type_id` MEDIUMINT UNSIGNED, IN `operation_type_id` MEDIUMINT UNSIGNED, IN `user_uuid_actor` VARCHAR(48),
     OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_user_id(user_uuid_actor, @user_id_actor);
-CALL help_get_membership_of_dataset(@user_id_actor, dataset_id, @membership);
+CALL help_get_membership_of_document(@user_id_actor, document_id, @membership);
 IF @membership = 1 THEN
-	INSERT INTO `DatasetMemberPermission` (`dataset_id`, `member_type_id`, `operation_type_id`) VALUES (dataset_id, member_type_id, operation_type_id);
+	INSERT INTO `DocumentMemberPermission` (`document_id`, `member_type_id`, `operation_type_id`) VALUES (document_id, member_type_id, operation_type_id);
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
 END IF;
 END$$
 
-# Create permission (dataset, user)
-CREATE PROCEDURE `create_dataset_user_permission` (IN `dataset_id` MEDIUMINT UNSIGNED, IN `user_uuid_perm` VARCHAR(48), IN `operation_type_id` MEDIUMINT UNSIGNED, IN `user_uuid_actor` VARCHAR(48),
+# Create permission (document, user)
+CREATE PROCEDURE `create_document_user_permission` (IN `document_id` MEDIUMINT UNSIGNED, IN `user_uuid_perm` VARCHAR(48), IN `operation_type_id` MEDIUMINT UNSIGNED, IN `user_uuid_actor` VARCHAR(48),
     OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_user_id(user_uuid_perm, @user_id_perm);
 CALL help_get_user_id(user_uuid_actor, @user_id_actor);
-CALL help_get_membership_of_dataset(@user_id_actor, dataset_id, @membership);
+CALL help_get_membership_of_document(@user_id_actor, document_id, @membership);
 IF @membership = 1 THEN
-	INSERT INTO `DatasetUserPermission` (`dataset_id`, `user_id`, `operation_type_id`) VALUES (dataset_id, @user_id_perm, operation_type_id);
+	INSERT INTO `DocumentUserPermission` (`document_id`, `user_id`, `operation_type_id`) VALUES (document_id, @user_id_perm, operation_type_id);
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
@@ -178,14 +180,17 @@ END$$
 -- Readers / getters
 -- --------------------------------------------------------
 
-# Read dataset
-CREATE PROCEDURE `read_dataset` (IN `dataset_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  READS SQL DATA
+# Read document
+CREATE PROCEDURE `read_document` (IN `document_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+IF NOT EXISTS(SELECT * FROM `Document` d WHERE d.`document_id` = document_id) THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Document ID does not exist', MYSQL_ERRNO = '02000';
+END IF;
 CALL help_get_user_id(user_uuid, @user_id);
-CALL permcheck_read_dataset(@user_id, dataset_id, @inner_result);
+CALL permcheck_read_document(@user_id, document_id, @inner_result);
 IF @inner_result IS TRUE THEN
-	SELECT * FROM `Dataset` d WHERE d.`dataset_id` = dataset_id;
+	SELECT * FROM `Document` d WHERE d.`document_id` = document_id;
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
@@ -196,6 +201,9 @@ END$$
 CREATE PROCEDURE `read_project` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+IF NOT EXISTS(SELECT * FROM `Project` p WHERE p.`project_id` = project_id) THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Project ID does not exist', MYSQL_ERRNO = '02000';
+END IF;
 CALL help_get_user_id(user_uuid, @user_id);
 CALL permcheck_read_project(@user_id, project_id, @inner_result);
 IF @inner_result IS TRUE THEN
@@ -241,28 +249,28 @@ SELECT * FROM `Project` p WHERE p.`visibility_id` = 1
 AND EXISTS(SELECT * FROM `ProjectUserPermission` pup WHERE pup.`project_id` = p.`project_id` AND pup.`user_id` = @user_id AND pup.`operation_type_id` = 2);
 END$$
 
-# Read all datasets of a project
-CREATE PROCEDURE `read_all_datasets_of_project` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48))  READS SQL DATA
+# Read all documents of a project
+CREATE PROCEDURE `read_all_documents_of_project` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48))  READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
 CALL help_get_membership(@user_id, project_id, @membership);
-SELECT * FROM `Dataset` d WHERE d.`project_id` = project_id
-AND ((EXISTS(SELECT * FROM `DatasetMemberPermission` dmp WHERE dmp.`dataset_id` = d.`dataset_id` AND dmp.`member_type_id` = @membership AND dmp.`operation_type_id` = 2)
-	OR EXISTS(SELECT * FROM `DatasetUserPermission` dup WHERE dup.`dataset_id` = d.`dataset_id` AND dup.`user_id` = @user_id AND dup.`operation_type_id` = 2))
+SELECT * FROM `Document` d WHERE d.`project_id` = project_id
+AND ((EXISTS(SELECT * FROM `DocumentMemberPermission` dmp WHERE dmp.`document_id` = d.`document_id` AND dmp.`member_type_id` = @membership AND dmp.`operation_type_id` = 2)
+	OR EXISTS(SELECT * FROM `DocumentUserPermission` dup WHERE dup.`document_id` = d.`document_id` AND dup.`user_id` = @user_id AND dup.`operation_type_id` = 2))
 OR (user_uuid IS NOT NULL AND d.`visibility_id` = 2)
 OR d.`visibility_id` = 3);
 END$$
 
-# Read all statements of a dataset
-CREATE PROCEDURE `read_all_statements_of_dataset` (IN `dataset_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48))  READS SQL DATA
+# Read all statements of a document
+CREATE PROCEDURE `read_all_statements_of_document` (IN `document_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48))  READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
-CALL help_get_membership_of_dataset(@user_id, dataset_id, @membership);
-SELECT s.* FROM `Statement` s INNER JOIN `Dataset` d ON s.`dataset_id` = d.`dataset_id` WHERE s.`dataset_id` = dataset_id
-AND ((EXISTS(SELECT * FROM `DatasetMemberPermission` dmp WHERE dmp.`dataset_id` = dataset_id AND dmp.`member_type_id` = @membership AND dmp.`operation_type_id` = 2)
-	OR EXISTS(SELECT * FROM `DatasetUserPermission` dup WHERE dup.`dataset_id` = dataset_id AND dup.`user_id` = @user_id AND dup.`operation_type_id` = 2))
+CALL help_get_membership_of_document(@user_id, document_id, @membership);
+SELECT s.* FROM `Statement` s INNER JOIN `Document` d ON s.`document_id` = d.`document_id` WHERE s.`document_id` = document_id
+AND ((EXISTS(SELECT * FROM `DocumentMemberPermission` dmp WHERE dmp.`document_id` = document_id AND dmp.`member_type_id` = @membership AND dmp.`operation_type_id` = 2)
+	OR EXISTS(SELECT * FROM `DocumentUserPermission` dup WHERE dup.`document_id` = document_id AND dup.`user_id` = @user_id AND dup.`operation_type_id` = 2))
 OR (user_uuid IS NOT NULL AND d.`visibility_id` = 2)
 OR d.`visibility_id` = 3);
 END$$
@@ -272,12 +280,12 @@ CREATE PROCEDURE `read_all_versions_of_statement` (IN `statement_id` MEDIUMINT U
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
-CALL help_get_dataset_of_statement(statement_id, @dataset_id);
-CALL help_get_membership_of_dataset(@user_id, @dataset_id, @membership);
-SELECT sv.* FROM `StatementVersion` sv INNER JOIN `Statement` s ON sv.`statement_id` = s.`statement_id` INNER JOIN `Dataset` d ON s.`dataset_id` = d.`dataset_id`
+CALL help_get_document_of_statement(statement_id, @document_id);
+CALL help_get_membership_of_document(@user_id, @document_id, @membership);
+SELECT sv.* FROM `StatementVersion` sv INNER JOIN `Statement` s ON sv.`statement_id` = s.`statement_id` INNER JOIN `Document` d ON s.`document_id` = d.`document_id`
 WHERE sv.`statement_id` = statement_id
-AND ((EXISTS(SELECT * FROM `DatasetMemberPermission` dmp WHERE dmp.`dataset_id` = @dataset_id AND dmp.`member_type_id` = @membership AND dmp.`operation_type_id` = 2)
-	OR EXISTS(SELECT * FROM `DatasetUserPermission` dup WHERE dup.`dataset_id` = @dataset_id AND dup.`user_id` = @user_id AND dup.`operation_type_id` = 2))
+AND ((EXISTS(SELECT * FROM `DocumentMemberPermission` dmp WHERE dmp.`document_id` = @document_id AND dmp.`member_type_id` = @membership AND dmp.`operation_type_id` = 2)
+	OR EXISTS(SELECT * FROM `DocumentUserPermission` dup WHERE dup.`document_id` = @document_id AND dup.`user_id` = @user_id AND dup.`operation_type_id` = 2))
 OR (user_uuid IS NOT NULL AND d.`visibility_id` = 2)
 OR d.`visibility_id` = 3);
 END$$
@@ -285,7 +293,12 @@ END$$
 # Get user
 CREATE PROCEDURE `get_user` (IN `user_uuid` VARCHAR(48))  READS SQL DATA
     SQL SECURITY INVOKER
-SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid$$
+BEGIN
+IF NOT EXISTS(SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid) THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User foreign_id does not exist', MYSQL_ERRNO = '02000';
+END IF;
+SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid;
+END$$
 
 # Get all users
 CREATE PROCEDURE `get_all_users` ()  READS SQL DATA
@@ -296,15 +309,22 @@ SELECT * FROM `User`$$
 -- Updaters
 -- --------------------------------------------------------
 
-# Update dataset
-CREATE PROCEDURE `update_dataset` (IN `name` VARCHAR(150), IN `description` VARCHAR(500), IN `visibility_id` MEDIUMINT UNSIGNED, IN `dataset_id` MEDIUMINT UNSIGNED,
+# Update document
+CREATE PROCEDURE `update_document` (IN `name` VARCHAR(150), IN `description` VARCHAR(500), IN `visibility_id` MEDIUMINT UNSIGNED, IN `document_id` MEDIUMINT UNSIGNED,
     IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+IF NOT EXISTS(SELECT * FROM `Document` d WHERE d.`document_id` = document_id) THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Document ID does not exist', MYSQL_ERRNO = '02000';
+END IF;
 CALL help_get_user_id(user_uuid, @user_id);
-CALL permcheck_update_dataset(@user_id, dataset_id, @inner_result);
+CALL permcheck_update_document(@user_id, document_id, @inner_result);
 IF @inner_result IS TRUE THEN
-	UPDATE `Dataset` d SET d.`name` = name, d.`description` = description, d.`visibility_id` = visibility_id WHERE d.`dataset_id` = dataset_id;
+	UPDATE `Document` d SET
+		d.`name` = IF(name IS NOT NULL, name, d.`name`),
+		d.`description` = IF(description IS NOT NULL, description, d.`description`),
+		d.`visibility_id` = IF(visibility_id IS NOT NULL, visibility_id, d.`visibility_id`)
+	WHERE d.`document_id` = document_id;
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
@@ -316,10 +336,17 @@ CREATE PROCEDURE `update_project` (IN `name` VARCHAR(150), IN `description` VARC
     IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+IF NOT EXISTS(SELECT * FROM `Project` p WHERE p.`project_id` = project_id) THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Project ID does not exist', MYSQL_ERRNO = '02000';
+END IF;
 CALL help_get_user_id(user_uuid, @user_id);
 CALL permcheck_update_project(@user_id, project_id, @inner_result);
 IF @inner_result IS TRUE THEN
-	UPDATE `Project` p SET p.`name` = name, p.`description` = description, p.`visibility_id` = visibility_id WHERE p.`project_id` = project_id;
+	UPDATE `Project` p SET
+		p.`name` = IF(name IS NOT NULL, name, p.`name`),
+		p.`description` = IF(description IS NOT NULL, description, p.`description`),
+		p.`visibility_id` = IF(visibility_id IS NOT NULL, visibility_id, p.`visibility_id`)
+	WHERE p.`project_id` = project_id;
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
@@ -329,12 +356,25 @@ END$$
 # Update user
 CREATE PROCEDURE `update_user` (IN `first_name` VARCHAR(75), IN `last_name` VARCHAR(75), IN `user_uuid` VARCHAR(48))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
-UPDATE `User` u SET u.`first_name` = first_name, u.`last_name` = last_name WHERE u.`foreign_id` = user_uuid$$
+BEGIN
+IF NOT EXISTS(SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid) THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User foreign_id does not exist', MYSQL_ERRNO = '02000';
+END IF;
+UPDATE `User` u SET
+	u.`first_name` = IF(first_name IS NOT NULL, first_name, d.`first_name`),
+	u.`last_name` = IF(last_name IS NOT NULL, last_name, d.`last_name`)
+WHERE u.`foreign_id` = user_uuid;
+END$$
 
 # Enable user
 CREATE PROCEDURE `enable_user` (IN `user_uuid` VARCHAR(48))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
-UPDATE `User` u SET u.`disabled` = 0 WHERE u.`foreign_id` = user_uuid$$
+BEGIN
+IF NOT EXISTS(SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid) THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User foreign_id does not exist', MYSQL_ERRNO = '02000';
+END IF;
+UPDATE `User` u SET u.`disabled` = 0 WHERE u.`foreign_id` = user_uuid;
+END$$
 
 # Promote project member to owner
 CREATE PROCEDURE `make_project_owner` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_uuid_object` VARCHAR(48), IN `user_uuid_actor` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
@@ -357,14 +397,17 @@ END$$
 -- Deleters
 -- --------------------------------------------------------
 
-# Delete dataset
-CREATE PROCEDURE `delete_dataset` (IN `dataset_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
+# Delete document
+CREATE PROCEDURE `delete_document` (IN `document_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+IF NOT EXISTS(SELECT * FROM `Document` d WHERE d.`document_id` = document_id) THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Document ID does not exist', MYSQL_ERRNO = '02000';
+END IF;
 CALL help_get_user_id(user_uuid, @user_id);
-CALL permcheck_delete_dataset(@user_id, dataset_id, @inner_result);
+CALL permcheck_delete_document(@user_id, document_id, @inner_result);
 IF @inner_result IS TRUE THEN
-	DELETE d FROM `Dataset` d WHERE d.`dataset_id` = dataset_id;
+	DELETE d FROM `Document` d WHERE d.`document_id` = document_id;
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
@@ -375,6 +418,9 @@ END$$
 CREATE PROCEDURE `delete_project` (IN `project_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+IF NOT EXISTS(SELECT * FROM `Project` p WHERE p.`project_id` = project_id) THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Project ID does not exist', MYSQL_ERRNO = '02000';
+END IF;
 CALL help_get_user_id(user_uuid, @user_id);
 CALL permcheck_delete_project(@user_id, project_id, @inner_result);
 IF @inner_result IS TRUE THEN
@@ -388,15 +434,23 @@ END$$
 # Disable user
 CREATE PROCEDURE `disable_user` (IN `user_uuid` VARCHAR(48))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
-UPDATE `User` u SET u.`disabled` = 1 WHERE u.`foreign_id` = user_uuid$$
+BEGIN
+IF NOT EXISTS(SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid) THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User foreign_id does not exist', MYSQL_ERRNO = '02000';
+END IF;
+UPDATE `User` u SET u.`disabled` = 1 WHERE u.`foreign_id` = user_uuid;
+END$$
 
 # Delete statement
 CREATE PROCEDURE `delete_statement` (IN `statement_id` MEDIUMINT UNSIGNED, IN `user_uuid` VARCHAR(48), OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
+IF NOT EXISTS(SELECT * FROM `Statement` s WHERE s.`statement_id` = statement_id) THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Statement ID does not exist', MYSQL_ERRNO = '02000';
+END IF;
 CALL help_get_user_id(user_uuid, @user_id);
-CALL help_get_dataset_of_statement(statement_id, @dataset_id);
-CALL permcheck_update_dataset(@user_id, @dataset_id, @inner_result);
+CALL help_get_document_of_statement(statement_id, @document_id);
+CALL permcheck_update_document(@user_id, @document_id, @inner_result);
 IF @inner_result IS TRUE THEN
 	DELETE s FROM `Statement` s WHERE s.`statement_id` = statement_id;
 	SET result = TRUE;
@@ -449,31 +503,31 @@ END IF;
 END$$
 
 
-# Delete permission (dataset, member)
-CREATE PROCEDURE `delete_dataset_member_permission` (IN `dataset_id` MEDIUMINT UNSIGNED, IN `member_type_id` MEDIUMINT UNSIGNED, IN `operation_type_id` MEDIUMINT UNSIGNED, IN `user_uuid_actor` VARCHAR(48),
+# Delete permission (document, member)
+CREATE PROCEDURE `delete_document_member_permission` (IN `document_id` MEDIUMINT UNSIGNED, IN `member_type_id` MEDIUMINT UNSIGNED, IN `operation_type_id` MEDIUMINT UNSIGNED, IN `user_uuid_actor` VARCHAR(48),
     OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_user_id(user_uuid_actor, @user_id_actor);
-CALL help_get_membership_of_dataset(@user_id_actor, dataset_id, @membership);
+CALL help_get_membership_of_document(@user_id_actor, document_id, @membership);
 IF @membership = 1 THEN
-	DELETE dmp FROM `DatasetMemberPermission` dmp WHERE dmp.`dataset_id` = dataset_id AND dmp.`member_type_id` = member_type_id AND dmp.`operation_type_id` = operation_type_id;
+	DELETE dmp FROM `DocumentMemberPermission` dmp WHERE dmp.`document_id` = document_id AND dmp.`member_type_id` = member_type_id AND dmp.`operation_type_id` = operation_type_id;
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
 END IF;
 END$$
 
-# Delete permission (dataset, user)
-CREATE PROCEDURE `delete_dataset_user_permission` (IN `dataset_id` MEDIUMINT UNSIGNED, IN `user_uuid_perm` VARCHAR(48), IN `operation_type_id` MEDIUMINT UNSIGNED, IN `user_uuid_actor` VARCHAR(48),
+# Delete permission (document, user)
+CREATE PROCEDURE `delete_document_user_permission` (IN `document_id` MEDIUMINT UNSIGNED, IN `user_uuid_perm` VARCHAR(48), IN `operation_type_id` MEDIUMINT UNSIGNED, IN `user_uuid_actor` VARCHAR(48),
     OUT `result` TINYINT(1))  MODIFIES SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_user_id(user_uuid_perm, @user_id_perm);
 CALL help_get_user_id(user_uuid_actor, @user_id_actor);
-CALL help_get_membership_of_dataset(@user_id_actor, dataset_id, @membership);
+CALL help_get_membership_of_document(@user_id_actor, document_id, @membership);
 IF @membership = 1 THEN
-	DELETE dup FROM `DatasetUserPermission` dup WHERE dup.`dataset_id` = dataset_id AND dup.`user_id` = @user_id_perm AND dup.`operation_type_id` = operation_type_id;
+	DELETE dup FROM `DocumentUserPermission` dup WHERE dup.`document_id` = document_id AND dup.`user_id` = @user_id_perm AND dup.`operation_type_id` = operation_type_id;
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
@@ -489,31 +543,31 @@ CREATE PROCEDURE `help_get_membership` (IN `user_id` MEDIUMINT UNSIGNED, IN `pro
     SQL SECURITY INVOKER
 SELECT pu.`member_type_id` INTO membership FROM `Project_User` pu WHERE pu.`user_id` = user_id AND pu.`project_id` = project_id$$
 
-# Helper: Get user membership given a dataset
-CREATE PROCEDURE `help_get_membership_of_dataset` (IN `user_id` MEDIUMINT UNSIGNED, IN `dataset_id` MEDIUMINT UNSIGNED, OUT `membership` MEDIUMINT UNSIGNED)  READS SQL DATA
+# Helper: Get user membership given a document
+CREATE PROCEDURE `help_get_membership_of_document` (IN `user_id` MEDIUMINT UNSIGNED, IN `document_id` MEDIUMINT UNSIGNED, OUT `membership` MEDIUMINT UNSIGNED)  READS SQL DATA
     SQL SECURITY INVOKER
-SELECT pu.`member_type_id` INTO membership FROM `Project_User` pu INNER JOIN `Dataset` d ON pu.`project_id` = d.`project_id`
-WHERE pu.`user_id` = user_id AND d.`dataset_id` = dataset_id$$
+SELECT pu.`member_type_id` INTO membership FROM `Project_User` pu INNER JOIN `Document` d ON pu.`project_id` = d.`project_id`
+WHERE pu.`user_id` = user_id AND d.`document_id` = document_id$$
 
-# Helper: Get the project ID for a dataset ID
-CREATE PROCEDURE `help_get_project_of_dataset` (IN `dataset_id` MEDIUMINT UNSIGNED, OUT `project_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+# Helper: Get the project ID for a document ID
+CREATE PROCEDURE `help_get_project_of_document` (IN `document_id` MEDIUMINT UNSIGNED, OUT `project_id` MEDIUMINT UNSIGNED)  READS SQL DATA
     SQL SECURITY INVOKER
-SELECT d.`project_id` INTO project_id FROM `Dataset` d WHERE d.`dataset_id` = dataset_id$$
+SELECT d.`project_id` INTO project_id FROM `Document` d WHERE d.`document_id` = document_id$$
 
-# Helper: Get the dataset ID for a statement ID
-CREATE PROCEDURE `help_get_dataset_of_statement` (IN `statement_id` MEDIUMINT UNSIGNED, OUT `dataset_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+# Helper: Get the document ID for a statement ID
+CREATE PROCEDURE `help_get_document_of_statement` (IN `statement_id` MEDIUMINT UNSIGNED, OUT `document_id` MEDIUMINT UNSIGNED)  READS SQL DATA
     SQL SECURITY INVOKER
-SELECT s.`dataset_id` INTO dataset_id FROM `Statement` s WHERE s.`statement_id` = statement_id$$
+SELECT s.`document_id` INTO document_id FROM `Statement` s WHERE s.`statement_id` = statement_id$$
 
 # Helper: Get a project's visibility
 CREATE PROCEDURE `help_get_project_visibility` (IN `project_id` MEDIUMINT UNSIGNED, OUT `visibility_id` MEDIUMINT UNSIGNED)  READS SQL DATA
     SQL SECURITY INVOKER
 SELECT p.`visibility_id` INTO visibility_id FROM `Project` p WHERE p.`project_id` = project_id$$
 
-# Helper: Get a dataset's visibility
-CREATE PROCEDURE `help_get_dataset_visibility` (IN `dataset_id` MEDIUMINT UNSIGNED, OUT `visibility_id` MEDIUMINT UNSIGNED)  READS SQL DATA
+# Helper: Get a document's visibility
+CREATE PROCEDURE `help_get_document_visibility` (IN `document_id` MEDIUMINT UNSIGNED, OUT `visibility_id` MEDIUMINT UNSIGNED)  READS SQL DATA
     SQL SECURITY INVOKER
-SELECT d.`visibility_id` INTO visibility_id FROM `Dataset` d WHERE d.`dataset_id` = dataset_id$$
+SELECT d.`visibility_id` INTO visibility_id FROM `Document` d WHERE d.`document_id` = document_id$$
 
 # Helper: Get the ID of a user by UUID
 CREATE PROCEDURE `help_get_user_id` (IN `user_uuid` VARCHAR(48), OUT `user_id` MEDIUMINT UNSIGNED)  READS SQL DATA
@@ -525,7 +579,7 @@ SELECT u.`user_id` INTO user_id FROM `User` u WHERE u.`foreign_id` = user_uuid$$
 -- --------------------------------------------------------
 
 # Operation types:
-# 1: 'create_dataset'
+# 1: 'create_document'
 # 2: 'read'
 # 3: 'update'
 # 4: 'delete'
@@ -546,15 +600,15 @@ ELSE
 END IF;
 END$$
 
-# Base check: Dataset permission
-CREATE PROCEDURE `permcheck_dataset` (IN `user_id` MEDIUMINT UNSIGNED, IN `dataset_id` MEDIUMINT UNSIGNED, IN `operation_type_id` MEDIUMINT UNSIGNED, IN `member_type_id` MEDIUMINT UNSIGNED,
+# Base check: Document permission
+CREATE PROCEDURE `permcheck_document` (IN `user_id` MEDIUMINT UNSIGNED, IN `document_id` MEDIUMINT UNSIGNED, IN `operation_type_id` MEDIUMINT UNSIGNED, IN `member_type_id` MEDIUMINT UNSIGNED,
     OUT `result` TINYINT(1))  READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
-IF EXISTS(SELECT * FROM `DatasetMemberPermission` dmp WHERE dmp.`dataset_id` = dataset_id AND dmp.`member_type_id` = member_type_id AND dmp.`operation_type_id` = operation_type_id) THEN
+IF EXISTS(SELECT * FROM `DocumentMemberPermission` dmp WHERE dmp.`document_id` = document_id AND dmp.`member_type_id` = member_type_id AND dmp.`operation_type_id` = operation_type_id) THEN
 	SET result = TRUE;
 ELSE
-	IF EXISTS(SELECT * FROM `DatasetUserPermission` dup WHERE dup.`dataset_id` = dataset_id AND dup.`user_id` = user_id AND dup.`operation_type_id` = operation_type_id) THEN
+	IF EXISTS(SELECT * FROM `DocumentUserPermission` dup WHERE dup.`document_id` = document_id AND dup.`user_id` = user_id AND dup.`operation_type_id` = operation_type_id) THEN
 		SET result = TRUE;
 	ELSE
 		SET result = FALSE;
@@ -562,8 +616,8 @@ ELSE
 END IF;
 END$$
 
-# Check: Create dataset
-CREATE PROCEDURE `permcheck_create_dataset` (IN `user_id` MEDIUMINT UNSIGNED, IN `project_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  READS SQL DATA
+# Check: Create document
+CREATE PROCEDURE `permcheck_create_document` (IN `user_id` MEDIUMINT UNSIGNED, IN `project_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_membership(user_id, project_id, @membership);
@@ -571,45 +625,45 @@ CALL permcheck_project(user_id, project_id, 1, @membership, @project_result);
 SET result = @project_result;
 END$$
 
-# Check: Read dataset
-CREATE PROCEDURE `permcheck_read_dataset` (IN `user_id` MEDIUMINT UNSIGNED, IN `dataset_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  READS SQL DATA
+# Check: Read document
+CREATE PROCEDURE `permcheck_read_document` (IN `user_id` MEDIUMINT UNSIGNED, IN `document_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
-CALL help_get_dataset_visibility(dataset_id, @dataset_visibility);
-IF @dataset_visibility = 1 THEN		# Private visibility
-	CALL help_get_membership_of_dataset(user_id, dataset_id, @membership);
-	CALL permcheck_dataset(user_id, dataset_id, 2, @membership, @dataset_result);
-	SET result = @dataset_result;
-ELSEIF @dataset_visibility = 2 THEN	# Internal visibility
+CALL help_get_document_visibility(document_id, @document_visibility);
+IF @document_visibility = 1 THEN		# Private visibility
+	CALL help_get_membership_of_document(user_id, document_id, @membership);
+	CALL permcheck_document(user_id, document_id, 2, @membership, @document_result);
+	SET result = @document_result;
+ELSEIF @document_visibility = 2 THEN	# Internal visibility
 	IF user_id IS NOT NULL THEN	# User is logged in
 		SET result = TRUE;
 	ELSE				# User is not logged in
 		SET result = FALSE;
 	END IF;
-ELSEIF @dataset_visibility = 3 THEN	# Public visibility
+ELSEIF @document_visibility = 3 THEN	# Public visibility
 	SET result = TRUE;
 ELSE					# Visibility invalid, error
 	SET result = FALSE;
-	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid visibility_id for Dataset - not in (1, 2, 3)';
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid visibility_id for Document - not in (1, 2, 3)', MYSQL_ERRNO = 'ER_SIGNAL_EXCEPTION';
 END IF;
 END$$
 
-# Check: Update dataset
-CREATE PROCEDURE `permcheck_update_dataset` (IN `user_id` MEDIUMINT UNSIGNED, IN `dataset_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  READS SQL DATA
+# Check: Update document
+CREATE PROCEDURE `permcheck_update_document` (IN `user_id` MEDIUMINT UNSIGNED, IN `document_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
-CALL help_get_membership_of_dataset(user_id, dataset_id, @membership);
-CALL permcheck_dataset(user_id, dataset_id, 3, @membership, @dataset_result);
-SET result = @dataset_result;
+CALL help_get_membership_of_document(user_id, document_id, @membership);
+CALL permcheck_document(user_id, document_id, 3, @membership, @document_result);
+SET result = @document_result;
 END$$
 
-# Check: Delete dataset
-CREATE PROCEDURE `permcheck_delete_dataset` (IN `user_id` MEDIUMINT UNSIGNED, IN `dataset_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  READS SQL DATA
+# Check: Delete document
+CREATE PROCEDURE `permcheck_delete_document` (IN `user_id` MEDIUMINT UNSIGNED, IN `document_id` MEDIUMINT UNSIGNED, OUT `result` TINYINT(1))  READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
-CALL help_get_membership_of_dataset(user_id, dataset_id, @membership);
-CALL permcheck_dataset(user_id, dataset_id, 4, @membership, @dataset_result);
-SET result = @dataset_result;
+CALL help_get_membership_of_document(user_id, document_id, @membership);
+CALL permcheck_document(user_id, document_id, 4, @membership, @document_result);
+SET result = @document_result;
 END$$
 
 # Check: Read project
@@ -631,7 +685,7 @@ ELSEIF @project_visibility = 3 THEN     # Public visibility
         SET result = TRUE;
 ELSE                                    # Visibility invalid, error
         SET result = FALSE;
-	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Invalid visibility_id for Project - not in (1, 2, 3)';
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid visibility_id for Project - not in (1, 2, 3)', MYSQL_ERRNO = 'ER_SIGNAL_EXCEPTION';
 END IF;
 END$$
 
@@ -657,9 +711,9 @@ END$$
 -- TRIGGERS
 -- --------------------------------------------------------
 
-CREATE TRIGGER `dataset_default_permissions` AFTER INSERT ON `Dataset`
- FOR EACH ROW INSERT INTO `DatasetMemberPermission` (`dataset_id`, `member_type_id`, `operation_type_id`)
-SELECT NEW.`dataset_id`, ddp.`member_type_id`, ddp.`operation_type_id` FROM DefaultDatasetPermission ddp$$
+CREATE TRIGGER `document_default_permissions` AFTER INSERT ON `Document`
+ FOR EACH ROW INSERT INTO `DocumentMemberPermission` (`document_id`, `member_type_id`, `operation_type_id`)
+SELECT NEW.`document_id`, ddp.`member_type_id`, ddp.`operation_type_id` FROM DefaultDocumentPermission ddp$$
 
 CREATE TRIGGER `project_default_permissions` AFTER INSERT ON `Project`
  FOR EACH ROW INSERT INTO `ProjectMemberPermission` (`project_id`, `member_type_id`, `operation_type_id`)

@@ -1,6 +1,6 @@
 from flask_restplus import Resource, reqparse, fields, marshal_with
 from flask import make_response
-from sql_db.dbaccess import add_user, get_user
+from db.mysql_db.dbaccess import add_user, get_user
 
 user_fields = {
     'user_uuid': fields.String,
@@ -25,15 +25,16 @@ class UsersResource(Resource):
     @marshal_with(user_fields)
     def get(self):
         user_uuid = user_parser_get.parse_args()['user_uuid']
+        # pass the query parameters by using tuple
+        # Note when creating a tuple with only one element, ',' is required otherwise tuple will be recognized as string
         res = get_user(user_uuid)
+        # return the query result as dictionary format
         return make_response(res)
 
-    @marshal_with(user_fields)
     def post(self):
         args = user_parser_post.parse_args()
         error = add_user(args)
         if not error:
             return make_response({'message': 'Insert user data successful!'}, 200)
         else:
-            return make_response({'errors': {"error_id": error.errno, 'msg': error.msg}, 'message': 'Insert Fail!'},
-                                 400)
+            return make_response({'errors': {"error_id": error.errno, 'msg': error.msg}, 'message': 'Insert Fail!'}, 400)
