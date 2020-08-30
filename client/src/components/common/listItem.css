@@ -1,0 +1,26 @@
+.app-bar-title{
+    margin-left: 1rem;
+    flex: 1;
+}
+
+#share-dialog{
+    width: 50%;
+    margin-left: 50%;
+}
+
+#share-dialog .app-bar{
+    position: relative;
+}
+
+.shared-with{
+    color: brown;
+}
+
+#share-dialog .share-dialog-content{
+    padding-top: 1rem;
+}
+
+#share-dialog .col-1{
+    padding-right: 0px;
+    max-width: 5%;
+}

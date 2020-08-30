@@ -28,51 +28,49 @@ USE mgmt;
 --
 
 INSERT INTO `MemberType` (`member_type_id`, `member_type`) VALUES
-(NULL, 'owner'),	# 1
-(NULL, 'member'),	# 2
-(NULL, 'guest');	# 3
+(1, 'owner'),
+(2, 'member'),
+(3, 'guest');
 
 --
 -- Known rows for table `OperationType`
 --
 
 INSERT INTO `OperationType` (`operation_type_id`, `operation_type`) VALUES
-(NULL, 'create_dataset'),	# 1
-(NULL, 'read'),			# 2
-(NULL, 'update'),		# 3
-(NULL, 'delete_project'),	# 4
-(NULL, 'delete_dataset');	# 5
+(1, 'create_document'),
+(2, 'read'),
+(3, 'update'),
+(4, 'delete');
 
 --
 -- Known rows for table `Visibility`
 --
 
 INSERT INTO `Visibility` (`visibility_id`, `visibility`) VALUES
-(NULL, 'private'),	# 1
-(NULL, 'internal'),	# 2
-(NULL, 'public');	# 3
+(1, 'private'),
+(2, 'internal'),
+(3, 'public');
 
 --
 -- Known rows for table `DefaultProjectPermission`
 --
 
 INSERT INTO `DefaultProjectPermission` (`member_type_id`, `operation_type_id`) VALUES
-('1', '1'), ('1', '2'), ('1', '3'), ('1', '4'), ('1', '5'),
-('2', '2'), ('2', '3'),
-('3', '2');
+(1, 1), (1, 2), (1, 3), (1, 4),	# Owner has all permissions
+(2, 2), (2, 3),			# Member can read and update
+(3, 2);				# Guest can read
 
 --
--- Known rows for table `DefaultDatasetPermission`
+-- Known rows for table `DefaultDocumentPermission`
 --
 
-INSERT INTO `DefaultDatasetPermission` (`member_type_id`, `operation_type_id`) VALUES
-('1', '2'), ('1', '3'), ('1', '5'),
-('2', '2'), ('2', '3'),
-('3', '2');
+INSERT INTO `DefaultDocumentPermission` (`member_type_id`, `operation_type_id`) VALUES
+(1, 2), (1, 3), (1, 4),	# Owner has all permissions that apply to documents (Read, Update, Delete)
+(2, 2), (2, 3),		# Member can read and update
+(3, 2);			# Guest can read
 
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-

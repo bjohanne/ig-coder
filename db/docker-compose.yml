@@ -6,8 +6,6 @@ services:
       ports:
           - "5000:3306"
       environment:
-          MYSQL_USER: user
-          MYSQL_PASSWORD_FILE: /run/secrets/mysql_pwd
           MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_pwd
       volumes:
           - ./dbInit:/docker-entrypoint-initdb.d
@@ -15,7 +13,6 @@ services:
           - ./mysql/50-mysql-clients.cnf:/etc/mysql/50-mysql-clients.cnf
           - mysql:/var/lib/mysql
       secrets:
-          - mysql_pwd
           - mysql_root_pwd
       networks:
           - default
@@ -23,8 +20,6 @@ services:
       image: phpmyadmin/phpmyadmin
       container_name: pma
       environment:
-          MYSQL_USER: user
-          MYSQL_PASSWORD_FILE: /run/secrets/mysql_pwd
           MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_pwd
           PMA_HOST: db
       ports:
@@ -32,13 +27,10 @@ services:
       volumes:
           - ./pma/config.inc.php:/etc/phpmyadmin/config.inc.php
       secrets:
-          - mysql_pwd
           - mysql_root_pwd
       networks:
           - default
 secrets:
-      mysql_pwd:
-          file: ./mysql/mysql_pwd
       mysql_root_pwd:
           file: ./mysql/mysql_root_pwd
 volumes:

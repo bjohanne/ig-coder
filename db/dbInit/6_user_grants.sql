@@ -1,0 +1,7 @@
+CREATE USER 'user'@'%' IDENTIFIED BY 'RV%6Ywfp6S&bf@';
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON `mgmt`.* TO 'user'@'%';
+
+GRANT EXECUTE ON `mgmt`.* TO 'user'@'%';
+
+FLUSH PRIVILEGES;

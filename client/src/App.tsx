@@ -1,59 +1,70 @@
 /*
   The App component is the root component/wrapper for all pages of the app.
-  Fixed UI elements should also be defined here.
+  Fixed UI elements such as the navbar should be placed here.
 */
 
-import React from 'react';
-import {Provider} from "react-redux";
-import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
-import './App.css';
-import { store, persistor } from "./state/store";
+import React from "react";
+import { Provider } from "react-redux";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { ReactReduxFirebaseProvider } from "react-redux-firebase";
 import { PersistGate } from "redux-persist/integration/react";
+import { store, persistor } from "./state/store";
 import ReactTooltip from "react-tooltip";
+import Container from "react-bootstrap/Container";
+import "./App.css";
+
+// Wrappers
+import AuthLoader from "./components/routeWrappers/authLoader";
+import HomeRoute from "./components/routeWrappers/home";
+import AuthenticationRoute from "./components/routeWrappers/authPage";
+import ProtectedRoute from "./components/routeWrappers/protected";
 
 // Components
+import SnackbarComponent from "./components/common/snackbar";
 import Navbar from "./components/common/navbar";
-import HomeComponent from "./components/home";
-import DocumentComponent from "./components/document";
-import NewDocumentComponent from "./components/newDocument";
 import NotFoundComponent from "./components/notFound";
-import {ToastContainer} from 'react-toastify';
+import LoginContainer from "./components/login/loginContainer";
+import RegisterContainer from "./components/register/registerContainer";
+import PasswordResetContainer from "./components/accountActions/pwdResetContainer";
+import ViewDocumentComponent from "./components/documents/viewDocument";
+import ProjectsPage from "./components/projects/projectsPage";
+import DocumentsPage from "./components/documents/documentsPage";
 
-// Styles
-import 'react-toastify/dist/ReactToastify.css';
-
-// Config
-import appConfig from "./core/config/appConfig";
+// Firebase
+import firebase, { rrfConfig } from "./core/config/firebase";
 
 function App() {
+	const reactReduxFirebaseProps = {
+		firebase,
+		config: rrfConfig,
+		dispatch: store.dispatch
+	}
+
     return (
         <Provider store={store}>
-			<PersistGate loading={null} persistor={persistor}>
-				<div className="App container-fluid">
-					<Router>
-						<Navbar/>
-						<Switch>{/* Inside a Switch, only one Route is rendered at a time */}
-							<Route exact path={`${appConfig.client.path}/`} component={HomeComponent}/>
-							<Route exact path={`${appConfig.client.path}/documents/new`} component={NewDocumentComponent}/>
-							<Route exact path={`${appConfig.client.path}/documents/:id`} component={DocumentComponent}/>
-							<Route path='*' component={NotFoundComponent} />
-						</Switch>
-					</Router>
-				</div>
-				{/* Default toaster settings */}
-				<ToastContainer
-					bodyClassName="toast-body"
-					position="bottom-center"
-					autoClose={3500}
-					hideProgressBar={true}
-					newestOnTop={false}
-					closeOnClick={true}
-					pauseOnFocusLoss={true}
-					pauseOnHover={true}
-					draggable={false}
-				/>
-                <ReactTooltip delayHide={1000} effect="solid" />
-			</PersistGate>
+			<ReactReduxFirebaseProvider {...reactReduxFirebaseProps}>
+				<PersistGate loading={null} persistor={persistor}>
+					<Container fluid className="App">
+						<AuthLoader>
+							<Router>
+								<Navbar/>
+								<Switch>
+									<HomeRoute exact path="/" />
+									<AuthenticationRoute exact path="/login" component={LoginContainer} />
+									<AuthenticationRoute exact path="/register" component={RegisterContainer} />
+									<AuthenticationRoute exact path="/resetpass" component={PasswordResetContainer} />
+									<ProtectedRoute exact path="/documents/:id" component={ViewDocumentComponent} />
+									<ProtectedRoute exact path="/projects/:tab" component={ProjectsPage} />
+									<ProtectedRoute exact path="/projects/project/:projectid/:tab" component={DocumentsPage} />
+									<Route path="*" component={NotFoundComponent} />
+								</Switch>
+							</Router>
+						</AuthLoader>
+					</Container>
+					<SnackbarComponent />
+	                <ReactTooltip delayHide={1000} effect="solid" />
+				</PersistGate>
+			</ReactReduxFirebaseProvider>
         </Provider>
     );
 }

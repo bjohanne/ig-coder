@@ -23,7 +23,7 @@ export interface INode {
   * The interface for the Document class, with forest optional.
   * In the Document class implementation, forest is required.
   */
- export interface IDocument {
+export interface IDocument {
 	name: string,
 	description: string,
 	id: number,

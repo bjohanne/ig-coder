@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import Toggle from "react-toggle";
-import { updateEntry, addJunction } from "../../../state/actions";
+import { updateEntry, addJunction } from "../../../state/documents/actions";
 import { SubcomponentNode } from "../../../core/model/nodes";
 import { Component } from "../../../core/model/component";
 import { INode } from "../../../core/model/interfaces";
 import { Arg } from "../../../core/model/enums";
 
-const SubComponentActivationEditor = (props: any) => { 
+const SubComponentActivationEditor = (props: any) => {
     const [hasChildJunction, setHasChildJunction] = useState(false);
     const [content, setContent] = useState("");
     let active = (props.node ? props.node : props.activeNode.node.data) as SubcomponentNode;
@@ -15,7 +15,7 @@ const SubComponentActivationEditor = (props: any) => {
     useEffect(() => {
         setHasChildJunction(active.children.filter((child: INode) => !child.isDummy()).length > 0)
     }, [active.children]);
-    
+
     let changeValue = (e: React.FormEvent<HTMLInputElement>) => {
         setContent(e.currentTarget.value);
         active.component = new Component(content);
@@ -33,8 +33,8 @@ const SubComponentActivationEditor = (props: any) => {
         props.addJunction(active);
     }
 
-    return (        
-        props.activeNode && 
+    return (
+        props.activeNode &&
         (
             <div className="sub-comp-root">
                 <div className="sub-comp-wrap">
@@ -46,24 +46,24 @@ const SubComponentActivationEditor = (props: any) => {
                 <span id='is-junc-label'>Activation is Junction</span>
             </div>
             <div className="sub-comp-wrap">
-                { !hasChildJunction ? 
-                    (<input type="text" 
-                        style={{ width: "100%" }} 
-                        placeholder={`${props.activeNode.nodeType} ${props.activeNode.subcomponentType}`} 
-                        name="component-value" 
-                        onChange={changeValue} 
+                { !hasChildJunction ?
+                    (<input type="text"
+                        style={{ width: "100%" }}
+                        placeholder={`${props.activeNode.nodeType} ${props.activeNode.subcomponentType}`}
+                        name="component-value"
+                        onChange={changeValue}
                         value={content} />) : null
                 }
             </div>
 
-            
+
             </div>
-        ) 
+        )
     )
 }
 
 const mapStateToProps = (state: any) => ({
-    activeNode: state.reducer.activeNode
+    activeNode: state.documents.activeNode
 });
 
 const mapDispatchToProps = (dispatch: any) => ({

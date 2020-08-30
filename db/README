@@ -1,6 +1,6 @@
 Docker Compose files for MariaDB and phpMyAdmin.
 
-MariaDB/MySQL: Config files are included in /mysql. Additionally, /mysql contains the passwords for the root user and a standard user of MariaDB ("user").
+MariaDB/MySQL: Config files are included in /mysql. Additionally, /mysql contains the password for the root user. The user intended for database access can be found in dbInit/6_user_grants.sql.
 
 phpMyAdmin: Accessible on port 3333 for viewing and editing the database.
 
@@ -20,19 +20,15 @@ To restart (alias in ~/.bashrc):
 	dc-rebuild
 
 SQL scripts in ./dbInit:
-1_phpmyadmin.sql	Sets up pma-internal tables.
-2_setup_mgmt_db.sql	Sets up tables for the main application database.
-3_populate_mgmt_db.sql	Adds known rows to fixed tables (member types, visibility levels etc.).
+1_phpmyadmin.sql		Sets up pma-internal tables.
+2_setup_mgmt_db.sql		Sets up the structure of the main application database.
+3_populate_mgmt_db.sql	Adds known rows to fixed tables (member types, operation types and visibility levels).
+4_procedures_and_triggers.sql	Adds stored procedures and triggers to the application database.
+5_development_test_data.sql		Adds dummy User, Project and Document entities for development purposes.
+6_user_grants.sql		Creates a user for database access and grants it privileges on the API procedures.
 9_mysql_secure....sql	Some queries from the original MSI script for increased security.
 
 Filenames are prefixed with a number to ensure they are run in the correct order.
 
-Do not overwrite scripts with phpMyAdmin exported SQL, as it does not yet support MySQL 8+ features and other edits have been made to them. These include but are not limited to:
+Do not overwrite scripts with SQL exported from phpMyAdmin. They must be maintained manually.
 
-1_phpmyadmin.sql:
-	CREATE DATABASE phpmyadmin;
-	USE phpmyadmin;
-
-2_setup_mgmt_db.sql:
-	CREATE DATABASE mgmt;
-	USE mgmt;

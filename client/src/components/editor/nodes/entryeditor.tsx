@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import { Collapse, Row, Col, ModalBody, ModalFooter } from 'reactstrap';
+import ModalBody from 'react-bootstrap/ModalBody';
+import ModalFooter from 'react-bootstrap/ModalFooter';
 import Toggle from "react-toggle";
 import { INode } from "../../../core/model/interfaces";
-import { updateEntry } from "../../../state/actions";
+import { updateEntry } from "../../../state/documents/actions";
 import { buildEntrySubTree } from "../../../core/model/builder";
-import Chevron from "../../units/chevron";
+//import Chevron from "../../units/chevron";
 import { NodeType, ComponentType, SubcomponentType, SubtreeType } from "../../../core/model/enums";
 import { ComponentNode } from "../../../core/model/nodes/";
 
@@ -19,10 +20,13 @@ import { ComponentNode } from "../../../core/model/nodes/";
 const EntryEditor = (props: any) => {
 	// State variables for expanding and collapsing the various UI elements
     const [collapse, setCollapse] = useState({ collapseTop: true, collapseBottom: true, collapseObjects: false, collapseConditions: false });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [atoms, setAtoms] = useState({ Attributes: null, Deontics: null, Aim: null, DirectObject: null, IndirectObject: null })
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [conditions, setConditions] = useState({ ActivationCondition: null, ExecutionCondition: null });
     const [entryText, setEntryText] = useState("")
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const updateAtoms = (e: any) => {
         setAtoms({
           ...atoms,
@@ -30,6 +34,7 @@ const EntryEditor = (props: any) => {
         });
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const updateConditions = (e: any) => {
         setConditions({
             ...conditions,
@@ -40,11 +45,11 @@ const EntryEditor = (props: any) => {
     const saveEntryData = () => {
         try {
             props.activeNode.node.data.entry.content = entryText;
-            buildEntrySubTree(props.activeNode.node.data, atoms, conditions, props.updateEntry);   
-            props.close(); 
+            buildEntrySubTree(props.activeNode.node.data, atoms, conditions, props.updateEntry);
+            props.close();
         } catch(error) {
             alert(error);
-        }   
+        }
     }
 
 	/* Functions to get the initial status for Negation and Sanction */
@@ -75,7 +80,7 @@ const EntryEditor = (props: any) => {
 	const changeIsNegated = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setIsNegated(e.target.checked);
 	}
-	
+
 	const changeHasObject = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setHasObject(e.target.checked);
 	}
@@ -85,19 +90,24 @@ const EntryEditor = (props: any) => {
     }
 
 	// State variables for Chevron rotation (points to the right by default)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [rotateTop, setRotateStateTop] = useState("accordion__icon rotate");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [rotateBottom, setRotateStateBottom] = useState("accordion__icon rotate-up");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [rotateObjects, setRotateStateObjects] = useState("accordion__icon");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [rotateConditions, setRotateStateConditions] = useState("accordion__icon");
-    
+
 	// State variables for whether each element is active
     const [activeTop, setActiveState] = useState(false);
     const [activeBottom, setActiveStateBottom] = useState(false);
     const [activeObjects, setActiveStateObjects] = useState(false);
     const [activeConditions, setActiveStateConditions] = useState(false);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const toggleAccordion = (accordion: string, collapseValue: boolean) => {
-        if (accordion === "collapseTop") { 
+        if (accordion === "collapseTop") {
             setActiveState(!activeTop);
             setRotateStateTop(activeTop ? "accordion__icon rotate" : "accordion__icon");
         } else if (accordion === "collapseBottom") {
@@ -118,6 +128,7 @@ const EntryEditor = (props: any) => {
 
 	/* Functions to get the current value of this node's component children */
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const getValue = (type: ComponentType) : string => {
         if (props.activeNode.node.data.activeNode && props.activeNode.node.data.children) {
 			// Find out whether this node has a child of the passed in type
@@ -134,6 +145,7 @@ const EntryEditor = (props: any) => {
         return "";
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const getObjectValue = (subType: SubcomponentType) : string => {
         if (props.activeNode && props.activeNode.children) {
 			// Find out whether this node has a child of the passed in type
@@ -157,7 +169,7 @@ const EntryEditor = (props: any) => {
 
     return (
         props.activeNode &&
-        (<><ModalBody>          
+        (<><ModalBody>
         <div className="container-fluid entry-editor">
             <div className="row">
 				<div className="col-md-2 pl-4 py-4">
@@ -193,19 +205,17 @@ const EntryEditor = (props: any) => {
 				</div>*/}
 			</div>
 
-			<Collapse isOpen={collapse.collapseTop}>
-				<div className="row">
-					<div className="col-md-12">
-						<textarea name="node-entry-content" onChange={entryTextChanged} className="form-control input-lg mb-3" value={entryText}></textarea>                
-					</div>
+			<div className="row">
+				<div className="col-md-12">
+					<textarea name="node-entry-content" onChange={entryTextChanged} className="form-control input-lg mb-3" value={entryText}></textarea>
 				</div>
-			</Collapse>
+			</div>
 
 			{/*<Collapse isOpen={collapse.collapseBottom}>*/}
 
 			{/* Attributes, deontic, aim */}
 			{/*
-			<Row>                
+			<Row>
 			<Col md="10">
 				<Row>
 					<Col md="12">
@@ -236,14 +246,14 @@ const EntryEditor = (props: any) => {
 			<Col md="2">
 			<button className="accordion" onClick={() => toggleAccordion("collapseObjects", collapse.collapseObjects)}>
 				<Chevron className={`${rotateObjects}`} width={10} fill={"#777"} />
-				<strong className="accordion__title">Objects</strong> 
+				<strong className="accordion__title">Objects</strong>
 			</button>
-			</Col>            
-			</Row>            
+			</Col>
+			</Row>
 			<Collapse isOpen={collapse.collapseObjects}>
 				<Row><Col md="12">Direct Object</Col></Row>
 				<Row>
-					<Col md="10">                    
+					<Col md="10">
 					<Row><Col md="12"><input type="text" defaultValue={getObjectValue(SubcomponentType.direct)} onChange={updateAtoms} name="DirectObject" placeholder="Object" className="form-control input-lg"/></Col></Row>
 					<Row><Col md="12">Indirect Object</Col></Row>
 					<Row><Col md="12"><input type="text" onChange={updateAtoms} name="IndirectObject" placeholder="Object" className="form-control input-lg"/></Col></Row>
@@ -265,14 +275,14 @@ const EntryEditor = (props: any) => {
 			<Col md="2">
 			<button className="accordion" onClick={() => toggleAccordion("collapseConditions", collapse.collapseConditions)}>
 				<Chevron className={`${rotateConditions}`} width={10} fill={"#777"} />
-				<strong className="accordion__title">Conditions</strong> 
+				<strong className="accordion__title">Conditions</strong>
 			</button>
-			</Col>            
-			</Row> 
+			</Col>
+			</Row>
 			<Collapse isOpen={collapse.collapseConditions}>
 			<Row><Col md="12">Activation Condition</Col></Row>
 				<Row>
-					<Col md="10">                    
+					<Col md="10">
 					<Row><Col md="12"><textarea name="ActivationCondition" onChange={updateConditions} placeholder="Condition" className="form-control input-lg"/></Col></Row>
 					<Row><Col md="12">Execution Condition</Col></Row>
 					<Row><Col md="12"><textarea name="ExecutionCondition" onChange={updateConditions} placeholder="Condition" className="form-control input-lg"/></Col></Row>
@@ -282,10 +292,10 @@ const EntryEditor = (props: any) => {
 						<span className="oi oi-fork"></span>
 					</button>
 					</Col>
-			</Row>    
+			</Row>
 			</Collapse>
 			*/}
-            
+
 			{/*</Collapse>
 
 			<hr/>
@@ -299,13 +309,13 @@ const EntryEditor = (props: any) => {
 		</div></ModalBody>
 		<ModalFooter className="d-flex justify-content-between">
 		    <button type="button" className="btn btn-secondary" onClick={props.close}>Cancel</button>
-			<button id="save-button-bottom" type="button" className="btn btn-primary" onClick={saveEntryData}>Save Changes</button>            
+			<button id="save-button-bottom" type="button" className="btn btn-primary" onClick={saveEntryData}>Save Changes</button>
 		</ModalFooter></>)
 	)
 }
 
 const mapStateToProps = (state: any) => ({
-    activeNode: state.reducer.activeNode
+    activeNode: state.documents.activeNode
 });
 
 const mapDispatchToProps = (dispatch: any) => ({

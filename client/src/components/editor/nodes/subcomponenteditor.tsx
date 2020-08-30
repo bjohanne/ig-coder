@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { INode } from "../../../core/model/interfaces";
-import { updateEntry } from "../../../state/actions";
-import { ModalBody } from 'reactstrap';
+import { updateEntry } from "../../../state/documents/actions";
+import ModalBody from 'react-bootstrap/ModalBody';
 import { SubcomponentNode } from "../../../core/model/nodes";
 import { Component } from "../../../core/model/component";
 import { componentColorScaler } from "../../../core/config/scales";
@@ -14,7 +14,7 @@ interface ISubcomponentData {
     suffix?: string
 }
 
-const SubComponentEditor = (props: any) => { 
+const SubComponentEditor = (props: any) => {
     const [content, setContent] = useState<ISubcomponentData>({
         prefix: "",
         main: "",
@@ -25,14 +25,14 @@ const SubComponentEditor = (props: any) => {
 
     useEffect(() => {
         setContent({ ...active.component.content })
-    }, [active.component.content])    
+    }, [active.component.content])
     // let changeValue = (e: React.FormEvent<HTMLInputElement>) => {
     //     setContent(e.currentTarget.value);
-    //     active.component = new Component(content);        
+    //     active.component = new Component(content);
     // }
 
     let saveComponent = () => {
-        active.component = new Component(content.main, content.prefix, content.suffix);               
+        active.component = new Component(content.main, content.prefix, content.suffix);
         props.updateEntry(active);
         props.activeNode.modalState(false);
     }
@@ -46,11 +46,13 @@ const SubComponentEditor = (props: any) => {
     const getparComponentType = () => {
         return props.activeNode.node.parent.data.componentType;
     }
-    const getparContent = () => {
+    /*const getparContent = () => {
         return props.activeNode.node.parent.data.content;
-    }
+    }*/
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [parcomptype, setparComptype] = useState(getparComponentType());
-    const [parcontent, setparcontent] = useState(getparContent());
+    //const [parcontent, setparcontent] = useState(getparContent());
 
     let currentComponentColor = componentColorScaler(props.activeNode.node.data.componentType);
 
@@ -75,8 +77,8 @@ const SubComponentEditor = (props: any) => {
                     <button className="btn-light btn" style={{margin:5}} onClick={saveComponent}>Clear</button>
                 </div>
             </ModalBody>
-            ) 
-        )  
+            )
+        )
     } else if (parcomptype === ComponentType.conditions) {
 	return (
 		props.activeNode && (
@@ -104,15 +106,15 @@ const SubComponentEditor = (props: any) => {
 		return (
 			props.activeNode && (
 			<div>
-			<input type="text" style={{ width: "100%" }} placeholder={`${props.activeNode.nodeType} ${props.activeNode.subcomponentType}`} name="component-value"  />            
+			<input type="text" style={{ width: "100%" }} placeholder={`${props.activeNode.nodeType} ${props.activeNode.subcomponentType}`} name="component-value"  />
 			</div>
-			) 
+			)
 		)
     }
 }
 
 const mapStateToProps = (state: any) => ({
-    activeNode: state.reducer.activeNode
+    activeNode: state.documents.activeNode
 });
 
 const mapDispatchToProps = (dispatch: any) => ({

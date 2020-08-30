@@ -68,13 +68,11 @@
     color: #61dafb;
 }
 
-.toast-body {
-	padding-left: 8px;
-}
 .component-editor-entry-text {
     padding: 1rem;
     font-size: 1.25rem;
 }
+
 .component-editor-input-controls {
 
     display: flex;

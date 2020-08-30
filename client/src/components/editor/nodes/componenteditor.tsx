@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { INode, INormAndConvention, IComponent } from "../../../core/model/interfaces";
-import { updateEntry } from "../../../state/actions";
-import { ModalBody } from 'reactstrap';
+import { updateEntry } from "../../../state/documents/actions";
+import ModalBody from 'react-bootstrap/ModalBody';
 import { ComponentNode } from "../../../core/model/nodes";
 import { Component } from "../../../core/model/component";
 import { componentColorScaler, posColorScaler, entColorScaler } from "../../../core/config/scales";
@@ -10,7 +10,7 @@ import SubComponentEditor from "./subcomponenteditor";
 import SubComponentActivationEditor from "./subcomponentactivationeditor";
 import { ComponentType } from "../../../core/model/enums";
 
-const ComponentEditor = (props: any) => { 
+const ComponentEditor = (props: any) => {
     const [component, setComponent] = useState<IComponent>({
 		content: {
 			main: "",
@@ -19,7 +19,7 @@ const ComponentEditor = (props: any) => {
 		}
 	});
     const [entryContentVal, setEntryContentVal] = useState("");
-    const [saveEnabled, setSaveEnabled] = useState(false);
+    //const [saveEnabled, setSaveEnabled] = useState(false);
     let active = props.activeNode.node.data as ComponentNode;
     let parent = props.activeNode.node.parent.data as INormAndConvention;
     let entryContent = parent.entry.content;
@@ -28,7 +28,7 @@ const ComponentEditor = (props: any) => {
         if(active.component && active.component.content) {
             setComponent(active.component);
         }
-    
+
         if(entryContent) {
             setEntryContentVal(entryContent);
         }
@@ -43,16 +43,16 @@ const ComponentEditor = (props: any) => {
 			console.log(value);
             let written = value;
             let textExists = parent.entry.content.indexOf(written) > -1
-            if(textExists) {                
-                setEntryContentVal(entryContent.replace(written, `<mark style='background-color: ${currentComponentColor}'>${written}</mark>`));                
+            if(textExists) {
+                setEntryContentVal(entryContent.replace(written, `<mark style='background-color: ${currentComponentColor}'>${written}</mark>`));
             }
-            setSaveEnabled(textExists && written.length > 0);
+            //setSaveEnabled(textExists && written.length > 0);
             setComponent((prev) => ({ content: { ...prev.content, [name]: written } }));
         }
     }
 
     let saveComponent = () => {
-        active.component = Component.fromData(component);               
+        active.component = Component.fromData(component);
         props.updateEntry(active);
         props.activeNode.modalState(false);
     }
@@ -62,7 +62,7 @@ const ComponentEditor = (props: any) => {
         let content = entryContent;
         let posColor = posColorScaler(pos);
         texts.forEach((text: string) => {
-            content = content.replace(text, `<mark style='background-color: ${posColor}'>${text}</mark>`); 
+            content = content.replace(text, `<mark style='background-color: ${posColor}'>${text}</mark>`);
         });
         setEntryContentVal(content);
     }
@@ -76,7 +76,7 @@ const ComponentEditor = (props: any) => {
         let content = entryContent;
         let entColor = entColorScaler(ent);
         texts.forEach((text: string) => {
-            content = content.replace(text, `<mark style='background-color: ${entColor}'>${text}</mark>`);             
+            content = content.replace(text, `<mark style='background-color: ${entColor}'>${text}</mark>`);
         });
         setEntryContentVal(content);
     }
@@ -85,8 +85,8 @@ const ComponentEditor = (props: any) => {
         setEntryContentVal(entryContent);
     }
 
-    return (        
-        props.activeNode && 
+    return (
+        props.activeNode &&
         (<ModalBody>
             <div className="modal-wrapper">
             <h4 style={{ padding: "1rem", color: "#fff", backgroundColor: currentComponentColor.toString() }}>{props.activeNode.node.data.componentType} ({props.activeNode.node.data.id})</h4>
@@ -104,7 +104,7 @@ const ComponentEditor = (props: any) => {
                     <input type="text" name="suffix" placeholder="Suffix" onFocus={changeValue} onMouseOver={changeValue} onChange={changeValue} value={component.content.suffix} />
                 </div>
             </div>
-            { active.componentType === ComponentType.conditions && 
+            { active.componentType === ComponentType.conditions &&
             <>
                 <SubComponentActivationEditor node={active.children[0]}/>
                 <SubComponentEditor node={active.children[1]}/>
@@ -137,12 +137,12 @@ const ComponentEditor = (props: any) => {
 
             </div>
             </div>
-        </ModalBody>) 
+        </ModalBody>)
     )
 }
 
 const mapStateToProps = (state: any) => ({
-    activeNode: state.reducer.activeNode
+    activeNode: state.documents.activeNode
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
