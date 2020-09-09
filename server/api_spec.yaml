@@ -354,13 +354,13 @@ definitions:
         maximum: 1
         example: 0
       created_time:
-        type: string
-        format: date-time
-        example: 2016-08-29T09:12:33.001Z
+        type: integer
+        format: int64
+        example: 1599644389
       modified_time:
-        type: string
-        format: date-time
-        example: 2016-08-29T09:12:33.001Z
+        type: integer
+        format: int64
+        example: 1599644389
   User_Post_Body:
     type: object
     required:
@@ -420,13 +420,13 @@ definitions:
         maximum: 3
         example: 2
       created_time:
-        type: string
-        format: date-time
-        example: 2016-08-29T09:12:33.001Z
+        type: integer
+        format: int64
+        example: 1599644389
       modified_time:
-        type: string
-        format: date-time
-        example: 2016-08-29T09:12:33.001Z
+        type: integer
+        format: int64
+        example: 1599644389
   Project_Post_Body:
     type: object
     required:
@@ -506,13 +506,13 @@ definitions:
         items:
           type: object
       created_time:
-        type: string
-        format: date-time
-        example: 2016-08-29T09:12:33.001Z
+        type: integer
+        format: int64
+        example: 1599644389
       modified_time:
-        type: string
-        format: date-time
-        example: 2016-08-29T09:12:33.001Z
+        type: integer
+        format: int64
+        example: 1599644389
   Document_Post_Body:
     type: object
     required:
