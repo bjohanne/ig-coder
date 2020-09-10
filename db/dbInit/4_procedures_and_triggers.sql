@@ -46,7 +46,8 @@ IF @inner_result IS TRUE THEN
 		SET visibility_id = @project_visibility;
 	END IF;
 	INSERT INTO `Document` (`name`, `description`, `project_id`, `visibility_id`) VALUES (name, description, project_id, visibility_id);
-    SELECT * FROM `Document` WHERE `document_id` = last_insert_id();
+	SELECT d.`document_id`, d.`name`, d.`description`, d.`project_id`, d.`visibility_id`, UNIX_TIMESTAMP(d.`created_time`) as 'created_time', UNIX_TIMESTAMP(d.`modified_time`) as 'modified_time'
+	FROM Document d WHERE d.`document_id` = last_insert_id();
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
@@ -59,7 +60,8 @@ CREATE PROCEDURE `create_project` (IN `name` VARCHAR(150), IN `description` VARC
 BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
 INSERT INTO `Project` (`name`, `description`, `visibility_id`) VALUES (name, description, visibility_id);
-SELECT * FROM `Project` WHERE `project_id` = last_insert_id();
+SELECT p.`project_id`, p.`name`, p.`description`, p.`visibility_id`, UNIX_TIMESTAMP(p.`created_time`) as 'created_time', UNIX_TIMESTAMP(p.`modified_time`) as 'modified_time'
+FROM `Project` p WHERE p.`project_id` = last_insert_id();
 INSERT INTO `Project_User` (`project_id`, `user_id`, `member_type_id`) VALUES (last_insert_id(), @user_id, 1); # Last insert ID is that of the Project, not the ProjectMemberPermission created by the trigger on Project
 END$$
 
