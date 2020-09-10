@@ -1,5 +1,5 @@
 def test_get(client):
     """Getting a user"""
 
-    rv = client.get('/users/abc123')
-    assert rv.status_code == 200
+    res = client.get('/v1/users/abc123')
+    assert res.status_code == 200

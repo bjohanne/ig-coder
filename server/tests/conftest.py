@@ -1,11 +1,13 @@
+import os
 import pytest
-import connexion
-
-flask_app = connexion.FlaskApp(__name__)
-flask_app.add_api('../api_spec.yaml', validate_responses=True, strict_validation=True)
+from .. import create_app
 
 
-@pytest.fixture(scope='module')
-def client():
-    with flask_app.app.test_client() as c:
-        yield c
+@pytest.fixture(scope="session")
+def app():
+    abs_file_path = os.path.abspath(os.path.dirname(__file__))
+    openapi_path = os.path.join(abs_file_path, "../", "openapi")
+    os.environ["SPEC_PATH"] = openapi_path
+
+    app = create_app()
+    return app
