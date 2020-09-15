@@ -46,7 +46,8 @@ IF @inner_result IS TRUE THEN
 		SET visibility_id = @project_visibility;
 	END IF;
 	INSERT INTO `Document` (`name`, `description`, `project_id`, `visibility_id`) VALUES (name, description, project_id, visibility_id);
-    SELECT * FROM `Document` WHERE `document_id` = last_insert_id();
+	SELECT d.`document_id`, d.`name`, d.`description`, d.`project_id`, d.`visibility_id`, UNIX_TIMESTAMP(d.`created_time`) as 'created_time', UNIX_TIMESTAMP(d.`modified_time`) as 'modified_time'
+	FROM Document d WHERE d.`document_id` = last_insert_id();
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
@@ -59,7 +60,8 @@ CREATE PROCEDURE `create_project` (IN `name` VARCHAR(150), IN `description` VARC
 BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
 INSERT INTO `Project` (`name`, `description`, `visibility_id`) VALUES (name, description, visibility_id);
-SELECT * FROM `Project` WHERE `project_id` = last_insert_id();
+SELECT p.`project_id`, p.`name`, p.`description`, p.`visibility_id`, UNIX_TIMESTAMP(p.`created_time`) as 'created_time', UNIX_TIMESTAMP(p.`modified_time`) as 'modified_time'
+FROM `Project` p WHERE p.`project_id` = last_insert_id();
 INSERT INTO `Project_User` (`project_id`, `user_id`, `member_type_id`) VALUES (last_insert_id(), @user_id, 1); # Last insert ID is that of the Project, not the ProjectMemberPermission created by the trigger on Project
 END$$
 
@@ -190,7 +192,8 @@ END IF;
 CALL help_get_user_id(user_uuid, @user_id);
 CALL permcheck_read_document(@user_id, document_id, @inner_result);
 IF @inner_result IS TRUE THEN
-	SELECT * FROM `Document` d WHERE d.`document_id` = document_id;
+	SELECT d.`document_id`, d.`name`, d.`description`, d.`project_id`, d.`visibility_id`, UNIX_TIMESTAMP(d.`created_time`) as 'created_time', UNIX_TIMESTAMP(d.`modified_time`) as 'modified_time'
+	FROM `Document` d WHERE d.`document_id` = document_id;
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
@@ -207,7 +210,8 @@ END IF;
 CALL help_get_user_id(user_uuid, @user_id);
 CALL permcheck_read_project(@user_id, project_id, @inner_result);
 IF @inner_result IS TRUE THEN
-	SELECT * FROM `Project` p WHERE p.`project_id` = project_id;
+	SELECT p.`project_id`, p.`name`, p.`description`, p.`visibility_id`, UNIX_TIMESTAMP(p.`created_time`) as 'created_time', UNIX_TIMESTAMP(p.`modified_time`) as 'modified_time'
+	FROM `Project` p WHERE p.`project_id` = project_id;
 	SET result = TRUE;
 ELSE
 	SET result = FALSE;
@@ -217,16 +221,19 @@ END$$
 # Read all public projects
 CREATE PROCEDURE `read_all_projects_public` ()  READS SQL DATA
     SQL SECURITY INVOKER
-SELECT * FROM `Project` p WHERE p.`visibility_id` = 3$$
+SELECT p.`project_id`, p.`name`, p.`description`, p.`visibility_id`, UNIX_TIMESTAMP(p.`created_time`) as 'created_time', UNIX_TIMESTAMP(p.`modified_time`) as 'modified_time'
+FROM `Project` p WHERE p.`visibility_id` = 3$$
 
 # Read all public or internal projects
 CREATE PROCEDURE `read_all_projects_public_internal` (IN `user_uuid` VARCHAR(48))  READS SQL DATA
     SQL SECURITY INVOKER
 BEGIN
 IF user_uuid IS NOT NULL THEN
-	SELECT * FROM `Project` p WHERE p.`visibility_id` = 3 OR p.`visibility_id` = 2;
+	SELECT p.`project_id`, p.`name`, p.`description`, p.`visibility_id`, UNIX_TIMESTAMP(p.`created_time`) as 'created_time', UNIX_TIMESTAMP(p.`modified_time`) as 'modified_time'
+	FROM `Project` p WHERE p.`visibility_id` = 3 OR p.`visibility_id` = 2;
 ELSE
-	SELECT * FROM `Project` p WHERE p.`visibility_id` = 3;
+	SELECT p.`project_id`, p.`name`, p.`description`, p.`visibility_id`, UNIX_TIMESTAMP(p.`created_time`) as 'created_time', UNIX_TIMESTAMP(p.`modified_time`) as 'modified_time'
+	FROM `Project` p WHERE p.`visibility_id` = 3;
 END IF;
 END$$
 
@@ -235,7 +242,8 @@ CREATE PROCEDURE `read_all_projects_member` (IN `user_uuid` VARCHAR(48))  READS 
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
-SELECT p.* FROM `Project` p INNER JOIN `Project_User` pu ON p.`project_id` = pu.`project_id`
+SELECT p.`project_id`, p.`name`, p.`description`, p.`visibility_id`, UNIX_TIMESTAMP(p.`created_time`) as 'created_time', UNIX_TIMESTAMP(p.`modified_time`) as 'modified_time'
+FROM `Project` p INNER JOIN `Project_User` pu ON p.`project_id` = pu.`project_id`
 WHERE pu.`user_id` = @user_id AND p.`visibility_id` = 1
 AND EXISTS(SELECT * FROM `ProjectMemberPermission` pmp WHERE pmp.`project_id` = p.`project_id` AND pmp.`member_type_id` = pu.`member_type_id` AND pmp.`operation_type_id` = 2);
 END$$
@@ -245,7 +253,8 @@ CREATE PROCEDURE `read_all_projects_shared` (IN `user_uuid` VARCHAR(48))  READS 
     SQL SECURITY INVOKER
 BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
-SELECT * FROM `Project` p WHERE p.`visibility_id` = 1
+SELECT p.`project_id`, p.`name`, p.`description`, p.`visibility_id`, UNIX_TIMESTAMP(p.`created_time`) as 'created_time', UNIX_TIMESTAMP(p.`modified_time`) as 'modified_time'
+FROM `Project` p WHERE p.`visibility_id` = 1
 AND EXISTS(SELECT * FROM `ProjectUserPermission` pup WHERE pup.`project_id` = p.`project_id` AND pup.`user_id` = @user_id AND pup.`operation_type_id` = 2);
 END$$
 
@@ -268,7 +277,8 @@ CREATE PROCEDURE `read_all_statements_of_document` (IN `document_id` MEDIUMINT U
 BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
 CALL help_get_membership_of_document(@user_id, document_id, @membership);
-SELECT s.* FROM `Statement` s INNER JOIN `Document` d ON s.`document_id` = d.`document_id` WHERE s.`document_id` = document_id
+SELECT s.`statement_id`, s.`foreign_id`, s.`document_id`, UNIX_TIMESTAMP(s.`created_time`) as 'created_time', UNIX_TIMESTAMP(s.`modified_time`) as 'modified_time'
+FROM `Statement` s INNER JOIN `Document` d ON s.`document_id` = d.`document_id` WHERE s.`document_id` = document_id
 AND ((EXISTS(SELECT * FROM `DocumentMemberPermission` dmp WHERE dmp.`document_id` = document_id AND dmp.`member_type_id` = @membership AND dmp.`operation_type_id` = 2)
 	OR EXISTS(SELECT * FROM `DocumentUserPermission` dup WHERE dup.`document_id` = document_id AND dup.`user_id` = @user_id AND dup.`operation_type_id` = 2))
 OR (user_uuid IS NOT NULL AND d.`visibility_id` = 2)
@@ -282,7 +292,8 @@ BEGIN
 CALL help_get_user_id(user_uuid, @user_id);
 CALL help_get_document_of_statement(statement_id, @document_id);
 CALL help_get_membership_of_document(@user_id, @document_id, @membership);
-SELECT sv.* FROM `StatementVersion` sv INNER JOIN `Statement` s ON sv.`statement_id` = s.`statement_id` INNER JOIN `Document` d ON s.`document_id` = d.`document_id`
+SELECT sv.`version_id`, sv.`foreign_id`, sv.`statement_id`, sv.`user_id`, UNIX_TIMESTAMP(sv.`created_time`) as 'created_time', UNIX_TIMESTAMP(sv.`modified_time`) as 'modified_time'
+FROM StatementVersion sv INNER JOIN `Statement` s ON sv.`statement_id` = s.`statement_id` INNER JOIN `Document` d ON s.`document_id` = d.`document_id`
 WHERE sv.`statement_id` = statement_id
 AND ((EXISTS(SELECT * FROM `DocumentMemberPermission` dmp WHERE dmp.`document_id` = @document_id AND dmp.`member_type_id` = @membership AND dmp.`operation_type_id` = 2)
 	OR EXISTS(SELECT * FROM `DocumentUserPermission` dup WHERE dup.`document_id` = @document_id AND dup.`user_id` = @user_id AND dup.`operation_type_id` = 2))
@@ -297,13 +308,15 @@ BEGIN
 IF NOT EXISTS(SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid) THEN
 	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User foreign_id does not exist', MYSQL_ERRNO = '02000';
 END IF;
-SELECT * FROM `User` u WHERE u.`foreign_id` = user_uuid;
+SELECT u.`user_id`, u.`foreign_id`, u.`first_name`, u.`last_name`, u.`disabled`, u.`privileged`, UNIX_TIMESTAMP(u.`created_time`) as 'created_time', UNIX_TIMESTAMP(u.`modified_time`) as 'modified_time'
+FROM `User` u WHERE u.`foreign_id` = user_uuid;
 END$$
 
 # Get all users
 CREATE PROCEDURE `get_all_users` ()  READS SQL DATA
     SQL SECURITY INVOKER
-SELECT * FROM `User`$$
+SELECT u.`user_id`, u.`foreign_id`, u.`first_name`, u.`last_name`, u.`disabled`, u.`privileged`, UNIX_TIMESTAMP(u.`created_time`) as 'created_time', UNIX_TIMESTAMP(u.`modified_time`) as 'modified_time'
+FROM `User` u$$
 
 -- --------------------------------------------------------
 -- Updaters
