@@ -9,7 +9,7 @@ def create_app():
         openapi_path = os.environ["SPEC_PATH"]
     else:
         abs_file_path = os.path.abspath(os.path.dirname(__file__))
-        openapi_path = os.path.join(abs_file_path, "../", "../", "openapi")
+        openapi_path = os.path.join(abs_file_path, "openapi")
     app = connexion.FlaskApp(__name__, specification_dir=openapi_path)
     app.add_api('swagger.yaml', validate_responses=True, strict_validation=True)
 

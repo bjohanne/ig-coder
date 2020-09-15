@@ -20,6 +20,12 @@ access_denied_msg = "Something is wrong with your username or password"
 bad_db_msg = "Database does not exist"
 
 
+"""
+Problem: How to ignore ER_SP_FETCH_NO_DATA?
+This MySQL error comes up when calling procedures and permission is not granted.
+"""
+
+
 def handle_error(error):
     if error.errno == errorcode.ER_ACCESS_DENIED_ERROR:
         print(access_denied_msg)
@@ -65,7 +71,11 @@ def execute_no_result_set_permission(proc_name, args):
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor()
     try:
-        cursor.callproc(proc_name, args)
+        try:    # Specially handle ER_SP_FETCH_NO_DATA, ignore it and proceed
+            cursor.callproc(proc_name, args)
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_SP_FETCH_NO_DATA:
+                pass    # The above error occurs in the DB API when permission is not granted, which we handle
         # Get output parameter, which is always the last argument as defined in the database API
         cursor.execute("SELECT " + "@_" + proc_name + "_arg" + str(len(args)))
         permission = cursor.fetchone()
@@ -115,7 +125,12 @@ def execute_one_result_set_permission(proc_name, args):
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor()
     try:
-        cursor.callproc(proc_name, args)
+        try:    # Specially handle ER_SP_FETCH_NO_DATA, ignore it and proceed
+            cursor.callproc(proc_name, args)
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_SP_FETCH_NO_DATA:
+                pass    # The above error occurs in the DB API when permission is not granted, which we handle
+            # NB: See if this handling is needed for the other execute function with permission. Get Doc, for example.
         # get the result set
         result_sets = []
         for result_set in cursor.stored_results():
