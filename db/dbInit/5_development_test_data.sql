@@ -42,6 +42,9 @@ INSERT INTO `Project` (`name`, `description`, `visibility_id`) VALUES
 INSERT INTO `Document` (`name`, `description`, `project_id`, `visibility_id`) VALUES
 ('My Document', 'A dummy document', 1, 1);	# Private visibility
 
+INSERT INTO `Document` (`name`, `description`, `project_id`, `visibility_id`) VALUES
+('Another Document', 'Another dummy document', 2, 1);      # Private visibility
+
 INSERT INTO `Project_User` (`project_id`, `user_id`, `member_type_id`) VALUES
 (1, 1, 1);	# User1 is an owner of Project 1
 
