@@ -68,7 +68,7 @@ export const updateNegation = (payload: any) => ({
     payload: payload
 });
 
-export const createDocument = (name, description, onSuccess, onError) => async dispatch => {
+export const createDocument = (name, description, visibility, onSuccess, onError) => async dispatch => {
     dispatch({ type: API_CALL_BEGIN });
     axios({
         url: "/documents",
@@ -76,6 +76,8 @@ export const createDocument = (name, description, onSuccess, onError) => async d
         data: {
             name,
             description,
+			visibility_id: visibility,
+			project_id: 1,	// NB: Hardcoded project ID for now - should take the current project
             forest: []
         }
     })
@@ -88,7 +90,7 @@ export const createDocument = (name, description, onSuccess, onError) => async d
             type: API_CALL_SUCCESS,
             payload: "Document created!"
         });
-        onSuccess(response.data.id);
+        onSuccess(response.data.document_id);
     })
     .catch(() => {
         let errorMsg = "Something went wrong, we couldn't create the document. Please try again.";

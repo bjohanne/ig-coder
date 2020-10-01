@@ -18,6 +18,7 @@ export default class Document implements IDocument {
 	 * @param name The document's title
 	 * @param description A free-text field describing the document
 	 * @param id The document's identifier, given by the server
+	 * @param forest (Optional) The document's forest of nodes, if one already exists
 	 */
     constructor(public name: string, public description: string, public id: number, forest?: INode[]) {
         this.name = name;

@@ -73,7 +73,7 @@ export function NewDocumentContainer(props) {
             return;
         }
         disableSubmitButton();
-        createDocument(state.name, state.description,
+        createDocument(state.name, state.description, state.visibility,
             (id) => {
                 history.push(`/documents/${id}`);
                 openSnackbar();
@@ -103,8 +103,8 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    createDocument: (name, description, onSuccess, onError) =>
-        dispatch(createDocument(name, description, onSuccess, onError)),
+    createDocument: (name, description, visibility, onSuccess, onError) =>
+        dispatch(createDocument(name, description, visibility, onSuccess, onError)),
     openSnackbar: () => dispatch(openSnackbar())
 });
 
