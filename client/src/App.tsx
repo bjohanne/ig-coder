@@ -3,7 +3,7 @@
   Fixed UI elements such as the navbar should be placed here.
 */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { ReactReduxFirebaseProvider } from "react-redux-firebase";
@@ -30,10 +30,19 @@ import ViewDocumentComponent from "./components/documents/viewDocument";
 import ProjectsPage from "./components/projects/projectsPage";
 import DocumentsPage from "./components/documents/documentsPage";
 
+// Config
+import appConfig from "./core/config/appConfig";
+import axios from "axios";
+
 // Firebase
 import firebase, { rrfConfig } from "./core/config/firebase";
 
 function App() {
+	useEffect(() => {
+		axios.defaults.baseURL = appConfig.api.baseUrl;
+		axios.defaults.timeout = 1000;
+	}, []);	// This will only run once
+
 	const reactReduxFirebaseProps = {
 		firebase,
 		config: rrfConfig,
