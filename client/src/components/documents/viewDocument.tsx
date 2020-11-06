@@ -3,8 +3,8 @@ import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import Spinner from "react-bootstrap/Spinner";
 import Accordion from "../units/accordion";
-import NewEntryEditor from "./../editor/newEntry";
-import TreeComponent from "../editor/tree";
+//import NewEntryEditor from "./../editor/newEntry";
+//import TreeComponent from "../editor/tree";
 
 import {INode} from "../../core/model/interfaces";
 import {getDocument, saveDocumentRequest} from "../../state/documents/actions";
@@ -53,20 +53,20 @@ export function ViewDocumentComponent(props) {
                         <small className="text-muted">{currentDocument.description}</small>
                     </div>
                     <div className="col-md-6 text-right">
-                        <NewEntryEditor
+                        {/*<NewEntryEditor
                             toggle={(show: any) =>
                                 <button type="button" className="btn btn-primary" onClick={show}>Create New Entry</button>
                             }
                             content={(hide: any) =>
                                 <Accordion close={hide} id={currentDocument.id}/>
                             }
-                        />
+                        />*/}
                     </div>
                 </div>
 
                 <div className="card-body" id="node-100000">
                 {(currentDocument.forest && currentDocument.forest.length &&
-                currentDocument.forest.map((root: INode) => <div key={root.id}><TreeComponent node={root}/></div>))
+                currentDocument.forest.map((root: INode) => <div key={root.id}></div>)) // between divs: <TreeComponent node={root}/>
                 ||
                 <h4 className="text-center">No entries to display</h4>
                 }

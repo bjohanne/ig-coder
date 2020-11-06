@@ -14,7 +14,7 @@ import {
 import { API_CALL_BEGIN, API_CALL_SUCCESS, API_CALL_ERROR } from "../apiCall/actions";
 
 import Document from "../../core/model/document";
-import { NormNode, ConventionNode, JunctionNode, NegationNode } from '../../core/model/nodes';
+import { RegulativeStatementNode, JunctionNode } from '../../core/model/nodes';
 import { Arg } from '../../core/model/enums';
 import { INode } from '../../core/model/interfaces';
 
@@ -63,59 +63,33 @@ const documents = (state: IDocumentState = initialState, action: any) => {
         case ADD_JUNCTION:
             node = action.payload as INode;
             currentDocument = state.currentDocument as Document;
-            currentDocument.forest[0].updatedAt = new Date();
-            currentDocument.updateNode(node);
+            currentDocument.entries[0].root.updatedAt = new Date();
+            currentDocument.replaceNode(node);
             newDocument = Object.assign(new Document("", "", -1), currentDocument);
             return update(state, {currentDocument: {$set: newDocument }});
         case UPDATE_JUNCTION:
             let junctionNode = action.payload.node as JunctionNode;
             currentDocument = state.currentDocument as Document;
-            currentDocument.forest[0].updatedAt = new Date();
+            currentDocument.entries[0].root.updatedAt = new Date();
             junctionNode.setJunction(action.payload.junctionType);
-            currentDocument.updateNode(junctionNode);
+            currentDocument.replaceNode(junctionNode);
             newDocument = Object.assign(new Document("", "", -1), currentDocument);
             return update(state, {currentDocument: {$set: newDocument }});
 
         case UPDATE_NEGATION:
-            let negationNode = action.payload.node as NegationNode;
+            let negationNode = action.payload.node;
             currentDocument = state.currentDocument as Document;
-            currentDocument.forest[0].updatedAt = new Date();
-            currentDocument.updateNode(negationNode);
+            currentDocument.entries[0].root.updatedAt = new Date();
+            currentDocument.replaceNode(negationNode);
             newDocument = Object.assign(new Document("", "", -1), currentDocument);
             return update(state, {currentDocument: {$set: newDocument }});
 
         case ADD_ENTRY_TO_DOCUMENT:
-            if(state.currentDocument.forest.length === 0) { // NB: Change this when allowing multiple entries per document
+            if(state.currentDocument.entries.length >= 0) { // Not sure why this check is necessary
                 let doc = new Document(state.currentDocument.name, state.currentDocument.description, state.currentDocument.id);
-                doc.createTree(action.payload.hasDeontic ? Arg.norm : Arg.convention, action.payload.content);
-				let root = (action.payload.hasDeontic) ? doc.getRoot() as NormNode : doc.getRoot() as ConventionNode;
+                let entry = doc.createEntry();
+                let root = entry.createRoot(Arg.regulative, action.payload.content) as RegulativeStatementNode;
 				root.createObject();
-
-				/*
-				// Below is development stuff - building an example tree to demonstrate the different node types
-				doc.addSanctionNodeToTree(0);
-				let root = doc.getRoot() as SanctionNode;
-				let norm = root.getLeft() as NormNode;	// Actually a Convention node, maybe
-				doc.turnOnNegation(norm, 0);
-				norm.setEntry("The Program Manager may not initiate suspension or revocation proceedings against a certified operation.");
-				let obj = norm.createObject() as ComponentNode;
-				let attr = norm.getAttributes() as ComponentNode;
-				attr.setContent("Program Manager", "The");
-				let dirObj = obj.getLeft() as SubcomponentNode;
-				let jun = dirObj.createJunctionNode() as JunctionNode;
-				jun.setJunction(JunctionType.xor);
-				let left = jun.createSubcomponentNode(SubcomponentType.direct, Arg.left) as SubcomponentNode;
-				left.setContent("suspension");
-				let right = jun.createSubcomponentNode(SubcomponentType.direct, Arg.right) as SubcomponentNode;
-				right.setContent("revocation proceedings");
-				let indirObj = obj.getRight() as SubcomponentNode;
-				let only = indirObj.createSubcomponentNode(SubcomponentType.indirect, Arg.only) as SubcomponentNode;
-				only.setContent("a certified operation");
-				let aim = norm.getAim() as ComponentNode;
-				aim.setContent("initiate");
-				// End dev stuff
-				*/
-
 				return update(state, { currentDocument: { $set: doc }});
 			} else {
 				return state;
@@ -123,7 +97,7 @@ const documents = (state: IDocumentState = initialState, action: any) => {
         case SET_ACTIVE_NODE:
             return update(state, { activeNode: { $set: action.payload }});
         case UPDATE_ENTRY:
-            state.currentDocument.updateNode(action.payload);
+            state.currentDocument.replaceNode(action.payload);
             let nDoc = Object.assign(new Document("", "", -1), state.currentDocument);
             return update(state, {currentDocument: { $set: nDoc } });
         case "persist/REHYDRATE":
@@ -142,7 +116,7 @@ const documents = (state: IDocumentState = initialState, action: any) => {
 			let dlist = [];
 			if (origList && origList.length > 0) {
 				origList.forEach((d: Document) => {
-					dlist.push(new Document(d.name, d.description, d.id, d.forest));
+					dlist.push(new Document(d.name, d.description, d.id, d.entries));
 				});
 			}
 

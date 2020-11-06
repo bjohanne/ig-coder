@@ -1,7 +1,8 @@
 import { IComponent } from "./interfaces"
 
 /**
- * An ABDICO component that holds text content.
+ * This class holds the text content of institutional components.
+ * TODO: IG Extended properties go here.
  * It can optionally have prefix and suffix.
  * Main holds the text that most narrowly fits the component type.
  * Prefix and suffix hold the rest of the clause that belongs to the component,
@@ -89,9 +90,9 @@ import { IComponent } from "./interfaces"
 		}
 	}
 
-	/*
-	 Concatenates the Component's prefix, main and suffix.
-	 If main is an empty string, the resulting string will have no superfluous spaces.
+	/**
+	 * Concatenates the Component's prefix, main and suffix.
+	 * If main is an empty string, the resulting string will have no superfluous spaces.
 	 */
 	string() : string {
 		let ret: string = "";

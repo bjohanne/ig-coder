@@ -10,7 +10,7 @@ import {
 import { Middleware, MiddlewareAPI } from "redux";
 import axios, { AxiosResponse, AxiosError } from "axios";
 import Document from "../../core/model/document";
-import { INormAndConvention } from "../../core/model/interfaces";
+import { IRegulativeStatementNode } from "../../core/model/interfaces";
 
 export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: any) => (action: any) => {
     switch (action.type) {
@@ -49,9 +49,9 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
                 return;
             }
             // extract the entry text, pass it to the endpoint
-            let parent = action.payload.node.parent.data as INormAndConvention;
-            let data = { entry: parent.entry.content }
-            axios.post("/entities", data).then((response) => {
+            let parent = action.payload.node.parent.data as IRegulativeStatementNode;
+            //let data = { entry: parent.entry.content }    // TODO FIX
+            axios.post("/entities", "DUMMY STRING").then((response) => {
                 store.dispatch({type: SET_ACTIVE_NODE, payload: Object.assign(action.payload, { ents: response.data["ent"], pos: response.data["pos"] }) });
                 action.payload.togglefunc();
             })
