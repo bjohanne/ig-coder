@@ -91,30 +91,30 @@ import { IComponent } from "./interfaces"
 	}
 
 	/**
-	 * Concatenates the Component's prefix, main and suffix.
+	 * Concatenates the Component's prefix, main and suffix and returns the resulting string.
 	 * If main is an empty string, the resulting string will have no superfluous spaces.
 	 */
-	string() : string {
-		let ret: string = "";
+	getString() : string {
+		let str: string = "";
 
 		if (this.content) {
 			if (this.content.prefix) {
-				ret += this.content.prefix;
+				str += this.content.prefix;
 				if (this.content.main) {
-					ret += " ";
+					str += " ";
 				}
 			}
 
-			ret += this.content.main;
+			str += this.content.main;
 
 			if (this.content.suffix) {
 				if (this.content.main) {
-					ret += " ";
+					str += " ";
 				}
-				ret += this.content.suffix;
+				str += this.content.suffix;
 			}
 		}
-		return ret;
+		return str;
 	}
 }
 

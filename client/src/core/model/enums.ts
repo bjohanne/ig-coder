@@ -4,9 +4,6 @@
  * Note: The Statement and Junction types aren't strictly needed,
  * as those classes are base classes not intended to be used directly.
  */
-import {Simulate} from "react-dom/test-utils";
-import contextMenu = Simulate.contextMenu;
-
 export enum NodeType {
     statement             = "Statement",
     regulativestatement   = "Regulative Statement",
@@ -94,6 +91,7 @@ export enum Arg {
     con_orelse                  = 6
 }
 
+/*
 class ContextComponent {
     code: string    // Abbreviation
 }
@@ -122,6 +120,7 @@ class CMethod extends ContextComponent { code = "met" }
 class CCause extends ContextComponent { code = "cau" }
 class CPurpose extends ContextComponent { code = "pur" }
 class CObservedEffect extends ContextComponent { code = "eff" }
+*/
 
 /**
  * A representation of the Circumstances Taxonomy used to label Context components.
@@ -159,3 +158,5 @@ export const ContextType = {
     purpose: "pur",
     observedeffect: "eff"
 }
+
+// TODO: Make context types a flat enum

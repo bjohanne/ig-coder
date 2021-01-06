@@ -1,6 +1,6 @@
 import { BaseNode, ComponentNode } from "./";
 import { INode, IRegulativeStatementNode } from "../interfaces";
-import { NodeType, ComponentType } from "../enums";
+import { NodeType, ComponentType, Arg } from "../enums";
 import { DataError, DataErrorType } from "../errors";
 
 /**
@@ -39,21 +39,21 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
      * Returns whether this node has an Object child.
      */
 	hasObject() : boolean {
-		return (!this.children[1].isDummy());
+		return (!this.children[Arg.reg_object].isDummy());
 	}
 
     /**
      * Returns whether this node has a Deontic child.
      */
     hasDeontic() : boolean {
-        return (!this.children[2].isDummy());
+        return (!this.children[Arg.reg_deontic].isDummy());
     }
 
     /**
      * Returns whether this node has an Or else child.
      */
     hasOrElse() : boolean {
-        return (!this.children[6].isDummy());
+        return (!this.children[Arg.reg_orelse].isDummy());
     }
 
     /* Getters for children */
@@ -62,7 +62,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
      * Returns this node's Attribute child.
      */
     getAttribute() : ComponentNode {
-        return this.children[0];
+        return this.children[Arg.reg_attribute];
     }
 
     /**
@@ -73,7 +73,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
 		if (!this.hasObject()) {
             throw new DataError(DataErrorType.REG_NO_OBJ);
 		}
-        return this.children[1];
+        return this.children[Arg.reg_object];
     }
 
     /**
@@ -84,28 +84,28 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
         if (!this.hasDeontic()) {
             throw new DataError(DataErrorType.REG_NO_DNT);
         }
-        return this.children[2];
+        return this.children[Arg.reg_deontic];
     }
 
     /**
      * Returns this node's Aim child.
      */
     getAim() : ComponentNode {
-        return this.children[3];
+        return this.children[Arg.reg_aim];
     }
 
     /**
      * Returns this node's ActivationConditions child.
      */
     getActivationConditions() : ComponentNode {
-        return this.children[4];
+        return this.children[Arg.reg_activationconditions];
     }
 
     /**
      * Returns this node's ExecutionConstraints child.
      */
     getExecutionConstraints() : ComponentNode {
-        return this.children[5];
+        return this.children[Arg.reg_executionconstraints];
     }
 
     /**
@@ -116,7 +116,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
         if (!this.hasOrElse()) {
             throw new DataError(DataErrorType.REG_NO_ORELSE);
         }
-        return this.children[6];
+        return this.children[Arg.reg_orelse];
     }
 
     /* Create and delete Object child */
@@ -130,9 +130,9 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
             console.warn("Attempt to overwrite existing node - operation aborted")
             return;
         }
-		this.children[1] = new ComponentNode(ComponentType.object, this.document, this.id);
+		this.children[Arg.reg_object] = new ComponentNode(ComponentType.object, this.document, this.id);
 		this.update();
-		return this.children[1];
+		return this.children[Arg.reg_object];
 	}
 
 	/**
@@ -143,7 +143,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
             console.warn("Attempt to delete dummy node - operation aborted")
             return;
         }
-		this.children[1] = new BaseNode(this.document, this.id);
+		this.children[Arg.reg_object] = new BaseNode(this.document, this.id);
 		this.update();
 	}
 
@@ -158,9 +158,9 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
             console.warn("Attempt to overwrite existing node - operation aborted")
             return;
         }
-        this.children[2] = new ComponentNode(ComponentType.deontic, this.document, this.id);
+        this.children[Arg.reg_deontic] = new ComponentNode(ComponentType.deontic, this.document, this.id);
         this.update();
-        return this.children[2];
+        return this.children[Arg.reg_deontic];
     }
 
     /**
@@ -171,7 +171,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
             console.warn("Attempt to delete dummy node - operation aborted")
             return;
         }
-        this.children[2] = new BaseNode(this.document, this.id);
+        this.children[Arg.reg_deontic] = new BaseNode(this.document, this.id);
         this.update();
     }
 
@@ -186,7 +186,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
             console.warn("Attempt to overwrite existing node - operation aborted")
             return;
         }
-        this.children[6] = new ComponentNode(ComponentType.orelse, this.document, this.id);
+        this.children[Arg.reg_orelse] = new ComponentNode(ComponentType.orelse, this.document, this.id);
         this.update();
         return this.children[6];
     }
@@ -199,7 +199,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
             console.warn("Attempt to delete dummy node - operation aborted")
             return;
         }
-        this.children[6] = new BaseNode(this.document, this.id);
+        this.children[Arg.reg_orelse] = new BaseNode(this.document, this.id);
         this.update();
     }
 }
