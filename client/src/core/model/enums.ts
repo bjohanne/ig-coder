@@ -94,68 +94,34 @@ export enum Arg {
     con_orelse                  = 6
 }
 
-class ContextComponent {
-    code: string    // Abbreviation
-}
-
-class CTemporal extends ContextComponent { code = "tmp" }
-    class CPointInTime extends CTemporal { code = "tim" }
-        class CTemporalBeginning extends CPointInTime { code = "beg" }
-        class CTemporalEnd extends CPointInTime { code = "end" }
-    class CTimeframe extends CTemporal { code = "tfr" }
-    class CFrequency extends CTemporal { code = "frq" }
-class CSpatial extends ContextComponent { code = "spt" }
-    class CLocation extends CSpatial { code = "loc" }
-        class CSpatialBeginning extends CLocation { code = "beg" }
-        class CSpatialEnd extends CLocation { code = "end" }
-    class CDirection extends CSpatial { code = "dir" }
-    class CPath extends CSpatial { code = "pth" }
-class CState extends ContextComponent { code = "ste" }
-    class CStateBeginning extends CState { code = "beg" }
-    class CStateEnd extends CState { code = "end" }
-class CStateTransition extends ContextComponent { code = "tra" }
-class CProceduralOrder extends ContextComponent { code = "prc" }
-class CConcept extends ContextComponent { code = "cpt" }
-class CMethod extends ContextComponent { code = "met" }
-    class CMeans extends CMethod { code = "mns" }
-    class CInstrument extends CMethod { code = "ins" }
-class CCause extends ContextComponent { code = "cau" }
-class CPurpose extends ContextComponent { code = "pur" }
-class CObservedEffect extends ContextComponent { code = "eff" }
-
 /**
  * A representation of the Circumstances Taxonomy used to label Context components.
- * Note that this is an object, not an enumerator.
+ * The indentation shows the hierarchy for reference, though this hierarchy is inconsequential
+ * for the purposes of labelling Context nodes.
  */
-export const ContextType = {
-    temporal: {
-        pointintime: {
-            beginning: "beginning",
-            end: "end"
-        },
-        timeframe: "tfr",
-        frequency: "frq"
-    },
-    spatial: {
-        location: {
-            beginning: "beginning",
-            end: "end"
-        },
-        direction: "dir",
-        path: "pth"
-    },
-    state: {
-        beginning: "beginning",
-        end: "end"
-    },
-    statetransition: "tra",
-    proceduralorder: "prc",
-    concept: "cpt",
-    method: {
-        means: "means",
-        instrument: "instrument"
-    },
-    cause: "cau",
-    purpose: "pur",
-    observedeffect: "eff"
+export enum ContextType {
+    temporal = "tmp",
+        pointintime = "tim",
+            t_beginning = "beg",
+            t_end = "end",
+        timeframe = "tfr",
+        frequency = "frq",
+    spatial = "spt",
+        location = "loc",
+            sp_beginning = "beg",
+            sp_end = "end",
+        direction = "dir",
+        path = "pth",
+    state = "ste",
+        st_beginning = "beg",
+        st_end = "end",
+    statetransition = "tra",
+    proceduralorder = "prc",
+    concept = "cpt",
+    method = "met",
+        means = "mns",
+        instrument = "ins",
+    cause = "cau",
+    purpose = "pur",
+    observedeffect = "eff"
 }

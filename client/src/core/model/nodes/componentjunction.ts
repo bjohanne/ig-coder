@@ -9,7 +9,7 @@ import { matchComponentTypes } from "../helpers";
  */
 export default class ComponentJunctionNode extends JunctionNode {
 	nodeType: NodeType = NodeType.componentjunction;
-    componentType!: ComponentType;		 // Used to check for correct type within statement subtrees
+    componentType!: ComponentType;		 // Used to check for correct type when nesting Component nodes
 
 	/**
 	 * Creates a new Junction node with dummy children.
