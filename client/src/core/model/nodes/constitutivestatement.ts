@@ -1,6 +1,6 @@
 import { BaseNode, ComponentNode } from "./";
 import { INode, IConstitutiveStatementNode } from "../interfaces";
-import { NodeType, ComponentType } from "../enums";
+import { NodeType, ComponentType, Arg } from "../enums";
 import { DataError, DataErrorType } from "../errors";
 
 /**
@@ -39,21 +39,21 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
      * Returns whether this node has a ConstitutingProperties child.
      */
     hasConstitutingProperties() : boolean {
-		return (!this.children[0].isDummy());
+		return (!this.children[Arg.con_constitutingproperties].isDummy());
 	}
 
     /**
      * Returns whether this node has a Deontic child.
      */
     hasDeontic() : boolean {
-        return (!this.children[1].isDummy());
+        return (!this.children[Arg.con_deontic].isDummy());
     }
 
     /**
      * Returns whether this node has an Or else child.
      */
     hasOrElse() : boolean {
-        return (!this.children[6].isDummy());
+        return (!this.children[Arg.con_orelse].isDummy());
     }
 
     /* Getters for children */
@@ -66,7 +66,7 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
         if (!this.hasConstitutingProperties()) {
             throw new DataError(DataErrorType.CON_NO_CONPROP);
         }
-        return this.children[0];
+        return this.children[Arg.con_constitutingproperties];
     }
 
     /**
@@ -77,35 +77,35 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
 		if (!this.hasDeontic()) {
             throw new DataError(DataErrorType.CON_NO_DNT);
 		}
-        return this.children[1];
+        return this.children[Arg.con_deontic];
     }
 
     /**
      * Returns this node's ConstitutiveFunction child.
      */
     getConstitutiveFunction() : ComponentNode {
-        return this.children[2];
+        return this.children[Arg.con_constitutivefunction];
     }
 
     /**
      * Returns this node's ConstitutedEntity child.
      */
     getConstitutedEntity() : ComponentNode {
-        return this.children[3];
+        return this.children[Arg.con_constitutedentity];
     }
 
     /**
      * Returns this node's ActivationConditions child.
      */
     getActivationConditions() : ComponentNode {
-        return this.children[4];
+        return this.children[Arg.con_activationconditions];
     }
 
     /**
      * Returns this node's ExecutionConstraints child.
      */
     getExecutionConstraints() : ComponentNode {
-        return this.children[5];
+        return this.children[Arg.con_executionconstraints];
     }
 
     /**
@@ -116,7 +116,7 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
         if (!this.hasOrElse()) {
             throw new DataError(DataErrorType.CON_NO_ORELSE);
         }
-        return this.children[6];
+        return this.children[Arg.con_orelse];
     }
 
     /* Create and delete ConstitutingProperties child */
@@ -130,9 +130,10 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
             console.warn("Attempt to overwrite existing node - operation aborted")
             return;
         }
-		this.children[0] = new ComponentNode(ComponentType.constitutingproperties, this.document, this.id);
+		this.children[Arg.con_constitutingproperties] =
+            new ComponentNode(ComponentType.constitutingproperties, this.document, this.id);
 		this.update();
-		return this.children[0];
+		return this.children[Arg.con_constitutingproperties];
 	}
 
 	/**
@@ -143,7 +144,7 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
             console.warn("Attempt to delete dummy node - operation aborted")
             return;
         }
-		this.children[0] = new BaseNode(this.document, this.id);
+		this.children[Arg.con_constitutingproperties] = new BaseNode(this.document, this.id);
 		this.update();
 	}
 
@@ -158,9 +159,9 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
             console.warn("Attempt to overwrite existing node - operation aborted")
             return;
         }
-        this.children[1] = new ComponentNode(ComponentType.deontic, this.document, this.id);
+        this.children[Arg.con_deontic] = new ComponentNode(ComponentType.deontic, this.document, this.id);
         this.update();
-        return this.children[1];
+        return this.children[Arg.con_deontic];
     }
 
     /**
@@ -171,7 +172,7 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
             console.warn("Attempt to delete dummy node - operation aborted")
             return;
         }
-        this.children[1] = new BaseNode(this.document, this.id);
+        this.children[Arg.con_deontic] = new BaseNode(this.document, this.id);
         this.update();
     }
 
@@ -186,9 +187,9 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
             console.warn("Attempt to overwrite existing node - operation aborted")
             return;
         }
-        this.children[6] = new ComponentNode(ComponentType.orelse, this.document, this.id);
+        this.children[Arg.con_orelse] = new ComponentNode(ComponentType.orelse, this.document, this.id);
         this.update();
-        return this.children[6];
+        return this.children[Arg.con_orelse];
     }
 
     /**
@@ -199,7 +200,7 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
             console.warn("Attempt to delete dummy node - operation aborted")
             return;
         }
-        this.children[6] = new BaseNode(this.document, this.id);
+        this.children[Arg.con_orelse] = new BaseNode(this.document, this.id);
         this.update();
     }
 }

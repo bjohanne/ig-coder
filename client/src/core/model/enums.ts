@@ -4,9 +4,6 @@
  * Note: The Statement and Junction types aren't strictly needed,
  * as those classes are base classes not intended to be used directly.
  */
-import {Simulate} from "react-dom/test-utils";
-import contextMenu = Simulate.contextMenu;
-
 export enum NodeType {
     statement             = "Statement",
     regulativestatement   = "Regulative Statement",

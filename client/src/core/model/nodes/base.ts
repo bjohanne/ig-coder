@@ -60,7 +60,7 @@ export default class BaseNode implements INode {
 
 	/**
 	 * Recreates the Date objects based on the dates stored in it.
-	 * Used when rebuilding from JSON and the dates are encoded as numbers or strings.
+	 * Used when rebuilding from JSON, and the dates are encoded as numbers or strings.
 	 */
 	rebuildDates() : void {
 		this.createdAt = new Date(this.createdAt);
