@@ -21,34 +21,32 @@ export enum NodeType {
  */
 export enum ComponentType {
     // Common
-    deontic    = "Deontic",
     activationconditions = "Activation Conditions",
     executionconstraints = "Execution Constraints",
     orelse     = "Or Else",
 
     // Regulative
-    attribute  = "Attribute",
-    object     = "Object",
-    aim        = "Aim",
+    attribute      = "Attribute",
+    directobject   = "Direct Object",
+    indirectobject = "Indirect Object",
+    deontic        = "Deontic",
+    aim            = "Aim",
 
     // Constitutive
     constitutingproperties = "Constituting Properties",
+    modal                  = "Modal",
     constitutivefunction   = "Constitutive Function",
     constitutedentity      = "Constituted Entity",
 
-    // Object subtypes
-    directobject        = "Direct Object",
-    indirectobject      = "Indirect Object",
-
     // Context subtypes
-    activationcondition = "Activation Condition",
-    executionconstraint = "Execution Constraint"
+    context       = "Context",
+    nestedcontext = "Nested Context"
 }
 
 /**
  * Primitive logical operators.
  * Their negated counterparts are not included because
- * when a Junction node is negated, the negation of its operator is implied.
+ * when a Junction node is negated, the negation of its operator is understood.
  */
 export enum JunctionType {
     and  = "AND",
@@ -73,17 +71,18 @@ export enum Arg {
     statementjunction,
 
     // Regulative components
-    reg_attribute   = 0,
-    reg_object      = 1,
-    reg_deontic     = 2,
-    reg_aim         = 3,
-    reg_activationconditions = 4,
-    reg_executionconstraints = 5,
-    reg_orelse      = 6,
+    reg_attribute      = 0,
+    reg_directobject   = 1,
+    reg_indirectobject = 2,
+    reg_deontic        = 3,
+    reg_aim            = 4,
+    reg_activationconditions = 5,
+    reg_executionconstraints = 6,
+    reg_orelse         = 7,
 
     // Constitutive components
     con_constitutingproperties  = 0,
-    con_deontic                 = 1,
+    con_modal                   = 1,
     con_constitutivefunction    = 2,
     con_constitutedentity       = 3,
     con_activationconditions    = 4,
@@ -109,16 +108,16 @@ export enum ContextType {
             sp_end = "end",
         direction = "dir",
         path = "pth",
+    domain = "dom",
     state = "ste",
-        st_beginning = "beg",
-        st_end = "end",
     statetransition = "tra",
+    event = "evt",
+    cause_reason = "cau",
+    outcome_effect = "eff",
     proceduralorder = "prc",
-    concept = "cpt",
     method = "met",
         means = "mns",
         instrument = "ins",
     cause = "cau",
-    purpose = "pur",
-    observedeffect = "eff"
+    purpose_function = "pur"
 }

@@ -124,7 +124,8 @@ export default class Document implements IDocument {
      * Deletes the given Entry from the document. The Entry is deleted from
      * the entries array, and its entire tree is deleted as a consequence.
      * This leaves all the deleted node IDs unused while the IDCounter keeps incrementing.
-     * If there is no Entry at the given index, no nodes will be deleted (and there is no warning).
+     * If there is no Entry at the given index, the "array index of out bounds" error is thrown.
+	 * Note that if an Entry is deleted, all succeeding entry indices are decremented.
      *
      * @param index The entries index of the Entry to be deleted
      */
@@ -132,7 +133,7 @@ export default class Document implements IDocument {
 		if (index < 0 || index >= this.entries.length) {
 			throw new DataError(DataErrorType.DOC_BAD_ENTRY_IDX);
 		}
-		console.warn("Deleting entry with ID " + this.entries[index].id + " from index " + index)
+		console.warn("Deleting entry with ID " + this.entries[index].id + " from index " + index);
 		this.entries.splice(index, 1);
 
 		// When an item is spliced from an array, all the succeeding items have their index decremented.

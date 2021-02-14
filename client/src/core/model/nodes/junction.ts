@@ -83,10 +83,11 @@ export default class JunctionNode extends BaseNode implements IJunctionNode {
 			throw new DataError(DataErrorType.JUN_DEL_BAD_IDX);	// though it may contain a dummy node
 		}
 		if (this.children[childPos].isDummy()) {
-			console.warn("Attempt to delete dummy node - operation aborted")
+			console.warn("Attempt to delete dummy child of Junction node with ID " + this.id);
 			return;
 		}
-		console.warn("Deleting child of Junction node")
+		console.warn("Deleting child with ID " + this.children[childPos].id + " of Junction node with ID " +
+			this.id);
 		this.children[childPos] = new BaseNode(this.document, this.id);
 		this.update();
 	}

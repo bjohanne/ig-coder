@@ -1,5 +1,5 @@
 import { BaseNode, ComponentNode } from "./nodes";
-import { NodeType } from "./enums";
+import { NodeType, ContextType } from "./enums";
 import { Entry } from "./entry";
 
 /**
@@ -63,9 +63,9 @@ export interface IEntry {
 }
 
 /**
- * The contract for Component objects
+ * The contract for the text content wrapper called Primitive
  */
- export interface IComponent {
+ export interface IPrimitive {
     content?: {
         main:   string,
         prefix: string,
@@ -78,7 +78,8 @@ export interface IEntry {
  */
  export interface IRegulativeStatementNode {
      getAttribute(): ComponentNode,
-     getObject(): BaseNode,
+     getDirectObject(): BaseNode,
+     getIndirectObject(): BaseNode,
      getDeontic(): BaseNode,
      getAim(): ComponentNode,
      getActivationConditions(): ComponentNode,
@@ -91,7 +92,7 @@ export interface IEntry {
  */
 export interface IConstitutiveStatementNode {
     getConstitutingProperties(): BaseNode,
-    getDeontic(): BaseNode,
+    getModal(): BaseNode,
     getConstitutiveFunction(): ComponentNode,
     getConstitutedEntity(): ComponentNode,
     getActivationConditions(): ComponentNode,
@@ -105,6 +106,8 @@ export interface IConstitutiveStatementNode {
  export interface IComponentNode {
      setContent(content?: string, prefix?: string, suffix?: string): void,
 	 unsetContent(): void,
+     setContextType(contextType: ContextType): void,
+     unsetContextType(): void,
      getChild(childPos: number): INode | undefined,
      deleteChild(childPos: number) : void
  }

@@ -95,16 +95,16 @@ it("Set and unset text content", () => {
     let root = entry.createRoot(Arg.regulative) as RegulativeStatementNode;
 
     let attr = root.getAttribute() as ComponentNode;
-    expect(attr.component.content).toBeUndefined();
+    expect(attr.primitive.content).toBeUndefined();
     attr.setContent("two", "one", "three");				// Setting content first time
-    expect(attr.component.content.main).toEqual("two");
-    expect(attr.component.content.prefix).toEqual("one");
-    expect(attr.component.content.suffix).toEqual("three");
+    expect(attr.primitive.content.main).toEqual("two");
+    expect(attr.primitive.content.prefix).toEqual("one");
+    expect(attr.primitive.content.suffix).toEqual("three");
     attr.setContent(undefined, "ONE");					// A new value for content
-    expect(attr.component.content.main).toEqual("two");
-    expect(attr.component.content.prefix).toEqual("ONE");
+    expect(attr.primitive.content.main).toEqual("two");
+    expect(attr.primitive.content.prefix).toEqual("ONE");
     attr.unsetContent();								// Unsetting content
-    expect(attr.component.content).toBeUndefined();
+    expect(attr.primitive.content).toBeUndefined();
 });
 
 //------------------------------------------------------------------------------

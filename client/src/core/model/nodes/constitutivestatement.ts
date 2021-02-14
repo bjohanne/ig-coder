@@ -10,7 +10,7 @@ import { DataError, DataErrorType } from "../errors";
 export default class ConstitutiveStatementNode extends BaseNode implements IConstitutiveStatementNode {
     nodeType: NodeType = NodeType.regulativestatement;
     // Fixed children:
-    // ConstitutingProperties (optional), Deontic (optional), ConstitutiveFunction, ConstitutedEntity, ActivationConditions, ExecutionConstraints, OrElse (optional)
+    // ConstitutingProperties (optional), Modal (optional), ConstitutiveFunction, ConstitutedEntity, ActivationConditions, ExecutionConstraints, OrElse (optional)
     children!: [BaseNode, BaseNode, ComponentNode, ComponentNode, ComponentNode, ComponentNode, BaseNode];
 
     /**
@@ -43,10 +43,10 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
 	}
 
     /**
-     * Returns whether this node has a Deontic child.
+     * Returns whether this node has a Modal child.
      */
-    hasDeontic() : boolean {
-        return (!this.children[Arg.con_deontic].isDummy());
+    hasModal() : boolean {
+        return (!this.children[Arg.con_modal].isDummy());
     }
 
     /**
@@ -70,14 +70,14 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
     }
 
     /**
-     * Returns this node's Deontic child.
-     * Throws an error if this node does not have a Deontic child.
+     * Returns this node's Modal child.
+     * Throws an error if this node does not have a Modal child.
      */
-    getDeontic() : BaseNode {
-		if (!this.hasDeontic()) {
-            throw new DataError(DataErrorType.CON_NO_DNT);
+    getModal() : BaseNode {
+		if (!this.hasModal()) {
+            throw new DataError(DataErrorType.CON_NO_MODAL);
 		}
-        return this.children[Arg.con_deontic];
+        return this.children[Arg.con_modal];
     }
 
     /**
@@ -127,7 +127,8 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
      */
 	createConstitutingProperties() : INode | undefined {
         if (this.hasConstitutingProperties()) {
-            console.warn("Attempt to overwrite existing node - operation aborted")
+            console.warn("Attempt to overwrite existing ConstitutingProperties child of ConstitutiveStatement node with ID "
+                + this.id);
             return;
         }
 		this.children[Arg.con_constitutingproperties] =
@@ -141,38 +142,41 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
 	 */
     deleteConstitutingProperties() : void {
         if (!this.hasConstitutingProperties()) {
-            console.warn("Attempt to delete dummy node - operation aborted")
+            console.warn("Attempt to delete dummy ConstitutingProperties child of ConstitutiveStatement node with ID "
+                + this.id);
             return;
         }
 		this.children[Arg.con_constitutingproperties] = new BaseNode(this.document, this.id);
 		this.update();
 	}
 
-    /* Create and delete Deontic child */
+    /* Create and delete Modal child */
 
     /**
-     * Creates a Component node of type Deontic in the pre-allotted space.
-     * Will not overwrite an existing Deontic child.
+     * Creates a Component node of type Modal in the pre-allotted space.
+     * Will not overwrite an existing Modal child.
      */
-    createDeontic() : INode | undefined {
-        if (this.hasDeontic()) {
-            console.warn("Attempt to overwrite existing node - operation aborted")
+    createModal() : INode | undefined {
+        if (this.hasModal()) {
+            console.warn("Attempt to overwrite existing Modal child of ConstitutiveStatement node with ID "
+                + this.id);
             return;
         }
-        this.children[Arg.con_deontic] = new ComponentNode(ComponentType.deontic, this.document, this.id);
+        this.children[Arg.con_modal] = new ComponentNode(ComponentType.modal, this.document, this.id);
         this.update();
-        return this.children[Arg.con_deontic];
+        return this.children[Arg.con_modal];
     }
 
     /**
-     * Deletes the Deontic child and all of its descendants by replacing it with a new dummy node.
+     * Deletes the Modal child and all of its descendants by replacing it with a new dummy node.
      */
-    deleteDeontic() : void {
-        if (!this.hasDeontic()) {
-            console.warn("Attempt to delete dummy node - operation aborted")
+    deleteModal() : void {
+        if (!this.hasModal()) {
+            console.warn("Attempt to delete dummy Modal child of ConstitutiveStatement node with ID "
+                + this.id);
             return;
         }
-        this.children[Arg.con_deontic] = new BaseNode(this.document, this.id);
+        this.children[Arg.con_modal] = new BaseNode(this.document, this.id);
         this.update();
     }
 
@@ -184,7 +188,8 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
      */
     createOrElse() : INode | undefined {
         if (this.hasOrElse()) {
-            console.warn("Attempt to overwrite existing node - operation aborted")
+            console.warn("Attempt to overwrite existing OrElse child of ConstitutiveStatement node with ID "
+                + this.id);
             return;
         }
         this.children[Arg.con_orelse] = new ComponentNode(ComponentType.orelse, this.document, this.id);
@@ -193,11 +198,12 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
     }
 
     /**
-     * Deletes the Deontic child and all of its descendants by replacing it with a new dummy node.
+     * Deletes the OrElse child and all of its descendants by replacing it with a new dummy node.
      */
     deleteOrElse() : void {
         if (!this.hasOrElse()) {
-            console.warn("Attempt to delete dummy node - operation aborted")
+            console.warn("Attempt to delete dummy OrElse child of ConstitutiveStatement node with ID "
+                + this.id);
             return;
         }
         this.children[Arg.con_orelse] = new BaseNode(this.document, this.id);

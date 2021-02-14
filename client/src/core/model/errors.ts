@@ -5,13 +5,12 @@ export enum DataErrorType {
 	CMP_ADD_STMTJUN			= "This Component type cannot have a StatementJunction child",
 	CMP_BAD_CHILD_IDX		= "Component child index out of bounds",
 	CMP_BAD_PARENT			= "Parent Component node violates rules regarding Component type and number of children",
-	CMP_CTXT_ADD_DEL		= "Component nodes of type ActivationCondition and ExecutionConstraint cannot have children",
+	CMP_CTXT_ADD_DEL		= "Component nodes of type NestedContent cannot have children",
+	CMP_CTXT_TYPE			= "Only component nodes of type Context can have context type",
 	CMP_DNT_ADD_DEL			= "Component nodes of type Deontic cannot have children",
 	CMP_GET_DUM				= "The child of this Component node is a dummy node",
-	CMP_GET_TXT_UNDEF		= "This Component node has no Component object",
-	CMP_OBJ_ADD_NO_POS		= "Position not provided for child of Component node of type Object",
-	CMP_OBJ_SUB_ADD_DEL		= "Component nodes of type DirectObject and IndirectObject cannot have children",
-	CMP_OBJ_TXT				= "Component nodes of type Object cannot have text content",
+	CMP_GET_TXT_UNDEF		= "This Component node's Primitive is undefined",
+	CMP_MODAL_ADD_DEL		= "Component nodes of type Modal cannot have children",
 	CMP_TYPE_MISMATCH		= "Provided child component type does not match ancestor's component type",
 
 	// Document
@@ -26,13 +25,14 @@ export enum DataErrorType {
 	JUN_GET_UNDEF_RIGHT		= "Right child of this Junction node is undefined",
 
 	// RegulativeStatement
-	REG_NO_OBJ				= "This RegulativeStatement node does not have an Object child",
+	REG_NO_DIROBJ			= "This RegulativeStatement node does not have a DirectObject child",
+	REG_NO_INDIROBJ			= "This RegulativeStatement node does not have an IndirectObject child",
 	REG_NO_DNT				= "This RegulativeStatement node does not have a Deontic child",
 	REG_NO_ORELSE			= "This RegulativeStatement node does not have an Or Else child",
 
 	// ConstitutiveStatement
 	CON_NO_CONPROP			= "This ConstitutiveStatement node does not have a ConstitutingProperties child",
-	CON_NO_DNT				= "This ConstitutiveStatement node does not have a Deontic child",
+	CON_NO_MODAL			= "This ConstitutiveStatement node does not have a Modal child",
 	CON_NO_ORELSE			= "This ConstitutiveStatement node does not have an Or Else child",}
 
 export class DataError extends Error {

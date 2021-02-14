@@ -1,10 +1,10 @@
-import { ConstitutiveStatementNode, RegulativeStatementNode, StatementJunctionNode } from "./nodes";
+import {BaseNode, ConstitutiveStatementNode, RegulativeStatementNode, StatementJunctionNode} from "./nodes";
 import { IEntry, INode } from "./interfaces";
 import { Arg } from "./enums";
 import { IDCounter } from "./document";
 
 /**
- * An Entry represents a statement and holds its root node, original text and rephrased text.
+ * An Entry represents a statement and holds its root node, original text and rephrased (prepared) text.
  * The text of a statement is furthermore broken down in its tree's leaf Component nodes.
  */
 export class Entry implements IEntry {
@@ -12,9 +12,9 @@ export class Entry implements IEntry {
 	id!: number;
 	/* ID of the Document this Entry belongs to */
 	document!: number;
-	/* The statement's root node */
+	/* This Entry's root node */
 	root?: INode;
-	/* The complete, undivided text of the statement */
+	/* The complete statement */
 	original?: string;
 	/* Rephrased, prepared version of the statement for coding */
 	prepared?: string;
@@ -51,6 +51,18 @@ export class Entry implements IEntry {
 	 */
 	getRoot() : INode | undefined {
     	return this.root;
+	}
+
+	/**
+	 * Delete this Entry's root node, which deletes the entire tree.
+	 */
+	deleteRoot() : void {
+		if (this.root) {
+			console.warn("Deleting root node with ID " + this.root.id + " from entry with ID " + this.id);
+			this.root =  new BaseNode(this.document, this.id);
+		} else {
+			console.warn("Attempt to delete non-existent root of Entry with ID " + this.id);
+		}
 	}
 
 	/**

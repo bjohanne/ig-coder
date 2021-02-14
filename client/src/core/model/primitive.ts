@@ -1,18 +1,18 @@
-import { IComponent } from "./interfaces"
+import { IPrimitive } from "./interfaces"
 
 /**
- * This class holds the text content of institutional components.
- * TODO: IG Extended properties go here.
- * It can optionally have prefix and suffix.
- * Main holds the text that most narrowly fits the component type.
- * Prefix and suffix hold the rest of the clause that belongs to the component,
- * like prepositions. Example: "against a certified operation", an Object.
+ * This class holds the text content of institutional components and properties.
+ * Components and properties with text content can be considered primitives, hence the name.
+ * The text content can optionally include prefix and suffix in addition to the main string.
+ * Main holds the text that most narrowly fits the component or property.
+ * Prefix and suffix hold the rest of the clause that belongs to the component, like prepositions.
+ * Example: "against a certified operation", an object.
  * "a certified operation" is the content; "against" is the prefix.
  *
- * When content is undefined, the Component is considered to be unset, otherwise set.
+ * When content is undefined, the Primitive's text content is considered to be unset and vice versa.
  * Use that to differentiate between intentionally empty and not yet set content.
  */
- export class Component implements IComponent {
+ export class Primitive implements IPrimitive {
     content?: {
         main: string,
         prefix: string,
@@ -39,12 +39,12 @@ import { IComponent } from "./interfaces"
     }
 
 	/**
-	 * Static factory method that takes an object of the IComponent type
+	 * Static factory method that takes an object of the IPrimitive type
 	 * and creates a new Component object. Convenience for when you have long arguments.
-	 * If content is undefined, returns undefined.
-	 * @param data An object of type IComponent
+	 * If content is unset, returns undefined.
+	 * @param data An object of type IPrimitive
 	 */
-	static fromData(data: IComponent) {
+	static fromData(data: IPrimitive) {
 		if (!data.content) {
 			return undefined;
 		}

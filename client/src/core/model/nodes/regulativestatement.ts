@@ -10,8 +10,8 @@ import { DataError, DataErrorType } from "../errors";
 export default class RegulativeStatementNode extends BaseNode implements IRegulativeStatementNode {
     nodeType: NodeType = NodeType.regulativestatement;
     // Fixed children:
-    // Attribute, Object (optional), Deontic (optional), Aim, ActivationConditions, ExecutionConstraints, OrElse (optional)
-    children!: [ComponentNode, BaseNode, BaseNode, ComponentNode, ComponentNode, ComponentNode, BaseNode];
+    // Attribute, DirectObject (optional), IndirectObject (optional), Deontic (optional), Aim, ActivationConditions, ExecutionConstraints, OrElse (optional)
+    children!: [ComponentNode, BaseNode, BaseNode, BaseNode, ComponentNode, ComponentNode, ComponentNode, BaseNode];
 
     /**
      * Creates a new RegulativeStatement node with fixed children.
@@ -26,6 +26,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
             new ComponentNode(ComponentType.attribute, document, this.id),
             new BaseNode(document, this.id),
             new BaseNode(document, this.id),
+            new BaseNode(document, this.id),
             new ComponentNode(ComponentType.aim, document, this.id),
             new ComponentNode(ComponentType.activationconditions, document, this.id),
             new ComponentNode(ComponentType.executionconstraints, document, this.id),
@@ -36,11 +37,18 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
     /* Checkers for optional children */
 
     /**
-     * Returns whether this node has an Object child.
+     * Returns whether this node has a DirectObject child.
      */
-	hasObject() : boolean {
-		return (!this.children[Arg.reg_object].isDummy());
-	}
+    hasDirectObject() : boolean {
+        return (!this.children[Arg.reg_directobject].isDummy());
+    }
+
+    /**
+     * Returns whether this node has an IndirectObject child.
+     */
+    hasIndirectObject() : boolean {
+        return (!this.children[Arg.reg_indirectobject].isDummy());
+    }
 
     /**
      * Returns whether this node has a Deontic child.
@@ -66,14 +74,25 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
     }
 
     /**
-     * Returns this node's Object child.
-     * Throws an error if this node does not have an Object child.
+     * Returns this node's DirectObject child.
+     * Throws an error if this node does not have a DirectObject child.
      */
-    getObject() : BaseNode {
-		if (!this.hasObject()) {
-            throw new DataError(DataErrorType.REG_NO_OBJ);
+    getDirectObject() : BaseNode {
+		if (!this.hasDirectObject()) {
+            throw new DataError(DataErrorType.REG_NO_DIROBJ);
 		}
-        return this.children[Arg.reg_object];
+        return this.children[Arg.reg_directobject];
+    }
+
+    /**
+     * Returns this node's IndirectObject child.
+     * Throws an error if this node does not have an IndirectObject child.
+     */
+    getIndirectObject() : BaseNode {
+        if (!this.hasIndirectObject()) {
+            throw new DataError(DataErrorType.REG_NO_INDIROBJ);
+        }
+        return this.children[Arg.reg_indirectobject];
     }
 
     /**
@@ -119,33 +138,65 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
         return this.children[Arg.reg_orelse];
     }
 
-    /* Create and delete Object child */
+    /* Create and delete DirectObject child */
 
     /**
-	 * Creates a Component node of type Object in the pre-allotted space.
-	 * Will not overwrite an existing Object child.
+	 * Creates a Component node of type DirectObject in the pre-allotted space.
+	 * Will not overwrite an existing DirectObject child.
      */
-	createObject() : INode | undefined {
-        if (this.hasObject()) {
-            console.warn("Attempt to overwrite existing node - operation aborted")
+	createDirectObject() : INode | undefined {
+        if (this.hasDirectObject()) {
+            console.warn("Attempt to overwrite existing DirectObject child of RegulativeStatement node with ID "
+                + this.id);
             return;
         }
-		this.children[Arg.reg_object] = new ComponentNode(ComponentType.object, this.document, this.id);
+		this.children[Arg.reg_directobject] = new ComponentNode(ComponentType.directobject, this.document, this.id);
 		this.update();
-		return this.children[Arg.reg_object];
+		return this.children[Arg.reg_directobject];
 	}
 
 	/**
-	 * Deletes the Object child and all of its descendants by replacing it with a new dummy node.
+	 * Deletes the DirectObject child and all of its descendants by replacing it with a new dummy node.
 	 */
-	deleteObject() : void {
-        if (!this.hasObject()) {
-            console.warn("Attempt to delete dummy node - operation aborted")
+	deleteDirectObject() : void {
+        if (!this.hasDirectObject()) {
+            console.warn("Attempt to delete dummy DirectObject child of RegulativeStatement node with ID "
+                + this.id);
             return;
         }
-		this.children[Arg.reg_object] = new BaseNode(this.document, this.id);
+		this.children[Arg.reg_directobject] = new BaseNode(this.document, this.id);
 		this.update();
 	}
+
+    /* Create and delete IndirectObject child */
+
+    /**
+     * Creates a Component node of type IndirectObject in the pre-allotted space.
+     * Will not overwrite an existing IndirectObject child.
+     */
+    createIndirectObject() : INode | undefined {
+        if (this.hasIndirectObject()) {
+            console.warn("Attempt to overwrite existing IndirectObject child of RegulativeStatement node with ID "
+                + this.id);
+            return;
+        }
+        this.children[Arg.reg_indirectobject] = new ComponentNode(ComponentType.indirectobject, this.document, this.id);
+        this.update();
+        return this.children[Arg.reg_indirectobject];
+    }
+
+    /**
+     * Deletes the IndirectObject child and all of its descendants by replacing it with a new dummy node.
+     */
+    deleteIndirectObject() : void {
+        if (!this.hasIndirectObject()) {
+            console.warn("Attempt to delete dummy IndirectObject child of RegulativeStatement node with ID "
+                + this.id);
+            return;
+        }
+        this.children[Arg.reg_indirectobject] = new BaseNode(this.document, this.id);
+        this.update();
+    }
 
     /* Create and delete Deontic child */
 
@@ -155,7 +206,8 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
      */
     createDeontic() : INode | undefined {
         if (this.hasDeontic()) {
-            console.warn("Attempt to overwrite existing node - operation aborted")
+            console.warn("Attempt to overwrite existing Deontic child of RegulativeStatement node with ID "
+                + this.id);
             return;
         }
         this.children[Arg.reg_deontic] = new ComponentNode(ComponentType.deontic, this.document, this.id);
@@ -168,7 +220,8 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
      */
     deleteDeontic() : void {
         if (!this.hasDeontic()) {
-            console.warn("Attempt to delete dummy node - operation aborted")
+            console.warn("Attempt to delete dummy Deontic child of RegulativeStatement node with ID "
+                + this.id);
             return;
         }
         this.children[Arg.reg_deontic] = new BaseNode(this.document, this.id);
@@ -183,7 +236,8 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
      */
     createOrElse() : INode | undefined {
         if (this.hasOrElse()) {
-            console.warn("Attempt to overwrite existing node - operation aborted")
+            console.warn("Attempt to overwrite existing OrElse child of RegulativeStatement node with ID "
+                + this.id);
             return;
         }
         this.children[Arg.reg_orelse] = new ComponentNode(ComponentType.orelse, this.document, this.id);
@@ -192,11 +246,12 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
     }
 
     /**
-     * Deletes the Deontic child and all of its descendants by replacing it with a new dummy node.
+     * Deletes the OrElse child and all of its descendants by replacing it with a new dummy node.
      */
     deleteOrElse() : void {
         if (!this.hasOrElse()) {
-            console.warn("Attempt to delete dummy node - operation aborted")
+            console.warn("Attempt to delete dummy OrElse child of RegulativeStatement node with ID "
+                + this.id);
             return;
         }
         this.children[Arg.reg_orelse] = new BaseNode(this.document, this.id);
