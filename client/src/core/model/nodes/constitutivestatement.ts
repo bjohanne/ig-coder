@@ -1,7 +1,7 @@
-import { BaseNode, ComponentNode } from "./";
-import { INode, IConstitutiveStatementNode } from "../interfaces";
-import { NodeType, ComponentType, Arg } from "../enums";
-import { DataError, DataErrorType } from "../errors";
+import {BaseNode, ComponentNode} from "./";
+import {IConstitutiveStatementNode, INode} from "../interfaces";
+import {Arg, ComponentType, NodeType} from "../enums";
+import {DataError, DataErrorType} from "../errors";
 
 /**
  * ConstitutiveStatement nodes represent a constitutive institutional statement,
@@ -64,7 +64,7 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
      */
     getConstitutingProperties() : BaseNode {
         if (!this.hasConstitutingProperties()) {
-            throw new DataError(DataErrorType.CON_NO_CONPROP);
+            throw new DataError(DataErrorType.CON_NO_CONPROP, this.id);
         }
         return this.children[Arg.con_constitutingproperties];
     }
@@ -75,7 +75,7 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
      */
     getModal() : BaseNode {
 		if (!this.hasModal()) {
-            throw new DataError(DataErrorType.CON_NO_MODAL);
+            throw new DataError(DataErrorType.CON_NO_MODAL, this.id);
 		}
         return this.children[Arg.con_modal];
     }
@@ -114,7 +114,7 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
      */
     getOrElse(): BaseNode {
         if (!this.hasOrElse()) {
-            throw new DataError(DataErrorType.CON_NO_ORELSE);
+            throw new DataError(DataErrorType.CON_NO_ORELSE, this.id);
         }
         return this.children[Arg.con_orelse];
     }
@@ -124,12 +124,12 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
     /**
 	 * Creates a Component node of type ConstitutingProperties in the pre-allotted space.
 	 * Will not overwrite an existing ConstitutingProperties child.
+     *
+     * @return The newly created node
      */
 	createConstitutingProperties() : INode | undefined {
         if (this.hasConstitutingProperties()) {
-            console.warn("Attempt to overwrite existing ConstitutingProperties child of ConstitutiveStatement node with ID "
-                + this.id);
-            return;
+            throw new DataError(DataErrorType.CON_HAS_CONPROP, this.id);
         }
 		this.children[Arg.con_constitutingproperties] =
             new ComponentNode(ComponentType.constitutingproperties, this.document, this.id);
@@ -142,9 +142,7 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
 	 */
     deleteConstitutingProperties() : void {
         if (!this.hasConstitutingProperties()) {
-            console.warn("Attempt to delete dummy ConstitutingProperties child of ConstitutiveStatement node with ID "
-                + this.id);
-            return;
+            throw new DataError(DataErrorType.CON_NO_CONPROP, this.id);
         }
 		this.children[Arg.con_constitutingproperties] = new BaseNode(this.document, this.id);
 		this.update();
@@ -155,12 +153,12 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
     /**
      * Creates a Component node of type Modal in the pre-allotted space.
      * Will not overwrite an existing Modal child.
+     *
+     * @return The newly created node
      */
     createModal() : INode | undefined {
         if (this.hasModal()) {
-            console.warn("Attempt to overwrite existing Modal child of ConstitutiveStatement node with ID "
-                + this.id);
-            return;
+            throw new DataError(DataErrorType.CON_HAS_MODAL, this.id);
         }
         this.children[Arg.con_modal] = new ComponentNode(ComponentType.modal, this.document, this.id);
         this.update();
@@ -172,9 +170,7 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
      */
     deleteModal() : void {
         if (!this.hasModal()) {
-            console.warn("Attempt to delete dummy Modal child of ConstitutiveStatement node with ID "
-                + this.id);
-            return;
+            throw new DataError(DataErrorType.CON_NO_MODAL, this.id);
         }
         this.children[Arg.con_modal] = new BaseNode(this.document, this.id);
         this.update();
@@ -185,12 +181,12 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
     /**
      * Creates a Component node of type OrElse in the pre-allotted space.
      * Will not overwrite an existing OrElse child.
+     *
+     * @return The newly created node
      */
     createOrElse() : INode | undefined {
         if (this.hasOrElse()) {
-            console.warn("Attempt to overwrite existing OrElse child of ConstitutiveStatement node with ID "
-                + this.id);
-            return;
+            throw new DataError(DataErrorType.CON_HAS_ORELSE, this.id);
         }
         this.children[Arg.con_orelse] = new ComponentNode(ComponentType.orelse, this.document, this.id);
         this.update();
@@ -202,9 +198,7 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
      */
     deleteOrElse() : void {
         if (!this.hasOrElse()) {
-            console.warn("Attempt to delete dummy OrElse child of ConstitutiveStatement node with ID "
-                + this.id);
-            return;
+            throw new DataError(DataErrorType.CON_NO_ORELSE, this.id);
         }
         this.children[Arg.con_orelse] = new BaseNode(this.document, this.id);
         this.update();

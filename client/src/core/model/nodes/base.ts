@@ -40,6 +40,22 @@ export default class BaseNode implements INode {
         this.updatedAt = new Date();
     }
 
+	/**
+	 * Find the index of a child of this node.
+	 * Returns undefined if no child with ID targetId exists.
+	 * Used for finding children of node types that can have many non-fixed children.
+	 *
+	 * @param targetId The ID of the child to locate
+	 */
+	getChildIndexById(targetId: number) : number | undefined {
+		for (let i = 0; i < this.children.length; i++) {
+			if (this.children[i].id === targetId) {
+				return i;
+			}
+		}
+		return undefined;
+	}
+
     /**
      * Check whether this node is a dummy node, i.e. a BaseNode.
      * Plain base nodes do not have the nodeType field.

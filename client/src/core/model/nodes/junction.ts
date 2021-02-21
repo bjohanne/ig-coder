@@ -1,7 +1,7 @@
-import { BaseNode } from "./";
-import { INode, IJunctionNode } from "../interfaces";
-import { JunctionType, NodeType } from "../enums";
-import { DataError, DataErrorType } from "../errors";
+import {BaseNode} from "./";
+import {IJunctionNode, INode} from "../interfaces";
+import {Arg, JunctionType, NodeType} from "../enums";
+import {DataError, DataErrorType} from "../errors";
 
 /**
  * This is the base class for StatementJunction and ComponentJunction.
@@ -51,9 +51,9 @@ export default class JunctionNode extends BaseNode implements IJunctionNode {
 	 */
 	getLeft() : INode | undefined {
 		if (!this.children[0]) {
-			throw new DataError(DataErrorType.JUN_GET_UNDEF_LEFT);
+			throw new DataError(DataErrorType.JUN_UNDEF_LEFT, this.id);
 		} else if (this.children[0].isDummy()) {
-			throw new DataError(DataErrorType.JUN_GET_DUM_LEFT);
+			throw new DataError(DataErrorType.JUN_DUM_LEFT, this.id);
 		}
 		return this.children[0];
 	}
@@ -64,9 +64,9 @@ export default class JunctionNode extends BaseNode implements IJunctionNode {
 	 */
 	getRight() : INode | undefined {
 		if (!this.children[1]) {
-			throw new DataError(DataErrorType.JUN_GET_UNDEF_RIGHT);
+			throw new DataError(DataErrorType.JUN_UNDEF_RIGHT, this.id);
 		} else if (this.children[1].isDummy()) {
-			throw new DataError(DataErrorType.JUN_GET_DUM_RIGHT);
+			throw new DataError(DataErrorType.JUN_DUM_RIGHT, this.id);
 		}
 		return this.children[1];
 	}
@@ -80,11 +80,14 @@ export default class JunctionNode extends BaseNode implements IJunctionNode {
 	 */
 	deleteChild(childPos: number) : void {
 		if (childPos < 0 || childPos > 1) {						// Ensure the given index is accessible,
-			throw new DataError(DataErrorType.JUN_DEL_BAD_IDX);	// though it may contain a dummy node
+			throw new DataError(DataErrorType.JUN_BAD_CHILD_IDX, this.id);	// though it may contain a dummy node
 		}
 		if (this.children[childPos].isDummy()) {
-			console.warn("Attempt to delete dummy child of Junction node with ID " + this.id);
-			return;
+			if (childPos === Arg.left) {
+				throw new DataError(DataErrorType.JUN_DUM_LEFT, this.id);
+			} else {
+				throw new DataError(DataErrorType.JUN_DUM_RIGHT, this.id);
+			}
 		}
 		console.warn("Deleting child with ID " + this.children[childPos].id + " of Junction node with ID " +
 			this.id);

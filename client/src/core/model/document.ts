@@ -1,7 +1,7 @@
-import { BaseNode } from "./nodes";
-import { IDocument, INode } from "./interfaces";
-import { Entry } from "./entry";
-import { DataError, DataErrorType } from "./errors";
+import {BaseNode} from "./nodes";
+import {IDocument, INode} from "./interfaces";
+import {Entry} from "./entry";
+import {DataError, DataErrorType} from "./errors";
 import cloneDeep from 'lodash/cloneDeep';
 
 /**
@@ -75,13 +75,13 @@ export default class Document implements IDocument {
     getRoot(entry?: number) : INode | undefined {
 		if (typeof entry !== "undefined") {	// An entry index is provided
 			if (entry < 0 || entry >= this.entries.length) {
-				throw new DataError(DataErrorType.DOC_BAD_ENTRY_IDX);
+				throw new DataError(DataErrorType.DOC_BAD_ENTRY_IDX, this.id);
 			}
 			return this.entries[entry].root;
 		} else if (this.entries[0]) {		// No entry index provided
 			return this.entries[0].root;
 		} else {							// No entries exist
-			throw new DataError(DataErrorType.DOC_NO_ENTRIES);
+			throw new DataError(DataErrorType.DOC_NO_ENTRIES, this.id);
 		}
     }
 
@@ -124,14 +124,18 @@ export default class Document implements IDocument {
      * Deletes the given Entry from the document. The Entry is deleted from
      * the entries array, and its entire tree is deleted as a consequence.
      * This leaves all the deleted node IDs unused while the IDCounter keeps incrementing.
-     * If there is no Entry at the given index, the "array index of out bounds" error is thrown.
-	 * Note that if an Entry is deleted, all succeeding entry indices are decremented.
+	 * Throws an error if there are no Entries in this Document or the given array index is out of bounds.
+	 * Note that if an Entry is deleted, all succeeding entry indices are decremented, so
+	 * this function also updates entryMap.
      *
      * @param index The entries index of the Entry to be deleted
      */
     deleteEntry(index: number) : void {
+    	if (this.entries.length === 0) {
+    		throw new DataError(DataErrorType.DOC_NO_ENTRIES, this.id);
+		}
 		if (index < 0 || index >= this.entries.length) {
-			throw new DataError(DataErrorType.DOC_BAD_ENTRY_IDX);
+			throw new DataError(DataErrorType.DOC_BAD_ENTRY_IDX, this.id);
 		}
 		console.warn("Deleting entry with ID " + this.entries[index].id + " from index " + index);
 		this.entries.splice(index, 1);
@@ -165,7 +169,7 @@ export default class Document implements IDocument {
 	 */
 	rebuildDates(index?: number) : void {
 		if (index && index >= this.entries.length) {
-			throw new DataError(DataErrorType.DOC_BAD_ENTRY_IDX);
+			throw new DataError(DataErrorType.DOC_BAD_ENTRY_IDX, this.id);
 		}
 
 		let stack;
@@ -193,7 +197,7 @@ export default class Document implements IDocument {
      */
 	find(targetId: number, index?: number) : BaseNode | undefined {
 		if (index && index >= this.entries.length) {
-			throw new DataError(DataErrorType.DOC_BAD_ENTRY_IDX);
+			throw new DataError(DataErrorType.DOC_BAD_ENTRY_IDX, this.id);
 		}
 
 		let stack;

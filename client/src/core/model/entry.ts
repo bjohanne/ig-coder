@@ -1,7 +1,8 @@
-import {BaseNode, ConstitutiveStatementNode, RegulativeStatementNode, StatementJunctionNode} from "./nodes";
-import { IEntry, INode } from "./interfaces";
-import { Arg } from "./enums";
-import { IDCounter } from "./document";
+import {ConstitutiveStatementNode, RegulativeStatementNode, StatementJunctionNode} from "./nodes";
+import {IEntry, INode} from "./interfaces";
+import {Arg} from "./enums";
+import {IDCounter} from "./document";
+import {DataError, DataErrorType} from "./errors";
 
 /**
  * An Entry represents a statement and holds its root node, original text and rephrased (prepared) text.
@@ -59,9 +60,9 @@ export class Entry implements IEntry {
 	deleteRoot() : void {
 		if (this.root) {
 			console.warn("Deleting root node with ID " + this.root.id + " from entry with ID " + this.id);
-			this.root =  new BaseNode(this.document, this.id);
+			this.root = undefined;
 		} else {
-			console.warn("Attempt to delete non-existent root of Entry with ID " + this.id);
+			throw new DataError(DataErrorType.ENT_NO_ROOT, this.id);
 		}
 	}
 

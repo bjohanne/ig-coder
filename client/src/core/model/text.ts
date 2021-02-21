@@ -1,27 +1,29 @@
-import { IPrimitive } from "./interfaces"
+import { IText } from "./interfaces"
 
 /**
  * This class holds the text content of institutional components and properties.
- * Components and properties with text content can be considered primitives, hence the name.
  * The text content can optionally include prefix and suffix in addition to the main string.
  * Main holds the text that most narrowly fits the component or property.
  * Prefix and suffix hold the rest of the clause that belongs to the component, like prepositions.
  * Example: "against a certified operation", an object.
  * "a certified operation" is the content; "against" is the prefix.
  *
- * When content is undefined, the Primitive's text content is considered to be unset and vice versa.
+ * When content is undefined, the Text's content is considered to be unset and vice versa.
  * Use that to differentiate between intentionally empty and not yet set content.
  */
- export class Primitive implements IPrimitive {
+ export class Text implements IText {
+ 	/* Text content with a main part and optionally prefix and suffix */
     content?: {
         main: string,
         prefix: string,
         suffix: string
     };
+    /* (Optional) Rewritten, explicit version of the original text */
+    explicit?: string;
 
     /**
-	 * Create a new Component that holds text content.
-	 * If no arguments are provided, content will be undefined.
+	 * Create a new Text object that holds text content.
+	 * If no arguments are provided, content will be undefined, meaning the Text's content is considered unset.
 	 * Otherwise, sets the content strings to the passed in arguments or an empty string.
 	 *
 	 * @param main (Optional) The text that most narrowly fits the component
@@ -39,25 +41,32 @@ import { IPrimitive } from "./interfaces"
     }
 
 	/**
-	 * Static factory method that takes an object of the IPrimitive type
-	 * and creates a new Component object. Convenience for when you have long arguments.
+	 * Static factory method that takes an object of the IText type
+	 * and creates a new Text object. Convenience for when you have long arguments.
 	 * If content is unset, returns undefined.
-	 * @param data An object of type IPrimitive
+	 * @param data An object of type IText
 	 */
-	static fromData(data: IPrimitive) {
+	static fromData(data: IText) {
 		if (!data.content) {
 			return undefined;
 		}
 		return new this(data.content.main, data.content.prefix, data.content.suffix);
     }
 
+	/**
+	 * Returns whether this Text's content has been set.
+	 */
+	isSet() : Boolean {
+		return (typeof this.content !== undefined);
+	}
+
     /**
-	 * Set each part of the component individually.
+	 * Set each part of the component/property individually.
 	 * Only the provided parameters are changed.
 	 * If no arguments are provided, the content strings will not be changed.
 	 * If content is undefined, defines it.
 	 *
-	 * @param main (Optional) The text that most narrowly fits the component
+	 * @param main (Optional) The text that most narrowly fits the component/property
 	 * @param prefix (Optional) Excess text that goes before the main content
 	 * @param suffix (Optional) Excess text that goes after the main content
 	 */
@@ -82,16 +91,30 @@ import { IPrimitive } from "./interfaces"
     }
 
 	/**
-	 * Set this Component's content to undefined if it isn't already.
+	 * Set this Text's content to undefined, reverting it to a "not yet coded" state.
 	 */
-	unset() {
-		if (this.content) {
-			this.content = undefined;
-		}
+	unset() : void {
+		this.content = undefined;
 	}
 
 	/**
-	 * Concatenates the Component's prefix, main and suffix and returns the resulting string.
+	 * Set this Text's explicit field to the passed in string.
+	 *
+	 * @param explicit A version of the original text rewritten in an explicit form
+	 */
+	setExplicit(explicit: string) : void {
+		this.explicit = explicit;
+	}
+
+	/**
+	 * Set this Text's explicit field to undefined.
+	 */
+	unsetExplicit() : void {
+		this.explicit = undefined;
+	}
+
+	/**
+	 * Concatenates the Text content's prefix, main and suffix and returns the resulting string.
 	 * If main is an empty string, the resulting string will have no superfluous spaces.
 	 */
 	getString() : string {

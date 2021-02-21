@@ -11,7 +11,9 @@ export enum NodeType {
     junction              = "Junction",
     statementjunction     = "Statement Junction",
     componentjunction     = "Component Junction",
-    component             = "Component"
+    component             = "Component",
+    property              = "Property",
+    propertyjunction      = "Property Junction"
 }
 
 /**

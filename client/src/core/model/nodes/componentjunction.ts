@@ -26,6 +26,8 @@ export default class ComponentJunctionNode extends JunctionNode {
 	/**
 	 * Creates a StatementJunction node as child of this node.
 	 * @param position Whether the new node should be the left or right child of this node
+	 *
+	 * @return The newly created node
 	 */
 	createStatementJunctionNode(position: Arg.left | Arg.right) : INode | undefined {
 		this.children[position] = new StatementJunctionNode(this.document, this.id);
@@ -36,6 +38,8 @@ export default class ComponentJunctionNode extends JunctionNode {
 	/**
 	 * Creates a ComponentJunction node as child of this node.
 	 * @param position Whether the new node should be the left or right child of this node
+	 *
+	 * @return The newly created node
 	 */
 	createComponentJunctionNode(position: Arg.left | Arg.right) : INode | undefined {
 		this.children[position] = new ComponentJunctionNode(this.componentType, this.document, this.id);
@@ -48,10 +52,12 @@ export default class ComponentJunctionNode extends JunctionNode {
 	 *
 	 * @param componentType The type of component the new node should have
 	 * @param position Whether the new node should be the left or right child of this node
+	 *
+	 * @return The newly created node
 	 */
 	createComponentNode(componentType: ComponentType, position: Arg.left | Arg.right) : INode | undefined {
 		if (!matchComponentTypes(this.componentType, componentType)) {
-			throw new DataError(DataErrorType.CMP_TYPE_MISMATCH);
+			throw new DataError(DataErrorType.CMP_TYPE_MISMATCH, this.id);
 		}
 		this.children[position] = new ComponentNode(componentType, this.document, this.id);
 		this.update();

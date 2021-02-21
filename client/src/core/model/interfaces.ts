@@ -65,7 +65,7 @@ export interface IEntry {
 /**
  * The contract for the text content wrapper called Primitive
  */
- export interface IPrimitive {
+ export interface IText {
     content?: {
         main:   string,
         prefix: string,
@@ -104,8 +104,8 @@ export interface IConstitutiveStatementNode {
   * The contract for Component nodes
   */
  export interface IComponentNode {
-     setContent(content?: string, prefix?: string, suffix?: string): void,
-	 unsetContent(): void,
+     setText(content?: string, prefix?: string, suffix?: string): void,
+	 unsetText(): void,
      setContextType(contextType: ContextType): void,
      unsetContextType(): void,
      getChild(childPos: number): INode | undefined,
@@ -119,4 +119,15 @@ export interface IConstitutiveStatementNode {
      getLeft(): INode | undefined,
      getRight(): INode | undefined,
      deleteChild(childPos: number) : void
+}
+
+/**
+ * The contract for Property nodes
+ */
+export interface IPropertyNode {
+    setText(content?: string, prefix?: string, suffix?: string): void,
+    unsetText(): void,
+    makeFunctionallyDependent(): void,
+    makeNotFunctionallyDependent(): void,
+    deleteChild(childPos: number) : void
 }

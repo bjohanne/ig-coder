@@ -1,7 +1,7 @@
-import { BaseNode, ComponentNode } from "./";
-import { INode, IRegulativeStatementNode } from "../interfaces";
-import { NodeType, ComponentType, Arg } from "../enums";
-import { DataError, DataErrorType } from "../errors";
+import {BaseNode, ComponentNode} from "./";
+import {INode, IRegulativeStatementNode} from "../interfaces";
+import {Arg, ComponentType, NodeType} from "../enums";
+import {DataError, DataErrorType} from "../errors";
 
 /**
  * RegulativeStatement nodes represent a regulative institutional statement,
@@ -79,7 +79,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
      */
     getDirectObject() : BaseNode {
 		if (!this.hasDirectObject()) {
-            throw new DataError(DataErrorType.REG_NO_DIROBJ);
+            throw new DataError(DataErrorType.REG_NO_DIROBJ, this.id);
 		}
         return this.children[Arg.reg_directobject];
     }
@@ -90,7 +90,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
      */
     getIndirectObject() : BaseNode {
         if (!this.hasIndirectObject()) {
-            throw new DataError(DataErrorType.REG_NO_INDIROBJ);
+            throw new DataError(DataErrorType.REG_NO_INDIROBJ, this.id);
         }
         return this.children[Arg.reg_indirectobject];
     }
@@ -101,7 +101,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
      */
     getDeontic() : BaseNode {
         if (!this.hasDeontic()) {
-            throw new DataError(DataErrorType.REG_NO_DNT);
+            throw new DataError(DataErrorType.REG_NO_DNT, this.id);
         }
         return this.children[Arg.reg_deontic];
     }
@@ -133,7 +133,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
      */
     getOrElse(): BaseNode {
         if (!this.hasOrElse()) {
-            throw new DataError(DataErrorType.REG_NO_ORELSE);
+            throw new DataError(DataErrorType.REG_NO_ORELSE, this.id);
         }
         return this.children[Arg.reg_orelse];
     }
@@ -143,12 +143,12 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
     /**
 	 * Creates a Component node of type DirectObject in the pre-allotted space.
 	 * Will not overwrite an existing DirectObject child.
+     *
+     * @return The newly created node
      */
 	createDirectObject() : INode | undefined {
         if (this.hasDirectObject()) {
-            console.warn("Attempt to overwrite existing DirectObject child of RegulativeStatement node with ID "
-                + this.id);
-            return;
+            throw new DataError(DataErrorType.REG_HAS_DIROBJ, this.id);
         }
 		this.children[Arg.reg_directobject] = new ComponentNode(ComponentType.directobject, this.document, this.id);
 		this.update();
@@ -160,9 +160,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
 	 */
 	deleteDirectObject() : void {
         if (!this.hasDirectObject()) {
-            console.warn("Attempt to delete dummy DirectObject child of RegulativeStatement node with ID "
-                + this.id);
-            return;
+            throw new DataError(DataErrorType.REG_NO_DIROBJ, this.id);
         }
 		this.children[Arg.reg_directobject] = new BaseNode(this.document, this.id);
 		this.update();
@@ -173,12 +171,12 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
     /**
      * Creates a Component node of type IndirectObject in the pre-allotted space.
      * Will not overwrite an existing IndirectObject child.
+     *
+     * @return The newly created node
      */
     createIndirectObject() : INode | undefined {
         if (this.hasIndirectObject()) {
-            console.warn("Attempt to overwrite existing IndirectObject child of RegulativeStatement node with ID "
-                + this.id);
-            return;
+            throw new DataError(DataErrorType.REG_HAS_INDIROBJ, this.id);
         }
         this.children[Arg.reg_indirectobject] = new ComponentNode(ComponentType.indirectobject, this.document, this.id);
         this.update();
@@ -190,9 +188,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
      */
     deleteIndirectObject() : void {
         if (!this.hasIndirectObject()) {
-            console.warn("Attempt to delete dummy IndirectObject child of RegulativeStatement node with ID "
-                + this.id);
-            return;
+            throw new DataError(DataErrorType.REG_NO_INDIROBJ, this.id);
         }
         this.children[Arg.reg_indirectobject] = new BaseNode(this.document, this.id);
         this.update();
@@ -203,12 +199,12 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
     /**
      * Creates a Component node of type Deontic in the pre-allotted space.
      * Will not overwrite an existing Deontic child.
+     *
+     * @return The newly created node
      */
     createDeontic() : INode | undefined {
         if (this.hasDeontic()) {
-            console.warn("Attempt to overwrite existing Deontic child of RegulativeStatement node with ID "
-                + this.id);
-            return;
+            throw new DataError(DataErrorType.REG_HAS_DNT, this.id);
         }
         this.children[Arg.reg_deontic] = new ComponentNode(ComponentType.deontic, this.document, this.id);
         this.update();
@@ -220,9 +216,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
      */
     deleteDeontic() : void {
         if (!this.hasDeontic()) {
-            console.warn("Attempt to delete dummy Deontic child of RegulativeStatement node with ID "
-                + this.id);
-            return;
+            throw new DataError(DataErrorType.REG_NO_DNT, this.id);
         }
         this.children[Arg.reg_deontic] = new BaseNode(this.document, this.id);
         this.update();
@@ -233,12 +227,12 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
     /**
      * Creates a Component node of type OrElse in the pre-allotted space.
      * Will not overwrite an existing OrElse child.
+     *
+     * @return The newly created node
      */
     createOrElse() : INode | undefined {
         if (this.hasOrElse()) {
-            console.warn("Attempt to overwrite existing OrElse child of RegulativeStatement node with ID "
-                + this.id);
-            return;
+            throw new DataError(DataErrorType.REG_HAS_ORELSE, this.id);
         }
         this.children[Arg.reg_orelse] = new ComponentNode(ComponentType.orelse, this.document, this.id);
         this.update();
@@ -250,9 +244,7 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
      */
     deleteOrElse() : void {
         if (!this.hasOrElse()) {
-            console.warn("Attempt to delete dummy OrElse child of RegulativeStatement node with ID "
-                + this.id);
-            return;
+            throw new DataError(DataErrorType.REG_NO_ORELSE, this.id);
         }
         this.children[Arg.reg_orelse] = new BaseNode(this.document, this.id);
         this.update();
