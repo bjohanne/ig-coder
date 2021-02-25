@@ -40,9 +40,8 @@ export enum ComponentType {
     constitutivefunction   = "Constitutive Function",
     constitutedentity      = "Constituted Entity",
 
-    // Context subtypes
-    context       = "Context",
-    nestedcontext = "Nested Context"
+    // Special
+    simplecontext = "Simple Context"
 }
 
 /**

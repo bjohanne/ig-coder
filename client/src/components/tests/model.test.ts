@@ -5,10 +5,14 @@ import {
     BaseNode,
     ComponentJunctionNode,
     ComponentNode,
-    PropertyJunctionNode, PropertyNode,
+    PropertyJunctionNode,
+    PropertyNode,
     RegulativeStatementNode
 } from "../../core/model/nodes";
+import {Entry} from "../../core/model/entry";
 import {Arg, ComponentType, JunctionType} from "../../core/model/enums";
+import {TextContent} from "../../core/model/textcontent";
+import {Component} from "react";
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -19,16 +23,15 @@ beforeEach(() => {
 });
 
 /*
-Notes and guidelines for the data model
+Some guidelines for the data model
 - Always type assert the node type when getting a node (`get() as <NodeType>`).
-  It's because many getters (getLeft(), getRight()) are agnostic about the type of the child.
-- Delete nodes with <NodeClass>.deleteChild().
+  It's to be able to access class-specific properties on the node.
+- Delete Component nodes with <parent>.deleteChild() and optional Statement children with <statement>.delete*().
   This will delete them in the tree structure, but variables pointing to them will still be valid.
   The actual data the variables point to will not be deleted until they all go out of scope.
 - Several node types are created with dummy children. These children are of the BaseNode class
   and can be checked for using BaseNode.isDummy(). All getter functions check for dummy nodes,
   and throw an error if one is found.
-- Component nodes with a dummy child are considered leaf nodes.
 
   To print the entire document structure:
   console.log(JSON.stringify(document, null, 2));
@@ -143,9 +146,10 @@ it("Set and unset text content", () => {
     let root = entry.createRoot(Arg.regulative) as RegulativeStatementNode;
 
     let attr = root.getAttribute() as ComponentNode;
+    expect(attr.text).toBeDefined();
     expect(attr.text.content).toBeUndefined();
 
-    attr.setText("two", "one", "three");				// Setting content first time
+    attr.setText("two", "one", "three");		// Setting content first time
     expect(attr.text.content.main).toEqual("two");
     expect(attr.text.content.prefix).toEqual("one");
     expect(attr.text.content.suffix).toEqual("three");
@@ -154,20 +158,47 @@ it("Set and unset text content", () => {
     expect(attr.text.content.main).toEqual("two");
     expect(attr.text.content.prefix).toEqual("ONE");
 
-    attr.unsetText();								// Unsetting content
+    attr.unsetText();								        // Unsetting content
     expect(attr.text.content).toBeUndefined();
+
+    attr.setText(undefined, "one");				// Setting prefix only
+    expect(attr.text.content.main).toEqual("");
+    expect(attr.text.content.prefix).toEqual("one");
+    expect(attr.text.content.suffix).toEqual("");
 });
 
 //------------------------------------------------------------------------------
 
-it("Delete a tree", () => {
+it("Concatenate text content", () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", documentId);
+    let entry = document.createEntry();
+    let root = entry.createRoot(Arg.regulative) as RegulativeStatementNode;
+    let attr = root.getAttribute() as ComponentNode;
+    let text = attr.getText();
+
+    attr.setText("two", "one", "three"); // Main, prefix and suffix
+    expect(text.getString()).toBe("one two three");
+
+    attr.setText("two", "", "three");    // Main and suffix
+    expect(text.getString()).toBe("two three");
+
+    attr.setText("two", "one", "");      // Main and prefix
+    expect(text.getString()).toBe("one two");
+
+    attr.setText("", "one", "three");    // Prefix and suffix
+    expect(text.getString()).toBe("one three");
+});
+
+//------------------------------------------------------------------------------
+
+it("Delete an entry", () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
     let entry = document.createEntry();
 
-    expect(entry).toBeDefined();
     document.deleteEntry(0);
-    expect(document.entries[0]).toBeUndefined();
+    expect(document.entries.length).toEqual(0);
 });
 
 //------------------------------------------------------------------------------
@@ -195,11 +226,15 @@ it("Delete a node", () => {
     attr.createComponentJunctionNode();
     attr.deleteChild(Arg.only);
     expect(() => { attr.getChild(Arg.only) }).toThrow("no children");
+
+    attr.createPropertyNode();
+    attr.deleteChild(Arg.only)
+    expect(() => { attr.getChild(Arg.only) }).toThrow("no children");
 });
 
 //------------------------------------------------------------------------------
 
-it("Find a node by ID", () => {
+it("Find a node by ID in a Document", () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
     let entry = document.createEntry();
@@ -218,13 +253,28 @@ it("Find a node by ID", () => {
 
 //------------------------------------------------------------------------------
 
-it("Rebuild dates", () => {
+it("Find a child of a node by ID", () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
     let entry = document.createEntry();
-    entry.createRoot(Arg.constitutive);
+    let root = entry.createRoot(Arg.regulative) as RegulativeStatementNode;
 
-    document.rebuildDates(0);
+    // Multiple Execution Constraints
+    let execstrts = root.getExecutionConstraints() as ComponentNode;
+    let context1 = execstrts.createComponentNode(ComponentType.simplecontext) as ComponentNode;
+    let context2 = execstrts.createComponentNode(ComponentType.simplecontext) as ComponentNode;
+    let context3 = execstrts.createComponentNode(ComponentType.simplecontext) as ComponentNode;
+
+    let contextIdx = execstrts.getChildIndexById(context3.id);
+    expect(contextIdx).toEqual(2);
+
+    // Multiple Properties
+    let attr = root.getAttribute() as ComponentNode;
+    let prop1 = attr.createPropertyNode() as PropertyNode;
+    let prop2 = attr.createPropertyNode() as PropertyNode;
+
+    let propIdx = attr.getChildIndexById(prop2.id);
+    expect(propIdx).toEqual(1);
 });
 
 //------------------------------------------------------------------------------
@@ -232,7 +282,6 @@ it("Rebuild dates", () => {
 it('Elevate isFunctionallyDependent', () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
-
     let entry = document.createEntry();
     let root = entry.createRoot(Arg.regulative) as RegulativeStatementNode;
 
@@ -253,13 +302,66 @@ it('Elevate isFunctionallyDependent', () => {
 
 //------------------------------------------------------------------------------
 
-
-it('Throw a specific error', () => {
+it('Rebuild a tree', () => {
     // Setup
-    const document = new Document("Test Policy", "Description", documentId);
+    let document = new Document("Test Policy", "Description", documentId);
+    let entry = document.createEntry();
+    let root = entry.createRoot(Arg.regulative) as RegulativeStatementNode;
 
-    expect(() => { document.getRoot(-1)}).toThrow("index out of bounds");
+    // Flesh out the tree with features
+    let attr = root.getAttribute() as ComponentNode;
+    attr.setText("Main Attribute");
+    let attrProp1 = attr.createPropertyNode() as PropertyNode;
+    attrProp1.setText("proposed");
+
+    let dirobj = root.createDirectObject() as ComponentNode;
+    let dirObjJun = dirobj.createComponentJunctionNode() as ComponentJunctionNode;
+    let dirObjJunLeft = dirObjJun.createComponentNode(ComponentType.directobject, Arg.left) as ComponentNode;
+    dirObjJunLeft.setText("left");
+
+    let actconds = root.getActivationConditions() as ComponentNode;
+    let context1 = actconds.createStatementNode(Arg.regulative) as RegulativeStatementNode;
+    let context2 = actconds.createComponentNode(ComponentType.simplecontext) as ComponentNode;
+    context2.setText("always");
+
+    // Turn the document into a string then back into JSON to lose object classes
+    let jsonStr = JSON.stringify(document);
+    let jsonObj = JSON.parse(jsonStr) as Document;  // Narrow to Document in order to access Document.entries
+
+    let newDocument = new Document("Test Policy", "Description", documentId, jsonObj.entries);
+
+    // Check for object classes. Note that we are not type asserting on get*() functions unless necessary.
+    expect(newDocument instanceof Document).toBeTruthy();
+    let newEntry = newDocument.getEntry(0);
+    expect(newEntry instanceof Entry).toBeTruthy();
+    let newRoot = newEntry.getRoot() as RegulativeStatementNode;
+    expect(newRoot instanceof RegulativeStatementNode).toBeTruthy();
+
+    let newAttr = newRoot.getAttribute();
+    expect(newAttr instanceof ComponentNode).toBeTruthy();
+    let attrText = newAttr.getText();
+    expect(attrText instanceof TextContent).toBeTruthy();
+    expect(attrText.isSet()).toBeTruthy();
+    expect(attrText.getString()).toBe("Main Attribute");
+
+    let newProp = newAttr.getChild(Arg.only) as PropertyNode;
+    expect(newProp instanceof PropertyNode).toBeTruthy();
+    let propText = newProp.getText();
+    expect(propText instanceof TextContent).toBeTruthy();
+    expect(propText.isSet()).toBeTruthy();
+    expect(propText.getString()).toBe("proposed");
+
+    let newDirObj = newRoot.getDirectObject() as ComponentNode;
+    expect(newDirObj instanceof ComponentNode).toBeTruthy();
+    let newDirObjJun = newDirObj.getChild(Arg.only);
+    expect(newDirObjJun instanceof ComponentJunctionNode).toBeTruthy();
+
+    let newActConds = newRoot.getActivationConditions();
+    expect(newActConds instanceof ComponentNode);
+    let newContext1 = newActConds.getChild(0);
+    expect(newContext1 instanceof RegulativeStatementNode);
+    let newContext2 = newActConds.getChild(1);
+    expect(newContext2 instanceof ComponentNode);
 });
-
 
 //------------------------------------------------------------------------------

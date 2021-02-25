@@ -1,4 +1,4 @@
-import { IText } from "./interfaces"
+import {ITextContent} from "./interfaces"
 
 /**
  * This class holds the text content of institutional components and properties.
@@ -8,10 +8,10 @@ import { IText } from "./interfaces"
  * Example: "against a certified operation", an object.
  * "a certified operation" is the content; "against" is the prefix.
  *
- * When content is undefined, the Text's content is considered to be unset and vice versa.
+ * When content is undefined, the text content is considered to be unset and vice versa.
  * Use that to differentiate between intentionally empty and not yet set content.
  */
- export class Text implements IText {
+ export class TextContent implements ITextContent {
  	/* Text content with a main part and optionally prefix and suffix */
     content?: {
         main: string,
@@ -22,8 +22,8 @@ import { IText } from "./interfaces"
     explicit?: string;
 
     /**
-	 * Create a new Text object that holds text content.
-	 * If no arguments are provided, content will be undefined, meaning the Text's content is considered unset.
+	 * Create a new TextContent object that holds text content.
+	 * If no arguments are provided, content will be undefined, meaning the text content is considered unset.
 	 * Otherwise, sets the content strings to the passed in arguments or an empty string.
 	 *
 	 * @param main (Optional) The text that most narrowly fits the component
@@ -41,20 +41,20 @@ import { IText } from "./interfaces"
     }
 
 	/**
-	 * Static factory method that takes an object of the IText type
-	 * and creates a new Text object. Convenience for when you have long arguments.
-	 * If content is unset, returns undefined.
-	 * @param data An object of type IText
+	 * Static factory method that creates a new TextContent object from the passed in data.
+	 * Convenience for when you have long arguments, but also used for rebuilding from existing data.
+	 * If content is unset, returns a TextContent object with content undefined.
+	 * @param data An object of type ITextContent
 	 */
-	static fromData(data: IText) {
+	static fromData(data: ITextContent) : TextContent {
 		if (!data.content) {
-			return undefined;
+			return new this();
 		}
 		return new this(data.content.main, data.content.prefix, data.content.suffix);
     }
 
 	/**
-	 * Returns whether this Text's content has been set.
+	 * Returns whether the text content has been set.
 	 */
 	isSet() : Boolean {
 		return (typeof this.content !== undefined);
@@ -62,7 +62,7 @@ import { IText } from "./interfaces"
 
     /**
 	 * Set each part of the component/property individually.
-	 * Only the provided parameters are changed.
+	 * Only the provided parameters are changed, but you can pass an empty string to set to that.
 	 * If no arguments are provided, the content strings will not be changed.
 	 * If content is undefined, defines it.
 	 *
@@ -78,27 +78,27 @@ import { IText } from "./interfaces"
 				suffix: (suffix) ? suffix : ""
 			}
 		} else {
-			if (main) {
+			if (typeof main !== "undefined") {
 				this.content.main = main;
 			}
-			if (prefix) {
+			if (typeof prefix !== "undefined") {
 				this.content.prefix = prefix;
 			}
-			if (suffix) {
+			if (typeof suffix !== "undefined") {
 				this.content.suffix = suffix;
 			}
 		}
     }
 
 	/**
-	 * Set this Text's content to undefined, reverting it to a "not yet coded" state.
+	 * Set text content to undefined, reverting it to a "not yet coded" state.
 	 */
 	unset() : void {
 		this.content = undefined;
 	}
 
 	/**
-	 * Set this Text's explicit field to the passed in string.
+	 * Set this TextContent's explicit field to the passed in string.
 	 *
 	 * @param explicit A version of the original text rewritten in an explicit form
 	 */
@@ -107,35 +107,33 @@ import { IText } from "./interfaces"
 	}
 
 	/**
-	 * Set this Text's explicit field to undefined.
+	 * Set this TextContent's explicit field to undefined.
 	 */
 	unsetExplicit() : void {
 		this.explicit = undefined;
 	}
 
 	/**
-	 * Concatenates the Text content's prefix, main and suffix and returns the resulting string.
-	 * If main is an empty string, the resulting string will have no superfluous spaces.
+	 * Concatenates the text content's prefix, main and suffix and returns the resulting string.
+	 * The resulting string will have exactly one space between each present component and no superfluous spaces.
 	 */
 	getString() : string {
 		let str: string = "";
 
 		if (this.content) {
+			str += this.content.prefix;
 			if (this.content.prefix) {
-				str += this.content.prefix;
-				if (this.content.main) {
+				if (this.content.main || this.content.suffix) {
 					str += " ";
 				}
 			}
 
 			str += this.content.main;
 
-			if (this.content.suffix) {
-				if (this.content.main) {
-					str += " ";
-				}
-				str += this.content.suffix;
+			if (this.content.main && this.content.suffix) {
+				str += " ";
 			}
+			str += this.content.suffix;
 		}
 		return str;
 	}

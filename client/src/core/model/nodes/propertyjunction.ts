@@ -1,12 +1,12 @@
 import { JunctionNode, PropertyNode } from "./";
-import { INode } from "../interfaces";
+import {INode, IPropertyJunctionNode, IPropertyNode} from "../interfaces";
 import { NodeType, Arg } from "../enums";
-import { DataError, DataErrorType } from "../errors";
+import {TextContent} from "../textcontent";
 
 /**
  * This is the class for Junction nodes in the Attribute/Object-Property Hierarchy.
  */
-export default class PropertyJunctionNode extends JunctionNode {
+export default class PropertyJunctionNode extends JunctionNode implements IPropertyJunctionNode {
     nodeType: NodeType = NodeType.propertyjunction;
     /* Used to pass descendant Property node's state to ancestor Component/Property node */
     isFunctionallyDependent: Boolean = false;
@@ -16,9 +16,23 @@ export default class PropertyJunctionNode extends JunctionNode {
      *
      * @param document The ID of the document this node belongs to
      * @param parent The ID of the node this node is a child of (the parent's children array must be set separately)
+     * @param id (Optional) The ID of this node if one already exists (for rebuilding from existing data)
      */
-    constructor(document: number, parent: number) {
-        super(document, parent);
+    constructor(document: number, parent: number, id?: number) {
+        super(document, parent, undefined, id);
+    }
+
+    /**
+     * Build a new PropertyJunctionNode from existing data.
+     * Properties (data fields) are copied to the new node from the passed in data.
+     *
+     * @param data An object of type IPropertyJunctionNode
+     * @return A new PropertyJunctionNode with the passed in properties
+     */
+    static fromData(data: IPropertyJunctionNode) : PropertyJunctionNode {
+        let newNode = new PropertyJunctionNode(data.document, data.parent, data.id);
+        newNode.isFunctionallyDependent = data.isFunctionallyDependent;
+        return newNode;
     }
 
     /**

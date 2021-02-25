@@ -1,9 +1,15 @@
+import {ComponentType} from "./enums";
+
 /**
  * A mapping of error codes to full error messages, for errors specific to the IG 2.0 data model.
  */
 export enum DataErrorType {
+	// Base
+	BAS_BAD_NODETYPE		= "This Node has an invalid node type (probably base Statement or Junction)",
+
 	// Component
 	CMP_AC_TXT				= "Component nodes of type Activation Conditions cannot have text content",
+	CMP_ADD_CMP 			= "Cannot create the specified Component child of this Component node",
 	CMP_ADD_CMPJUN			= "This Component type cannot have a ComponentJunction child",
 	CMP_ADD_PRP 			= "This Component type cannot have a Property child",
 	CMP_ADD_PRPJUN 			= "This Component type cannot have a PropertyJunction child",
@@ -11,14 +17,13 @@ export enum DataErrorType {
 	CMP_ADD_STMTJUN			= "This Component type cannot have a StatementJunction child",
 	CMP_BAD_CHILD_IDX		= "Component child index out of bounds",
 	CMP_BAD_PARENT			= "Parent Component node violates rules regarding Component type and number of children",
-	CMP_CTXT_ADD_DEL		= "Component nodes of type NestedContent cannot have children",
-	CMP_CTXT_TXT 			= "Component nodes of type Context cannot have text content",
-	CMP_CTXT_TYPE			= "Only component nodes of type Context can have context type",
+	CMP_CTXT_ADD_DEL		= "Component nodes of type SimpleContext cannot have children",
+	CMP_CTXT_TYPE			= "Component type must be SimpleContext to set and unset context type",
 	CMP_DNT_ADD_DEL			= "Component nodes of type Deontic cannot have children",
-	CMP_DUM_CHLD			= "The child of this Component node is a dummy node",
 	CMP_EC_TXT 				= "Component nodes of type Execution Constraints cannot have text content",
 	CMP_GET_TXT_UNDEF		= "This Component node's Text object is undefined",
 	CMP_HAS_CHLD 			= "This Component node already has one or more children",
+	CMP_HAS_CHLD_NO_PRP		= "This Component node already has a child not of type Property or PropertyJunction",
 	CMP_MODAL_ADD_DEL		= "Component nodes of type Modal cannot have children",
 	CMP_NO_CHLD 			= "This Component node has no children",
 	CMP_TYPE_MISMATCH		= "Provided child component type does not match ancestor's component type",
@@ -70,15 +75,17 @@ export enum DataErrorType {
 export class DataError extends Error {
 	name = "DataError";
 
-	// TODO Go through console.warns and create errors from them with IDs
-
 	/**
 	 * @param type The type of error, specified by the enum DataErrorType which maps error codes to full error messages
 	 * @param id The ID of the Node, Document or Entry on which the error occurred
+	 * @param componentType (Optional) If the error involves a component type, it is given here
 	 */
-	constructor(public type: DataErrorType, public id: number) {
+	constructor(public type: DataErrorType, public id: number, public componentType?: ComponentType) {
 		super(type);
 		this.type = type;
 		this.id = id;
+		if (componentType) {
+			this.componentType = componentType;
+		}
 	}
 }

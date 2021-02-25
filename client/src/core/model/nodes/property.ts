@@ -7,7 +7,7 @@ import {
 } from "./";
 import {INode, IPropertyNode} from "../interfaces";
 import {Arg, NodeType} from "../enums";
-import {Text} from "../text";
+import {TextContent} from "../textcontent";
 import {DataError, DataErrorType} from "../errors";
 
 /**
@@ -16,7 +16,7 @@ import {DataError, DataErrorType} from "../errors";
 export default class PropertyNode extends BaseNode implements IPropertyNode {
     nodeType: NodeType = NodeType.property;
     /* Holds the text content of the institutional component. Should always be defined */
-    text!: Text;
+    text!: TextContent;
     /* Whether this property/object is functionally dependent on its parent */
     isFunctionallyDependent: Boolean = false;
     /* Array of child nodes of this Node */
@@ -27,11 +27,26 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
      *
      * @param document The ID of the document this node belongs to
      * @param parent The ID of the node this node is a child of (the parent's children array must be set separately)
+     * @param id (Optional) The ID of this node if one already exists (for rebuilding from existing data)
      */
-    constructor(document: number, parent: number) {
-        super(document, parent);
-        this.text = new Text();
+    constructor(document: number, parent: number, id?: number) {
+        super(document, parent, id);
+        this.text = new TextContent();
         this.children = [];
+    }
+
+    /**
+     * Build a new PropertyNode from existing data.
+     * Properties (data fields) are copied to the new node from the passed in data.
+     *
+     * @param data An object of type IPropertyNode
+     * @return A new PropertyNode with the passed in properties
+     */
+    static fromData(data: IPropertyNode) : PropertyNode {
+        let newNode = new PropertyNode(data.document, data.parent, data.id);
+        newNode.isFunctionallyDependent = data.isFunctionallyDependent;
+        newNode.text = TextContent.fromData(data.text);
+        return newNode;
     }
 
     /**
@@ -74,8 +89,28 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
     }
 
     /**
-     * Modifies the node's Text object with the passed in text content.
-     * If this node has a child of type Statement or StatementJunction, deletes the child.
+     * Sets the node's isFunctionallyDependent field to the passed in value.
+     * @param isFD Whether this node should be functionally dependent on its parent
+     */
+    setFunctionallyDependent(isFD: Boolean) : void {
+        this.isFunctionallyDependent = isFD;
+        this.update();
+    }
+
+    /**
+     * Return this node's TextContent object. Throws an error if the TextContent object is undefined.
+     * @return The TextContent object found in this node's text property
+     */
+    getText() : TextContent {
+        if (!this.text) {
+            throw new DataError(DataErrorType.CMP_GET_TXT_UNDEF, this.id);
+        }
+        return this.text;
+    }
+
+    /**
+     * Modifies the node's TextContent object with the passed in text content.
+     * If this node has a child of type Statement or StatementJunction, throws an error.
      *
      * @param main (Optional) The text that most narrowly fits the component
      * @param prefix (Optional) Excess text that goes before the main content
@@ -85,7 +120,7 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
         if (!this.text) {
             throw new DataError(DataErrorType.PRP_GET_TXT_UNDEF, this.id);
         } else {
-            // Check type of child, if any; if Statement or StatementJunction, delete child before adding text content
+            // Check type of child, if any; if Statement or StatementJunction, cannot add text content
             if (this.children.length === 1) {
                 if (this.children[0].nodeType === NodeType.statement) {
                     throw new DataError(DataErrorType.PRP_HAS_STMT_CHLD, this.id);
@@ -100,7 +135,7 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
     }
 
     /**
-     * Unsets the Text's content (not the Text object itself, which should always be defined).
+     * Unsets the TextContent's content (not the TextContent object itself, which should always be defined).
      */
     unsetText() : void {
         this.text.unset();

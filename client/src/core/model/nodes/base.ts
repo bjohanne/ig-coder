@@ -1,6 +1,16 @@
-import { INode } from "../interfaces";
-import { NodeType } from "../enums";
-import { IDCounter } from "../document";
+import {INode} from "../interfaces";
+import {NodeType} from "../enums";
+import {IDCounter} from "../document";
+import {
+	ComponentJunctionNode,
+	ComponentNode,
+	ConstitutiveStatementNode,
+	PropertyJunctionNode,
+	PropertyNode,
+	RegulativeStatementNode,
+	StatementJunctionNode
+} from ".";
+import {DataError, DataErrorType} from "../errors";
 
 /**
  * This is the base class for nodes, which implements INode.
@@ -29,9 +39,10 @@ export default class BaseNode implements INode {
      *
      * @param document The ID of the document this node belongs to
      * @param parent (Optional) The ID of the node this node is a child of (the parent's children array must be set separately)
+	 * @param id (Optional) The ID of this node if one already exists (for rebuilding from existing data)
      */
-    constructor(document: number, parent?: number) {
-        this.id = IDCounter.getInstance().getNextId(document);
+    constructor(document: number, parent?: number, id?: number) {
+		this.id = (id) ? id : IDCounter.getInstance().getNextId(document);
         this.document = document;
         if (parent) {
             this.parent = parent;
@@ -39,6 +50,61 @@ export default class BaseNode implements INode {
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }
+
+	/**
+	 * Build a new node from existing data. Properties are copied to the new node from the passed in data.
+	 * This function handles common BaseNode properties and calls the class-specific fromData() function
+	 * based on the passed in data's node type. Those functions handle the node's children.
+	 *
+	 * @param data An object of type INode
+	 * @return A new node with the passed in properties
+	 */
+	static fromData(data: INode) : INode {
+		let newNode;
+
+		if (data.nodeType) {
+			switch (data.nodeType) {
+				case NodeType.regulativestatement:
+					newNode = RegulativeStatementNode.fromData(data as RegulativeStatementNode);
+					break;
+				case NodeType.constitutivestatement:
+					newNode = ConstitutiveStatementNode.fromData(data as ConstitutiveStatementNode);
+					break;
+				case NodeType.statementjunction:
+					newNode = StatementJunctionNode.fromData(data as StatementJunctionNode);
+					break;
+				case NodeType.componentjunction:
+					newNode = ComponentJunctionNode.fromData(data as ComponentJunctionNode);
+					break;
+				case NodeType.component:
+					newNode = ComponentNode.fromData(data as ComponentNode);
+					break;
+				case NodeType.property:
+					newNode = PropertyNode.fromData(data as PropertyNode);
+					break;
+				case NodeType.propertyjunction:
+					newNode = PropertyJunctionNode.fromData(data as PropertyJunctionNode);
+					break;
+				default:
+					throw new DataError(DataErrorType.BAS_BAD_NODETYPE, data.id);
+			}
+
+			// Rebuild children - not for dummy nodes
+			newNode.children = [];	// Make sure we start with an empty array (some constructors create children)
+			for (let i = 0; i < data.children.length; i++) {
+				newNode.children.push(BaseNode.fromData(data.children[i]));	// Call this same function for each child
+			}
+		} else {	// This is a dummy node
+			newNode = new BaseNode(data.document, data.parent, data.id);
+		}
+
+		// Set common properties - for both normal and dummy nodes
+		newNode.isNegated = data.isNegated;
+		newNode.createdAt = new Date(data.createdAt);
+		newNode.updatedAt = new Date(data.updatedAt);
+
+		return newNode;
+	}
 
 	/**
 	 * Find the index of a child of this node.

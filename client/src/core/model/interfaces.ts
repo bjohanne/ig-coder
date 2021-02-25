@@ -1,6 +1,7 @@
 import { BaseNode, ComponentNode } from "./nodes";
-import { NodeType, ContextType } from "./enums";
+import { NodeType, ComponentType, ContextType } from "./enums";
 import { Entry } from "./entry";
+import { TextContent } from "./textcontent";
 
 /**
  * The interface implemented by all nodes
@@ -27,11 +28,11 @@ export interface INode {
     rebuildDates() : void,
     turnNegationOn() : void,
     turnNegationOff() : void
- }
+}
 
  /**
-  * The contract for the Document class, with entries and entryMap optional.
-  * In the Document class implementation, entries is required (but can be empty).
+  * The contract for Document objects.
+  * Deviation: In the Document class implementation, entries is required (but can be empty).
   */
 export interface IDocument {
     /* Name/title of the Document */
@@ -47,7 +48,7 @@ export interface IDocument {
 }
 
 /**
- * The contract for the Entry class
+ * The contract for Entry objects
  */
 export interface IEntry {
     /* ID of this Entry, unique within its Document */
@@ -63,34 +64,41 @@ export interface IEntry {
 }
 
 /**
- * The contract for the text content wrapper called Primitive
+ * The contract for the TextContent container
  */
- export interface IText {
+export interface ITextContent {
     content?: {
         main:   string,
         prefix: string,
         suffix: string
     }
- }
+}
+
+/**
+ * The base contract for Statement nodes
+ */
+export interface IStatementNode extends INode {
+    contextType?: ContextType
+}
 
 /**
  * The contract for RegulativeStatement nodes
  */
- export interface IRegulativeStatementNode {
-     getAttribute(): ComponentNode,
-     getDirectObject(): BaseNode,
-     getIndirectObject(): BaseNode,
-     getDeontic(): BaseNode,
-     getAim(): ComponentNode,
-     getActivationConditions(): ComponentNode,
-     getExecutionConstraints(): ComponentNode,
-     getOrElse(): BaseNode,
+export interface IRegulativeStatementNode extends IStatementNode {
+    getAttribute(): ComponentNode,
+    getDirectObject(): BaseNode,
+    getIndirectObject(): BaseNode,
+    getDeontic(): BaseNode,
+    getAim(): ComponentNode,
+    getActivationConditions(): ComponentNode,
+    getExecutionConstraints(): ComponentNode,
+    getOrElse(): BaseNode,
 }
 
 /**
  * The contract for ConstitutiveStatement nodes
  */
-export interface IConstitutiveStatementNode {
+export interface IConstitutiveStatementNode extends IStatementNode {
     getConstitutingProperties(): BaseNode,
     getModal(): BaseNode,
     getConstitutiveFunction(): ComponentNode,
@@ -100,31 +108,59 @@ export interface IConstitutiveStatementNode {
     getOrElse(): BaseNode,
 }
 
- /**
-  * The contract for Component nodes
-  */
- export interface IComponentNode {
-     setText(content?: string, prefix?: string, suffix?: string): void,
-	 unsetText(): void,
-     setContextType(contextType: ContextType): void,
-     unsetContextType(): void,
-     getChild(childPos: number): INode | undefined,
-     deleteChild(childPos: number) : void
- }
+/**
+ * The contract for Component nodes
+ */
+export interface IComponentNode extends INode {
+    componentType: ComponentType,
+    text: TextContent,
+    contextType?: ContextType,
+    getText() : TextContent,
+    setText(content?: string, prefix?: string, suffix?: string): void,
+    unsetText(): void,
+    setContextType(contextType: ContextType): void,
+    unsetContextType(): void,
+    getChild(childPos: number): INode | undefined,
+    deleteChild(childPos: number) : void
+}
 
 /**
- * The contract for Junction nodes
+ * The base contract for Junction nodes
  */
- export interface IJunctionNode {
-     getLeft(): INode | undefined,
-     getRight(): INode | undefined,
-     deleteChild(childPos: number) : void
+export interface IJunctionNode extends INode {
+    getLeft(): INode | undefined,
+    getRight(): INode | undefined,
+    deleteChild(childPos: number) : void
+}
+
+/**
+ * The contract for StatementJunction nodes
+ */
+export interface IStatementJunctionNode extends IJunctionNode {
+    // It's empty, but is implemented for consistency with the other Junction node types.
+}
+
+/**
+ * The contract for ComponentJunction nodes
+ */
+export interface IComponentJunctionNode extends IJunctionNode {
+    componentType: ComponentType
+}
+
+/**
+ * The contract for PropertyJunction nodes
+ */
+export interface IPropertyJunctionNode extends IJunctionNode {
+    isFunctionallyDependent: Boolean
 }
 
 /**
  * The contract for Property nodes
  */
-export interface IPropertyNode {
+export interface IPropertyNode extends INode {
+    isFunctionallyDependent: Boolean,
+    text: TextContent,
+    getText() : TextContent,
     setText(content?: string, prefix?: string, suffix?: string): void,
     unsetText(): void,
     makeFunctionallyDependent(): void,

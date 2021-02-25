@@ -89,7 +89,7 @@ const documents = (state: IDocumentState = initialState, action: any) => {
                 let doc = new Document(state.currentDocument.name, state.currentDocument.description, state.currentDocument.id);
                 let entry = doc.createEntry();
                 let root = entry.createRoot(Arg.regulative, action.payload.content) as RegulativeStatementNode;
-				root.createObject();
+				root.createDirectObject();
 				return update(state, { currentDocument: { $set: doc }});
 			} else {
 				return state;

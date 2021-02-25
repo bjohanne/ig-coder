@@ -9,9 +9,8 @@ import {
 } from "./";
 import {IComponentNode, INode} from "../interfaces";
 import {Arg, ComponentType, ContextType, NodeType} from "../enums";
-import {Text} from "../text";
+import {TextContent} from "../textcontent";
 import {DataError, DataErrorType} from "../errors";
-import {matchComponentTypes} from "../helpers";
 
 /**
  * Component nodes hold a regulative or constitutive component. This class accommodates both.
@@ -21,8 +20,8 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
     /* All Component nodes have a component type */
     componentType!: ComponentType;
     /* Holds the text content of the institutional component. Should always be defined */
-    text!: Text;
-    /* Context type held by component type Context */
+    text!: TextContent;
+    /* Context type held by component type SimpleContext */
     contextType?: ContextType;
     /* Array of child nodes of this Node */
     children!: INode[];
@@ -33,15 +32,27 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
      * @param componentType This node's institutional component type
      * @param document The ID of the document this node belongs to
      * @param parent The ID of the node this node is a child of (the parent's children array must be set separately)
+     * @param id (Optional) The ID of this node if one already exists (for rebuilding from existing data)
      */
-    constructor(componentType: ComponentType, document: number, parent: number) {
-        super(document, parent);
-		this.text = new Text();
+    constructor(componentType: ComponentType, document: number, parent: number, id?: number) {
+        super(document, parent, id);
+		this.text = new TextContent();
         this.componentType = componentType;
         this.children = [];
-        if (componentType === ComponentType.context) {  // Context gets a dummy child
-            this.children.push(new BaseNode(this.document, this.id));
-        }
+    }
+
+    /**
+     * Build a new ComponentNode from existing data.
+     * Properties are copied to the new node from the passed in data.
+     *
+     * @param data An object of type IComponentNode
+     * @return A new ComponentNode with the passed in properties
+     */
+    static fromData(data: IComponentNode) : ComponentNode {
+        let newNode = new ComponentNode(data.componentType, data.document, data.parent, data.id);
+        newNode.contextType = data.contextType;
+        newNode.text = TextContent.fromData(data.text);
+        return newNode;
     }
 
     /**
@@ -52,31 +63,41 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
      * NB: Assumes that it is legal to add the passed in child.
      *
      * @param node A reference to the node to be added as a child
+     * @return The passed in node
+     * @private
      */
     private addChild(node: INode) : INode {
         if (this.children.length === 0 || [
             ComponentType.activationconditions,
             ComponentType.executionconstraints
         ].includes(this.componentType)) {
-            this.children.push(node);   // Can simply push to the array if it's empty or Component type is AC/EC
+            this.children.push(node);   // Can push to the array if it's empty or Component type is AC/EC
 
         } else if (this.children.length === 1) {    // Nodes that currently have 1 child
-            if (!this.children[0].isDummy()) {
-                throw new DataError(DataErrorType.CMP_HAS_CHLD, this.id);
-            }
-            this.children[0] = node; // Accessing index 0 is now safe.
+            throw new DataError(DataErrorType.CMP_HAS_CHLD, this.id);
 
         } else {
             throw new DataError(DataErrorType.CMP_BAD_PARENT, this.id);
         }
-        this.unsetText(); // Delete this node's text content
+        this.unsetText(); // Delete this node's text content - can do because this is not used to create Properties
         this.update();
 		return node;
     }
 
     /**
-     * Modifies the node's Text object with the passed in text content.
-     * This function also deletes any descendants the node has, unless it has Property/PropertyJunction children.
+     * Return this node's TextContent object. Throws an error if the TextContent object is undefined.
+     * @return The TextContent object found in this node's text property
+     */
+    getText() : TextContent {
+        if (!this.text) {
+            throw new DataError(DataErrorType.CMP_GET_TXT_UNDEF, this.id);
+        }
+        return this.text;
+    }
+
+    /**
+     * Modifies the node's TextContent object with the passed in text content.
+     * If the node has children that are not Property/PropertyJunction, throws an error.
      *
      * @param main (Optional) The text that most narrowly fits the component
      * @param prefix (Optional) Excess text that goes before the main content
@@ -88,24 +109,23 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
                 throw new DataError(DataErrorType.CMP_AC_TXT, this.id);
             case ComponentType.executionconstraints:
                 throw new DataError(DataErrorType.CMP_EC_TXT, this.id);
-            case ComponentType.context:
-                throw new DataError(DataErrorType.CMP_CTXT_TXT, this.id);
             default:
         }
         if (!this.text) {
             throw new DataError(DataErrorType.CMP_GET_TXT_UNDEF, this.id);
-        } else {
-            if (this.children.length > 0) {
-                // TODO: Check for Property/PJ children: if yes, don't delete them.
-                throw new DataError(DataErrorType.CMP_HAS_CHLD, this.id);
-            }
-            this.text.set(main, prefix, suffix);
-            this.update();
         }
+        // Cannot set text content if the node already has a child not of type Property/PropertyJunction
+        if (this.children.length > 0) {
+            if (![NodeType.property, NodeType.propertyjunction].includes(this.children[0].nodeType)) {
+                throw new DataError(DataErrorType.CMP_HAS_CHLD_NO_PRP, this.id);
+            }
+        }
+        this.text.set(main, prefix, suffix);
+        this.update();
     }
 
 	/**
-	 * Unsets the Text's content (not the Text object itself, which should always be defined).
+	 * Unsets the TextContent's content (not the TextContent object itself, which should always be defined).
 	 */
 	unsetText() : void {
 		this.text.unset();
@@ -113,13 +133,12 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
 	}
 
     /**
-     * Sets the context type to the passed context type.
-     * Throws an error if this node is not of component type Context.
+     * Sets the context type to the passed in context type.
      *
      * @param contextType The context type to set
      */
 	setContextType(contextType: ContextType) : void {
-	    if (this.componentType !== ComponentType.context) {
+	    if (this.componentType !== ComponentType.simplecontext) {
 	        throw new DataError(DataErrorType.CMP_CTXT_TYPE, this.id);
         }
 	    this.contextType = contextType;
@@ -128,10 +147,9 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
 
     /**
      * Unsets the context type (sets it to undefined).
-     * Throws an error if this node is not of component type Context.
      */
     unsetContextType() : void {
-        if (this.componentType !== ComponentType.context) {
+        if (this.componentType !== ComponentType.simplecontext) {
             throw new DataError(DataErrorType.CMP_CTXT_TYPE, this.id);
         }
 	    this.contextType = undefined;
@@ -140,30 +158,25 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
 
     /**
      * Returns this node's child in the given index.
-     * Throws an error if the index is out of bounds
-     * or the node in it is a dummy node.
+     * Throws an error if the index is out of bounds or this node has no children.
      */
     getChild(position: number) : INode | undefined {
         if (this.children.length === 0) {
             throw new DataError(DataErrorType.CMP_NO_CHLD, this.id);
         }
 
-        if (position < 0 || position >= this.children.length) {	    // Ensure the given index is accessible,
-            throw new DataError(DataErrorType.CMP_BAD_CHILD_IDX, this.id); // though it may contain a dummy node
+        if (position < 0 || position >= this.children.length) {
+            throw new DataError(DataErrorType.CMP_BAD_CHILD_IDX, this.id);
         }
 
-        if (this.children[position].isDummy()) {
-            throw new DataError(DataErrorType.CMP_DUM_CHLD, this.id);
-        }
         return this.children[position];
     }
 
     /**
-     * Delete a child of this node. It can be any of the valid node types for children of Component nodes,
+     * Delete a child of this node. It can be any valid node type for children of Component nodes,
      *  including Property and PropertyJunction.
-     * The method of deletion depends on this node's Component type, which determines the number of children allowed.
+     * The method of deletion depends on this node's component type, which determines the number of children allowed.
      * Throws an error if the node has no children or if position is out of bounds.
-     * TODO: Support deletion of P/PJ
      *
      * @param position The children array index of the child node to delete
      */
@@ -172,8 +185,8 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
             throw new DataError(DataErrorType.CMP_NO_CHLD, this.id);
         }
 
-        if (position < 0 || position >= this.children.length) {	    // Ensure the given index is accessible,
-            throw new DataError(DataErrorType.CMP_BAD_CHILD_IDX, this.id); // though it may contain a dummy node
+        if (position < 0 || position >= this.children.length) {
+            throw new DataError(DataErrorType.CMP_BAD_CHILD_IDX, this.id);
         }
 
         switch (this.componentType) {   // Handle component types with different rules regarding number of children
@@ -181,7 +194,7 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
                 throw new DataError(DataErrorType.CMP_DNT_ADD_DEL, this.id);
             case ComponentType.modal:
                 throw new DataError(DataErrorType.CMP_MODAL_ADD_DEL, this.id);
-            case ComponentType.nestedcontext:
+            case ComponentType.simplecontext:
                 throw new DataError(DataErrorType.CMP_CTXT_ADD_DEL, this.id);
             case ComponentType.activationconditions:
                 console.warn("Deleting child at index " + position +
@@ -193,15 +206,6 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
                 console.warn("Deleting child at index " + position +
                     " of Component (Execution Constraints) node with ID " + this.id);
                 this.children.splice(position, 1);
-                this.update();
-                break;
-            case ComponentType.context:
-                if (this.children[position].isDummy()) {
-                    throw new DataError(DataErrorType.CMP_DUM_CHLD, this.id);
-                } else {
-                    console.warn("Deleting child of Component (Context) node with ID " + this.id);
-                    this.children[position] = new BaseNode(this.document, this.id);
-                }
                 this.update();
                 break;
             default:
@@ -255,11 +259,7 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
                 throw new DataError(DataErrorType.CMP_MODAL_ADD_DEL, this.id);
             case ComponentType.constitutivefunction:
                 throw new DataError(DataErrorType.CMP_ADD_STMT, this.id);
-            case ComponentType.activationconditions:
-                throw new DataError(DataErrorType.CMP_ADD_STMT, this.id);
-            case ComponentType.executionconstraints:
-                throw new DataError(DataErrorType.CMP_ADD_STMT, this.id);
-            case ComponentType.nestedcontext:
+            case ComponentType.simplecontext:
                 throw new DataError(DataErrorType.CMP_CTXT_ADD_DEL, this.id);
             default:
         }
@@ -284,11 +284,7 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
                 throw new DataError(DataErrorType.CMP_MODAL_ADD_DEL, this.id);
             case ComponentType.constitutivefunction:
                 throw new DataError(DataErrorType.CMP_ADD_STMTJUN, this.id);
-            case ComponentType.activationconditions:
-                throw new DataError(DataErrorType.CMP_ADD_STMTJUN, this.id);
-            case ComponentType.executionconstraints:
-                throw new DataError(DataErrorType.CMP_ADD_STMTJUN, this.id);
-            case ComponentType.nestedcontext:
+            case ComponentType.simplecontext:
                 throw new DataError(DataErrorType.CMP_CTXT_ADD_DEL, this.id);
             default:
         }
@@ -309,11 +305,7 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
                 throw new DataError(DataErrorType.CMP_ADD_CMPJUN, this.id);
             case ComponentType.modal:
                 throw new DataError(DataErrorType.CMP_MODAL_ADD_DEL, this.id);
-            case ComponentType.activationconditions:
-                throw new DataError(DataErrorType.CMP_ADD_CMPJUN, this.id);
-            case ComponentType.executionconstraints:
-                throw new DataError(DataErrorType.CMP_ADD_CMPJUN, this.id);
-            case ComponentType.nestedcontext:
+            case ComponentType.simplecontext:
                 throw new DataError(DataErrorType.CMP_CTXT_ADD_DEL, this.id);
             default:
         }
@@ -322,35 +314,27 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
 
     /**
      * Creates a Component node as child of this node, if legal.
-     * There are only two situations in which this is legal:
-     * - this is an ActivationConditions or ExecutionConstraints node and we are creating a Context node
-     * - this is a Context node and we are creating a NestedContext node
+     * There is only one situation in which this is legal:
+     * - this is an ActivationConditions or ExecutionConstraints node and we are creating a SimpleContext node
      * Throws an error if illegal.
      *
      * @param componentType The type of component the new node should have
      * @return The newly created node
      */
     createComponentNode(componentType: ComponentType) : INode | undefined {
-        switch (this.componentType) {   // Handle component types that cannot have children
-            case ComponentType.deontic:
-                throw new DataError(DataErrorType.CMP_DNT_ADD_DEL, this.id);
-            case ComponentType.orelse:
-                throw new DataError(DataErrorType.CMP_ADD_CMPJUN, this.id);
-            case ComponentType.modal:
-                throw new DataError(DataErrorType.CMP_MODAL_ADD_DEL, this.id);
-            default:
+        if ([ComponentType.activationconditions, ComponentType.executionconstraints]
+            .includes(this.componentType) && componentType === ComponentType.simplecontext) {
+            return this.addChild(new ComponentNode(componentType, this.document, this.id));
+        } else {
+            throw new DataError(DataErrorType.CMP_ADD_CMP, this.id, componentType);
         }
-        if (!matchComponentTypes(this.componentType, componentType)) {
-            throw new DataError(DataErrorType.CMP_TYPE_MISMATCH, this.id);
-        }
-        return this.addChild(new ComponentNode(ComponentType.context, this.document, this.id));
     }
 
     /**
      * Creates a Property node as child of this node, if legal.
      * Does not use the helper addChild().
      *
-     * @return The newly created node, or undefined if illegal
+     * @return The newly created node
      */
     createPropertyNode() : INode | undefined {
         if (![                          // Only these Component types can have Property nodes as children
@@ -362,36 +346,28 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
         ].includes(this.componentType)) {
             throw new DataError(DataErrorType.CMP_ADD_PRP, this.id);
         }
-        // Only legal if all other children, if any, are of type P/PJ.
-        // So when calling this function on a node that already has a child of another type, it's probably a mistake
-        // -> we should warn and abort, not overwrite the existing child.
 
-        // Need a way to check for P/PJ children that doesn't loop through the entire children array (such a method
-        // gets slower the more children there are).
-        // We can probably just check the first child.
-
-        if (this.children.length === 0) {
+        if (this.children.length === 0) {   // This node has no children
             this.children.push(new PropertyNode(this.document, this.id));
-            this.update();
-            return this.children[this.children.length - 1]; // Return newly pushed node
-        } else if ([
+
+        } else if ([                        // This node's first child is a Property/PropertyJunction
             NodeType.property,
             NodeType.propertyjunction
         ].includes(this.children[0].nodeType)) {
             this.children.push(new PropertyNode(this.document, this.id));
-            this.update();
-            return this.children[this.children.length - 1]; // Return newly pushed node
-        } else {
-            //throw new DataError("Attempt to add Property child to Component node with ID " + this.id +
-            //" which has a child of ");
+
+        } else {                            // This node's first child is NOT a Property/PropertyJunction
+            throw new DataError(DataErrorType.CMP_HAS_CHLD_NO_PRP, this.id);
         }
+        this.update();
+        return this.children[this.children.length - 1]; // Return newly pushed node
     }
 
     /**
      * Creates a PropertyJunction node as child of this node, if legal.
      * Does not use the helper addChild().
      *
-     * @return The newly created node, or undefined if illegal
+     * @return The newly created node
      */
     createPropertyJunctionNode() : INode | undefined {
         if (![                          // Only these Component types can have PropertyJunction nodes as children
@@ -403,8 +379,19 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
         ].includes(this.componentType)) {
             throw new DataError(DataErrorType.CMP_ADD_PRPJUN, this.id);
         }
-        // TODO: Check for existing children, same as createPropertyNode().
-        this.children.push(new PropertyJunctionNode(this.document, this.id));
+
+        if (this.children.length === 0) {   // This node has no children
+            this.children.push(new PropertyJunctionNode(this.document, this.id));
+
+        } else if ([                        // This node's first child is a Property/PropertyJunction
+            NodeType.property,
+            NodeType.propertyjunction
+        ].includes(this.children[0].nodeType)) {
+            this.children.push(new PropertyJunctionNode(this.document, this.id));
+
+        } else {                            // This node's first child is NOT a Property/PropertyJunction
+            throw new DataError(DataErrorType.CMP_HAS_CHLD_NO_PRP, this.id);
+        }
         this.update();
         return this.children[this.children.length - 1]; // Return newly pushed node
     }

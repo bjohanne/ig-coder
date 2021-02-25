@@ -2,7 +2,6 @@ import {BaseNode} from "./nodes";
 import {IDocument, INode} from "./interfaces";
 import {Entry} from "./entry";
 import {DataError, DataErrorType} from "./errors";
-import cloneDeep from 'lodash/cloneDeep';
 
 /**
  * A Document represents a policy. It contains a list of entries that are part of it.
@@ -28,30 +27,27 @@ export default class Document implements IDocument {
         this.id = id;
         this.entryMap = {};
 
-		// If the entries param is provided, need to recursively build each tree in it.
-		// This will be the single method of building/rebuilding a Document.
-        if (entries && entries.length > 0) {	// An entry list is provided and it is not empty
-            this.entries[0] = cloneDeep(entries[0]);	// NB: Just one entry! Change this when implementing rebuild.
-			this.rebuildDates(0);
+		// If the entries parameter is provided, rebuild each tree in it.
+		if (entries) {
+			this.entries = []; // Empty the entry list - it will be rebuilt from the entries parameter
+			for (let i = 0; i < entries.length; i++) {
+				// For each entry, rebuild the tree starting with root.
+				// All node type classes have their own fromData() function that takes an object of its type
+				//  and creates a new object from that data.
+				// The BaseNode class is responsible for checking the node type, calling the appropriate constructors
+				//  and repeating the process for each of the node's children.
 
-			// For each level, starting with entries[0], create/assign the appropriate class.
-			// Then for each of the children, do the same (need a way to identify each class) (node/comp type).
-			// Maybe each class should have its own rebuild function that takes any data it needs as arguments.
-
-			// The steps here will be:
-			// 1. for each entry in argument entries, call Entry's own rebuild function
-			// 2. Entry.rebuild should call the appropriate rebuild function for the root node
-			// 3. and so on...
-			// Note: All node rebuild functions should rebuild their own dates using the common method on BaseNode.
-			// Then you can remove Document.rebuildDates().
-        }
+				let length = this.entries.push(Entry.fromData(entries[i]));
+				this.entryMap[entries[i].id] = length - 1;	// Update entryMap - see createEntry()
+			}
+		}
     }
 
 	/**
 	 * Static factory method that takes an object containing name, description and ID
 	 * and creates a new Document object. Convenience for when you have long arguments.
-	 * Only use this for Documents without entries. (?) Don't see why.
-	 * @param data An object of type IDocument containing name, description, ID and optionally entries
+	 * @param data An object of type IDocument
+	 * @return A new Document with the passed in properties
 	 */
 	static fromData(data: IDocument) : Document {
 		return new this(data.name, data.description, data.id, data.entries);
@@ -120,6 +116,20 @@ export default class Document implements IDocument {
 		return entry;
     }
 
+	/**
+	 * Get the specified Entry from this Document using entries array index.
+	 * @param index The entries index of the Entry to get
+	 */
+	getEntry(index: number) : Entry {
+		if (this.entries.length === 0) {
+			throw new DataError(DataErrorType.DOC_NO_ENTRIES, this.id);
+		}
+		if (index < 0 || index >= this.entries.length) {
+			throw new DataError(DataErrorType.DOC_BAD_ENTRY_IDX, this.id);
+		}
+		return this.entries[index];
+	}
+
     /**
      * Deletes the given Entry from the document. The Entry is deleted from
      * the entries array, and its entire tree is deleted as a consequence.
@@ -148,7 +158,7 @@ export default class Document implements IDocument {
     }
 
 	/**
-	 * Find the index of an entry in this document.
+	 * Find the index of an entry in this document using its ID.
 	 * Returns undefined if no entry with ID targetId exists.
 	 * (This is an alternative to entryMap.)
 	 * @param targetId The ID of the entry to find
@@ -160,31 +170,6 @@ export default class Document implements IDocument {
 			}
 		}
 		return undefined;
-	}
-
-	/**
-	 * Iteratively rebuilds all Date objects in this document, optionally in a single entry.
-	 *
-	 * @param index (Optional) The entries array index of the entry to rebuild Dates in.
-	 */
-	rebuildDates(index?: number) : void {
-		if (index && index >= this.entries.length) {
-			throw new DataError(DataErrorType.DOC_BAD_ENTRY_IDX, this.id);
-		}
-
-		let stack;
-		if (typeof index === "undefined") {	// An entry index is not provided
-			stack = this.getRootNodes();	// Use the entire entry list
-		} else {							// An entry index is provided - can be 0
-			stack = [ this.entries[index].root ];	// Use only the provided entry
-		}
-
-		while (stack.length) {
-			const node = stack.shift() as BaseNode;
-			if (node && node.createdAt) node.createdAt = new Date(node.createdAt);
-			if (node && node.updatedAt) node.updatedAt = new Date(node.updatedAt);
-			node && node.children && stack.push(...node.children);	// Push the children to the stack, if any
-		}
 	}
 
 	/**

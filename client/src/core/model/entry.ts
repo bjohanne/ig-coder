@@ -1,5 +1,5 @@
-import {ConstitutiveStatementNode, RegulativeStatementNode, StatementJunctionNode} from "./nodes";
-import {IEntry, INode} from "./interfaces";
+import {BaseNode, ConstitutiveStatementNode, RegulativeStatementNode, StatementJunctionNode} from "./nodes";
+import {IDocument, IEntry, INode} from "./interfaces";
 import {Arg} from "./enums";
 import {IDCounter} from "./document";
 import {DataError, DataErrorType} from "./errors";
@@ -25,11 +25,28 @@ export class Entry implements IEntry {
 	 * The Entry is assigned an ID from the IDCounter class,
 	 * resulting in Entries and Nodes having unique IDs within their Document.
 	 * @param document The ID of the Document to place this Entry in
+	 * @param id (Optional) The ID of this entry if one already exists (for rebuilding from existing data)
      */
-    constructor(document: number) {
-		this.id = IDCounter.getInstance().getNextId(document);
+    constructor(document: number, id?: number) {
+    	this.id = (id) ? id : IDCounter.getInstance().getNextId(document);
 		this.document = document;
     }
+
+	/**
+	 * Build a new Entry from existing data. If the passed in data includes a root node,
+	 *  the node data is forwarded to BaseNode.fromData() to be rebuilt.
+	 * @param data An object of type IEntry
+	 * @return A new Entry with the passed in properties
+	 */
+	static fromData(data: IEntry) : Entry {
+		let newEntry = new this(data.document, data.id);
+		newEntry.original = data.original;
+		newEntry.prepared = data.prepared;
+		if (data.root) {
+			newEntry.root = BaseNode.fromData(data.root);
+		}
+		return newEntry;
+	}
 
 	/**
 	 * Create a root node in this Entry.

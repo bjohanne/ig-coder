@@ -1,5 +1,5 @@
 import { ComponentNode, JunctionNode, StatementJunctionNode } from "./";
-import { INode } from "../interfaces";
+import { IComponentJunctionNode, INode } from "../interfaces";
 import { NodeType, ComponentType, Arg } from "../enums";
 import { DataError, DataErrorType } from "../errors";
 import { matchComponentTypes } from "../helpers";
@@ -7,20 +7,32 @@ import { matchComponentTypes } from "../helpers";
 /**
  * This is the class for Junction nodes on the component level.
  */
-export default class ComponentJunctionNode extends JunctionNode {
+export default class ComponentJunctionNode extends JunctionNode implements IComponentJunctionNode {
 	nodeType: NodeType = NodeType.componentjunction;
     componentType!: ComponentType;		 // Used to check for correct type when nesting Component nodes
 
 	/**
-	 * Creates a new Junction node with dummy children.
+	 * Creates a new ComponentJunction node with dummy children.
 	 *
 	 * @param componentType The component type of this node's ancestor ComponentNode, if it has one.
 	 * @param document The ID of the document this node belongs to
 	 * @param parent The ID of the node this node is a child of (the parent's children array must be set separately)
+	 * @param id (Optional) The ID of this node if one already exists (for rebuilding from existing data)
 	 */
-	constructor(componentType: ComponentType, document: number, parent: number) {
-		super(document, parent);
+	constructor(componentType: ComponentType, document: number, parent: number, id?: number) {
+		super(document, parent, undefined, id);
 		this.componentType = componentType;
+	}
+
+	/**
+	 * Build a new ComponentJunctionNode from existing data.
+	 * Properties are copied to the new node from the passed in data.
+	 *
+	 * @param data An object of type IComponentJunctionNode
+	 * @return A new StatementJunctionNode with the passed in properties
+	 */
+	static fromData(data: IComponentJunctionNode) : ComponentJunctionNode {
+		return new ComponentJunctionNode(data.componentType, data.document, data.parent, data.id);
 	}
 
 	/**

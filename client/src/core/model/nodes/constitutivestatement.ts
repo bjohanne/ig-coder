@@ -1,5 +1,5 @@
-import {BaseNode, ComponentNode} from "./";
-import {IConstitutiveStatementNode, INode} from "../interfaces";
+import {BaseNode, ComponentNode, StatementNode} from "./";
+import {IConstitutiveStatementNode, INode, IRegulativeStatementNode} from "../interfaces";
 import {Arg, ComponentType, NodeType} from "../enums";
 import {DataError, DataErrorType} from "../errors";
 
@@ -7,7 +7,7 @@ import {DataError, DataErrorType} from "../errors";
  * ConstitutiveStatement nodes represent a constitutive institutional statement,
  * its components embedded in its child nodes.
  */
-export default class ConstitutiveStatementNode extends BaseNode implements IConstitutiveStatementNode {
+export default class ConstitutiveStatementNode extends StatementNode implements IConstitutiveStatementNode {
     nodeType: NodeType = NodeType.regulativestatement;
     // Fixed children:
     // ConstitutingProperties (optional), Modal (optional), ConstitutiveFunction, ConstitutedEntity, ActivationConditions, ExecutionConstraints, OrElse (optional)
@@ -19,9 +19,10 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
      *
      * @param document The ID of the document this node belongs to
      * @param parent (Optional) The ID of the node this node is a child of (the parent's children array must be set separately)
+     * @param id (Optional) The ID of this node if one already exists (for rebuilding from existing data)
      */
-    constructor(document: number, parent?: number) {
-        super(document, parent);
+    constructor(document: number, parent?: number, id?: number) {
+        super(document, parent, id);
         this.children = [
             new BaseNode(document, this.id),
             new BaseNode(document, this.id),
@@ -31,6 +32,23 @@ export default class ConstitutiveStatementNode extends BaseNode implements ICons
             new ComponentNode(ComponentType.executionconstraints, document, this.id),
             new BaseNode(document, this.id),
         ];
+    }
+
+    /**
+     * Build a new ConstitutiveStatementNode from existing data.
+     * Properties are copied to the new node from the passed in data.
+     *
+     * @param data An object of type IConstitutiveStatementNode
+     * @return A new ConstitutiveStatementNode with the passed in properties
+     */
+    static fromData(data: IConstitutiveStatementNode) : ConstitutiveStatementNode {
+        let newNode = new ConstitutiveStatementNode(data.document, data.parent, data.id);
+
+        // Note that we could have had a common function Statement.fromData for this one and RegulativeStatementNode
+        //  that sets contextType. However, the function overhead is probably not worth this one line:
+        newNode.contextType = data.contextType;
+
+        return newNode;
     }
 
     /* Checkers for optional children */

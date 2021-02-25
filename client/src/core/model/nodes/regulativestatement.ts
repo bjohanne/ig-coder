@@ -1,4 +1,11 @@
-import {BaseNode, ComponentNode} from "./";
+import {
+    BaseNode,
+    ComponentJunctionNode,
+    ComponentNode,
+    ConstitutiveStatementNode, PropertyJunctionNode, PropertyNode,
+    StatementJunctionNode,
+    StatementNode
+} from "./";
 import {INode, IRegulativeStatementNode} from "../interfaces";
 import {Arg, ComponentType, NodeType} from "../enums";
 import {DataError, DataErrorType} from "../errors";
@@ -7,7 +14,7 @@ import {DataError, DataErrorType} from "../errors";
  * RegulativeStatement nodes represent a regulative institutional statement,
  * its components embedded in its child nodes.
  */
-export default class RegulativeStatementNode extends BaseNode implements IRegulativeStatementNode {
+export default class RegulativeStatementNode extends StatementNode implements IRegulativeStatementNode {
     nodeType: NodeType = NodeType.regulativestatement;
     // Fixed children:
     // Attribute, DirectObject (optional), IndirectObject (optional), Deontic (optional), Aim, ActivationConditions, ExecutionConstraints, OrElse (optional)
@@ -19,9 +26,10 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
      *
      * @param document The ID of the document this node belongs to
      * @param parent (Optional) The ID of the node this node is a child of (the parent's children array must be set separately)
+     * @param id (Optional) The ID of this node if one already exists (for rebuilding from existing data)
      */
-    constructor(document: number, parent?: number) {
-        super(document, parent);
+    constructor(document: number, parent?: number, id?: number) {
+        super(document, parent, id);
         this.children = [
             new ComponentNode(ComponentType.attribute, document, this.id),
             new BaseNode(document, this.id),
@@ -32,6 +40,23 @@ export default class RegulativeStatementNode extends BaseNode implements IRegula
             new ComponentNode(ComponentType.executionconstraints, document, this.id),
             new BaseNode(document, this.id),
         ];
+    }
+
+    /**
+     * Build a new RegulativeStatementNode from existing data.
+     * Properties are copied to the new node from the passed in data.
+     *
+     * @param data An object of type IRegulativeStatementNode
+     * @return A new RegulativeStatementNode with the passed in properties
+     */
+    static fromData(data: IRegulativeStatementNode) : RegulativeStatementNode {
+        let newNode = new RegulativeStatementNode(data.document, data.parent, data.id);
+
+        // Note that we could have had a common function Statement.fromData for this one and ConstitutiveStatementNode
+        //  that sets contextType. However, the function overhead is probably not worth this one line:
+        newNode.contextType = data.contextType;
+
+        return newNode;
     }
 
     /* Checkers for optional children */
