@@ -18,8 +18,10 @@ export enum NodeType {
 
 /**
  * Second-level types that all Component nodes have.
- * The four "subtypes" are special, as they are the only Component types
- * that can be used as child of another Component node (details in documentation).
+ * Component types can be categorized as regulative, constitutive,
+ * common for regulative & constitutive, and one special type.
+ * The special type, Simple Context, is for Component children of
+ * component types Activation Conditions and Execution constraints.
  */
 export enum ComponentType {
     // Common
@@ -66,10 +68,10 @@ export enum Arg {
 	right = 1,
 	only  = 0,
 
-    // Valid node types for root
-    regulative,
-    constitutive,
-    statementjunction,
+    // Valid node types for root (constant values mean nothing)
+    regulative = 10,
+    constitutive = 11,
+    statementjunction = 12,
 
     // Regulative components
     reg_attribute      = 0,
@@ -121,4 +123,12 @@ export enum ContextType {
         instrument = "ins",
     cause = "cau",
     purpose_function = "pur"
+}
+
+/**
+ * Default strings for Context components of statements that have no Activation Conditions or Execution Constraints.
+ */
+export enum DefaultContext {
+    activationconditions = "under all circumstances",
+    executionconstraints = "no constraints"
 }

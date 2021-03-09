@@ -24,7 +24,9 @@ import {ITextContent} from "./interfaces"
     /**
 	 * Create a new TextContent object that holds text content.
 	 * If no arguments are provided, content will be undefined, meaning the text content is considered unset.
-	 * Otherwise, sets the content strings to the passed in arguments or an empty string.
+	 * Otherwise, sets the content strings to the passed in arguments.
+	 * If an argument is undefined, the corresponding string is set to an empty string.
+	 * Ensures that if content is defined, all three slots are defined.
 	 *
 	 * @param main (Optional) The text that most narrowly fits the component
 	 * @param prefix (Optional) Excess text that goes before the main content
@@ -60,11 +62,28 @@ import {ITextContent} from "./interfaces"
 		return (typeof this.content !== undefined);
 	}
 
+	/**
+	 * Returns true if the text content is unset OR
+	 *  text content is set and all text slots are empty OR
+	 *  text content is set and the main slot has one of the default values for Junction text content,
+	 *  which are ["and", "or"].
+	 */
+	isEmptyOrJunctionDefault() : Boolean {
+		if (!this.content) {
+			return true;
+		}
+		else return (	// Ensure we can access this.content
+			(this.content.main === "" && this.content.prefix === "" && this.content.suffix === "") ||
+			["and", "or"].includes(this.content.main)
+		)
+	}
+
     /**
 	 * Set each part of the component/property individually.
 	 * Only the provided parameters are changed, but you can pass an empty string to set to that.
-	 * If no arguments are provided, the content strings will not be changed.
+	 * If an argument is undefined, the corresponding string is unchanged.
 	 * If content is undefined, defines it.
+	 * Ensures that if content is defined, all three slots are defined.
 	 *
 	 * @param main (Optional) The text that most narrowly fits the component/property
 	 * @param prefix (Optional) Excess text that goes before the main content
@@ -77,7 +96,7 @@ import {ITextContent} from "./interfaces"
 				prefix: (prefix) ? prefix : "",
 				suffix: (suffix) ? suffix : ""
 			}
-		} else {
+		} else { // The reason for the below checks is to allow setting to an empty string (i.e. removing a string).
 			if (typeof main !== "undefined") {
 				this.content.main = main;
 			}
@@ -116,6 +135,7 @@ import {ITextContent} from "./interfaces"
 	/**
 	 * Concatenates the text content's prefix, main and suffix and returns the resulting string.
 	 * The resulting string will have exactly one space between each present component and no superfluous spaces.
+	 * @return A string concatenated from the present components out of prefix, main and suffix
 	 */
 	getString() : string {
 		let str: string = "";

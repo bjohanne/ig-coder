@@ -1,8 +1,9 @@
-import { ComponentNode, JunctionNode, StatementJunctionNode } from "./";
-import { IComponentJunctionNode, INode } from "../interfaces";
-import { NodeType, ComponentType, Arg } from "../enums";
-import { DataError, DataErrorType } from "../errors";
-import { matchComponentTypes } from "../helpers";
+import {ComponentNode, JunctionNode} from "./";
+import {IComponentJunctionNode} from "../interfaces";
+import {NodeType, ComponentType, Arg} from "../enums";
+import {DataError, DataErrorType} from "../errors";
+import {matchComponentTypes} from "../helpers";
+import {TextContent} from "../textcontent";
 
 /**
  * This is the class for Junction nodes on the component level.
@@ -32,19 +33,9 @@ export default class ComponentJunctionNode extends JunctionNode implements IComp
 	 * @return A new StatementJunctionNode with the passed in properties
 	 */
 	static fromData(data: IComponentJunctionNode) : ComponentJunctionNode {
-		return new ComponentJunctionNode(data.componentType, data.document, data.parent, data.id);
-	}
-
-	/**
-	 * Creates a StatementJunction node as child of this node.
-	 * @param position Whether the new node should be the left or right child of this node
-	 *
-	 * @return The newly created node
-	 */
-	createStatementJunctionNode(position: Arg.left | Arg.right) : INode | undefined {
-		this.children[position] = new StatementJunctionNode(this.document, this.id);
-		this.update();
-		return this.children[position];
+		let newNode = new ComponentJunctionNode(data.componentType, data.document, data.parent, data.id);
+		newNode.text = TextContent.fromData(data.text);
+		return newNode;
 	}
 
 	/**
@@ -53,10 +44,10 @@ export default class ComponentJunctionNode extends JunctionNode implements IComp
 	 *
 	 * @return The newly created node
 	 */
-	createComponentJunctionNode(position: Arg.left | Arg.right) : INode | undefined {
+	createComponentJunctionNode(position: Arg.left | Arg.right) : ComponentJunctionNode {
 		this.children[position] = new ComponentJunctionNode(this.componentType, this.document, this.id);
 		this.update();
-		return this.children[position];
+		return this.children[position] as ComponentJunctionNode;
 	}
 
 	/**
@@ -67,12 +58,12 @@ export default class ComponentJunctionNode extends JunctionNode implements IComp
 	 *
 	 * @return The newly created node
 	 */
-	createComponentNode(componentType: ComponentType, position: Arg.left | Arg.right) : INode | undefined {
+	createComponentNode(componentType: ComponentType, position: Arg.left | Arg.right) : ComponentNode {
 		if (!matchComponentTypes(this.componentType, componentType)) {
 			throw new DataError(DataErrorType.CMP_TYPE_MISMATCH, this.id);
 		}
 		this.children[position] = new ComponentNode(componentType, this.document, this.id);
 		this.update();
-		return this.children[position];
+		return this.children[position] as ComponentNode;
 	}
 }

@@ -3,10 +3,10 @@ import {
     ConstitutiveStatementNode,
     PropertyJunctionNode,
     RegulativeStatementNode,
-    StatementJunctionNode
+    StatementJunctionNode, StatementNode
 } from "./";
 import {INode, IPropertyNode} from "../interfaces";
-import {Arg, NodeType} from "../enums";
+import {Arg, ContextType, NodeType} from "../enums";
 import {TextContent} from "../textcontent";
 import {DataError, DataErrorType} from "../errors";
 
@@ -15,10 +15,12 @@ import {DataError, DataErrorType} from "../errors";
  */
 export default class PropertyNode extends BaseNode implements IPropertyNode {
     nodeType: NodeType = NodeType.property;
-    /* Holds the text content of the institutional component. Should always be defined */
+    /* Holds the text content of the property/object. Should always be defined */
     text!: TextContent;
     /* Whether this property/object is functionally dependent on its parent */
     isFunctionallyDependent: Boolean = false;
+    /* Optional context type for using the Circumstances Taxonomy on Properties */
+    contextType?: ContextType;
     /* Array of child nodes of this Node */
     children!: INode[];
 
@@ -47,29 +49,6 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
         newNode.isFunctionallyDependent = data.isFunctionallyDependent;
         newNode.text = TextContent.fromData(data.text);
         return newNode;
-    }
-
-    /**
-     * Internal function that is called by all create*() functions.
-     * Checks this node's number of children, which dictates how the child should be added to the array.
-     * Calls this.update().
-     * NB: Assumes that it is legal to add the child AND that text content is handled separately.
-     *
-     * @param node A reference to the node to be added as a child
-     * @return The passed in node
-     */
-    private addChild(node: INode) : INode {
-        if (this.children.length === 0) {
-            this.children.push(node);   // Push to the array if it's empty
-
-        } else if (this.children.length === 1) {    // This node currently has a child
-            throw new DataError(DataErrorType.PRP_HAS_CHLD, this.id);
-
-        } else {
-            throw new DataError(DataErrorType.PRP_TOO_MANY_CHLD, this.id);
-        }
-        this.update();
-        return node;
     }
 
     /**
@@ -143,6 +122,48 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
     }
 
     /**
+     * Sets the context type to the passed in context type.
+     *
+     * @param contextType The context type to set
+     */
+    setContextType(contextType: ContextType) : void {
+        this.contextType = contextType;
+        this.update();
+    }
+
+    /**
+     * Unsets the context type (sets it to undefined).
+     */
+    unsetContextType() : void {
+        this.contextType = undefined;
+        this.update();
+    }
+
+    /**
+     * Internal function that is called by all create*() functions.
+     * Checks this node's number of children, which dictates how the child should be added to the array.
+     * Calls this.update().
+     * NB: Assumes that it is legal to add the child AND that text content is handled separately.
+     *
+     * @param node A reference to the node to be added as a child
+     * @return The passed in node
+     * @private
+     */
+    private addChild(node: INode) : INode {
+        if (this.children.length === 0) {
+            this.children.push(node);   // Push to the array if it's empty
+
+        } else if (this.children.length === 1) {    // This node currently has a child
+            throw new DataError(DataErrorType.PRP_HAS_CHLD, this.id);
+
+        } else {
+            throw new DataError(DataErrorType.PRP_TOO_MANY_CHLD, this.id);
+        }
+        this.update();
+        return node;
+    }
+
+    /**
      * Delete a child of this node.
      * The children array is emptied, deleting the child and all its descendants.
      */
@@ -165,10 +186,10 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
      * @param type Whether the new statement should be regulative or constitutive
      * @return The newly created node
      */
-    createStatementNode(type: Arg.regulative | Arg.constitutive) : INode | undefined {
+    createStatementNode(type: Arg.regulative | Arg.constitutive) : StatementNode {
         this.unsetText();
-        return this.addChild((type === Arg.regulative ) ? new RegulativeStatementNode(this.document, this.id)
-            : new ConstitutiveStatementNode(this.document, this.id));
+        return this.addChild((type === Arg.regulative ) ? new RegulativeStatementNode(this.document, this.id) as StatementNode
+            : new ConstitutiveStatementNode(this.document, this.id)) as StatementNode;
     }
 
     /**
@@ -177,9 +198,9 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
      *
      * @return The newly created node
      */
-    createStatementJunctionNode() : INode | undefined {
+    createStatementJunctionNode() : StatementJunctionNode {
         this.unsetText();
-        return this.addChild(new StatementJunctionNode(this.document, this.id));
+        return this.addChild(new StatementJunctionNode(this.document, this.id)) as StatementJunctionNode;
     }
 
     /**
@@ -187,8 +208,8 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
      *
      * @return The newly created node
      */
-    createPropertyNode() : INode | undefined {
-        return this.addChild(new PropertyNode(this.document, this.id));
+    createPropertyNode() : PropertyNode {
+        return this.addChild(new PropertyNode(this.document, this.id)) as PropertyNode;
     }
 
     /**
@@ -196,7 +217,7 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
      *
      * @return The newly created node
      */
-    createPropertyJunctionNode() : INode | undefined {
-        return this.addChild(new PropertyJunctionNode(this.document, this.id));
+    createPropertyJunctionNode() : PropertyJunctionNode {
+        return this.addChild(new PropertyJunctionNode(this.document, this.id)) as PropertyJunctionNode;
     }
 }

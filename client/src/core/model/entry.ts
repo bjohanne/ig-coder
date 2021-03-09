@@ -1,5 +1,11 @@
-import {BaseNode, ConstitutiveStatementNode, RegulativeStatementNode, StatementJunctionNode} from "./nodes";
-import {IDocument, IEntry, INode} from "./interfaces";
+import {
+	BaseNode,
+	ConstitutiveStatementNode,
+	RegulativeStatementNode,
+	StatementJunctionNode,
+	StatementNode
+} from "./nodes";
+import {IEntry, INode} from "./interfaces";
 import {Arg} from "./enums";
 import {IDCounter} from "./document";
 import {DataError, DataErrorType} from "./errors";
@@ -52,9 +58,10 @@ export class Entry implements IEntry {
 	 * Create a root node in this Entry.
 	 * If an original statement is provided, it is set in this Entry.
 	 * @param type The node type of the root statement
-	 * @param statement (Optional) The full text of the statement
+	 * @param statement?? (Optional) The full text of the statement
+	 * @return The newly created root node. You must type assert its node type.
 	 */
-    createRoot(type: Arg.regulative | Arg.constitutive | Arg.statementjunction, statement?: string) : INode {
+	createRoot(type: Arg.regulative | Arg.constitutive | Arg.statementjunction, statement?: string) : INode {
 		this.root = (type === Arg.regulative) ? new RegulativeStatementNode(this.document)
 			: (type === Arg.constitutive) ? new ConstitutiveStatementNode(this.document)
 				: new StatementJunctionNode(this.document);
@@ -66,6 +73,7 @@ export class Entry implements IEntry {
 
 	/**
 	 * Returns this Entry's root node or undefined if it doesn't exist.
+	 * @return This Entry's root node. You must type assert its node type.
 	 */
 	getRoot() : INode | undefined {
     	return this.root;

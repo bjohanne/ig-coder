@@ -67,14 +67,15 @@ export default class Document implements IDocument {
      * or the root node of the first entry if no index is given.
 	 *
 	 * @param entry (Optional) The index of the entry to get in the list of entries
+	 * @return The root node of the given entry. You must type assert its node type.
      */
-    getRoot(entry?: number) : INode | undefined {
+    getRoot(entry?: number) : INode {
 		if (typeof entry !== "undefined") {	// An entry index is provided
 			if (entry < 0 || entry >= this.entries.length) {
 				throw new DataError(DataErrorType.DOC_BAD_ENTRY_IDX, this.id);
 			}
 			return this.entries[entry].root;
-		} else if (this.entries[0]) {		// No entry index provided
+		} else if (this.entries[0]) {		// No entry index provided - use first
 			return this.entries[0].root;
 		} else {							// No entries exist
 			throw new DataError(DataErrorType.DOC_NO_ENTRIES, this.id);
@@ -159,17 +160,17 @@ export default class Document implements IDocument {
 
 	/**
 	 * Find the index of an entry in this document using its ID.
-	 * Returns undefined if no entry with ID targetId exists.
+	 * Returns -1 if no entry with ID targetId exists.
 	 * (This is an alternative to entryMap.)
 	 * @param targetId The ID of the entry to find
 	 */
-	getEntryIndexById(targetId: number) : number | undefined {
+	getEntryIndexById(targetId: number) : number {
 		for (let i = 0; i < this.entries.length; i++) {
 			if (this.entries[i].id === targetId) {
 				return i;
 			}
 		}
-		return undefined;
+		return -1;
 	}
 
 	/**
@@ -178,9 +179,9 @@ export default class Document implements IDocument {
 	 *
 	 * @param targetId The ID of the node to be retrieved.
 	 * @param index (Optional) The entries array index of the entry to search in.
-	 * @return A reference to the node if found, undefined otherwise
+	 * @return A reference to the node if found, undefined otherwise. You must type assert its node type.
      */
-	find(targetId: number, index?: number) : BaseNode | undefined {
+	find(targetId: number, index?: number) : INode | undefined {
 		if (index && index >= this.entries.length) {
 			throw new DataError(DataErrorType.DOC_BAD_ENTRY_IDX, this.id);
 		}
@@ -209,12 +210,6 @@ export default class Document implements IDocument {
       // TODO
     }
 
-    /**
-     * Saves a document by posting it to the server where it is persisted to the database
-     */
-    save() {
-        // TODO
-    }
 }
 
 /**

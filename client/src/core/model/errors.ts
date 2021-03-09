@@ -16,12 +16,11 @@ export enum DataErrorType {
 	CMP_ADD_STMT			= "This Component type cannot have a Statement child",
 	CMP_ADD_STMTJUN			= "This Component type cannot have a StatementJunction child",
 	CMP_BAD_CHILD_IDX		= "Component child index out of bounds",
-	CMP_BAD_PARENT			= "Parent Component node violates rules regarding Component type and number of children",
 	CMP_CTXT_ADD_DEL		= "Component nodes of type SimpleContext cannot have children",
 	CMP_CTXT_TYPE			= "Component type must be SimpleContext to set and unset context type",
 	CMP_DNT_ADD_DEL			= "Component nodes of type Deontic cannot have children",
 	CMP_EC_TXT 				= "Component nodes of type Execution Constraints cannot have text content",
-	CMP_GET_TXT_UNDEF		= "This Component node's Text object is undefined",
+	CMP_GET_TXT_UNDEF		= "This Component node's TextContent is undefined",
 	CMP_HAS_CHLD 			= "This Component node already has one or more children",
 	CMP_HAS_CHLD_NO_PRP		= "This Component node already has a child not of type Property or PropertyJunction",
 	CMP_MODAL_ADD_DEL		= "Component nodes of type Modal cannot have children",
@@ -39,8 +38,7 @@ export enum DataErrorType {
 	JUN_BAD_CHILD_IDX 		= "Junction child index out of bounds",
 	JUN_DUM_LEFT			= "Left child of this Junction node is a dummy node",
 	JUN_DUM_RIGHT			= "Right child of this Junction node is a dummy node",
-	JUN_UNDEF_LEFT			= "Left child of this Junction node is undefined",
-	JUN_UNDEF_RIGHT			= "Right child of this Junction node is undefined",
+	JUN_GET_TXT_UNDEF 		= "This Junction node's TextContent is undefined",
 
 	// RegulativeStatement
 	REG_HAS_DIROBJ			= "This RegulativeStatement node already has a DirectObject child",
@@ -64,7 +62,7 @@ export enum DataErrorType {
 	PRP_HAS_CHLD			= "This Property node already has a child",
 	PRP_HAS_STMT_CHLD		= "This Property node already has a Statement child",
 	PRP_HAS_STMTJUN_CHLD	= "This Property node already has a StatementJunction child",
-	PRP_GET_TXT_UNDEF 		= "This Property node's Primitive is undefined",
+	PRP_GET_TXT_UNDEF 		= "This Property node's TextContent is undefined",
 	PRP_NO_CHLD				= "This Property node has no children",
 	PRP_TOO_MANY_CHLD 		= "This Property node has more than one child"
 }

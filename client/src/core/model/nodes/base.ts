@@ -35,7 +35,8 @@ export default class BaseNode implements INode {
     children!: INode[];
 
     /**
-     * The base constructor for all nodes
+     * The base constructor for all nodes. Generates an ID for the node unless one is provided.
+	 * Sets the createdAt and updatedAt fields.
      *
      * @param document The ID of the document this node belongs to
      * @param parent (Optional) The ID of the node this node is a child of (the parent's children array must be set separately)
@@ -56,7 +57,7 @@ export default class BaseNode implements INode {
 	 * This function handles common BaseNode properties and calls the class-specific fromData() function
 	 * based on the passed in data's node type. Those functions handle the node's children.
 	 *
-	 * @param data An object of type INode
+	 * @param data An object of type INode (can be of a more specific type that extends INode)
 	 * @return A new node with the passed in properties
 	 */
 	static fromData(data: INode) : INode {
@@ -94,7 +95,7 @@ export default class BaseNode implements INode {
 			for (let i = 0; i < data.children.length; i++) {
 				newNode.children.push(BaseNode.fromData(data.children[i]));	// Call this same function for each child
 			}
-		} else {	// This is a dummy node
+		} else {	// This is a dummy node, which can't have children
 			newNode = new BaseNode(data.document, data.parent, data.id);
 		}
 
@@ -112,14 +113,15 @@ export default class BaseNode implements INode {
 	 * Used for finding children of node types that can have many non-fixed children.
 	 *
 	 * @param targetId The ID of the child to locate
+	 * @return The index of the child if found, -1 otherwise
 	 */
-	getChildIndexById(targetId: number) : number | undefined {
+	getChildIndexById(targetId: number) : number {
 		for (let i = 0; i < this.children.length; i++) {
 			if (this.children[i].id === targetId) {
 				return i;
 			}
 		}
-		return undefined;
+		return -1;
 	}
 
     /**
@@ -138,15 +140,6 @@ export default class BaseNode implements INode {
 	 */
 	update() : void {
 		this.updatedAt = new Date();
-	}
-
-	/**
-	 * Recreates the Date objects based on the dates stored in it.
-	 * Used when rebuilding from JSON, and the dates are encoded as numbers or strings.
-	 */
-	rebuildDates() : void {
-		this.createdAt = new Date(this.createdAt);
-		this.updatedAt = new Date(this.updatedAt);
 	}
 
 	/**

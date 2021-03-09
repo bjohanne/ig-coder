@@ -2,16 +2,19 @@ import {BaseNode} from "./";
 import {IJunctionNode, INode} from "../interfaces";
 import {Arg, JunctionType, NodeType} from "../enums";
 import {DataError, DataErrorType} from "../errors";
+import {TextContent} from "../textcontent";
 
 /**
- * This is the base class for StatementJunction and ComponentJunction.
+ * This is the base class for StatementJunction, ComponentJunction and PropertyJunction.
  * Junction nodes are the main building block of horizontal nesting.
  * It is used to combine nodes with logical operators.
  */
 export default class JunctionNode extends BaseNode implements IJunctionNode {
 	nodeType: NodeType = NodeType.junction;
-	/* Logical operator of the Junction node */
+	/* Logical operator of the junction */
 	junctionType!: JunctionType;
+	/* Holds the text content of the junction. Should always be defined */
+	text!: TextContent;
 	/* Two fixed children for Junction nodes */
 	children!: [INode, INode];
 
@@ -26,6 +29,7 @@ export default class JunctionNode extends BaseNode implements IJunctionNode {
 	 */
 	constructor(document: number, parent?: number, junctionType?: JunctionType, id?: number) {
 		super(document, parent, id);
+		this.text = new TextContent();
 		this.children = [
 			new BaseNode(document, this.id),
 			new BaseNode(document, this.id)
@@ -37,10 +41,61 @@ export default class JunctionNode extends BaseNode implements IJunctionNode {
 
 	/**
 	 * Assigns a junction type to this node.
+	 * If this node's text content is empty or one of the defaults,
+	 * sets it to the default value determined by the new junction type.
 	 * @param junctionType and/or/xor
 	 */
-	setJunction(junctionType: JunctionType) : void{
+	setJunction(junctionType: JunctionType) : void {
 		this.junctionType = junctionType;
+		this.update();
+		// Set text to a default value if empty or one of the default values
+		if (this.text.isEmptyOrJunctionDefault()) {
+			switch (junctionType) {
+				case JunctionType.and:
+					this.setText("and");
+					break;
+				case JunctionType.or:
+					this.setText("or");
+					break;
+				case JunctionType.xor:
+					this.setText("or");
+					break;
+				default:
+			}
+		}
+	}
+
+	/**
+	 * Return this node's TextContent object. Throws an error if the TextContent object is undefined.
+	 * @return The TextContent object found in this node's text property
+	 */
+	getText() : TextContent {
+		if (!this.text) {
+			throw new DataError(DataErrorType.JUN_GET_TXT_UNDEF, this.id);
+		}
+		return this.text;
+	}
+
+	/**
+	 * Modifies the node's TextContent object with the passed in text content.
+	 *
+	 * @param main (Optional) Text deemed to fit in the middle
+	 * @param prefix (Optional) Text deemed a prefix
+	 * @param suffix (Optional) Text deemed a suffix
+	 */
+	setText(main?: string, prefix?: string, suffix?: string) : void {
+		if (!this.text) {
+			throw new DataError(DataErrorType.JUN_GET_TXT_UNDEF, this.id);
+		}
+		this.text.set(main, prefix, suffix);
+		this.update();
+	}
+
+	/**
+	 * Unsets the TextContent's content (not the TextContent object itself, which should always be defined).
+	 */
+	unsetText() : void {
+		this.text.unset();
 		this.update();
 	}
 
@@ -49,50 +104,54 @@ export default class JunctionNode extends BaseNode implements IJunctionNode {
 	/**
 	 * Returns this node's left child.
 	 * Throws an error if the child is a dummy node or undefined.
+	 * @return This node's left child. You must assert its node type.
 	 */
-	getLeft() : INode | undefined {
-		if (!this.children[0]) {
-			throw new DataError(DataErrorType.JUN_UNDEF_LEFT, this.id);
-		} else if (this.children[0].isDummy()) {
+	getLeft() : INode {
+		if (this.children[Arg.left].isDummy()) {
 			throw new DataError(DataErrorType.JUN_DUM_LEFT, this.id);
 		}
-		return this.children[0];
+		return this.children[Arg.left];
 	}
 
 	/**
 	 * Returns this node's right child.
 	 * Throws an error if the child is a dummy node or undefined.
+	 * @return This node's right child. You must assert its node type.
 	 */
-	getRight() : INode | undefined {
-		if (!this.children[1]) {
-			throw new DataError(DataErrorType.JUN_UNDEF_RIGHT, this.id);
-		} else if (this.children[1].isDummy()) {
+	getRight() : INode {
+		if (this.children[Arg.right].isDummy()) {
 			throw new DataError(DataErrorType.JUN_DUM_RIGHT, this.id);
 		}
-		return this.children[1];
+		return this.children[Arg.right];
 	}
 
 	/**
-	 * Delete either the left or right child of this node.
-	 * The child is overwritten with a new dummy node, deleting the old data and all its descendants.
-	 * Throws an error if childPos is out of bounds (outside 0-1).
-	 *
-	 * @param childPos The children array index of the child node to delete
+	 * Delete the left child of this node.
+	 * The child is overwritten with a new dummy node, deleting the old data and all its descendants,
+	 *  with a warning.
 	 */
-	deleteChild(childPos: number) : void {
-		if (childPos < 0 || childPos > 1) {						// Ensure the given index is accessible,
-			throw new DataError(DataErrorType.JUN_BAD_CHILD_IDX, this.id);	// though it may contain a dummy node
+	deleteLeft() : void {
+		if (this.children[Arg.left].isDummy()) {
+			throw new DataError(DataErrorType.JUN_DUM_LEFT, this.id);
 		}
-		if (this.children[childPos].isDummy()) {
-			if (childPos === Arg.left) {
-				throw new DataError(DataErrorType.JUN_DUM_LEFT, this.id);
-			} else {
-				throw new DataError(DataErrorType.JUN_DUM_RIGHT, this.id);
-			}
-		}
-		console.warn("Deleting child with ID " + this.children[childPos].id + " of Junction node with ID " +
+		console.warn("Deleting left child with ID " + this.children[Arg.left].id + " of Junction node with ID " +
 			this.id);
-		this.children[childPos] = new BaseNode(this.document, this.id);
+		this.children[Arg.left] = new BaseNode(this.document, this.id);
+		this.update();
+	}
+
+	/**
+	 * Delete the right child of this node.
+	 * The child is overwritten with a new dummy node, deleting the old data and all its descendants,
+	 *  with a warning.
+	 */
+	deleteRight() : void {
+		if (this.children[Arg.right].isDummy()) {
+			throw new DataError(DataErrorType.JUN_DUM_RIGHT, this.id);
+		}
+		console.warn("Deleting right child with ID " + this.children[Arg.right].id + " of Junction node with ID " +
+			this.id);
+		this.children[Arg.right] = new BaseNode(this.document, this.id);
 		this.update();
 	}
 }

@@ -1,12 +1,9 @@
 import {
     BaseNode,
-    ComponentJunctionNode,
     ComponentNode,
-    ConstitutiveStatementNode, PropertyJunctionNode, PropertyNode,
-    StatementJunctionNode,
     StatementNode
 } from "./";
-import {INode, IRegulativeStatementNode} from "../interfaces";
+import {IRegulativeStatementNode} from "../interfaces";
 import {Arg, ComponentType, NodeType} from "../enums";
 import {DataError, DataErrorType} from "../errors";
 
@@ -102,33 +99,33 @@ export default class RegulativeStatementNode extends StatementNode implements IR
      * Returns this node's DirectObject child.
      * Throws an error if this node does not have a DirectObject child.
      */
-    getDirectObject() : BaseNode {
+    getDirectObject() : ComponentNode {
 		if (!this.hasDirectObject()) {
             throw new DataError(DataErrorType.REG_NO_DIROBJ, this.id);
 		}
-        return this.children[Arg.reg_directobject];
+        return this.children[Arg.reg_directobject] as ComponentNode;
     }
 
     /**
      * Returns this node's IndirectObject child.
      * Throws an error if this node does not have an IndirectObject child.
      */
-    getIndirectObject() : BaseNode {
+    getIndirectObject() : ComponentNode {
         if (!this.hasIndirectObject()) {
             throw new DataError(DataErrorType.REG_NO_INDIROBJ, this.id);
         }
-        return this.children[Arg.reg_indirectobject];
+        return this.children[Arg.reg_indirectobject] as ComponentNode;
     }
 
     /**
      * Returns this node's Deontic child.
      * Throws an error if this node does not have a Deontic child.
      */
-    getDeontic() : BaseNode {
+    getDeontic() : ComponentNode {
         if (!this.hasDeontic()) {
             throw new DataError(DataErrorType.REG_NO_DNT, this.id);
         }
-        return this.children[Arg.reg_deontic];
+        return this.children[Arg.reg_deontic] as ComponentNode;
     }
 
     /**
@@ -156,11 +153,11 @@ export default class RegulativeStatementNode extends StatementNode implements IR
      * Returns this node's Or else child.
      * Throws an error if this node does not have an Or else child.
      */
-    getOrElse(): BaseNode {
+    getOrElse(): ComponentNode {
         if (!this.hasOrElse()) {
             throw new DataError(DataErrorType.REG_NO_ORELSE, this.id);
         }
-        return this.children[Arg.reg_orelse];
+        return this.children[Arg.reg_orelse] as ComponentNode;
     }
 
     /* Create and delete DirectObject child */
@@ -171,13 +168,13 @@ export default class RegulativeStatementNode extends StatementNode implements IR
      *
      * @return The newly created node
      */
-	createDirectObject() : INode | undefined {
+    createDirectObject() : ComponentNode {
         if (this.hasDirectObject()) {
             throw new DataError(DataErrorType.REG_HAS_DIROBJ, this.id);
         }
 		this.children[Arg.reg_directobject] = new ComponentNode(ComponentType.directobject, this.document, this.id);
 		this.update();
-		return this.children[Arg.reg_directobject];
+		return this.children[Arg.reg_directobject] as ComponentNode;
 	}
 
 	/**
@@ -199,13 +196,13 @@ export default class RegulativeStatementNode extends StatementNode implements IR
      *
      * @return The newly created node
      */
-    createIndirectObject() : INode | undefined {
+    createIndirectObject() : ComponentNode {
         if (this.hasIndirectObject()) {
             throw new DataError(DataErrorType.REG_HAS_INDIROBJ, this.id);
         }
         this.children[Arg.reg_indirectobject] = new ComponentNode(ComponentType.indirectobject, this.document, this.id);
         this.update();
-        return this.children[Arg.reg_indirectobject];
+        return this.children[Arg.reg_indirectobject] as ComponentNode;
     }
 
     /**
@@ -227,13 +224,13 @@ export default class RegulativeStatementNode extends StatementNode implements IR
      *
      * @return The newly created node
      */
-    createDeontic() : INode | undefined {
+    createDeontic() : ComponentNode {
         if (this.hasDeontic()) {
             throw new DataError(DataErrorType.REG_HAS_DNT, this.id);
         }
         this.children[Arg.reg_deontic] = new ComponentNode(ComponentType.deontic, this.document, this.id);
         this.update();
-        return this.children[Arg.reg_deontic];
+        return this.children[Arg.reg_deontic]  as ComponentNode;
     }
 
     /**
@@ -255,13 +252,13 @@ export default class RegulativeStatementNode extends StatementNode implements IR
      *
      * @return The newly created node
      */
-    createOrElse() : INode | undefined {
+    createOrElse() : ComponentNode {
         if (this.hasOrElse()) {
             throw new DataError(DataErrorType.REG_HAS_ORELSE, this.id);
         }
         this.children[Arg.reg_orelse] = new ComponentNode(ComponentType.orelse, this.document, this.id);
         this.update();
-        return this.children[6];
+        return this.children[Arg.reg_orelse] as ComponentNode;
     }
 
     /**

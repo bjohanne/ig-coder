@@ -1,5 +1,5 @@
 import {BaseNode, ComponentNode, StatementNode} from "./";
-import {IConstitutiveStatementNode, INode, IRegulativeStatementNode} from "../interfaces";
+import {IConstitutiveStatementNode, INode} from "../interfaces";
 import {Arg, ComponentType, NodeType} from "../enums";
 import {DataError, DataErrorType} from "../errors";
 
@@ -80,22 +80,22 @@ export default class ConstitutiveStatementNode extends StatementNode implements 
      * Returns this node's ConstitutingProperties child.
      * Throws an error if this node does not have a ConstitutingProperties child.
      */
-    getConstitutingProperties() : BaseNode {
+    getConstitutingProperties() : ComponentNode {
         if (!this.hasConstitutingProperties()) {
             throw new DataError(DataErrorType.CON_NO_CONPROP, this.id);
         }
-        return this.children[Arg.con_constitutingproperties];
+        return this.children[Arg.con_constitutingproperties] as ComponentNode;
     }
 
     /**
      * Returns this node's Modal child.
      * Throws an error if this node does not have a Modal child.
      */
-    getModal() : BaseNode {
+    getModal() : ComponentNode {
 		if (!this.hasModal()) {
             throw new DataError(DataErrorType.CON_NO_MODAL, this.id);
 		}
-        return this.children[Arg.con_modal];
+        return this.children[Arg.con_modal] as ComponentNode;
     }
 
     /**
@@ -130,11 +130,11 @@ export default class ConstitutiveStatementNode extends StatementNode implements 
      * Returns this node's Or else child.
      * Throws an error if this node does not have an Or else child.
      */
-    getOrElse(): BaseNode {
+    getOrElse(): ComponentNode {
         if (!this.hasOrElse()) {
             throw new DataError(DataErrorType.CON_NO_ORELSE, this.id);
         }
-        return this.children[Arg.con_orelse];
+        return this.children[Arg.con_orelse] as ComponentNode;
     }
 
     /* Create and delete ConstitutingProperties child */
@@ -145,14 +145,14 @@ export default class ConstitutiveStatementNode extends StatementNode implements 
      *
      * @return The newly created node
      */
-	createConstitutingProperties() : INode | undefined {
+    createConstitutingProperties() : ComponentNode {
         if (this.hasConstitutingProperties()) {
             throw new DataError(DataErrorType.CON_HAS_CONPROP, this.id);
         }
 		this.children[Arg.con_constitutingproperties] =
             new ComponentNode(ComponentType.constitutingproperties, this.document, this.id);
 		this.update();
-		return this.children[Arg.con_constitutingproperties];
+		return this.children[Arg.con_constitutingproperties] as ComponentNode;
 	}
 
 	/**
@@ -174,13 +174,13 @@ export default class ConstitutiveStatementNode extends StatementNode implements 
      *
      * @return The newly created node
      */
-    createModal() : INode | undefined {
+    createModal() : ComponentNode {
         if (this.hasModal()) {
             throw new DataError(DataErrorType.CON_HAS_MODAL, this.id);
         }
         this.children[Arg.con_modal] = new ComponentNode(ComponentType.modal, this.document, this.id);
         this.update();
-        return this.children[Arg.con_modal];
+        return this.children[Arg.con_modal] as ComponentNode;
     }
 
     /**
@@ -202,13 +202,13 @@ export default class ConstitutiveStatementNode extends StatementNode implements 
      *
      * @return The newly created node
      */
-    createOrElse() : INode | undefined {
+    createOrElse() : ComponentNode {
         if (this.hasOrElse()) {
             throw new DataError(DataErrorType.CON_HAS_ORELSE, this.id);
         }
         this.children[Arg.con_orelse] = new ComponentNode(ComponentType.orelse, this.document, this.id);
         this.update();
-        return this.children[Arg.con_orelse];
+        return this.children[Arg.con_orelse] as ComponentNode;
     }
 
     /**

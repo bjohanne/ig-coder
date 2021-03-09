@@ -1,5 +1,5 @@
-import { BaseNode } from "./";
-import { ContextType, NodeType } from "../enums";
+import {BaseNode} from "./";
+import {ContextType, NodeType} from "../enums";
 
 /**
  * This is the base class for RegulativeStatement and ConstitutiveStatement.
@@ -8,19 +8,11 @@ import { ContextType, NodeType } from "../enums";
  */
 export default class StatementNode extends BaseNode {
     nodeType: NodeType = NodeType.statement;
-    /* Optional context type for descendants of ActivationConditions/ExecutionConstraints Components */
+    /* Optional context type for using the Circumstances Taxonomy on Statements.
+       For descendants of ActivationConditions/ExecutionConstraints Components. */
     contextType?: ContextType;
 
-    /**
-     * Creates a new Statement node.
-     *
-     * @param document The ID of the document this node belongs to
-     * @param parent The ID of the node this node is a child of (the parent's children array must be set separately)
-     * @param id (Optional) The ID of this node if one already exists (for rebuilding from existing data)
-     */
-    constructor(document: number, parent?: number, id?: number) {
-        super(document, parent, id);
-    }
+    // Constructor omitted because it doesn't need to do anything
 
     /**
      * Sets the context type to the passed in context type.

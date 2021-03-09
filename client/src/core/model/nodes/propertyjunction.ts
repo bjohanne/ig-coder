@@ -1,6 +1,6 @@
-import { JunctionNode, PropertyNode } from "./";
-import {INode, IPropertyJunctionNode, IPropertyNode} from "../interfaces";
-import { NodeType, Arg } from "../enums";
+import {JunctionNode, PropertyNode} from "./";
+import {IPropertyJunctionNode} from "../interfaces";
+import {NodeType, Arg} from "../enums";
 import {TextContent} from "../textcontent";
 
 /**
@@ -32,6 +32,7 @@ export default class PropertyJunctionNode extends JunctionNode implements IPrope
     static fromData(data: IPropertyJunctionNode) : PropertyJunctionNode {
         let newNode = new PropertyJunctionNode(data.document, data.parent, data.id);
         newNode.isFunctionallyDependent = data.isFunctionallyDependent;
+        newNode.text = TextContent.fromData(data.text);
         return newNode;
     }
 
@@ -66,10 +67,10 @@ export default class PropertyJunctionNode extends JunctionNode implements IPrope
      * @param position Whether the new node should be the left or right child of this node
      * @return The newly created node
      */
-    createPropertyNode(position: Arg.left | Arg.right) : INode | undefined {
+    createPropertyNode(position: Arg.left | Arg.right) : PropertyNode {
         this.children[position] = new PropertyNode(this.document, this.id);
         this.update();
-        return this.children[position];
+        return this.children[position] as PropertyNode;
     }
 
     /**
@@ -78,9 +79,9 @@ export default class PropertyJunctionNode extends JunctionNode implements IPrope
      * @param position Whether the new node should be the left or right child of this node
      * @return The newly created node
      */
-    createPropertyJunctionNode(position: Arg.left | Arg.right) : INode | undefined {
+    createPropertyJunctionNode(position: Arg.left | Arg.right) : PropertyJunctionNode {
         this.children[position] = new PropertyJunctionNode(this.document, this.id);
         this.update();
-        return this.children[position];
+        return this.children[position] as PropertyJunctionNode;
     }
 }
