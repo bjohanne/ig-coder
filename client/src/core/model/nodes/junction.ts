@@ -79,22 +79,27 @@ export default class JunctionNode extends BaseNode implements IJunctionNode {
 	/**
 	 * Modifies the node's TextContent object with the passed in text content.
 	 *
-	 * @param main (Optional) Text deemed to fit in the middle
-	 * @param prefix (Optional) Text deemed a prefix
-	 * @param suffix (Optional) Text deemed a suffix
+	 * @param main (Optional) The text that most narrowly fits the component/property
+	 * @param prefix (Optional) Text from the raw statement that precedes the main part
+	 * @param suffix (Optional) Text from the raw statement that succeeds the main part
+	 * @param explicit (Optional) If the raw text is tacit/implicit, this is an explicit specification
+	 * @param rephrased (Optional) A rephrased version of the text in the main field
 	 */
-	setText(main?: string, prefix?: string, suffix?: string) : void {
+	setText(main?: string, prefix?: string, suffix?: string, explicit?: string, rephrased?: string) : void {
 		if (!this.text) {
 			throw new DataError(DataErrorType.JUN_GET_TXT_UNDEF, this.id);
 		}
-		this.text.set(main, prefix, suffix);
+		this.text.set(main, prefix, suffix, explicit, rephrased);
 		this.update();
 	}
 
 	/**
-	 * Unsets the TextContent's content (not the TextContent object itself, which should always be defined).
+	 * Unsets the TextContent's fields (not the TextContent object itself).
 	 */
 	unsetText() : void {
+		if (!this.text) {
+			throw new DataError(DataErrorType.JUN_GET_TXT_UNDEF, this.id);
+		}
 		this.text.unset();
 		this.update();
 	}

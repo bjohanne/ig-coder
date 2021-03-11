@@ -71,19 +71,19 @@ export interface IEntry {
     /* The complete, undivided text of the statement */
     original?: string,
     /* Rephrased, prepared version of the statement for coding */
-    prepared?: string
+    rephrased?: string
 }
 
 /**
- * The contract for the TextContent container.
+ * The contract for TextContent objects.
  * Defines no functions in order to support TextContent objects without a class.
  */
 export interface ITextContent {
-    content?: {
-        main:   string,
-        prefix: string,
-        suffix: string
-    }
+    main?: string,
+    prefix?: string,
+    suffix?: string,
+    explicit?: string,
+    rephrased?: string
 }
 
 /**

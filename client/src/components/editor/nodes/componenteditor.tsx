@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import {INode, ITextContent } from "../../../core/model/interfaces";
 import { updateEntry } from "../../../state/documents/actions";
-import ModalBody from 'react-bootstrap/ModalBody';
+import ModalBody from "react-bootstrap/ModalBody";
 import { ComponentNode } from "../../../core/model/nodes";
 import { TextContent } from "../../../core/model/textcontent";
 import { componentColorScaler, posColorScaler, entColorScaler } from "../../../core/config/scales";
@@ -11,11 +11,11 @@ import { ComponentType } from "../../../core/model/enums";
 
 const ComponentEditor = (props: any) => {
     const [component, setComponent] = useState<ITextContent>({
-		content: {
-			main: "",
-			prefix: "",
-			suffix: ""
-		}
+        main: "",
+        prefix: "",
+        suffix: "",
+        explicit: "",
+        rephrased: ""
 	});
     const [entryContentVal, setEntryContentVal] = useState("");
     //const [saveEnabled, setSaveEnabled] = useState(false);
@@ -24,7 +24,7 @@ const ComponentEditor = (props: any) => {
     let entryContent = "";  // Would be the full statement found in the Entry
 
     useEffect(() => {
-        if(active.text && active.text.content) {
+        if(active.text && active.text.main) {
             setComponent(active.text);
         }
 
@@ -46,7 +46,7 @@ const ComponentEditor = (props: any) => {
                 setEntryContentVal(entryContent.replace(written, `<mark style='background-color: ${currentComponentColor}'>${written}</mark>`));
             }
             //setSaveEnabled(textExists && written.length > 0);
-            setComponent((prev) => ({ content: { ...prev.content, [name]: written } }));
+            setComponent((prev) => ({ ...prev, [name]: written }));
         }
     }
 
@@ -94,13 +94,13 @@ const ComponentEditor = (props: any) => {
             <div className="nlp-controls">
             <div className="text-control-wrap">
                 <div className="text-control">
-                    <input type="text" name="prefix" placeholder="Prefix" onFocus={changeValue} onMouseOver={changeValue} onChange={changeValue} value={component.content.prefix} />
+                    <input type="text" name="prefix" placeholder="Prefix" onFocus={changeValue} onMouseOver={changeValue} onChange={changeValue} value={component.prefix} />
                 </div>
                 <div className="text-control">
-                    <input type="text" name="main" placeholder="Main" onFocus={changeValue} onMouseOver={changeValue} onChange={changeValue} value={component.content.main} />
+                    <input type="text" name="main" placeholder="Main" onFocus={changeValue} onMouseOver={changeValue} onChange={changeValue} value={component.main} />
                 </div>
                 <div className="text-control">
-                    <input type="text" name="suffix" placeholder="Suffix" onFocus={changeValue} onMouseOver={changeValue} onChange={changeValue} value={component.content.suffix} />
+                    <input type="text" name="suffix" placeholder="Suffix" onFocus={changeValue} onMouseOver={changeValue} onChange={changeValue} value={component.suffix} />
                 </div>
             </div>
             { active.componentType === ComponentType.activationconditions &&

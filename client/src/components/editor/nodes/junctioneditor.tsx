@@ -48,7 +48,7 @@ const JunctionEditor = (props: any) => {
                 if(checked) {
                     //active.createStatementNode(Arg.norm, Arg.left, "");
                 } else {
-                    active.deleteChild(Arg.left);
+                    active.deleteLeft();
                 }
                 setHasNorm(checked);
                 break;

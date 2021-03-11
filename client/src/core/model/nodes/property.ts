@@ -91,11 +91,13 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
      * Modifies the node's TextContent object with the passed in text content.
      * If this node has a child of type Statement or StatementJunction, throws an error.
      *
-     * @param main (Optional) The text that most narrowly fits the component
-     * @param prefix (Optional) Excess text that goes before the main content
-     * @param suffix (Optional) Excess text that goes after the main content
+     * @param main (Optional) The text that most narrowly fits the component/property
+     * @param prefix (Optional) Text from the raw statement that precedes the main part
+     * @param suffix (Optional) Text from the raw statement that succeeds the main part
+     * @param explicit (Optional) If the raw text is tacit/implicit, this is an explicit specification
+     * @param rephrased (Optional) A rephrased version of the text in the main field
      */
-    setText(main?: string, prefix?: string, suffix?: string) : void {
+    setText(main?: string, prefix?: string, suffix?: string, explicit?: string, rephrased?: string) : void {
         if (!this.text) {
             throw new DataError(DataErrorType.PRP_GET_TXT_UNDEF, this.id);
         } else {
@@ -108,15 +110,18 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
                 }
                 this.children.length = 0;
             }
-            this.text.set(main, prefix, suffix);
+            this.text.set(main, prefix, suffix, explicit, rephrased);
             this.update();
         }
     }
 
     /**
-     * Unsets the TextContent's content (not the TextContent object itself, which should always be defined).
+     * Unsets the TextContent's fields (not the TextContent object itself).
      */
     unsetText() : void {
+        if (!this.text) {
+            throw new DataError(DataErrorType.PRP_GET_TXT_UNDEF, this.id);
+        }
         this.text.unset();
         this.update();
     }

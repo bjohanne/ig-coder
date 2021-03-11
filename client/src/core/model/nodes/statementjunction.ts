@@ -1,5 +1,5 @@
 import {ConstitutiveStatementNode, RegulativeStatementNode, JunctionNode, StatementNode} from "./";
-import {INode, IStatementJunctionNode} from "../interfaces";
+import {IStatementJunctionNode} from "../interfaces";
 import {NodeType, Arg} from "../enums";
 import {TextContent} from "../textcontent";
 

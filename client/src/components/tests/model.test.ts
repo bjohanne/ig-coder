@@ -113,24 +113,24 @@ it("Set and unset text content", () => {
 
     let attr = root.getAttribute();
     expect(attr.text).toBeDefined();
-    expect(attr.text.content).toBeUndefined();
+    expect(attr.text.main).toBeUndefined();
 
     attr.setText("two", "one", "three");		// Setting content first time
-    expect(attr.text.content.main).toEqual("two");
-    expect(attr.text.content.prefix).toEqual("one");
-    expect(attr.text.content.suffix).toEqual("three");
+    expect(attr.text.main).toEqual("two");
+    expect(attr.text.prefix).toEqual("one");
+    expect(attr.text.suffix).toEqual("three");
 
     attr.setText(undefined, "ONE");					// A new value for content
-    expect(attr.text.content.main).toEqual("two");
-    expect(attr.text.content.prefix).toEqual("ONE");
+    expect(attr.text.main).toEqual("two");
+    expect(attr.text.prefix).toEqual("ONE");
 
     attr.unsetText();								        // Unsetting content
-    expect(attr.text.content).toBeUndefined();
+    expect(attr.text.main).toBeUndefined();
 
     attr.setText(undefined, "one");				// Setting prefix only
-    expect(attr.text.content.main).toEqual("");
-    expect(attr.text.content.prefix).toEqual("one");
-    expect(attr.text.content.suffix).toEqual("");
+    expect(attr.text.main).toBeUndefined();
+    expect(attr.text.prefix).toEqual("one");
+    expect(attr.text.suffix).toBeUndefined();
 });
 
 //------------------------------------------------------------------------------
@@ -167,9 +167,6 @@ it('Check if text content is empty for Junction nodes', () => {
     let text = attr.getText();
 
     expect(text.isEmptyOrJunctionDefault()).toBeTruthy(); // Should return true if text content is unset
-
-    attr.setText();
-    expect(text.isEmptyOrJunctionDefault()).toBeTruthy(); // Should return true if text content is set but empty
 
     attr.setText("abc", "def", "ghi");
     expect(text.isEmptyOrJunctionDefault()).toBeFalsy();  // Should return false if text content is set and not empty

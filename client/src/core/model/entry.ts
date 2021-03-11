@@ -23,8 +23,8 @@ export class Entry implements IEntry {
 	root?: INode;
 	/* The complete statement */
 	original?: string;
-	/* Rephrased, prepared version of the statement for coding */
-	prepared?: string;
+	/* Optionally, the statement can be rephrased before coding. The rephrased version is stored here. */
+	rephrased?: string;
 
     /**
      * Create a new Entry without a statement or root node.
@@ -47,7 +47,7 @@ export class Entry implements IEntry {
 	static fromData(data: IEntry) : Entry {
 		let newEntry = new this(data.document, data.id);
 		newEntry.original = data.original;
-		newEntry.prepared = data.prepared;
+		newEntry.rephrased = data.rephrased;
 		if (data.root) {
 			newEntry.root = BaseNode.fromData(data.root);
 		}
@@ -111,13 +111,13 @@ export class Entry implements IEntry {
 	 * @param statement The full text of the prepared statement
 	 */
 	setPrepared(statement: string) : void {
-		this.prepared = statement;
+		this.rephrased = statement;
 	}
 
 	/**
 	 * Set this Entry's prepared statement to undefined.
 	 */
 	unsetPrepared() : void {
-		this.prepared = undefined;
+		this.rephrased = undefined;
 	}
 }

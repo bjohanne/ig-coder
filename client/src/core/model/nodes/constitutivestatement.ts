@@ -1,5 +1,5 @@
 import {BaseNode, ComponentNode, StatementNode} from "./";
-import {IConstitutiveStatementNode, INode} from "../interfaces";
+import {IConstitutiveStatementNode} from "../interfaces";
 import {Arg, ComponentType, NodeType} from "../enums";
 import {DataError, DataErrorType} from "../errors";
 

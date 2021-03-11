@@ -24,8 +24,8 @@ const SubComponentEditor = (props: any) => {
     let active = (props.node ? props.node : props.activeNode.node.data) as ComponentNode;
 
     useEffect(() => {
-        setContent({ ...active.text.content })
-    }, [active.text.content])
+        setContent({ ...active.text })
+    }, [active.text])
     // let changeValue = (e: React.FormEvent<HTMLInputElement>) => {
     //     setContent(e.currentTarget.value);
     //     active.component = new Component(content);
