@@ -6,26 +6,13 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import hardSet from "redux-persist/lib/stateReconciler/hardSet";
 
 import { documentMiddleware } from "./documents/middleware";
-
 import { firebaseReducer } from "react-redux-firebase";
+import appSettings from "./appSettings/reducer";
 import documents from "./documents/reducer";
 import user from "./user/reducer";
 import ui from "./ui/reducer";
 
-//import { reactReduxFirebase } from "react-redux-firebase";
-//import { compose } from "redux";
-//import firebase from "../core/config/firebase";
-
-const persistConfig = {
-    key: "root",
-    storage,
-    blacklist: [
-        "documents",
-        "user",
-        "ui",
-        "firebase"
-    ]
-}
+const appConfig = { key: "appSettings", storage }
 
 const documentConfig = { key: "documents", storage }
 
@@ -43,18 +30,28 @@ const uiConfig = { key: "ui", storage,
 const firebaseConfig = { key: "firebase", storage, stateReconciler: hardSet }
 
 const rootReducer = combineReducers({
+    appSettings: persistReducer(appConfig, appSettings),
     documents: persistReducer(documentConfig, documents),
     user: persistReducer(userConfig, user),
     ui: persistReducer(uiConfig, ui),
     firebase: persistReducer(firebaseConfig, firebaseReducer)
 });
 
-const allMiddlewares = [documentMiddleware];
+const persistConfig = {
+    key: "root",
+    storage,
+    blacklist: [    // Since each state category is persisted separately, exclude them from being persisted together
+        "appSettings",
+        "documents",
+        "user",
+        "ui",
+        "firebase"
+    ]
+}
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-// @ts-ignore: Expression not callable (typeof reactReduxFirebase has no call signatures). - Most likely this is replaced by ReactReduxFirebaseProvider.
-//const createStoreWithFirebase = compose(reactReduxFirebase(firebase))(createStore);
+const allMiddlewares = [documentMiddleware];
 
 const store = createStore(
     persistedReducer,

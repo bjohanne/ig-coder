@@ -1,5 +1,5 @@
 /*
-    Static page titles for each Route defined in app.tsx.
+    Static page titles for each Route defined in App.tsx.
     Import this in the Route's component and set
         document.title = pageTitles.<route name>;
 */
@@ -8,6 +8,7 @@ const pageTitles = {
     prefix: "IG Coder \u00b7 ",
     dashboard: "Dashboard",
     landing: "Welcome",
+    welcome: "Welcome",
     login: "Sign in",
     register: "Sign up",
     pwdReset: "Reset password",

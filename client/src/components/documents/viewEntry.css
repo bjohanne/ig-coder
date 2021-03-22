@@ -1,0 +1,11 @@
+#raw-prepend, #rephrased-prepend {
+    width: 6.4em !important;
+}
+
+#original-textarea, #rephrased-textarea textarea {
+    min-height: 38px;
+}
+
+#original-textarea textarea:disabled {
+    background-color: #fff !important;
+}

@@ -51,7 +51,7 @@ export default class StatementJunctionNode extends JunctionNode implements IStat
 	 * @param type Whether the new statement should be regulative or constitutive
 	 * @param position Whether the new node should be the left or right child of this node
 	 *
-	 * @return The newly created node
+	 * @return The newly created node. You must assert its node type.
 	 */
 	createStatementNode(type: Arg.regulative | Arg.constitutive, position: Arg.left | Arg.right) : StatementNode {
 		this.children[position] = (type === Arg.regulative ) ? new RegulativeStatementNode(this.document, this.id)

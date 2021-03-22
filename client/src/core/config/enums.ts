@@ -1,3 +1,5 @@
+/* The following 3 enums pertain to the management layer of the system. */
+
 export enum OperationType {
     createDataset   = 1,
     read            = 2,

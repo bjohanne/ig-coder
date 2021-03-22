@@ -8,7 +8,7 @@ import {DataError, DataErrorType} from "../errors";
  * its components embedded in its child nodes.
  */
 export default class ConstitutiveStatementNode extends StatementNode implements IConstitutiveStatementNode {
-    nodeType: NodeType = NodeType.regulativestatement;
+    nodeType: NodeType = NodeType.constitutivestatement;
     // Fixed children:
     // ConstitutingProperties (optional), Modal (optional), ConstitutiveFunction, ConstitutedEntity, ActivationConditions, ExecutionConstraints, OrElse (optional)
     children!: [BaseNode, BaseNode, ComponentNode, ComponentNode, ComponentNode, ComponentNode, BaseNode];

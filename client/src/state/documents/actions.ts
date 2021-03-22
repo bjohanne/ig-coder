@@ -22,6 +22,8 @@ export const ADD_JUNCTION = "ADD_JUNCTION";
 export const UPDATE_JUNCTION = "UPDATE_JUNCTION";
 export const UPDATE_NEGATION = "UPDATE_NEGATION";
 
+export const POPULATE_PREMADE_DOC = "POPULATE_PREMADE_DOC";
+
 
 export const getDocument = (document_id: number) => ({
     type: GET_DOCUMENT,
@@ -60,12 +62,12 @@ export const addJunction = (parentNode: any) => ({
 
 export const updateJunction = (payload: any) => ({
     type: UPDATE_JUNCTION,
-    payload: payload
+    payload
 });
 
 export const updateNegation = (payload: any) => ({
     type: UPDATE_NEGATION,
-    payload: payload
+    payload
 });
 
 export const createDocument = (name, description, visibility, onSuccess, onError) => async dispatch => {
@@ -101,3 +103,7 @@ export const createDocument = (name, description, visibility, onSuccess, onError
         onError(errorMsg);
     });
 };
+
+export const populatePremadeDocument = () => ({
+    type: POPULATE_PREMADE_DOC
+})

@@ -1,20 +1,11 @@
-.search {
-    position: relative;
+#navbar-nav a {
+    color: rgba(0, 0, 0, 0.5) !important;
 }
 
-.search input {
-    text-indent: .25rem;
-}
-
-.search .oi-magnifying-glass {
-    position: absolute;
-    top: 9px;
-    right: 5px;
-    font-size: 15px;
-}
-
-
-nav {
-    width: 100% !important;
-    margin: 0 !important;
+.dropdown-item-text {
+    display: block;
+    width: 100%;
+    padding: 0.25rem 1.5rem;
+    clear: both;
+    white-space: nowrap;
 }

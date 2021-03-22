@@ -1,0 +1,27 @@
+#number-col {
+    width: 2em;
+}
+
+#statement-col {
+
+}
+
+#actions-col {
+    width: 5.5em;
+}
+
+#actions-head {
+    text-align: center !important;
+}
+
+#statements-table td {
+    vertical-align: baseline !important;
+}
+
+#statements-table Button {
+    width: 5em;
+}
+
+#statements-table tbody>tr:hover {
+    cursor: pointer;
+}

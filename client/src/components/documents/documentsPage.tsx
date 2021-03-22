@@ -157,7 +157,7 @@ function DocumentsPage(props) {
 
                     </div>
                     <div className="col-auto" id={"verticalline"}>
-                        <div className={'vertical-line'}></div>
+                        <div className={'vertical-line'}/>
                     </div>
                     <div className="col">
                         <div className="row align-items-center">
@@ -167,12 +167,12 @@ function DocumentsPage(props) {
                             <div className="col-auto">
                                 <div className="search">
                                     <input type="text" className="form-control" placeholder="Search" name="ig-q"/>
-                                    <span className="dark-igc-gray-text oi oi-magnifying-glass"></span>
+                                    <span className="dark-igc-gray-text oi oi-magnifying-glass"/>
                                 </div>
                             </div>
                         </div>
                         <div className="row">
-                            <div className={'horizontal-line'}></div>
+                            <div className={'horizontal-line'}/>
                         </div>
 
 

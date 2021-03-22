@@ -3,7 +3,6 @@ import {
 	ConstitutiveStatementNode,
 	RegulativeStatementNode,
 	StatementJunctionNode,
-	StatementNode
 } from "./nodes";
 import {IEntry, INode} from "./interfaces";
 import {Arg} from "./enums";

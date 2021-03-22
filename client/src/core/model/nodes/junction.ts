@@ -66,6 +66,26 @@ export default class JunctionNode extends BaseNode implements IJunctionNode {
 	}
 
 	/**
+	 * Return a string representing the logical operator for this Junction node.
+	 * If this node has no junction type, returns an empty string.
+	 * @return A full-text specification of the logical operator (e.g. conjunction, disjunction)
+	 */
+	getOperatorString() : string {
+		if (!this.junctionType) {
+			return "";
+		}
+		switch (this.junctionType) {
+			case JunctionType.and:
+				return "Conjunction";
+			case JunctionType.or:
+				return "Disjunction";
+			case JunctionType.xor:
+				return "Exclusive disjunction";
+			default:
+		}
+	}
+
+	/**
 	 * Return this node's TextContent object. Throws an error if the TextContent object is undefined.
 	 * @return The TextContent object found in this node's text property
 	 */

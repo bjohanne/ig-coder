@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import Spinner from "react-bootstrap/Spinner";
 
 /*
- Wrapper that ensures Firebase Auth is loaded before the app is accessible.
+ Wrapper that ensures Firebase Auth is loaded before the appSettings is accessible.
  */
 
 export function AuthLoader(props) {

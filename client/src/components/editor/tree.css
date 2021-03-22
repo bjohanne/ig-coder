@@ -34,14 +34,11 @@ p.component {
 }
 
 .tooltipHover {
-    pointer-events: auto !important;
-    &:hover {
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
+  pointer-events: auto !important;
 }
 
 .treeContainer {
-	width: 100%;
-	overflow-x: scroll;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }

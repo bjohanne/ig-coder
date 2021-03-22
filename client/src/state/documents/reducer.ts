@@ -8,7 +8,8 @@ import {
     UPDATE_ENTRY,
     ADD_JUNCTION,
     UPDATE_JUNCTION,
-    UPDATE_NEGATION
+    UPDATE_NEGATION,
+    POPULATE_PREMADE_DOC
 } from "./actions";
 
 import { API_CALL_BEGIN, API_CALL_SUCCESS, API_CALL_ERROR } from "../apiCall/actions";
@@ -128,6 +129,8 @@ const documents = (state: IDocumentState = initialState, action: any) => {
 			}
 
 		    return update(state, {documentList: {$set: dlist}, currentDocument: { $set: rebuiltDoc }})
+        case POPULATE_PREMADE_DOC:
+            return update(state, {currentDocument: {$set: action.doc}});
         default:
             return state;
     }

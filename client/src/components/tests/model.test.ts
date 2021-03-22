@@ -4,6 +4,7 @@ import Document from "../../core/model/document";
 import {
     ComponentJunctionNode,
     ComponentNode,
+    ConstitutiveStatementNode,
     PropertyNode,
     RegulativeStatementNode
 } from "../../core/model/nodes";
@@ -52,55 +53,144 @@ it('Template for tests', () => {
 */
 
 /**
- * This test verifies that a simple tree is built without any errors being thrown.
+ * This test verifies that a complete tree is built without any errors being thrown. (NB: Does not test Or else.)
  */
-it('Basic statement with properties', () => {
-    /*
-    Here are the steps to build the tree for this statement:
-    1. Make a Document and an Entry within it.
-    2. Make a RegulativeStatement node as the Entry's root and feed it the raw statement.
-        This will automatically make its fixed children.
-    3. For each of Attribute, Aim and Deontic, add text content. (Also enable the Deontic.)
-    4. Enable the direct object, add text content to it and make a PropertyJunction node under it.
-    5. Set the PropertyJunction node's Junction type.
-    6. Make Property nodes for the direct object.
-    7. Enable the indirect object and make a Property node under it.
-    8. Add text content to the nodes from steps 6 and 7.
-    */
-
+it('Full statement with properties', () => {
     // Setup
-    const statement = "The Program Manager may initiate suspension or revocation proceedings against a certified operation";
-    const document = new Document("Program Manager Policy", "Description", documentId);
+    const statement = "The Program Manager may initiate suspension or revocation proceedings against a certified operation: (1) When the Program Manager has reason to believe that a certified operation has violated or is not in compliance with the Act or regulations in this part; or (2) When a certifying agent or a State organic program's governing State official fails to take appropriate action to enforce the Act or regulations in this part.";
+    const document = new Document("Program Manager Policy", "", documentId);
 
     let entry = document.createEntry();
     let root = entry.createRoot(Arg.regulative, statement) as RegulativeStatementNode;
 
-    let attr = root.getAttribute();
-    attr.setText("Program Manager", "The");
+    root.getAttribute().setText("Program Manager", "The");
 
-    let deontic = root.createDeontic();
-    deontic.setText("may");
+    root.createDeontic().setText("may");
 
-    let aim = root.getAim();
-    aim.setText("initiate");
+    root.getAim().setText("initiate");
 
     let directObject = root.createDirectObject();
     directObject.setText("proceedings");
 
     let dirPropJunction = directObject.createPropertyJunctionNode();
     dirPropJunction.setJunction(JunctionType.xor);
+    dirPropJunction.setText("or");
 
-    let dirPropA = dirPropJunction.createPropertyNode(Arg.left);
-    dirPropA.setText("suspension");
+    dirPropJunction.createPropertyNode(Arg.left).setText("suspension");
 
-    let dirPropB = dirPropJunction.createPropertyNode(Arg.right);
-    dirPropB.setText("revocation");
+    dirPropJunction.createPropertyNode(Arg.right).setText("revocation");
 
     let indirectObject = root.createIndirectObject();
     indirectObject.setText("operation", "against a");
 
-    let indirProp = indirectObject.createPropertyNode();
-    indirProp.setText("certified");
+    indirectObject.createPropertyNode().setText("certified");
+
+    let actConds = root.getActivationConditions();
+    let lvl2StmtJunction = actConds.createStatementJunctionNode();
+    lvl2StmtJunction.setJunction(JunctionType.or);
+    lvl2StmtJunction.setText("or");
+
+    let lvl2Stmt1 = lvl2StmtJunction.createStatementNode(Arg.regulative, Arg.left) as RegulativeStatementNode;
+
+    lvl2Stmt1.getAttribute().setText("Program Manager", "the");
+    lvl2Stmt1.getAim().setText("has reason to believe", undefined, "that",undefined,"suspects");
+    let lvl2Stmt1DirObj = lvl2Stmt1.createDirectObject();
+
+    let lvl3Stmt = lvl2Stmt1DirObj.createStatementNode(Arg.regulative) as RegulativeStatementNode;
+
+    let lvl3StmtAttr = lvl3Stmt.getAttribute();
+    lvl3StmtAttr.setText("operation", "a");
+    lvl3StmtAttr.createPropertyNode().setText("certified");
+
+    let lvl3StmtDirJunction = lvl3Stmt.createDirectObject().createComponentJunctionNode();
+    lvl3StmtDirJunction.setJunction(JunctionType.or);
+    lvl3StmtDirJunction.setText("or");
+    lvl3StmtDirJunction.createComponentNode(ComponentType.directobject, Arg.left).setText("Act", "the");
+
+    let lvl3StmtDirRight = lvl3StmtDirJunction.createComponentNode(ComponentType.directobject, Arg.right);
+    lvl3StmtDirRight.setText("regulations");
+    lvl3StmtDirRight.createPropertyNode().setText("in this part");
+
+    let lvl3StmtAimJunction = lvl3Stmt.getAim().createComponentJunctionNode();
+    lvl3StmtAimJunction.setJunction(JunctionType.or);
+    lvl3StmtAimJunction.setText("or");
+    lvl3StmtAimJunction.createComponentNode(ComponentType.aim, Arg.left).setText("has violated");
+
+    let lvl3StmtAimRight = lvl3StmtAimJunction.createComponentNode(ComponentType.aim, Arg.right);
+    lvl3StmtAimRight.setText("is not in compliance");
+    lvl3StmtAimRight.turnNegationOn();
+
+    let lvl2Stmt2 = lvl2StmtJunction.createStatementNode(Arg.regulative, Arg.right) as RegulativeStatementNode;
+
+    let lvl2Stmt2AttrJunction = lvl2Stmt2.getAttribute().createComponentJunctionNode();
+    lvl2Stmt2AttrJunction.setJunction(JunctionType.or);
+    lvl2Stmt2AttrJunction.setText("or");
+
+    let lvl2Stmt2AttrLeft = lvl2Stmt2AttrJunction.createComponentNode(ComponentType.attribute, Arg.left);
+    lvl2Stmt2AttrLeft.setText("agent", "a");
+    let lvl2Stmt2AttrRight = lvl2Stmt2AttrJunction.createComponentNode(ComponentType.attribute, Arg.right);
+    lvl2Stmt2AttrRight.setText("State official", "a");
+
+    lvl2Stmt2AttrLeft.createPropertyNode().setText("certifying");
+    lvl2Stmt2AttrRight.createPropertyNode().setText("State organic program's");
+    lvl2Stmt2AttrRight.createPropertyNode().setText("governing");
+
+    let lvl2Stmt2DirJunction = lvl2Stmt2.createDirectObject().createComponentJunctionNode();
+    lvl2Stmt2DirJunction.setJunction(JunctionType.or);
+    lvl2Stmt2DirJunction.setText("or");
+    lvl2Stmt2DirJunction.createComponentNode(ComponentType.directobject, Arg.left).setText("Act", "the");
+
+    let lvl2Stmt2DirRight = lvl2Stmt2DirJunction.createComponentNode(ComponentType.directobject, Arg.right);
+    lvl2Stmt2DirRight.setText("regulations");
+    lvl2Stmt2DirRight.createPropertyNode().setText("in this part");
+
+    let lvl2Stmt2Aim = lvl2Stmt2.getAim();
+    lvl2Stmt2Aim.setText("fails to take appropriate action to enforce", undefined, undefined, undefined, "fails to enforce");
+    lvl2Stmt2Aim.turnNegationOn();
+});
+
+//------------------------------------------------------------------------------
+
+/**
+ * This test creates a complete constitutive statement tree.
+ */
+it("Constitutive statement", () => {
+    // Setup
+    const statement = "From 1st of January onward, food preparation guidelines must adhere to national standards, in addition to communal provisions.";
+    const document = new Document("Test Policy", "", documentId);
+    let entry = document.createEntry();
+    let root = entry.createRoot(Arg.constitutive, statement) as ConstitutiveStatementNode;
+
+    root.getConstitutedEntity().setText("food preparation guidelines");
+    root.createModal().setText("must");
+    root.getConstitutiveFunction().setText("adhere", undefined, "to");
+    root.createConstitutingProperties().setText("national standards");
+    let actconds = root.getActivationConditions();
+    actconds.createComponentNode(ComponentType.simplecontext).setText("From 1st of January onward");
+    let execstrts = root.getExecutionConstraints();
+    execstrts.createComponentNode(ComponentType.simplecontext).setText("communal provisions", "in addition to");
+});
+
+//------------------------------------------------------------------------------
+
+it("Regulative statement with Or else", () => {
+    // Setup
+    const statement = "Organic farmers must comply with organic farming regulations, or else certifiers must revoke the organic farming certification.";
+    const document = new Document("Test Policy", "", documentId);
+    let entry = document.createEntry();
+    let root = entry.createRoot(Arg.regulative, statement) as RegulativeStatementNode;
+
+    root.getAttribute().setText("Organic farmers");
+    root.createDeontic().setText("must");
+    root.getAim().setText("comply", undefined, "with");
+    root.createDirectObject().setText("organic farming regulations");
+    let orelse = root.createOrElse();
+
+    let nestedStmt = orelse.createStatementNode(Arg.regulative) as RegulativeStatementNode;
+    nestedStmt.getAttribute().setText("certifiers");
+    nestedStmt.createDeontic().setText("must");
+    nestedStmt.getAim().setText("revoke");
+    nestedStmt.createDirectObject().setText("organic farming certification", "the");
 });
 
 //------------------------------------------------------------------------------
@@ -173,6 +263,28 @@ it('Check if text content is empty for Junction nodes', () => {
 
     attr.setText("and", "def", "ghi");
     expect(text.isEmptyOrJunctionDefault()).toBeTruthy(); // Should return true if text content is set and the main slot is "and" or "or"
+});
+
+//------------------------------------------------------------------------------
+
+it('Set text content on Junction nodes', () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", documentId);
+    let entry = document.createEntry();
+    let root = entry.createRoot(Arg.regulative) as RegulativeStatementNode;
+    let attr = root.getAttribute();
+    let junction = attr.createComponentJunctionNode();
+    let text = junction.getText();
+
+    // Set junction type and check default text
+    junction.setJunction(JunctionType.and);
+    expect(text.getString()).toBe("and");
+
+    // Set to custom text, then set junction type, then check for custom text
+    junction.setText("either or");
+    junction.setJunction(JunctionType.xor);
+    expect(text.getString()).toBe("either or");
+
 });
 
 //------------------------------------------------------------------------------
@@ -347,28 +459,6 @@ it('Rebuild a tree', () => {
     expect(newContext1 instanceof RegulativeStatementNode).toBeTruthy();
     let newContext2 = newActConds.getChild(1);
     expect(newContext2 instanceof ComponentNode).toBeTruthy();
-});
-
-//------------------------------------------------------------------------------
-
-it('Set text content on Junction nodes', () => {
-    // Setup
-    const document = new Document("Test Policy", "Description", documentId);
-    let entry = document.createEntry();
-    let root = entry.createRoot(Arg.regulative) as RegulativeStatementNode;
-    let attr = root.getAttribute();
-    let junction = attr.createComponentJunctionNode();
-    let text = junction.getText();
-
-    // Set junction type and check default text
-    junction.setJunction(JunctionType.and);
-    expect(text.getString()).toBe("and");
-
-    // Set to custom text, then set junction type, then check for custom text
-    junction.setText("either or");
-    junction.setJunction(JunctionType.xor);
-    expect(text.getString()).toBe("either or");
-
 });
 
 //------------------------------------------------------------------------------

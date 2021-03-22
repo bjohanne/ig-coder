@@ -1,11 +1,11 @@
 /*
-  The App component is the root component/wrapper for all pages of the app.
-  Fixed UI elements such as the navbar should be placed here.
+  The App component handles routing and showing all pages of the appSettings, as well as config.
+  Fixed UI elements such as the navbar belong here.
 */
 
 import React, { useEffect } from "react";
-import { Provider } from "react-redux";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import {connect} from "react-redux";
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import { ReactReduxFirebaseProvider } from "react-redux-firebase";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./state/store";
@@ -23,25 +23,36 @@ import ProtectedRoute from "./components/routeWrappers/protected";
 import SnackbarComponent from "./components/common/snackbar";
 import Navbar from "./components/common/navbar";
 import NotFoundComponent from "./components/notFound";
+import WelcomeComponent from "./components/welcome";
 import LoginContainer from "./components/login/loginContainer";
 import RegisterContainer from "./components/register/registerContainer";
 import PasswordResetContainer from "./components/accountActions/pwdResetContainer";
 import ViewDocumentComponent from "./components/documents/viewDocument";
+import ViewEntryComponent from "./components/documents/viewEntry";
 import ProjectsPage from "./components/projects/projectsPage";
 import DocumentsPage from "./components/documents/documentsPage";
 
+// Actions
+import {populatePremadeDocument} from "./state/documents/actions";
+
 // Config
-import appConfig from "./core/config/appConfig";
+import appConfig from "./core/config/urlConfig";
 import axios from "axios";
 
 // Firebase
 import firebase, { rrfConfig } from "./core/config/firebase";
 
-function App() {
+function App(props) {
+	const { inManagementMode, populatePremadeDocument } = props;
+
 	useEffect(() => {
 		axios.defaults.baseURL = appConfig.api.baseUrl;
-		axios.defaults.timeout = 1000;
-	}, []);	// This will only run once
+		axios.defaults.timeout = 1500;
+
+		if (!inManagementMode) {	// For the testing prototype, populate state with a test Document
+			populatePremadeDocument();
+		}
+	}, [inManagementMode, populatePremadeDocument]);
 
 	const reactReduxFirebaseProps = {
 		firebase,
@@ -49,8 +60,8 @@ function App() {
 		dispatch: store.dispatch
 	}
 
-    return (
-        <Provider store={store}>
+	if (inManagementMode) {	// Management layer ON
+		return (
 			<ReactReduxFirebaseProvider {...reactReduxFirebaseProps}>
 				<PersistGate loading={null} persistor={persistor}>
 					<Container fluid className="App">
@@ -71,11 +82,41 @@ function App() {
 						</AuthLoader>
 					</Container>
 					<SnackbarComponent />
-	                <ReactTooltip delayHide={1000} effect="solid" />
+					<ReactTooltip delayHide={1000} effect="solid" />
 				</PersistGate>
 			</ReactReduxFirebaseProvider>
-        </Provider>
-    );
+		);
+
+	} else {							// Management layer OFF
+		return (
+			<PersistGate loading={null} persistor={persistor}>
+				<Container fluid className="App">
+					<Router>
+						<Navbar/>
+						<Switch>
+							<Route exact path="/" component={WelcomeComponent} />
+							<Route exact path="/documents/:id" component={ViewDocumentComponent} />
+							<Route exact path="/documents/:docid/entries/:entryid" component={ViewEntryComponent} />
+							<Route path="*" component={NotFoundComponent} />
+						</Switch>
+					</Router>
+				</Container>
+				<SnackbarComponent />
+				<ReactTooltip delayHide={1000} effect="solid" />
+			</PersistGate>
+		);
+	}
 }
 
-export default App;
+const mapStateToProps = (state: any) => ({
+	inManagementMode: state.appSettings.mode.management
+});
+
+const mapDispatchToProps = (dispatch: any) => ({
+	populatePremadeDocument: () => dispatch(populatePremadeDocument())
+});
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(App);

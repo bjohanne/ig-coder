@@ -32,11 +32,11 @@ export interface INode {
     updatedAt:  Date,
     /* Array of child nodes of this Node */
     children:   INode[],
-    getChildIndexById(targetId: number) : number,
-    isDummy() : boolean,
-    update() :  void,
-    turnNegationOn() : void,
-    turnNegationOff() : void
+    getChildIndexById(targetId: number): number,
+    isDummy(): boolean,
+    update():  void,
+    turnNegationOn(): void,
+    turnNegationOff(): void
 }
 
  /**
@@ -140,7 +140,7 @@ export interface IConstitutiveStatementNode extends IStatementNode {
     createModal(): ComponentNode,
     deleteModal(): void
     createOrElse(): ComponentNode,
-    deleteOrElse() : void
+    deleteOrElse(): void
 }
 
 /**
@@ -150,7 +150,7 @@ export interface IComponentNode extends INode {
     componentType: ComponentType,
     text: TextContent,
     contextType?: ContextType,
-    getText() : TextContent,
+    getText(): TextContent,
     setText(main?: string, prefix?: string, suffix?: string): void,
     unsetText(): void,
     setContextType(contextType: ContextType): void,
@@ -173,7 +173,8 @@ export interface IJunctionNode extends INode {
     junctionType: JunctionType,
     text: TextContent,
     setJunction(junctionType: JunctionType): void,
-    getText() : TextContent,
+    getOperatorString(): string,
+    getText(): TextContent,
     setText(main?: string, prefix?: string, suffix?: string): void,
     unsetText(): void,
     getLeft(): INode,
@@ -187,7 +188,7 @@ export interface IJunctionNode extends INode {
  */
 export interface IStatementJunctionNode extends IJunctionNode {
     createStatementJunctionNode(position: Arg.left | Arg.right): StatementJunctionNode,
-    createStatementNode(type: Arg.regulative | Arg.constitutive, position: Arg.left | Arg.right) : StatementNode
+    createStatementNode(type: Arg.regulative | Arg.constitutive, position: Arg.left | Arg.right): StatementNode
 }
 
 /**
@@ -196,7 +197,7 @@ export interface IStatementJunctionNode extends IJunctionNode {
 export interface IComponentJunctionNode extends IJunctionNode {
     componentType: ComponentType,
     createComponentJunctionNode(position: Arg.left | Arg.right): ComponentJunctionNode,
-    createComponentNode(componentType: ComponentType, position: Arg.left | Arg.right) : ComponentNode
+    createComponentNode(componentType: ComponentType, position: Arg.left | Arg.right): ComponentNode
 }
 
 /**

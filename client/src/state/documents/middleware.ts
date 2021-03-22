@@ -5,12 +5,14 @@ import {
     CREATE_DOCUMENT_RESPONSE,
     SAVE_DOCUMENT_REQUEST,
     PRE_SET_ACTIVE_NODE,
-    SET_ACTIVE_NODE
+    SET_ACTIVE_NODE,
+    POPULATE_PREMADE_DOC
 } from "./actions";
 import { Middleware, MiddlewareAPI } from "redux";
 import axios, { AxiosResponse, AxiosError } from "axios";
 import Document from "../../core/model/document";
-import { IRegulativeStatementNode } from "../../core/model/interfaces";
+//import { IRegulativeStatementNode } from "../../core/model/interfaces";
+import testDocumentString from "../../core/config/testDocument";
 
 export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: any) => (action: any) => {
     switch (action.type) {
@@ -49,12 +51,16 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
                 return;
             }
             // extract the entry text, pass it to the endpoint
-            let parent = action.payload.node.parent.data as IRegulativeStatementNode;
+            //let parent = action.payload.node.parent.data as IRegulativeStatementNode;
             //let data = { entry: parent.entry.content }    // TODO FIX
             axios.post("/entities", "DUMMY STRING").then((response) => {
                 store.dispatch({type: SET_ACTIVE_NODE, payload: Object.assign(action.payload, { ents: response.data["ent"], pos: response.data["pos"] }) });
                 action.payload.togglefunc();
             })
+            break;
+        case POPULATE_PREMADE_DOC:
+            // Take the predefined string in core/config/testDocument.ts and construct a Document from it
+            action.doc = Document.fromData(JSON.parse(testDocumentString) as Document);
             break;
         default:
             break;
