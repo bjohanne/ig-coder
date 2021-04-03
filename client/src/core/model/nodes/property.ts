@@ -6,7 +6,7 @@ import {
     StatementJunctionNode, StatementNode
 } from "./";
 import {INode, IPropertyNode} from "../interfaces";
-import {Arg, ContextType, NodeType} from "../enums";
+import {Arg, ContextType, JunctionType, NodeType} from "../enums";
 import {TextContent} from "../textcontent";
 import {DataError, DataErrorType} from "../errors";
 
@@ -220,9 +220,10 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
     /**
      * Creates a PropertyJunction node as child of this node.
      *
+     * @param junctionType (Optional) A junction type to be given to the new node immediately
      * @return The newly created node
      */
-    createPropertyJunctionNode() : PropertyJunctionNode {
-        return this.addChild(new PropertyJunctionNode(this.document, this.id)) as PropertyJunctionNode;
+    createPropertyJunctionNode(junctionType?: JunctionType) : PropertyJunctionNode {
+        return this.addChild(new PropertyJunctionNode(this.document, this.id, junctionType)) as PropertyJunctionNode;
     }
 }

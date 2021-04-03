@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import { updateJunction } from "../../../state/documents/actions";
-import ModalBody from 'react-bootstrap/ModalBody';
-import { JunctionNode } from "../../../core/model/nodes";
-import { JunctionType, NodeType, Arg } from "../../../core/model/enums";
-import { componentColorScaler } from "../../../core/config/scales";
-import { INode } from "../../../core/model/interfaces";
+import { updateJunction } from "../../../../state/documents/actions";
+import { JunctionNode } from "../../../../core/model/nodes";
+import { JunctionType, NodeType } from "../../../../core/model/enums";
+import { componentColorScaler } from "../../../../core/config/scales";
+import { INode } from "../../../../core/model/interfaces";
 
 const JunctionEditor = (props: any) => {
     let active = props.activeNode.node.data as JunctionNode;
-    const [hasNegate, setHasNegate] = useState(false);
+    const [hasNegate,] = useState(false);
     const [hasConvention, setHasConvention] = useState(false);
     const [hasNorm, setHasNorm] = useState(false);
-    const [hasDirect, setHasDirect] = useState(false);
-    const [hasIndirect, setHasIndirect] = useState(false);
+    const [hasDirect,] = useState(false);
+    const [hasIndirect,] = useState(false);
 
     useEffect(() => {
         let children = active.children;
@@ -63,7 +62,7 @@ const JunctionEditor = (props: any) => {
 
     return (
         props.activeNode &&
-        (<ModalBody><div className="modal-wrapper">
+        (<div className="modal-wrapper">
             <h4 style={{ padding: "1rem", color: "#fff", backgroundColor: currentComponentColor.toString() }}>{props.activeNode.node.data.junctionType} ({props.activeNode.node.data.id})</h4>
             <div className="text-control-wrap">
             <div className="radio-wrap">
@@ -115,7 +114,7 @@ const JunctionEditor = (props: any) => {
             </div>
         </div>
         <button className="btn-primary btn" style={{margin:5}} onClick={close}>Save</button>
-    </div></ModalBody>)
+    </div>)
     )
 }
 

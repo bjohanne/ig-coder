@@ -3,9 +3,11 @@ html, body, #root {
 }
 
 .App {
-    min-height: calc(100% - 64px) !important;
-    height: auto; /* cross-browser */
-    height: calc(100% - 64px) !important; /* cross-browser */
+    min-height: calc(100% - 48px) !important;
+    height: auto;
+    padding-bottom: 16px;
+    /* height: auto; /* cross-browser */
+    /* height: calc(100% - 48px) !important; /* cross-browser */
 }
 
 body {

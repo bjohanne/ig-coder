@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import {INode, ITextContent } from "../../../core/model/interfaces";
-import { updateEntry } from "../../../state/documents/actions";
-import ModalBody from "react-bootstrap/ModalBody";
-import { ComponentNode } from "../../../core/model/nodes";
-import { TextContent } from "../../../core/model/textcontent";
-import { componentColorScaler, posColorScaler, entColorScaler } from "../../../core/config/scales";
+import {INode, ITextContent } from "../../../../core/model/interfaces";
+import { updateEntry } from "../../../../state/documents/actions";
+import { ComponentNode } from "../../../../core/model/nodes";
+import { TextContent } from "../../../../core/model/textcontent";
+import { componentColorScaler, posColorScaler, entColorScaler } from "../../../../core/config/scales";
 import SubComponentEditor from "./subcomponenteditor";
-import { ComponentType } from "../../../core/model/enums";
+import { ComponentType } from "../../../../core/model/enums";
 
 const ComponentEditor = (props: any) => {
     const [component, setComponent] = useState<ITextContent>({
@@ -20,7 +19,6 @@ const ComponentEditor = (props: any) => {
     const [entryContentVal, setEntryContentVal] = useState("");
     //const [saveEnabled, setSaveEnabled] = useState(false);
     let active = props.activeNode.node.data as ComponentNode;
-    let parent = props.activeNode.node.parent.data as INode;
     let entryContent = "";  // Would be the full statement found in the Entry
 
     useEffect(() => {
@@ -86,7 +84,7 @@ const ComponentEditor = (props: any) => {
 
     return (
         props.activeNode &&
-        (<ModalBody>
+        (<>
             <div className="modal-wrapper">
             <h4 style={{ padding: "1rem", color: "#fff", backgroundColor: currentComponentColor.toString() }}>{props.activeNode.node.data.componentType} ({props.activeNode.node.data.id})</h4>
             <div className="component-editor-entry-text" dangerouslySetInnerHTML={{__html: entryContentVal}}/>
@@ -135,7 +133,7 @@ const ComponentEditor = (props: any) => {
 
             </div>
             </div>
-        </ModalBody>)
+        </>)
     )
 }
 

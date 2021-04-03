@@ -14,8 +14,8 @@ import {DataError, DataErrorType} from "../errors";
 export default class RegulativeStatementNode extends StatementNode implements IRegulativeStatementNode {
     nodeType: NodeType = NodeType.regulativestatement;
     // Fixed children:
-    // Attribute, DirectObject (optional), IndirectObject (optional), Deontic (optional), Aim, ActivationConditions, ExecutionConstraints, OrElse (optional)
-    children!: [ComponentNode, BaseNode, BaseNode, BaseNode, ComponentNode, ComponentNode, ComponentNode, BaseNode];
+    // Attribute, Deontic (optional), Aim, DirectObject (optional), IndirectObject (optional), ActivationConditions, ExecutionConstraints, OrElse (optional)
+    children!: [ComponentNode, BaseNode, ComponentNode, BaseNode, BaseNode, ComponentNode, ComponentNode, BaseNode];
 
     /**
      * Creates a new RegulativeStatement node with fixed children.
@@ -30,9 +30,9 @@ export default class RegulativeStatementNode extends StatementNode implements IR
         this.children = [
             new ComponentNode(ComponentType.attribute, document, this.id),
             new BaseNode(document, this.id),
-            new BaseNode(document, this.id),
-            new BaseNode(document, this.id),
             new ComponentNode(ComponentType.aim, document, this.id),
+            new BaseNode(document, this.id),
+            new BaseNode(document, this.id),
             new ComponentNode(ComponentType.activationconditions, document, this.id),
             new ComponentNode(ComponentType.executionconstraints, document, this.id),
             new BaseNode(document, this.id),

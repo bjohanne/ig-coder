@@ -11,7 +11,8 @@ export default class ConstitutiveStatementNode extends StatementNode implements 
     nodeType: NodeType = NodeType.constitutivestatement;
     // Fixed children:
     // ConstitutingProperties (optional), Modal (optional), ConstitutiveFunction, ConstitutedEntity, ActivationConditions, ExecutionConstraints, OrElse (optional)
-    children!: [BaseNode, BaseNode, ComponentNode, ComponentNode, ComponentNode, ComponentNode, BaseNode];
+    // ConstitutedEntity, Modal (optional), ConstitutiveFunction, ConstitutingProperties (optional), ActivationConditions, ExecutionConstraints, OrElse (optional)
+    children!: [ComponentNode, BaseNode, ComponentNode, BaseNode, ComponentNode, ComponentNode, BaseNode];
 
     /**
      * Creates a new ConstitutiveStatement node with fixed children.
@@ -24,10 +25,10 @@ export default class ConstitutiveStatementNode extends StatementNode implements 
     constructor(document: number, parent?: number, id?: number) {
         super(document, parent, id);
         this.children = [
-            new BaseNode(document, this.id),
+            new ComponentNode(ComponentType.constitutedentity, document, this.id),
             new BaseNode(document, this.id),
             new ComponentNode(ComponentType.constitutivefunction, document, this.id),
-            new ComponentNode(ComponentType.constitutedentity, document, this.id),
+            new BaseNode(document, this.id),
             new ComponentNode(ComponentType.activationconditions, document, this.id),
             new ComponentNode(ComponentType.executionconstraints, document, this.id),
             new BaseNode(document, this.id),

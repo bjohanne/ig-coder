@@ -32,9 +32,6 @@ import ViewEntryComponent from "./components/documents/viewEntry";
 import ProjectsPage from "./components/projects/projectsPage";
 import DocumentsPage from "./components/documents/documentsPage";
 
-// Actions
-import {populatePremadeDocument} from "./state/documents/actions";
-
 // Config
 import appConfig from "./core/config/urlConfig";
 import axios from "axios";
@@ -43,16 +40,29 @@ import axios from "axios";
 import firebase, { rrfConfig } from "./core/config/firebase";
 
 function App(props) {
-	const { inManagementMode, populatePremadeDocument } = props;
+	const { inManagementMode, changed } = props;
 
 	useEffect(() => {
 		axios.defaults.baseURL = appConfig.api.baseUrl;
 		axios.defaults.timeout = 1500;
+	}, []);
 
-		if (!inManagementMode) {	// For the testing prototype, populate state with a test Document
-			populatePremadeDocument();
+	const alertUser = (e: BeforeUnloadEvent) => {
+		if (changed) {
+			// Cancel the event
+			e.preventDefault(); // If you prevent default behavior in Mozilla Firefox, prompt will always be shown
+			// Chrome requires returnValue to be set
+			e.returnValue = "";
 		}
-	}, [inManagementMode, populatePremadeDocument]);
+	}
+
+	useEffect(() => {
+		// Warn the user before closing the tab/navigating elsewhere, if there are unsaved changes
+		window.addEventListener("beforeunload", alertUser);
+		return () => {
+			window.removeEventListener("beforeunload", alertUser)
+		}
+	})
 
 	const reactReduxFirebaseProps = {
 		firebase,
@@ -109,14 +119,11 @@ function App(props) {
 }
 
 const mapStateToProps = (state: any) => ({
-	inManagementMode: state.appSettings.mode.management
-});
-
-const mapDispatchToProps = (dispatch: any) => ({
-	populatePremadeDocument: () => dispatch(populatePremadeDocument())
+	inManagementMode: state.appSettings.mode.management,
+	changed: state.documents.changed
 });
 
 export default connect(
 	mapStateToProps,
-	mapDispatchToProps
+	null
 )(App);

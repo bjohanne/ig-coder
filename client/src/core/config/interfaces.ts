@@ -6,6 +6,7 @@ export interface IMode {
 
 export interface IPreferences {
     useCoreOnly: Boolean,
+    useNodeLabels: Boolean,
     usePrefixSuffix: Boolean
 }
 

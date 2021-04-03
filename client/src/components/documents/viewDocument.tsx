@@ -7,6 +7,7 @@ import Button from "react-bootstrap/Button";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import Dropdown from "react-bootstrap/Dropdown";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
 
 import "./viewDocument.css";
 import {getDocument, saveDocumentRequest} from "../../state/documents/actions";
@@ -19,7 +20,6 @@ export function ViewDocumentComponent(props) {
         match: {params: {id}},
         currentDocument,
         loading,
-        saveDocumentRequest,
         inManagementMode
     } = props;
 
@@ -33,25 +33,20 @@ export function ViewDocumentComponent(props) {
     useEffect(() => {
 		// There is no currentDocument, or the currentDocument is not the requested one - but only when management mode is on
         if ((!currentDocument || currentDocument.id !== Number(id)) && inManagementMode) {
-            getDocument(id);	// Fetch the document if it's not already in store
+            getDocument(Number(id));	// Fetch the document if it's not already in store
         }
 	}, [currentDocument, id, getDocument, inManagementMode]);
 
-
     const onSave = () => {
-        saveDocumentRequest(currentDocument);
-    };
+    }
 
-    const onExportJSON = () => {
+    const onLoad = () => {
     }
 
     const onExportUIMACAS = () => {
     }
 
     const onExportShorthand = () => {
-    }
-
-    const onImport = () => {
     }
 
     const handleRowClicked = (e: React.MouseEvent<HTMLTableRowElement>) => {
@@ -81,25 +76,22 @@ export function ViewDocumentComponent(props) {
                         }
                     </div>
                     <div className="col-md-6 text-right">
-                        <DropdownButton id="export-dropdown" title="Export" className="d-inline-block">
-                            <Dropdown.Item onClick={onExportJSON} title="Save the document to a file">
-                                JSON
-                            </Dropdown.Item>
-                            <Dropdown.Item onClick={onExportUIMACAS} title="Save the document to a file">
-                                UIMA CAS
-                            </Dropdown.Item>
-                            <Dropdown.Item onClick={onExportShorthand} title="Save the document to a file">
-                                Shorthand
-                            </Dropdown.Item>
-                        </DropdownButton>
-                        <Button onClick={onImport} title="Load document from JSON file" className="ml-3">
-                            Import
-                        </Button>
-                        {inManagementMode &&
-                        <Button onClick={onSave} className="ml-3">
-                            Save Document
-                        </Button>
-                        }
+                        <ButtonGroup>
+                            <Button onClick={onSave} title="Save the document to a JSON file">
+                                Save to file
+                            </Button>
+                            <Button onClick={onLoad} title="Load a document from a JSON file">
+                                Load from file
+                            </Button>
+                            <DropdownButton id="export-dropdown" title="Export" as={ButtonGroup} className="d-inline-block">
+                                <Dropdown.Item onClick={onExportUIMACAS} title="Save the document to a file" role="menuitem">
+                                    UIMA CAS
+                                </Dropdown.Item>
+                                <Dropdown.Item onClick={onExportShorthand} title="Save the document to a file" role="menuitem">
+                                    Shorthand
+                                </Dropdown.Item>
+                            </DropdownButton>
+                        </ButtonGroup>
                     </div>
                 </div>
 
@@ -124,7 +116,7 @@ export function ViewDocumentComponent(props) {
                             <td><small>{entry.original}</small></td>
                             <td>
                                 <Link to={"/documents/" + id + "/entries/" + entry.id}>
-                                    <Button size="sm" title="Code this statement">Edit</Button>
+                                    <Button size="sm" title="Code this statement">Code</Button>
                                 </Link>
                             </td>
                         </tr>
@@ -149,7 +141,7 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    getDocument: (document_id: any) => dispatch(getDocument(document_id)),
+    getDocument: (document_id: number) => dispatch(getDocument(document_id)),
     saveDocumentRequest: (document: any) => dispatch(saveDocumentRequest(document))
 });
 

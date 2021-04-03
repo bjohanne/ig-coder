@@ -6,6 +6,7 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import hardSet from "redux-persist/lib/stateReconciler/hardSet";
 
 import { documentMiddleware } from "./documents/middleware";
+import { modelMiddleware } from "./model/middleware";
 import { firebaseReducer } from "react-redux-firebase";
 import appSettings from "./appSettings/reducer";
 import documents from "./documents/reducer";
@@ -51,7 +52,7 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const allMiddlewares = [documentMiddleware];
+const allMiddlewares = [documentMiddleware, modelMiddleware];
 
 const store = createStore(
     persistedReducer,

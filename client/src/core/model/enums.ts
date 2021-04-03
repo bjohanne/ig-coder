@@ -75,19 +75,19 @@ export enum Arg {
 
     // Regulative components
     reg_attribute      = 0,
-    reg_directobject   = 1,
-    reg_indirectobject = 2,
-    reg_deontic        = 3,
-    reg_aim            = 4,
+    reg_deontic        = 1,
+    reg_aim            = 2,
+    reg_directobject   = 3,
+    reg_indirectobject = 4,
     reg_activationconditions = 5,
     reg_executionconstraints = 6,
     reg_orelse         = 7,
 
     // Constitutive components
-    con_constitutingproperties  = 0,
+    con_constitutedentity       = 0,
     con_modal                   = 1,
     con_constitutivefunction    = 2,
-    con_constitutedentity       = 3,
+    con_constitutingproperties  = 3,
     con_activationconditions    = 4,
     con_executionconstraints    = 5,
     con_orelse                  = 6
@@ -123,6 +123,66 @@ export enum ContextType {
         instrument = "ins",
     cause = "cau",
     purpose_function = "pur"
+}
+
+/**
+ * Get the full, human-readable string for a given ContextType.
+ * @param contextType The enum value for the context type to get
+ * @return The full string associated with the passed in context type
+ */
+export function getContextString(contextType: ContextType): string {
+    switch(contextType){
+        case ContextType.temporal:
+            return "Temporal";
+        case ContextType.pointintime:
+            return "Point in time";
+        case ContextType.t_beginning:
+            return "Beginning";
+        case ContextType.t_end:
+            return "End";
+        case ContextType.timeframe:
+            return "Time frame";
+        case ContextType.frequency:
+            return "Frequency";
+        case ContextType.spatial:
+            return "Spatial";
+        case ContextType.location:
+            return "Location";
+        case ContextType.sp_beginning:
+            return "Beginning";
+        case ContextType.sp_end:
+            return "End";
+        case ContextType.direction:
+            return "Direction";
+        case ContextType.path:
+            return "Path";
+        case ContextType.domain:
+            return "Domain";
+        case ContextType.state:
+            return "State";
+        case ContextType.statetransition:
+            return "State transition";
+        case ContextType.event:
+            return "Event";
+        case ContextType.cause_reason:
+            return "Cause/Reason";
+        case ContextType.outcome_effect:
+            return "Outcome/Effect";
+        case ContextType.proceduralorder:
+            return "Procedural order";
+        case ContextType.method:
+            return "Method";
+        case ContextType.means:
+            return "Means";
+        case ContextType.instrument:
+            return "Instrument";
+        case ContextType.cause:
+            return "Cause";
+        case ContextType.purpose_function:
+            return "Purpose/Function";
+        default:
+            return "";
+    }
 }
 
 /**

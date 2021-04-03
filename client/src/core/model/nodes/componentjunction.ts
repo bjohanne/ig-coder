@@ -1,6 +1,6 @@
 import {ComponentNode, JunctionNode} from "./";
 import {IComponentJunctionNode} from "../interfaces";
-import {NodeType, ComponentType, Arg} from "../enums";
+import {NodeType, ComponentType, Arg, JunctionType} from "../enums";
 import {DataError, DataErrorType} from "../errors";
 import {matchComponentTypes} from "../helpers";
 import {TextContent} from "../textcontent";
@@ -18,10 +18,11 @@ export default class ComponentJunctionNode extends JunctionNode implements IComp
 	 * @param componentType The component type of this node's ancestor ComponentNode, if it has one.
 	 * @param document The ID of the document this node belongs to
 	 * @param parent The ID of the node this node is a child of (the parent's children array must be set separately)
+	 * @param junctionType (Optional) A junction type to be given to the new node immediately
 	 * @param id (Optional) The ID of this node if one already exists (for rebuilding from existing data)
 	 */
-	constructor(componentType: ComponentType, document: number, parent: number, id?: number) {
-		super(document, parent, undefined, id);
+	constructor(componentType: ComponentType, document: number, parent: number, junctionType?: JunctionType, id?: number) {
+		super(document, parent, junctionType, id);
 		this.componentType = componentType;
 	}
 
@@ -33,21 +34,9 @@ export default class ComponentJunctionNode extends JunctionNode implements IComp
 	 * @return A new StatementJunctionNode with the passed in properties
 	 */
 	static fromData(data: IComponentJunctionNode) : ComponentJunctionNode {
-		let newNode = new ComponentJunctionNode(data.componentType, data.document, data.parent, data.id);
+		let newNode = new ComponentJunctionNode(data.componentType, data.document, data.parent, data.junctionType, data.id);
 		newNode.text = TextContent.fromData(data.text);
 		return newNode;
-	}
-
-	/**
-	 * Creates a ComponentJunction node as child of this node.
-	 * @param position Whether the new node should be the left or right child of this node
-	 *
-	 * @return The newly created node
-	 */
-	createComponentJunctionNode(position: Arg.left | Arg.right) : ComponentJunctionNode {
-		this.children[position] = new ComponentJunctionNode(this.componentType, this.document, this.id);
-		this.update();
-		return this.children[position] as ComponentJunctionNode;
 	}
 
 	/**
@@ -65,5 +54,18 @@ export default class ComponentJunctionNode extends JunctionNode implements IComp
 		this.children[position] = new ComponentNode(componentType, this.document, this.id);
 		this.update();
 		return this.children[position] as ComponentNode;
+	}
+
+	/**
+	 * Creates a ComponentJunction node as child of this node.
+	 * @param position Whether the new node should be the left or right child of this node
+	 *
+	 * @param junctionType (Optional) A junction type to be given to the new node immediately
+	 * @return The newly created node
+	 */
+	createComponentJunctionNode(position: Arg.left | Arg.right, junctionType?: JunctionType) : ComponentJunctionNode {
+		this.children[position] = new ComponentJunctionNode(this.componentType, this.document, this.id, junctionType);
+		this.update();
+		return this.children[position] as ComponentJunctionNode;
 	}
 }

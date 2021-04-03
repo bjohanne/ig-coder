@@ -98,7 +98,7 @@ import {ITextContent} from "./interfaces"
 	 * NB: This function ignores all other fields than main.
 	 */
 	isSet() : Boolean {
-		return (typeof this.main !== undefined);
+		return (typeof this.main !== "undefined");
 	}
 
 	/**

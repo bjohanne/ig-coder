@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import { INode } from "../../../core/model/interfaces";
-import { updateEntry } from "../../../state/documents/actions";
-import ModalBody from 'react-bootstrap/ModalBody';
-import { TextContent } from "../../../core/model/textcontent";
-import { componentColorScaler } from "../../../core/config/scales";
-import { ComponentType } from "../../../core/model/enums";
-import { ComponentNode } from "../../../core/model/nodes";
+import { INode } from "../../../../core/model/interfaces";
+import { updateEntry } from "../../../../state/documents/actions";
+import { TextContent } from "../../../../core/model/textcontent";
+import { componentColorScaler } from "../../../../core/config/scales";
+import { ComponentType } from "../../../../core/model/enums";
+import { ComponentNode } from "../../../../core/model/nodes";
 
 interface ISubcomponentData {
     prefix?: string,
@@ -59,7 +58,7 @@ const SubComponentEditor = (props: any) => {
     if (parcomptype === ComponentType.directobject) {
         return (
             props.activeNode && (
-            <ModalBody>
+            <>
                 <div>
                     <h4 style={{ padding: "1rem", color: "#fff", backgroundColor: currentComponentColor.toString() }}>{props.activeNode.node.parent.data.content}I want to put parent.data.content.main here.({props.activeNode.node.data.id})</h4>
                     <div className="text-control-wrap">
@@ -76,13 +75,13 @@ const SubComponentEditor = (props: any) => {
                     <button className="btn-primary btn" style={{margin:5}} onClick={saveComponent}>Save</button>
                     <button className="btn-light btn" style={{margin:5}} onClick={saveComponent}>Clear</button>
                 </div>
-            </ModalBody>
+            </>
             )
         )
     } else if (parcomptype === ComponentType.indirectobject) {
 	return (
 		props.activeNode && (
-		<ModalBody>
+		<>
 			<div>
 				<h4 style={{ padding: "1rem", color: "#fff", backgroundColor: currentComponentColor.toString() }}>{props.activeNode.node.parent.data.content}({props.activeNode.node.data.id})</h4>
 				<div className="text-control-wrap">
@@ -99,7 +98,7 @@ const SubComponentEditor = (props: any) => {
 				<button className="btn-success btn" style={{margin:5}} onClick={saveComponent}>Save</button>
 				<button className="btn-light btn" style={{margin:5}} onClick={saveComponent}>Clear</button>
 			</div>
-		</ModalBody>
+		</>
 		)
 	)
 	} else {

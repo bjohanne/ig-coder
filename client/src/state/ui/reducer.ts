@@ -9,10 +9,10 @@ import { AUTH_SUCCESS, AUTH_ERROR } from "../user/actions";
 import { API_CALL_SUCCESS, API_CALL_ERROR } from "../apiCall/actions";
 
 interface uiState {
-    snackbarOpen: Boolean,
+    snackbarOpen: boolean,
     snackbarColor: string,
     snackbarMessage: string,
-    snackbarDuration: Number
+    snackbarDuration: number
 }
 
 const initialState: uiState = {

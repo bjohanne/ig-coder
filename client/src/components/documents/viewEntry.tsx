@@ -1,18 +1,25 @@
 import React, {useEffect, useRef, useState} from "react";
 import {withRouter, Link, Redirect} from "react-router-dom";
 import {connect} from "react-redux";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import Spinner from "react-bootstrap/Spinner";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
 import Form from "react-bootstrap/Form";
-import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
+import Accordion from "react-bootstrap/Accordion";
 
 import "./viewEntry.css";
 import pageTitles from "../../core/config/pageTitles";
+import {Arg} from "../../core/model/enums";
 import {Entry} from "../../core/model/entry";
 import TreeComponent from "../editor/tree";
-import Edit from "../editor/edit";
+import EditorModal from "../editor/editorModal";
+import {createRootNode, clearTree} from "../../state/model/actions";
+import {setSaved} from "../../state/documents/actions";
+import {openSnackbarWithData} from "../../state/ui/actions";
+import {AccordionToggle} from "../common/accordionToggle";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
 
 export function ViewEntryComponent(props) {
     // Set page title
@@ -22,18 +29,26 @@ export function ViewEntryComponent(props) {
         match: {params: {docid, entryid}},
         currentDocument,
         loading,
+        changed,
+        createRootNode,
+        clearTree,
+        setSaved,
+        openSnackbarWithData
     } = props;
 
     const currentEntry: Entry = currentDocument.entries[currentDocument.entryMap[entryid]];
 
-    const [modal, setModal] = useState(false);
+    // Base modal for node editors
+    const [modalState, setModalState] = useState(false);
+    const handleCloseModal = () => setModalState(false);
+    const handleShowModal = () => setModalState(true);
 
     const rawTextArea = useRef(null);
     const rephrasedTextArea = useRef(null);
 
     useEffect(() => {
         if (rawTextArea.current && rephrasedTextArea.current) {
-            // For the textareas that display the statement, adapt the number of rows to the length of the statement
+            // For the 2 textareas that display the statement, adapt the number of rows to the length of the statement
             rawTextArea.current.rows = 1;
             rephrasedTextArea.current.rows = 1;
             if (rawTextArea.current.scrollHeight > 36) {
@@ -42,18 +57,29 @@ export function ViewEntryComponent(props) {
                 rephrasedTextArea.current.rows = newRowsNumber;
             }
         }
-    }, []);
-
-    const onSave = () => {
-    };
-
-    /* These 2 will dispatch an action to create the root node, updating currentDocument, triggering a rerender. */
+    }, []); // Run only once on mount
 
     const onRootRegulative = () => {
+        createRootNode(currentDocument.entryMap[entryid], Arg.regulative);
     };
 
     const onRootConstitutive = () => {
+        createRootNode(currentDocument.entryMap[entryid], Arg.constitutive);
     };
+
+    const onClearTree = () => {
+        if (!window.confirm("The entire tree for this entry will be deleted. Proceed?")) {
+            return;
+        }
+        clearTree(currentDocument.entryMap[entryid]);
+    };
+
+    const onSave = () => {
+        // This doesn't actually save anything, because work is saved automatically in the browser.
+        // It's implemented for users who feel they need to click a save button.
+        setSaved();
+        openSnackbarWithData("success", "Your changes have been saved locally.", 3000);
+    }
 
     return (
         loading ?
@@ -71,50 +97,57 @@ export function ViewEntryComponent(props) {
                 </Breadcrumb>
 
                 <div className="card-body">
-                    <Form>
-                        <Form.Group controlId="original-textarea" id="original-textarea">
-                            <InputGroup>
-                                <InputGroup.Prepend>
-                                    <InputGroup.Text id="raw-prepend">
-                                        Raw
-                                    </InputGroup.Text>
-                                </InputGroup.Prepend>
-                                <Form.Control as="textarea" ref={rawTextArea} disabled value={currentEntry.original}/>
-                            </InputGroup>
-                        </Form.Group>
-                        <Form.Group controlId="rephrased-textarea" id="rephrased-textarea">
-                            <InputGroup>
-                                <InputGroup.Prepend>
-                                    <InputGroup.Text id="rephrased-prepend">
-                                        Rephrased
-                                    </InputGroup.Text>
-                                </InputGroup.Prepend>
-                                <Form.Control as="textarea" ref={rephrasedTextArea}/>
-                            </InputGroup>
-                        </Form.Group>
+                    <Form id="textarea-container">
+                        <Accordion defaultActiveKey="0">
+                            <AccordionToggle text="Raw" openByDefault eventKey="0"/>
+                            <Accordion.Collapse eventKey="0">
+                                <Form.Group controlId="original-textarea" id="original-textarea">
+                                    <Form.Control as="textarea" ref={rawTextArea} disabled
+                                                  value={currentEntry.original}/>
+                                </Form.Group>
+                            </Accordion.Collapse>
+                        </Accordion>
+                        <Accordion>
+                            <AccordionToggle text="Rephrased" isLast eventKey="0" id="rephrased-toggle"/>
+                            <Accordion.Collapse eventKey="0">
+                                <Form.Group controlId="rephrased-textarea" id="rephrased-textarea">
+                                    <Form.Control as="textarea" ref={rephrasedTextArea}/>
+                                </Form.Group>
+                            </Accordion.Collapse>
+                        </Accordion>
                     </Form>
 
                     {currentEntry.root ?                /* The Entry has a root node */
-                    <div>
-                        <TreeComponent togglefunc={() => {setModal(!modal)}} currentEntry={currentEntry}/>
-                    </div>
+                    <>
+                        <TreeComponent showModal={handleShowModal} currentEntry={currentEntry}/>
+                    </>
                     :                                   /* The Entry does not have a root node */
-                    <div>
-                        <small className="mr-2">Statement type:</small>
-                        <Button onClick={onRootRegulative} className="mr-2">Regulative</Button>
-                        <Button onClick={onRootConstitutive}>Constitutive</Button>
-                    </div>
-                    }
+                    <Row className="py-2">
+                        <Col className="d-flex align-items-center">
+                            <small className="mr-2">Statement type:</small>
+                            <ButtonGroup>
+                                <Button onClick={onRootRegulative}>Regulative</Button>
+                                <Button onClick={onRootConstitutive}>Constitutive</Button>
+                            </ButtonGroup>
+                        </Col>
 
-                    {/*<div className="card-body" id="accordion-root"/>*/} {/* Presumably, the Accordion is rendered here
-                                                                               (which is actually the Create New Entry form */}
+                    </Row>
+                    }
+                    {currentEntry.root &&
+                    <Row className="pt-2">
+                        <Col className="d-flex justify-content-start">
+                            <Button onClick={onClearTree} variant="danger">Clear tree</Button>
+                        </Col>
+                        <Col className="d-flex justify-content-end">
+                            <Button onClick={onSave} variant="primary" disabled={!changed}>Save changes</Button>
+                        </Col>
+                    </Row>
+                    }
                 </div>
             </div>
 
-            {/* Here is the editor base modal */}
-            <Modal show={modal} onHide={() => setModal(false)} className="modal-open">
-                <Edit close={() => setModal(!modal)} />
-            </Modal>
+            {/* Editor base modal */}
+            <EditorModal modalState={modalState} closeModal={handleCloseModal} />
         </>
         :
         <Redirect to="/404"/>
@@ -123,10 +156,18 @@ export function ViewEntryComponent(props) {
 }
 
 const mapStateToProps = (state: any) => ({
-    currentDocument: state.documents.currentDocument
+    currentDocument: state.documents.currentDocument,
+    loading: state.documents.loading,
+    changed: state.documents.changed
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
+    createRootNode: (entryIndex: number, nodeType: Arg.regulative | Arg.constitutive | Arg.statementjunction) =>
+        dispatch(createRootNode(entryIndex, nodeType)),
+    clearTree: (entryIndex: number) => dispatch(clearTree(entryIndex)),
+    setSaved: () => dispatch(setSaved()),
+    openSnackbarWithData: (color: string, message: string, duration: number) =>
+        dispatch(openSnackbarWithData(color, message, duration))
 });
 
 export default connect(

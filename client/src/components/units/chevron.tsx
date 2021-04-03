@@ -1,11 +1,15 @@
 import React from "react";
 
-function Chevron(props: any) {
+interface IProps extends React.HTMLProps<HTMLElement> {
+    fill?: string
+}
+
+/* Points to the right by default */
+function Chevron(props: IProps) {
 
     return (
         <svg
             className={props.className}
-            height={props.height}
             width={props.width}
             viewBox="0 0 266 438"
             xmlns="http://www.w3.org/2000/svg"

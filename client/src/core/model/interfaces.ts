@@ -159,11 +159,11 @@ export interface IComponentNode extends INode {
     deleteChild(childPos: number): void,
     elevateFunctionallyDependent(targetId: number, isFD: Boolean): void,
     createStatementNode(type: Arg.regulative | Arg.constitutive): StatementNode,
-    createStatementJunctionNode(): StatementJunctionNode,
-    createComponentJunctionNode(): ComponentJunctionNode,
+    createStatementJunctionNode(junctionType?: JunctionType): StatementJunctionNode,
     createComponentNode(componentType: ComponentType): ComponentNode,
+    createComponentJunctionNode(junctionType?: JunctionType): ComponentJunctionNode,
     createPropertyNode(): PropertyNode,
-    createPropertyJunctionNode(): PropertyJunctionNode
+    createPropertyJunctionNode(junctionType?: JunctionType): PropertyJunctionNode
 }
 
 /**
@@ -187,8 +187,8 @@ export interface IJunctionNode extends INode {
  * The contract for StatementJunction nodes
  */
 export interface IStatementJunctionNode extends IJunctionNode {
-    createStatementJunctionNode(position: Arg.left | Arg.right): StatementJunctionNode,
     createStatementNode(type: Arg.regulative | Arg.constitutive, position: Arg.left | Arg.right): StatementNode
+    createStatementJunctionNode(position: Arg.left | Arg.right, junctionType?: JunctionType): StatementJunctionNode,
 }
 
 /**
@@ -196,8 +196,8 @@ export interface IStatementJunctionNode extends IJunctionNode {
  */
 export interface IComponentJunctionNode extends IJunctionNode {
     componentType: ComponentType,
-    createComponentJunctionNode(position: Arg.left | Arg.right): ComponentJunctionNode,
     createComponentNode(componentType: ComponentType, position: Arg.left | Arg.right): ComponentNode
+    createComponentJunctionNode(position: Arg.left | Arg.right, junctionType?: JunctionType): ComponentJunctionNode,
 }
 
 /**
@@ -209,7 +209,7 @@ export interface IPropertyJunctionNode extends IJunctionNode {
     makeNotFunctionallyDependent(): void,
     setFunctionallyDependent(isFD: Boolean): void
     createPropertyNode(position: Arg.left | Arg.right): PropertyNode,
-    createPropertyJunctionNode(position: Arg.left | Arg.right): PropertyJunctionNode
+    createPropertyJunctionNode(position: Arg.left | Arg.right, junctionType?: JunctionType): PropertyJunctionNode
 }
 
 /**
@@ -229,7 +229,7 @@ export interface IPropertyNode extends INode {
     unsetContextType(): void,
     deleteChild(childPos: number): void,
     createStatementNode(type: Arg.regulative | Arg.constitutive): StatementNode,
-    createStatementJunctionNode(): StatementJunctionNode,
+    createStatementJunctionNode(junctionType?: JunctionType): StatementJunctionNode,
     createPropertyNode(): PropertyNode,
-    createPropertyJunctionNode(): PropertyJunctionNode
+    createPropertyJunctionNode(junctionType?: JunctionType): PropertyJunctionNode
 }

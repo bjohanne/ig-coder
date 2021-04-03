@@ -22,7 +22,6 @@ export function WelcomeComponent(props) {
             <Row>
                 <Col>
                     <h1 className="home-title">Welcome to IG Coder!</h1>
-                    <p>Short introductory text</p>
                     <Link to="/documents/1">
                         <Button variant="dark" className="mt-3">Go to the test document</Button>
                     </Link>

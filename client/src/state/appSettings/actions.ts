@@ -18,6 +18,16 @@ export const turnCoreOff = () => ({
     type: TURN_CORE_OFF
 });
 
+export const TURN_LABELS_ON = "TURN_LABELS_ON";
+export const turnLabelsOn = () => ({
+    type: TURN_LABELS_ON
+});
+
+export const TURN_LABELS_OFF = "TURN_LABELS_OFF";
+export const turnLabelsOff = () => ({
+    type: TURN_LABELS_OFF
+});
+
 export const TURN_PREFIXSUFFIX_ON = "TURN_PREFIXSUFFIX_ON";
 export const turnPrefixSuffixOn = () => ({
     type: TURN_PREFIXSUFFIX_ON
@@ -27,4 +37,3 @@ export const TURN_PREFIXSUFFIX_OFF = "TURN_PREFIXSUFFIX_OFF";
 export const turnPrefixSuffixOff = () => ({
     type: TURN_PREFIXSUFFIX_OFF
 });
-

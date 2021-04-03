@@ -13,7 +13,8 @@ import {signOut} from "../../state/user/actions";
 import {openSnackbar} from "../../state/ui/actions";
 import {
     turnCoreOff, turnCoreOn,
-    turnPrefixSuffixOn, turnPrefixSuffixOff
+    turnPrefixSuffixOn, turnPrefixSuffixOff,
+    turnLabelsOn, turnLabelsOff
 } from "../../state/appSettings/actions";
 
 export function NavbarComponent(props) {
@@ -21,8 +22,9 @@ export function NavbarComponent(props) {
 
     const {
         auth, loading, signOut, openSnackbar,
-        inManagementMode, useCoreOnly, usePrefixSuffix,
+        inManagementMode, useCoreOnly, useNodeLabels, usePrefixSuffix,
         turnCoreOn, turnCoreOff,
+        turnLabelsOn, turnLabelsOff,
         turnPrefixSuffixOn, turnPrefixSuffixOff
     } = props;
 
@@ -37,6 +39,20 @@ export function NavbarComponent(props) {
             turnCoreOn();
         } else if (e.currentTarget.value === '2') {
             turnCoreOff();
+        }
+    }
+
+    const [labelMode, setLabelMode] = useState(useNodeLabels ? '1' : '2');
+    const labelModes = [
+        { name: 'On', value: '1' },
+        { name: 'Off', value: '2' }
+    ];
+    const onChangeLabelMode = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setLabelMode(e.currentTarget.value)
+        if (e.currentTarget.value === '1') {
+            turnLabelsOn();
+        } else if (e.currentTarget.value === '2') {
+            turnLabelsOff();
         }
     }
 
@@ -96,9 +112,8 @@ export function NavbarComponent(props) {
                             </Nav>
                         }
                         </div>
-                        :
+                    :
                     <Nav className="mr-auto">
-                        <Link className="nav-link" to="/">Home</Link>
                         <NavDropdown title="Preferences" id="nav-dropdown">
                             <NavDropdown.ItemText>
                                 <span className="mr-3">
@@ -114,6 +129,28 @@ export function NavbarComponent(props) {
                                             value={mode.value}
                                             checked={codingMode === mode.value}
                                             onChange={onChangeCodingMode}
+                                            role="menuitemradio"
+                                        >
+                                            {mode.name}
+                                        </ToggleButton>
+                                    ))}
+                                </ButtonGroup>
+                            </NavDropdown.ItemText>
+                            <NavDropdown.ItemText>
+                                <span style={{"marginRight": "37px"}}>
+                                    Show node labels:
+                                </span>
+                                <ButtonGroup toggle>
+                                    {labelModes.map((mode, idx) => (
+                                        <ToggleButton
+                                            key={idx}
+                                            type="radio"
+                                            variant="light"
+                                            name="radio"
+                                            value={mode.value}
+                                            checked={labelMode === mode.value}
+                                            onChange={onChangeLabelMode}
+                                            role="menuitemradio"
                                         >
                                             {mode.name}
                                         </ToggleButton>
@@ -134,6 +171,7 @@ export function NavbarComponent(props) {
                                             value={mode.value}
                                             checked={prefixMode === mode.value}
                                             onChange={onChangePrefixMode}
+                                            role="menuitemradio"
                                         >
                                             {mode.name}
                                         </ToggleButton>
@@ -153,6 +191,7 @@ const mapStateToProps = (state: any) => ({
     loading: state.user.loading,
     inManagementMode: state.appSettings.mode.management,
     useCoreOnly: state.appSettings.preferences.useCoreOnly,
+    useNodeLabels: state.appSettings.preferences.useNodeLabels,
     usePrefixSuffix: state.appSettings.preferences.usePrefixSuffix
 });
 
@@ -161,6 +200,8 @@ const mapDispatchToProps = (dispatch: any) => ({
     openSnackbar: () => dispatch(openSnackbar()),
     turnCoreOn: () => dispatch(turnCoreOn()),
     turnCoreOff: () => dispatch(turnCoreOff()),
+    turnLabelsOn: () => dispatch(turnLabelsOn()),
+    turnLabelsOff: () => dispatch(turnLabelsOff()),
     turnPrefixSuffixOn: () => dispatch(turnPrefixSuffixOn()),
     turnPrefixSuffixOff: () => dispatch(turnPrefixSuffixOff())
 });

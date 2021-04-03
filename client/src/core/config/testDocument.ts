@@ -1,3 +1,5 @@
+import Document from "../model/document";
+
 // This is where you add sample statements when they're ready. Each statement goes in the `original` key.
 // Remember to update entryMap.
 // Name and description will be shown to the user.
@@ -8,25 +10,26 @@ const testDocumentString = `{
 	"id": "1",
 	"entries": [
         {
-          "id": 2,
+          "id": 1,
           "document": 1,
           "original": "The Program Manager may initiate suspension or revocation proceedings against a certified operation: (1) When the Program Manager has reason to believe that a certified operation has violated or is not in compliance with the Act or regulations in this part; or (2) When a certifying agent or a State organic program's governing State official fails to take appropriate action to enforce the Act or regulations in this part.",
           "root": {
-            "id": 23,
+            "id": 2,
             "document": 1,
             "nodeType": "Regulative Statement",
+            "contextType": "tmp",
             "isNegated": false,
-            "createdAt": "2021-03-22T15:50:42.667Z",
-            "updatedAt": "2021-03-22T15:50:42.667Z",
+            "createdAt": "2021-03-24T20:04:38.506Z",
+            "updatedAt": "2021-03-24T20:04:38.507Z",
             "children": [
               {
-                "id": 24,
+                "id": 3,
                 "document": 1,
                 "nodeType": "Component",
                 "isNegated": false,
-                "parent": 23,
-                "createdAt": "2021-03-22T15:50:42.667Z",
-                "updatedAt": "2021-03-22T15:50:42.667Z",
+                "parent": 2,
+                "createdAt": "2021-03-24T20:04:38.506Z",
+                "updatedAt": "2021-03-24T20:04:38.506Z",
                 "children": [],
                 "componentType": "Attribute",
                 "text": {
@@ -35,31 +38,59 @@ const testDocumentString = `{
                 }
               },
               {
-                "id": 35,
+                "id": 13,
                 "document": 1,
                 "nodeType": "Component",
                 "isNegated": false,
-                "parent": 23,
-                "createdAt": "2021-03-22T15:50:42.667Z",
-                "updatedAt": "2021-03-22T15:50:42.667Z",
+                "parent": 2,
+                "createdAt": "2021-03-24T20:04:38.506Z",
+                "updatedAt": "2021-03-24T20:04:38.506Z",
+                "children": [],
+                "componentType": "Deontic",
+                "text": {
+                  "main": "may"
+                }
+              },
+              {
+                "id": 5,
+                "document": 1,
+                "nodeType": "Component",
+                "isNegated": false,
+                "parent": 2,
+                "createdAt": "2021-03-24T20:04:38.506Z",
+                "updatedAt": "2021-03-24T20:04:38.506Z",
+                "children": [],
+                "componentType": "Aim",
+                "text": {
+                  "main": "initiate"
+                }
+              },
+              {
+                "id": 14,
+                "document": 1,
+                "nodeType": "Component",
+                "isNegated": false,
+                "parent": 2,
+                "createdAt": "2021-03-24T20:04:38.506Z",
+                "updatedAt": "2021-03-24T20:04:38.506Z",
                 "children": [
                   {
-                    "id": 36,
+                    "id": 15,
                     "document": 1,
                     "nodeType": "Property Junction",
                     "isNegated": false,
-                    "parent": 35,
-                    "createdAt": "2021-03-22T15:50:42.667Z",
-                    "updatedAt": "2021-03-22T15:50:42.667Z",
+                    "parent": 14,
+                    "createdAt": "2021-03-24T20:04:38.506Z",
+                    "updatedAt": "2021-03-24T20:04:38.506Z",
                     "children": [
                       {
-                        "id": 39,
+                        "id": 18,
                         "document": 1,
                         "nodeType": "Property",
                         "isNegated": false,
-                        "parent": 36,
-                        "createdAt": "2021-03-22T15:50:42.667Z",
-                        "updatedAt": "2021-03-22T15:50:42.667Z",
+                        "parent": 15,
+                        "createdAt": "2021-03-24T20:04:38.506Z",
+                        "updatedAt": "2021-03-24T20:04:38.506Z",
                         "children": [],
                         "text": {
                           "main": "suspension"
@@ -67,13 +98,13 @@ const testDocumentString = `{
                         "isFunctionallyDependent": false
                       },
                       {
-                        "id": 40,
+                        "id": 19,
                         "document": 1,
                         "nodeType": "Property",
                         "isNegated": false,
-                        "parent": 36,
-                        "createdAt": "2021-03-22T15:50:42.667Z",
-                        "updatedAt": "2021-03-22T15:50:42.667Z",
+                        "parent": 15,
+                        "createdAt": "2021-03-24T20:04:38.506Z",
+                        "updatedAt": "2021-03-24T20:04:38.506Z",
                         "children": [],
                         "text": {
                           "main": "revocation"
@@ -94,22 +125,22 @@ const testDocumentString = `{
                 }
               },
               {
-                "id": 41,
+                "id": 20,
                 "document": 1,
                 "nodeType": "Component",
                 "isNegated": false,
-                "parent": 23,
-                "createdAt": "2021-03-22T15:50:42.667Z",
-                "updatedAt": "2021-03-22T15:50:42.667Z",
+                "parent": 2,
+                "createdAt": "2021-03-24T20:04:38.507Z",
+                "updatedAt": "2021-03-24T20:04:38.507Z",
                 "children": [
                   {
-                    "id": 42,
+                    "id": 21,
                     "document": 1,
                     "nodeType": "Property",
                     "isNegated": false,
-                    "parent": 41,
-                    "createdAt": "2021-03-22T15:50:42.667Z",
-                    "updatedAt": "2021-03-22T15:50:42.667Z",
+                    "parent": 20,
+                    "createdAt": "2021-03-24T20:04:38.507Z",
+                    "updatedAt": "2021-03-24T20:04:38.507Z",
                     "children": [],
                     "text": {
                       "main": "certified"
@@ -124,68 +155,40 @@ const testDocumentString = `{
                 }
               },
               {
-                "id": 34,
+                "id": 8,
                 "document": 1,
                 "nodeType": "Component",
                 "isNegated": false,
-                "parent": 23,
-                "createdAt": "2021-03-22T15:50:42.667Z",
-                "updatedAt": "2021-03-22T15:50:42.667Z",
-                "children": [],
-                "componentType": "Deontic",
-                "text": {
-                  "main": "may"
-                }
-              },
-              {
-                "id": 28,
-                "document": 1,
-                "nodeType": "Component",
-                "isNegated": false,
-                "parent": 23,
-                "createdAt": "2021-03-22T15:50:42.667Z",
-                "updatedAt": "2021-03-22T15:50:42.667Z",
-                "children": [],
-                "componentType": "Aim",
-                "text": {
-                  "main": "initiate"
-                }
-              },
-              {
-                "id": 29,
-                "document": 1,
-                "nodeType": "Component",
-                "isNegated": false,
-                "parent": 23,
-                "createdAt": "2021-03-22T15:50:42.667Z",
-                "updatedAt": "2021-03-22T15:50:42.667Z",
+                "parent": 2,
+                "createdAt": "2021-03-24T20:04:38.506Z",
+                "updatedAt": "2021-03-24T20:04:38.507Z",
                 "children": [
                   {
-                    "id": 43,
+                    "id": 22,
                     "document": 1,
                     "nodeType": "Statement Junction",
                     "isNegated": false,
-                    "parent": 29,
-                    "createdAt": "2021-03-22T15:50:42.667Z",
-                    "updatedAt": "2021-03-22T15:50:42.667Z",
+                    "parent": 8,
+                    "createdAt": "2021-03-24T20:04:38.507Z",
+                    "updatedAt": "2021-03-24T20:04:38.507Z",
                     "children": [
                       {
-                        "id": 46,
+                        "id": 25,
                         "document": 1,
                         "nodeType": "Regulative Statement",
                         "isNegated": false,
-                        "parent": 43,
-                        "createdAt": "2021-03-22T15:50:42.667Z",
-                        "updatedAt": "2021-03-22T15:50:42.667Z",
+                        "parent": 22,
+                        "createdAt": "2021-03-24T20:04:38.507Z",
+                        "updatedAt": "2021-03-24T20:04:38.507Z",
                         "children": [
                           {
-                            "id": 47,
+                            "id": 26,
                             "document": 1,
                             "nodeType": "Component",
                             "isNegated": false,
-                            "parent": 46,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z",
+                            "parent": 25,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z",
                             "children": [],
                             "componentType": "Attribute",
                             "text": {
@@ -194,40 +197,64 @@ const testDocumentString = `{
                             }
                           },
                           {
-                            "id": 57,
+                            "id": 27,
+                            "document": 1,
+                            "isNegated": false,
+                            "parent": 25,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z"
+                          },
+                          {
+                            "id": 28,
                             "document": 1,
                             "nodeType": "Component",
                             "isNegated": false,
-                            "parent": 46,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z",
+                            "parent": 25,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z",
+                            "children": [],
+                            "componentType": "Aim",
+                            "text": {
+                              "main": "has reason to believe",
+                              "suffix": "that",
+                              "rephrased": "suspects"
+                            }
+                          },
+                          {
+                            "id": 36,
+                            "document": 1,
+                            "nodeType": "Component",
+                            "isNegated": false,
+                            "parent": 25,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z",
                             "children": [
                               {
-                                "id": 58,
+                                "id": 37,
                                 "document": 1,
                                 "nodeType": "Regulative Statement",
                                 "isNegated": false,
-                                "parent": 57,
-                                "createdAt": "2021-03-22T15:50:42.667Z",
-                                "updatedAt": "2021-03-22T15:50:42.667Z",
+                                "parent": 36,
+                                "createdAt": "2021-03-24T20:04:38.507Z",
+                                "updatedAt": "2021-03-24T20:04:38.507Z",
                                 "children": [
                                   {
-                                    "id": 59,
+                                    "id": 38,
                                     "document": 1,
                                     "nodeType": "Component",
                                     "isNegated": false,
-                                    "parent": 58,
-                                    "createdAt": "2021-03-22T15:50:42.667Z",
-                                    "updatedAt": "2021-03-22T15:50:42.667Z",
+                                    "parent": 37,
+                                    "createdAt": "2021-03-24T20:04:38.507Z",
+                                    "updatedAt": "2021-03-24T20:04:38.507Z",
                                     "children": [
                                       {
-                                        "id": 69,
+                                        "id": 48,
                                         "document": 1,
                                         "nodeType": "Property",
                                         "isNegated": false,
-                                        "parent": 59,
-                                        "createdAt": "2021-03-22T15:50:42.667Z",
-                                        "updatedAt": "2021-03-22T15:50:42.667Z",
+                                        "parent": 38,
+                                        "createdAt": "2021-03-24T20:04:38.507Z",
+                                        "updatedAt": "2021-03-24T20:04:38.507Z",
                                         "children": [],
                                         "text": {
                                           "main": "certified"
@@ -242,31 +269,96 @@ const testDocumentString = `{
                                     }
                                   },
                                   {
-                                    "id": 70,
+                                    "id": 39,
+                                    "document": 1,
+                                    "isNegated": false,
+                                    "parent": 37,
+                                    "createdAt": "2021-03-24T20:04:38.507Z",
+                                    "updatedAt": "2021-03-24T20:04:38.507Z"
+                                  },
+                                  {
+                                    "id": 40,
                                     "document": 1,
                                     "nodeType": "Component",
                                     "isNegated": false,
-                                    "parent": 58,
-                                    "createdAt": "2021-03-22T15:50:42.667Z",
-                                    "updatedAt": "2021-03-22T15:50:42.667Z",
+                                    "parent": 37,
+                                    "createdAt": "2021-03-24T20:04:38.507Z",
+                                    "updatedAt": "2021-03-24T20:04:38.507Z",
                                     "children": [
                                       {
-                                        "id": 71,
+                                        "id": 56,
                                         "document": 1,
                                         "nodeType": "Component Junction",
                                         "isNegated": false,
-                                        "parent": 70,
-                                        "createdAt": "2021-03-22T15:50:42.667Z",
-                                        "updatedAt": "2021-03-22T15:50:42.667Z",
+                                        "parent": 40,
+                                        "createdAt": "2021-03-24T20:04:38.507Z",
+                                        "updatedAt": "2021-03-24T20:04:38.507Z",
                                         "children": [
                                           {
-                                            "id": 74,
+                                            "id": 59,
                                             "document": 1,
                                             "nodeType": "Component",
                                             "isNegated": false,
-                                            "parent": 71,
-                                            "createdAt": "2021-03-22T15:50:42.667Z",
-                                            "updatedAt": "2021-03-22T15:50:42.667Z",
+                                            "parent": 56,
+                                            "createdAt": "2021-03-24T20:04:38.507Z",
+                                            "updatedAt": "2021-03-24T20:04:38.507Z",
+                                            "children": [],
+                                            "componentType": "Aim",
+                                            "text": {
+                                              "main": "has violated"
+                                            }
+                                          },
+                                          {
+                                            "id": 60,
+                                            "document": 1,
+                                            "nodeType": "Component",
+                                            "isNegated": true,
+                                            "parent": 56,
+                                            "createdAt": "2021-03-24T20:04:38.507Z",
+                                            "updatedAt": "2021-03-24T20:04:38.507Z",
+                                            "children": [],
+                                            "componentType": "Aim",
+                                            "text": {
+                                              "main": "is not in compliance"
+                                            }
+                                          }
+                                        ],
+                                        "junctionType": "OR",
+                                        "text": {
+                                          "main": "or"
+                                        },
+                                        "componentType": "Aim"
+                                      }
+                                    ],
+                                    "componentType": "Aim",
+                                    "text": {}
+                                  },
+                                  {
+                                    "id": 49,
+                                    "document": 1,
+                                    "nodeType": "Component",
+                                    "isNegated": false,
+                                    "parent": 37,
+                                    "createdAt": "2021-03-24T20:04:38.507Z",
+                                    "updatedAt": "2021-03-24T20:04:38.507Z",
+                                    "children": [
+                                      {
+                                        "id": 50,
+                                        "document": 1,
+                                        "nodeType": "Component Junction",
+                                        "isNegated": false,
+                                        "parent": 49,
+                                        "createdAt": "2021-03-24T20:04:38.507Z",
+                                        "updatedAt": "2021-03-24T20:04:38.507Z",
+                                        "children": [
+                                          {
+                                            "id": 53,
+                                            "document": 1,
+                                            "nodeType": "Component",
+                                            "isNegated": false,
+                                            "parent": 50,
+                                            "createdAt": "2021-03-24T20:04:38.507Z",
+                                            "updatedAt": "2021-03-24T20:04:38.507Z",
                                             "children": [],
                                             "componentType": "Direct Object",
                                             "text": {
@@ -275,22 +367,22 @@ const testDocumentString = `{
                                             }
                                           },
                                           {
-                                            "id": 75,
+                                            "id": 54,
                                             "document": 1,
                                             "nodeType": "Component",
                                             "isNegated": false,
-                                            "parent": 71,
-                                            "createdAt": "2021-03-22T15:50:42.667Z",
-                                            "updatedAt": "2021-03-22T15:50:42.667Z",
+                                            "parent": 50,
+                                            "createdAt": "2021-03-24T20:04:38.507Z",
+                                            "updatedAt": "2021-03-24T20:04:38.507Z",
                                             "children": [
                                               {
-                                                "id": 76,
+                                                "id": 55,
                                                 "document": 1,
                                                 "nodeType": "Property",
                                                 "isNegated": false,
-                                                "parent": 75,
-                                                "createdAt": "2021-03-22T15:50:42.667Z",
-                                                "updatedAt": "2021-03-22T15:50:42.667Z",
+                                                "parent": 54,
+                                                "createdAt": "2021-03-24T20:04:38.507Z",
+                                                "updatedAt": "2021-03-24T20:04:38.507Z",
                                                 "children": [],
                                                 "text": {
                                                   "main": "in this part"
@@ -315,95 +407,30 @@ const testDocumentString = `{
                                     "text": {}
                                   },
                                   {
-                                    "id": 61,
+                                    "id": 42,
                                     "document": 1,
                                     "isNegated": false,
-                                    "parent": 58,
-                                    "createdAt": "2021-03-22T15:50:42.667Z",
-                                    "updatedAt": "2021-03-22T15:50:42.667Z"
+                                    "parent": 37,
+                                    "createdAt": "2021-03-24T20:04:38.507Z",
+                                    "updatedAt": "2021-03-24T20:04:38.507Z"
                                   },
                                   {
-                                    "id": 62,
-                                    "document": 1,
-                                    "isNegated": false,
-                                    "parent": 58,
-                                    "createdAt": "2021-03-22T15:50:42.667Z",
-                                    "updatedAt": "2021-03-22T15:50:42.667Z"
-                                  },
-                                  {
-                                    "id": 63,
+                                    "id": 43,
                                     "document": 1,
                                     "nodeType": "Component",
                                     "isNegated": false,
-                                    "parent": 58,
-                                    "createdAt": "2021-03-22T15:50:42.667Z",
-                                    "updatedAt": "2021-03-22T15:50:42.667Z",
+                                    "parent": 37,
+                                    "createdAt": "2021-03-24T20:04:38.507Z",
+                                    "updatedAt": "2021-03-24T20:04:38.507Z",
                                     "children": [
                                       {
-                                        "id": 77,
-                                        "document": 1,
-                                        "nodeType": "Component Junction",
-                                        "isNegated": false,
-                                        "parent": 63,
-                                        "createdAt": "2021-03-22T15:50:42.667Z",
-                                        "updatedAt": "2021-03-22T15:50:42.667Z",
-                                        "children": [
-                                          {
-                                            "id": 80,
-                                            "document": 1,
-                                            "nodeType": "Component",
-                                            "isNegated": false,
-                                            "parent": 77,
-                                            "createdAt": "2021-03-22T15:50:42.667Z",
-                                            "updatedAt": "2021-03-22T15:50:42.667Z",
-                                            "children": [],
-                                            "componentType": "Aim",
-                                            "text": {
-                                              "main": "has violated"
-                                            }
-                                          },
-                                          {
-                                            "id": 81,
-                                            "document": 1,
-                                            "nodeType": "Component",
-                                            "isNegated": true,
-                                            "parent": 77,
-                                            "createdAt": "2021-03-22T15:50:42.667Z",
-                                            "updatedAt": "2021-03-22T15:50:42.667Z",
-                                            "children": [],
-                                            "componentType": "Aim",
-                                            "text": {
-                                              "main": "is not in compliance"
-                                            }
-                                          }
-                                        ],
-                                        "junctionType": "OR",
-                                        "text": {
-                                          "main": "or"
-                                        },
-                                        "componentType": "Aim"
-                                      }
-                                    ],
-                                    "componentType": "Aim",
-                                    "text": {}
-                                  },
-                                  {
-                                    "id": 64,
-                                    "document": 1,
-                                    "nodeType": "Component",
-                                    "isNegated": false,
-                                    "parent": 58,
-                                    "createdAt": "2021-03-22T15:50:42.667Z",
-                                    "updatedAt": "2021-03-22T15:50:42.667Z",
-                                    "children": [
-                                      {
-                                        "id": 65,
+                                        "id": 44,
                                         "document": 1,
                                         "nodeType": "Component",
                                         "isNegated": false,
-                                        "parent": 64,
-                                        "createdAt": "2021-03-22T15:50:42.667Z",
-                                        "updatedAt": "2021-03-22T15:50:42.667Z",
+                                        "parent": 43,
+                                        "createdAt": "2021-03-24T20:04:38.507Z",
+                                        "updatedAt": "2021-03-24T20:04:38.507Z",
                                         "children": [],
                                         "componentType": "Simple Context",
                                         "text": {
@@ -415,22 +442,22 @@ const testDocumentString = `{
                                     "text": {}
                                   },
                                   {
-                                    "id": 66,
+                                    "id": 45,
                                     "document": 1,
                                     "nodeType": "Component",
                                     "isNegated": false,
-                                    "parent": 58,
-                                    "createdAt": "2021-03-22T15:50:42.667Z",
-                                    "updatedAt": "2021-03-22T15:50:42.667Z",
+                                    "parent": 37,
+                                    "createdAt": "2021-03-24T20:04:38.507Z",
+                                    "updatedAt": "2021-03-24T20:04:38.507Z",
                                     "children": [
                                       {
-                                        "id": 67,
+                                        "id": 46,
                                         "document": 1,
                                         "nodeType": "Component",
                                         "isNegated": false,
-                                        "parent": 66,
-                                        "createdAt": "2021-03-22T15:50:42.667Z",
-                                        "updatedAt": "2021-03-22T15:50:42.667Z",
+                                        "parent": 45,
+                                        "createdAt": "2021-03-24T20:04:38.507Z",
+                                        "updatedAt": "2021-03-24T20:04:38.507Z",
                                         "children": [],
                                         "componentType": "Simple Context",
                                         "text": {
@@ -442,12 +469,12 @@ const testDocumentString = `{
                                     "text": {}
                                   },
                                   {
-                                    "id": 68,
+                                    "id": 47,
                                     "document": 1,
                                     "isNegated": false,
-                                    "parent": 58,
-                                    "createdAt": "2021-03-22T15:50:42.667Z",
-                                    "updatedAt": "2021-03-22T15:50:42.667Z"
+                                    "parent": 37,
+                                    "createdAt": "2021-03-24T20:04:38.507Z",
+                                    "updatedAt": "2021-03-24T20:04:38.507Z"
                                   }
                                 ]
                               }
@@ -456,54 +483,30 @@ const testDocumentString = `{
                             "text": {}
                           },
                           {
-                            "id": 49,
+                            "id": 30,
                             "document": 1,
                             "isNegated": false,
-                            "parent": 46,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z"
+                            "parent": 25,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z"
                           },
                           {
-                            "id": 50,
-                            "document": 1,
-                            "isNegated": false,
-                            "parent": 46,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z"
-                          },
-                          {
-                            "id": 51,
+                            "id": 31,
                             "document": 1,
                             "nodeType": "Component",
                             "isNegated": false,
-                            "parent": 46,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z",
-                            "children": [],
-                            "componentType": "Aim",
-                            "text": {
-                              "main": "has reason to believe",
-                              "suffix": "that",
-                              "rephrased": "suspects"
-                            }
-                          },
-                          {
-                            "id": 52,
-                            "document": 1,
-                            "nodeType": "Component",
-                            "isNegated": false,
-                            "parent": 46,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z",
+                            "parent": 25,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z",
                             "children": [
                               {
-                                "id": 53,
+                                "id": 32,
                                 "document": 1,
                                 "nodeType": "Component",
                                 "isNegated": false,
-                                "parent": 52,
-                                "createdAt": "2021-03-22T15:50:42.667Z",
-                                "updatedAt": "2021-03-22T15:50:42.667Z",
+                                "parent": 31,
+                                "createdAt": "2021-03-24T20:04:38.507Z",
+                                "updatedAt": "2021-03-24T20:04:38.507Z",
                                 "children": [],
                                 "componentType": "Simple Context",
                                 "text": {
@@ -515,22 +518,22 @@ const testDocumentString = `{
                             "text": {}
                           },
                           {
-                            "id": 54,
+                            "id": 33,
                             "document": 1,
                             "nodeType": "Component",
                             "isNegated": false,
-                            "parent": 46,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z",
+                            "parent": 25,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z",
                             "children": [
                               {
-                                "id": 55,
+                                "id": 34,
                                 "document": 1,
                                 "nodeType": "Component",
                                 "isNegated": false,
-                                "parent": 54,
-                                "createdAt": "2021-03-22T15:50:42.667Z",
-                                "updatedAt": "2021-03-22T15:50:42.667Z",
+                                "parent": 33,
+                                "createdAt": "2021-03-24T20:04:38.507Z",
+                                "updatedAt": "2021-03-24T20:04:38.507Z",
                                 "children": [],
                                 "componentType": "Simple Context",
                                 "text": {
@@ -542,59 +545,59 @@ const testDocumentString = `{
                             "text": {}
                           },
                           {
-                            "id": 56,
+                            "id": 35,
                             "document": 1,
                             "isNegated": false,
-                            "parent": 46,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z"
+                            "parent": 25,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z"
                           }
                         ]
                       },
                       {
-                        "id": 82,
+                        "id": 61,
                         "document": 1,
                         "nodeType": "Regulative Statement",
                         "isNegated": false,
-                        "parent": 43,
-                        "createdAt": "2021-03-22T15:50:42.667Z",
-                        "updatedAt": "2021-03-22T15:50:42.667Z",
+                        "parent": 22,
+                        "createdAt": "2021-03-24T20:04:38.507Z",
+                        "updatedAt": "2021-03-24T20:04:38.507Z",
                         "children": [
                           {
-                            "id": 83,
+                            "id": 62,
                             "document": 1,
                             "nodeType": "Component",
                             "isNegated": false,
-                            "parent": 82,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z",
+                            "parent": 61,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z",
                             "children": [
                               {
-                                "id": 93,
+                                "id": 72,
                                 "document": 1,
                                 "nodeType": "Component Junction",
                                 "isNegated": false,
-                                "parent": 83,
-                                "createdAt": "2021-03-22T15:50:42.667Z",
-                                "updatedAt": "2021-03-22T15:50:42.667Z",
+                                "parent": 62,
+                                "createdAt": "2021-03-24T20:04:38.507Z",
+                                "updatedAt": "2021-03-24T20:04:38.507Z",
                                 "children": [
                                   {
-                                    "id": 96,
+                                    "id": 75,
                                     "document": 1,
                                     "nodeType": "Component",
                                     "isNegated": false,
-                                    "parent": 93,
-                                    "createdAt": "2021-03-22T15:50:42.667Z",
-                                    "updatedAt": "2021-03-22T15:50:42.667Z",
+                                    "parent": 72,
+                                    "createdAt": "2021-03-24T20:04:38.507Z",
+                                    "updatedAt": "2021-03-24T20:04:38.507Z",
                                     "children": [
                                       {
-                                        "id": 98,
+                                        "id": 77,
                                         "document": 1,
                                         "nodeType": "Property",
                                         "isNegated": false,
-                                        "parent": 96,
-                                        "createdAt": "2021-03-22T15:50:42.667Z",
-                                        "updatedAt": "2021-03-22T15:50:42.667Z",
+                                        "parent": 75,
+                                        "createdAt": "2021-03-24T20:04:38.507Z",
+                                        "updatedAt": "2021-03-24T20:04:38.507Z",
                                         "children": [],
                                         "text": {
                                           "main": "certifying"
@@ -609,22 +612,22 @@ const testDocumentString = `{
                                     }
                                   },
                                   {
-                                    "id": 97,
+                                    "id": 76,
                                     "document": 1,
                                     "nodeType": "Component",
                                     "isNegated": false,
-                                    "parent": 93,
-                                    "createdAt": "2021-03-22T15:50:42.667Z",
-                                    "updatedAt": "2021-03-22T15:50:42.667Z",
+                                    "parent": 72,
+                                    "createdAt": "2021-03-24T20:04:38.507Z",
+                                    "updatedAt": "2021-03-24T20:04:38.507Z",
                                     "children": [
                                       {
-                                        "id": 99,
+                                        "id": 78,
                                         "document": 1,
                                         "nodeType": "Property",
                                         "isNegated": false,
-                                        "parent": 97,
-                                        "createdAt": "2021-03-22T15:50:42.667Z",
-                                        "updatedAt": "2021-03-22T15:50:42.667Z",
+                                        "parent": 76,
+                                        "createdAt": "2021-03-24T20:04:38.507Z",
+                                        "updatedAt": "2021-03-24T20:04:38.507Z",
                                         "children": [],
                                         "text": {
                                           "main": "State organic program's"
@@ -632,13 +635,13 @@ const testDocumentString = `{
                                         "isFunctionallyDependent": false
                                       },
                                       {
-                                        "id": 100,
+                                        "id": 79,
                                         "document": 1,
                                         "nodeType": "Property",
                                         "isNegated": false,
-                                        "parent": 97,
-                                        "createdAt": "2021-03-22T15:50:42.667Z",
-                                        "updatedAt": "2021-03-22T15:50:42.667Z",
+                                        "parent": 76,
+                                        "createdAt": "2021-03-24T20:04:38.507Z",
+                                        "updatedAt": "2021-03-24T20:04:38.507Z",
                                         "children": [],
                                         "text": {
                                           "main": "governing"
@@ -664,31 +667,54 @@ const testDocumentString = `{
                             "text": {}
                           },
                           {
-                            "id": 101,
+                            "id": 63,
+                            "document": 1,
+                            "isNegated": false,
+                            "parent": 61,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z"
+                          },
+                          {
+                            "id": 64,
+                            "document": 1,
+                            "nodeType": "Component",
+                            "isNegated": true,
+                            "parent": 61,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z",
+                            "children": [],
+                            "componentType": "Aim",
+                            "text": {
+                              "main": "fails to take appropriate action to enforce",
+                              "rephrased": "fails to enforce"
+                            }
+                          },
+                          {
+                            "id": 80,
                             "document": 1,
                             "nodeType": "Component",
                             "isNegated": false,
-                            "parent": 82,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z",
+                            "parent": 61,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z",
                             "children": [
                               {
-                                "id": 102,
+                                "id": 81,
                                 "document": 1,
                                 "nodeType": "Component Junction",
                                 "isNegated": false,
-                                "parent": 101,
-                                "createdAt": "2021-03-22T15:50:42.667Z",
-                                "updatedAt": "2021-03-22T15:50:42.667Z",
+                                "parent": 80,
+                                "createdAt": "2021-03-24T20:04:38.507Z",
+                                "updatedAt": "2021-03-24T20:04:38.507Z",
                                 "children": [
                                   {
-                                    "id": 105,
+                                    "id": 84,
                                     "document": 1,
                                     "nodeType": "Component",
                                     "isNegated": false,
-                                    "parent": 102,
-                                    "createdAt": "2021-03-22T15:50:42.667Z",
-                                    "updatedAt": "2021-03-22T15:50:42.667Z",
+                                    "parent": 81,
+                                    "createdAt": "2021-03-24T20:04:38.507Z",
+                                    "updatedAt": "2021-03-24T20:04:38.507Z",
                                     "children": [],
                                     "componentType": "Direct Object",
                                     "text": {
@@ -697,22 +723,22 @@ const testDocumentString = `{
                                     }
                                   },
                                   {
-                                    "id": 106,
+                                    "id": 85,
                                     "document": 1,
                                     "nodeType": "Component",
                                     "isNegated": false,
-                                    "parent": 102,
-                                    "createdAt": "2021-03-22T15:50:42.667Z",
-                                    "updatedAt": "2021-03-22T15:50:42.667Z",
+                                    "parent": 81,
+                                    "createdAt": "2021-03-24T20:04:38.507Z",
+                                    "updatedAt": "2021-03-24T20:04:38.507Z",
                                     "children": [
                                       {
-                                        "id": 107,
+                                        "id": 86,
                                         "document": 1,
                                         "nodeType": "Property",
                                         "isNegated": false,
-                                        "parent": 106,
-                                        "createdAt": "2021-03-22T15:50:42.667Z",
-                                        "updatedAt": "2021-03-22T15:50:42.667Z",
+                                        "parent": 85,
+                                        "createdAt": "2021-03-24T20:04:38.507Z",
+                                        "updatedAt": "2021-03-24T20:04:38.507Z",
                                         "children": [],
                                         "text": {
                                           "main": "in this part"
@@ -737,53 +763,30 @@ const testDocumentString = `{
                             "text": {}
                           },
                           {
-                            "id": 85,
+                            "id": 66,
                             "document": 1,
                             "isNegated": false,
-                            "parent": 82,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z"
+                            "parent": 61,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z"
                           },
                           {
-                            "id": 86,
-                            "document": 1,
-                            "isNegated": false,
-                            "parent": 82,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z"
-                          },
-                          {
-                            "id": 87,
-                            "document": 1,
-                            "nodeType": "Component",
-                            "isNegated": true,
-                            "parent": 82,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z",
-                            "children": [],
-                            "componentType": "Aim",
-                            "text": {
-                              "main": "fails to take appropriate action to enforce",
-                              "rephrased": "fails to enforce"
-                            }
-                          },
-                          {
-                            "id": 88,
+                            "id": 67,
                             "document": 1,
                             "nodeType": "Component",
                             "isNegated": false,
-                            "parent": 82,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z",
+                            "parent": 61,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z",
                             "children": [
                               {
-                                "id": 89,
+                                "id": 68,
                                 "document": 1,
                                 "nodeType": "Component",
                                 "isNegated": false,
-                                "parent": 88,
-                                "createdAt": "2021-03-22T15:50:42.667Z",
-                                "updatedAt": "2021-03-22T15:50:42.667Z",
+                                "parent": 67,
+                                "createdAt": "2021-03-24T20:04:38.507Z",
+                                "updatedAt": "2021-03-24T20:04:38.507Z",
                                 "children": [],
                                 "componentType": "Simple Context",
                                 "text": {
@@ -795,22 +798,22 @@ const testDocumentString = `{
                             "text": {}
                           },
                           {
-                            "id": 90,
+                            "id": 69,
                             "document": 1,
                             "nodeType": "Component",
                             "isNegated": false,
-                            "parent": 82,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z",
+                            "parent": 61,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z",
                             "children": [
                               {
-                                "id": 91,
+                                "id": 70,
                                 "document": 1,
                                 "nodeType": "Component",
                                 "isNegated": false,
-                                "parent": 90,
-                                "createdAt": "2021-03-22T15:50:42.667Z",
-                                "updatedAt": "2021-03-22T15:50:42.667Z",
+                                "parent": 69,
+                                "createdAt": "2021-03-24T20:04:38.507Z",
+                                "updatedAt": "2021-03-24T20:04:38.507Z",
                                 "children": [],
                                 "componentType": "Simple Context",
                                 "text": {
@@ -822,12 +825,12 @@ const testDocumentString = `{
                             "text": {}
                           },
                           {
-                            "id": 92,
+                            "id": 71,
                             "document": 1,
                             "isNegated": false,
-                            "parent": 82,
-                            "createdAt": "2021-03-22T15:50:42.667Z",
-                            "updatedAt": "2021-03-22T15:50:42.667Z"
+                            "parent": 61,
+                            "createdAt": "2021-03-24T20:04:38.507Z",
+                            "updatedAt": "2021-03-24T20:04:38.507Z"
                           }
                         ]
                       }
@@ -842,22 +845,22 @@ const testDocumentString = `{
                 "text": {}
               },
               {
-                "id": 31,
+                "id": 10,
                 "document": 1,
                 "nodeType": "Component",
                 "isNegated": false,
-                "parent": 23,
-                "createdAt": "2021-03-22T15:50:42.667Z",
-                "updatedAt": "2021-03-22T15:50:42.667Z",
+                "parent": 2,
+                "createdAt": "2021-03-24T20:04:38.506Z",
+                "updatedAt": "2021-03-24T20:04:38.506Z",
                 "children": [
                   {
-                    "id": 32,
+                    "id": 11,
                     "document": 1,
                     "nodeType": "Component",
                     "isNegated": false,
-                    "parent": 31,
-                    "createdAt": "2021-03-22T15:50:42.667Z",
-                    "updatedAt": "2021-03-22T15:50:42.667Z",
+                    "parent": 10,
+                    "createdAt": "2021-03-24T20:04:38.506Z",
+                    "updatedAt": "2021-03-24T20:04:38.506Z",
                     "children": [],
                     "componentType": "Simple Context",
                     "text": {
@@ -869,16 +872,17 @@ const testDocumentString = `{
                 "text": {}
               },
               {
-                "id": 33,
+                "id": 12,
                 "document": 1,
                 "isNegated": false,
-                "parent": 23,
-                "createdAt": "2021-03-22T15:50:42.667Z",
-                "updatedAt": "2021-03-22T15:50:42.667Z"
+                "parent": 2,
+                "createdAt": "2021-03-24T20:04:38.506Z",
+                "updatedAt": "2021-03-24T20:04:38.506Z"
               }
             ]
           }
         },
+
         
         
         
@@ -889,445 +893,447 @@ const testDocumentString = `{
         
         
 
-		{
-			"id": "3",
-			"document": "1",
-			"original": "From 1st of January onward, food preparation guidelines must adhere to national standards, in addition to communal provisions.",
-			"root": {
-                "id": 2,
-                "document": 2,
-                "nodeType": "Constitutive Statement",
+        {
+          "id": 2,
+          "document": 1,
+          "original": "From 1st of January onward, food preparation guidelines must adhere to national standards, in addition to communal provisions.",
+          "root": {
+            "id": 2,
+            "document": 1,
+            "nodeType": "Constitutive Statement",
+            "isNegated": false,
+            "createdAt": "2021-03-24T20:07:33.586Z",
+            "updatedAt": "2021-03-24T20:07:33.586Z",
+            "children": [
+              {
+                "id": 3,
+                "document": 1,
+                "nodeType": "Component",
                 "isNegated": false,
-                "createdAt": "2021-03-22T16:15:35.464Z",
-                "updatedAt": "2021-03-22T16:15:35.464Z",
-                "children": [
-                  {
-                    "id": 13,
-                    "document": 2,
-                    "nodeType": "Component",
-                    "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:15:35.464Z",
-                    "updatedAt": "2021-03-22T16:15:35.464Z",
-                    "children": [],
-                    "componentType": "Constituting Properties",
-                    "text": {
-                      "main": "national standards"
-                    }
-                  },
-                  {
-                    "id": 12,
-                    "document": 2,
-                    "nodeType": "Component",
-                    "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:15:35.464Z",
-                    "updatedAt": "2021-03-22T16:15:35.464Z",
-                    "children": [],
-                    "componentType": "Modal",
-                    "text": {
-                      "main": "must"
-                    }
-                  },
-                  {
-                    "id": 5,
-                    "document": 2,
-                    "nodeType": "Component",
-                    "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:15:35.464Z",
-                    "updatedAt": "2021-03-22T16:15:35.464Z",
-                    "children": [],
-                    "componentType": "Constitutive Function",
-                    "text": {
-                      "main": "adhere",
-                      "suffix": "to"
-                    }
-                  },
-                  {
-                    "id": 6,
-                    "document": 2,
-                    "nodeType": "Component",
-                    "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:15:35.464Z",
-                    "updatedAt": "2021-03-22T16:15:35.464Z",
-                    "children": [],
-                    "componentType": "Constituted Entity",
-                    "text": {
-                      "main": "food preparation guidelines"
-                    }
-                  },
-                  {
-                    "id": 7,
-                    "document": 2,
-                    "nodeType": "Component",
-                    "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:15:35.464Z",
-                    "updatedAt": "2021-03-22T16:15:35.464Z",
-                    "children": [
-                      {
-                        "id": 14,
-                        "document": 2,
-                        "nodeType": "Component",
-                        "isNegated": false,
-                        "parent": 7,
-                        "createdAt": "2021-03-22T16:15:35.464Z",
-                        "updatedAt": "2021-03-22T16:15:35.464Z",
-                        "children": [],
-                        "componentType": "Simple Context",
-                        "text": {
-                          "main": "From 1st of January onward"
-                        }
-                      }
-                    ],
-                    "componentType": "Activation Conditions",
-                    "text": {}
-                  },
-                  {
-                    "id": 9,
-                    "document": 2,
-                    "nodeType": "Component",
-                    "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:15:35.464Z",
-                    "updatedAt": "2021-03-22T16:15:35.464Z",
-                    "children": [
-                      {
-                        "id": 15,
-                        "document": 2,
-                        "nodeType": "Component",
-                        "isNegated": false,
-                        "parent": 9,
-                        "createdAt": "2021-03-22T16:15:35.464Z",
-                        "updatedAt": "2021-03-22T16:15:35.464Z",
-                        "children": [],
-                        "componentType": "Simple Context",
-                        "text": {
-                          "main": "communal provisions",
-                          "prefix": "in addition to"
-                        }
-                      }
-                    ],
-                    "componentType": "Execution Constraints",
-                    "text": {}
-                  },
-                  {
-                    "id": 11,
-                    "document": 2,
-                    "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:15:35.464Z",
-                    "updatedAt": "2021-03-22T16:15:35.464Z"
-                  }
-                ]
-            }
-		},
-		
-		
-		
-		
-		
-		
-		
-		{
-			"id": "4",
-			"document": "1",
-			"original": "Organic farmers must comply with organic farming regulations, or else certifiers must revoke the organic farming certification.",
-			"root": {
-                "id": 2,
-                "document": 3,
-                "nodeType": "Regulative Statement",
+                "parent": 2,
+                "createdAt": "2021-03-24T20:07:33.586Z",
+                "updatedAt": "2021-03-24T20:07:33.586Z",
+                "children": [],
+                "componentType": "Constituted Entity",
+                "text": {
+                  "main": "food preparation guidelines"
+                }
+              },
+              {
+                "id": 12,
+                "document": 1,
+                "nodeType": "Component",
                 "isNegated": false,
-                "createdAt": "2021-03-22T16:20:15.273Z",
-                "updatedAt": "2021-03-22T16:20:15.273Z",
+                "parent": 2,
+                "createdAt": "2021-03-24T20:07:33.586Z",
+                "updatedAt": "2021-03-24T20:07:33.586Z",
+                "children": [],
+                "componentType": "Modal",
+                "text": {
+                  "main": "must"
+                }
+              },
+              {
+                "id": 5,
+                "document": 1,
+                "nodeType": "Component",
+                "isNegated": false,
+                "parent": 2,
+                "createdAt": "2021-03-24T20:07:33.586Z",
+                "updatedAt": "2021-03-24T20:07:33.586Z",
+                "children": [],
+                "componentType": "Constitutive Function",
+                "text": {
+                  "main": "adhere",
+                  "suffix": "to"
+                }
+              },
+              {
+                "id": 13,
+                "document": 1,
+                "nodeType": "Component",
+                "isNegated": false,
+                "parent": 2,
+                "createdAt": "2021-03-24T20:07:33.586Z",
+                "updatedAt": "2021-03-24T20:07:33.586Z",
+                "children": [],
+                "componentType": "Constituting Properties",
+                "text": {
+                  "main": "national standards"
+                }
+              },
+              {
+                "id": 7,
+                "document": 1,
+                "nodeType": "Component",
+                "isNegated": false,
+                "parent": 2,
+                "createdAt": "2021-03-24T20:07:33.586Z",
+                "updatedAt": "2021-03-24T20:07:33.586Z",
                 "children": [
-                  {
-                    "id": 3,
-                    "document": 3,
-                    "nodeType": "Component",
-                    "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:20:15.273Z",
-                    "updatedAt": "2021-03-22T16:20:15.273Z",
-                    "children": [],
-                    "componentType": "Attribute",
-                    "text": {
-                      "main": "Organic farmers"
-                    }
-                  },
                   {
                     "id": 14,
-                    "document": 3,
+                    "document": 1,
                     "nodeType": "Component",
                     "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:20:15.273Z",
-                    "updatedAt": "2021-03-22T16:20:15.273Z",
+                    "parent": 7,
+                    "createdAt": "2021-03-24T20:07:33.586Z",
+                    "updatedAt": "2021-03-24T20:07:33.586Z",
                     "children": [],
-                    "componentType": "Direct Object",
+                    "componentType": "Simple Context",
                     "text": {
-                      "main": "organic farming regulations"
+                      "main": "From 1st of January onward"
                     }
-                  },
-                  {
-                    "id": 5,
-                    "document": 3,
-                    "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:20:15.273Z",
-                    "updatedAt": "2021-03-22T16:20:15.273Z"
-                  },
-                  {
-                    "id": 13,
-                    "document": 3,
-                    "nodeType": "Component",
-                    "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:20:15.273Z",
-                    "updatedAt": "2021-03-22T16:20:15.273Z",
-                    "children": [],
-                    "componentType": "Deontic",
-                    "text": {
-                      "main": "must"
-                    }
-                  },
-                  {
-                    "id": 7,
-                    "document": 3,
-                    "nodeType": "Component",
-                    "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:20:15.273Z",
-                    "updatedAt": "2021-03-22T16:20:15.273Z",
-                    "children": [],
-                    "componentType": "Aim",
-                    "text": {
-                      "main": "comply",
-                      "suffix": "with"
-                    }
-                  },
-                  {
-                    "id": 8,
-                    "document": 3,
-                    "nodeType": "Component",
-                    "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:20:15.273Z",
-                    "updatedAt": "2021-03-22T16:20:15.273Z",
-                    "children": [
-                      {
-                        "id": 9,
-                        "document": 3,
-                        "nodeType": "Component",
-                        "isNegated": false,
-                        "parent": 8,
-                        "createdAt": "2021-03-22T16:20:15.273Z",
-                        "updatedAt": "2021-03-22T16:20:15.273Z",
-                        "children": [],
-                        "componentType": "Simple Context",
-                        "text": {
-                          "main": "under all circumstances"
-                        }
-                      }
-                    ],
-                    "componentType": "Activation Conditions",
-                    "text": {}
-                  },
-                  {
-                    "id": 10,
-                    "document": 3,
-                    "nodeType": "Component",
-                    "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:20:15.273Z",
-                    "updatedAt": "2021-03-22T16:20:15.273Z",
-                    "children": [
-                      {
-                        "id": 11,
-                        "document": 3,
-                        "nodeType": "Component",
-                        "isNegated": false,
-                        "parent": 10,
-                        "createdAt": "2021-03-22T16:20:15.273Z",
-                        "updatedAt": "2021-03-22T16:20:15.273Z",
-                        "children": [],
-                        "componentType": "Simple Context",
-                        "text": {
-                          "main": "no constraints"
-                        }
-                      }
-                    ],
-                    "componentType": "Execution Constraints",
-                    "text": {}
-                  },
+                  }
+                ],
+                "componentType": "Activation Conditions",
+                "text": {}
+              },
+              {
+                "id": 9,
+                "document": 1,
+                "nodeType": "Component",
+                "isNegated": false,
+                "parent": 2,
+                "createdAt": "2021-03-24T20:07:33.586Z",
+                "updatedAt": "2021-03-24T20:07:33.586Z",
+                "children": [
                   {
                     "id": 15,
-                    "document": 3,
+                    "document": 1,
                     "nodeType": "Component",
                     "isNegated": false,
-                    "parent": 2,
-                    "createdAt": "2021-03-22T16:20:15.273Z",
-                    "updatedAt": "2021-03-22T16:20:15.273Z",
+                    "parent": 9,
+                    "createdAt": "2021-03-24T20:07:33.586Z",
+                    "updatedAt": "2021-03-24T20:07:33.586Z",
+                    "children": [],
+                    "componentType": "Simple Context",
+                    "text": {
+                      "main": "communal provisions",
+                      "prefix": "in addition to"
+                    }
+                  }
+                ],
+                "componentType": "Execution Constraints",
+                "text": {}
+              },
+              {
+                "id": 11,
+                "document": 1,
+                "isNegated": false,
+                "parent": 2,
+                "createdAt": "2021-03-24T20:07:33.586Z",
+                "updatedAt": "2021-03-24T20:07:33.586Z"
+              }
+            ]
+          }
+        },
+		
+		
+		
+		
+		
+		
+		
+		
+		
+        {
+          "id": 87,
+          "document": 1,
+          "original": "Organic farmers must comply with organic farming regulations, or else certifiers must revoke the organic farming certification.",
+          "root": {
+            "id": 88,
+            "document": 1,
+            "nodeType": "Regulative Statement",
+            "isNegated": false,
+            "createdAt": "2021-03-24T20:09:12.337Z",
+            "updatedAt": "2021-03-24T20:09:12.337Z",
+            "children": [
+              {
+                "id": 89,
+                "document": 1,
+                "nodeType": "Component",
+                "isNegated": false,
+                "parent": 88,
+                "createdAt": "2021-03-24T20:09:12.337Z",
+                "updatedAt": "2021-03-24T20:09:12.337Z",
+                "children": [],
+                "componentType": "Attribute",
+                "text": {
+                  "main": "Organic farmers"
+                }
+              },
+              {
+                "id": 99,
+                "document": 1,
+                "nodeType": "Component",
+                "isNegated": false,
+                "parent": 88,
+                "createdAt": "2021-03-24T20:09:12.337Z",
+                "updatedAt": "2021-03-24T20:09:12.337Z",
+                "children": [],
+                "componentType": "Deontic",
+                "text": {
+                  "main": "must"
+                }
+              },
+              {
+                "id": 91,
+                "document": 1,
+                "nodeType": "Component",
+                "isNegated": false,
+                "parent": 88,
+                "createdAt": "2021-03-24T20:09:12.337Z",
+                "updatedAt": "2021-03-24T20:09:12.337Z",
+                "children": [],
+                "componentType": "Aim",
+                "text": {
+                  "main": "comply",
+                  "suffix": "with"
+                }
+              },
+              {
+                "id": 100,
+                "document": 1,
+                "nodeType": "Component",
+                "isNegated": false,
+                "parent": 88,
+                "createdAt": "2021-03-24T20:09:12.337Z",
+                "updatedAt": "2021-03-24T20:09:12.337Z",
+                "children": [],
+                "componentType": "Direct Object",
+                "text": {
+                  "main": "organic farming regulations"
+                }
+              },
+              {
+                "id": 93,
+                "document": 1,
+                "isNegated": false,
+                "parent": 88,
+                "createdAt": "2021-03-24T20:09:12.337Z",
+                "updatedAt": "2021-03-24T20:09:12.337Z"
+              },
+              {
+                "id": 94,
+                "document": 1,
+                "nodeType": "Component",
+                "isNegated": false,
+                "parent": 88,
+                "createdAt": "2021-03-24T20:09:12.337Z",
+                "updatedAt": "2021-03-24T20:09:12.337Z",
+                "children": [
+                  {
+                    "id": 95,
+                    "document": 1,
+                    "nodeType": "Component",
+                    "isNegated": false,
+                    "parent": 94,
+                    "createdAt": "2021-03-24T20:09:12.337Z",
+                    "updatedAt": "2021-03-24T20:09:12.337Z",
+                    "children": [],
+                    "componentType": "Simple Context",
+                    "text": {
+                      "main": "under all circumstances"
+                    }
+                  }
+                ],
+                "componentType": "Activation Conditions",
+                "text": {}
+              },
+              {
+                "id": 96,
+                "document": 1,
+                "nodeType": "Component",
+                "isNegated": false,
+                "parent": 88,
+                "createdAt": "2021-03-24T20:09:12.337Z",
+                "updatedAt": "2021-03-24T20:09:12.337Z",
+                "children": [
+                  {
+                    "id": 97,
+                    "document": 1,
+                    "nodeType": "Component",
+                    "isNegated": false,
+                    "parent": 96,
+                    "createdAt": "2021-03-24T20:09:12.337Z",
+                    "updatedAt": "2021-03-24T20:09:12.337Z",
+                    "children": [],
+                    "componentType": "Simple Context",
+                    "text": {
+                      "main": "no constraints"
+                    }
+                  }
+                ],
+                "componentType": "Execution Constraints",
+                "text": {}
+              },
+              {
+                "id": 101,
+                "document": 1,
+                "nodeType": "Component",
+                "isNegated": false,
+                "parent": 88,
+                "createdAt": "2021-03-24T20:09:12.337Z",
+                "updatedAt": "2021-03-24T20:09:12.337Z",
+                "children": [
+                  {
+                    "id": 102,
+                    "document": 1,
+                    "nodeType": "Regulative Statement",
+                    "isNegated": false,
+                    "parent": 101,
+                    "createdAt": "2021-03-24T20:09:12.337Z",
+                    "updatedAt": "2021-03-24T20:09:12.337Z",
                     "children": [
                       {
-                        "id": 16,
-                        "document": 3,
-                        "nodeType": "Regulative Statement",
+                        "id": 103,
+                        "document": 1,
+                        "nodeType": "Component",
                         "isNegated": false,
-                        "parent": 15,
-                        "createdAt": "2021-03-22T16:20:15.273Z",
-                        "updatedAt": "2021-03-22T16:20:15.273Z",
+                        "parent": 102,
+                        "createdAt": "2021-03-24T20:09:12.337Z",
+                        "updatedAt": "2021-03-24T20:09:12.337Z",
+                        "children": [],
+                        "componentType": "Attribute",
+                        "text": {
+                          "main": "certifiers"
+                        }
+                      },
+                      {
+                        "id": 113,
+                        "document": 1,
+                        "nodeType": "Component",
+                        "isNegated": false,
+                        "parent": 102,
+                        "createdAt": "2021-03-24T20:09:12.337Z",
+                        "updatedAt": "2021-03-24T20:09:12.337Z",
+                        "children": [],
+                        "componentType": "Deontic",
+                        "text": {
+                          "main": "must"
+                        }
+                      },
+                      {
+                        "id": 105,
+                        "document": 1,
+                        "nodeType": "Component",
+                        "isNegated": false,
+                        "parent": 102,
+                        "createdAt": "2021-03-24T20:09:12.337Z",
+                        "updatedAt": "2021-03-24T20:09:12.337Z",
+                        "children": [],
+                        "componentType": "Aim",
+                        "text": {
+                          "main": "revoke"
+                        }
+                      },
+                      {
+                        "id": 114,
+                        "document": 1,
+                        "nodeType": "Component",
+                        "isNegated": false,
+                        "parent": 102,
+                        "createdAt": "2021-03-24T20:09:12.337Z",
+                        "updatedAt": "2021-03-24T20:09:12.337Z",
+                        "children": [],
+                        "componentType": "Direct Object",
+                        "text": {
+                          "main": "organic farming certification",
+                          "prefix": "the"
+                        }
+                      },
+                      {
+                        "id": 107,
+                        "document": 1,
+                        "isNegated": false,
+                        "parent": 102,
+                        "createdAt": "2021-03-24T20:09:12.337Z",
+                        "updatedAt": "2021-03-24T20:09:12.337Z"
+                      },
+                      {
+                        "id": 108,
+                        "document": 1,
+                        "nodeType": "Component",
+                        "isNegated": false,
+                        "parent": 102,
+                        "createdAt": "2021-03-24T20:09:12.337Z",
+                        "updatedAt": "2021-03-24T20:09:12.337Z",
                         "children": [
                           {
-                            "id": 17,
-                            "document": 3,
+                            "id": 109,
+                            "document": 1,
                             "nodeType": "Component",
                             "isNegated": false,
-                            "parent": 16,
-                            "createdAt": "2021-03-22T16:20:15.273Z",
-                            "updatedAt": "2021-03-22T16:20:15.273Z",
+                            "parent": 108,
+                            "createdAt": "2021-03-24T20:09:12.337Z",
+                            "updatedAt": "2021-03-24T20:09:12.337Z",
                             "children": [],
-                            "componentType": "Attribute",
+                            "componentType": "Simple Context",
                             "text": {
-                              "main": "certifiers"
+                              "main": "under all circumstances"
                             }
-                          },
-                          {
-                            "id": 28,
-                            "document": 3,
-                            "nodeType": "Component",
-                            "isNegated": false,
-                            "parent": 16,
-                            "createdAt": "2021-03-22T16:20:15.273Z",
-                            "updatedAt": "2021-03-22T16:20:15.273Z",
-                            "children": [],
-                            "componentType": "Direct Object",
-                            "text": {
-                              "main": "organic farming certification",
-                              "prefix": "the"
-                            }
-                          },
-                          {
-                            "id": 19,
-                            "document": 3,
-                            "isNegated": false,
-                            "parent": 16,
-                            "createdAt": "2021-03-22T16:20:15.273Z",
-                            "updatedAt": "2021-03-22T16:20:15.273Z"
-                          },
-                          {
-                            "id": 27,
-                            "document": 3,
-                            "nodeType": "Component",
-                            "isNegated": false,
-                            "parent": 16,
-                            "createdAt": "2021-03-22T16:20:15.273Z",
-                            "updatedAt": "2021-03-22T16:20:15.273Z",
-                            "children": [],
-                            "componentType": "Deontic",
-                            "text": {
-                              "main": "must"
-                            }
-                          },
-                          {
-                            "id": 21,
-                            "document": 3,
-                            "nodeType": "Component",
-                            "isNegated": false,
-                            "parent": 16,
-                            "createdAt": "2021-03-22T16:20:15.273Z",
-                            "updatedAt": "2021-03-22T16:20:15.273Z",
-                            "children": [],
-                            "componentType": "Aim",
-                            "text": {
-                              "main": "revoke"
-                            }
-                          },
-                          {
-                            "id": 22,
-                            "document": 3,
-                            "nodeType": "Component",
-                            "isNegated": false,
-                            "parent": 16,
-                            "createdAt": "2021-03-22T16:20:15.273Z",
-                            "updatedAt": "2021-03-22T16:20:15.273Z",
-                            "children": [
-                              {
-                                "id": 23,
-                                "document": 3,
-                                "nodeType": "Component",
-                                "isNegated": false,
-                                "parent": 22,
-                                "createdAt": "2021-03-22T16:20:15.273Z",
-                                "updatedAt": "2021-03-22T16:20:15.273Z",
-                                "children": [],
-                                "componentType": "Simple Context",
-                                "text": {
-                                  "main": "under all circumstances"
-                                }
-                              }
-                            ],
-                            "componentType": "Activation Conditions",
-                            "text": {}
-                          },
-                          {
-                            "id": 24,
-                            "document": 3,
-                            "nodeType": "Component",
-                            "isNegated": false,
-                            "parent": 16,
-                            "createdAt": "2021-03-22T16:20:15.273Z",
-                            "updatedAt": "2021-03-22T16:20:15.273Z",
-                            "children": [
-                              {
-                                "id": 25,
-                                "document": 3,
-                                "nodeType": "Component",
-                                "isNegated": false,
-                                "parent": 24,
-                                "createdAt": "2021-03-22T16:20:15.273Z",
-                                "updatedAt": "2021-03-22T16:20:15.273Z",
-                                "children": [],
-                                "componentType": "Simple Context",
-                                "text": {
-                                  "main": "no constraints"
-                                }
-                              }
-                            ],
-                            "componentType": "Execution Constraints",
-                            "text": {}
-                          },
-                          {
-                            "id": 26,
-                            "document": 3,
-                            "isNegated": false,
-                            "parent": 16,
-                            "createdAt": "2021-03-22T16:20:15.273Z",
-                            "updatedAt": "2021-03-22T16:20:15.273Z"
                           }
-                        ]
+                        ],
+                        "componentType": "Activation Conditions",
+                        "text": {}
+                      },
+                      {
+                        "id": 110,
+                        "document": 1,
+                        "nodeType": "Component",
+                        "isNegated": false,
+                        "parent": 102,
+                        "createdAt": "2021-03-24T20:09:12.337Z",
+                        "updatedAt": "2021-03-24T20:09:12.337Z",
+                        "children": [
+                          {
+                            "id": 111,
+                            "document": 1,
+                            "nodeType": "Component",
+                            "isNegated": false,
+                            "parent": 110,
+                            "createdAt": "2021-03-24T20:09:12.337Z",
+                            "updatedAt": "2021-03-24T20:09:12.337Z",
+                            "children": [],
+                            "componentType": "Simple Context",
+                            "text": {
+                              "main": "no constraints"
+                            }
+                          }
+                        ],
+                        "componentType": "Execution Constraints",
+                        "text": {}
+                      },
+                      {
+                        "id": 112,
+                        "document": 1,
+                        "isNegated": false,
+                        "parent": 102,
+                        "createdAt": "2021-03-24T20:09:12.337Z",
+                        "updatedAt": "2021-03-24T20:09:12.337Z"
                       }
-                    ],
-                    "componentType": "Or Else",
-                    "text": {}
+                    ]
                   }
-                ]
-            }
-		},
+                ],
+                "componentType": "Or Else",
+                "text": {}
+              }
+            ]
+          }
+        },
 		{
-			"id": "5",
+			"id": "4",
 			"document": "1",
 			"original": "The Ministry may issue regulations with further provisions concerning the activities of the committee, including provisions concerning procedure and concerning the duty of secrecy for members of the committee."
 		}
 	],
 	"entryMap": {
-		"2": "0",
-		"3": "1",
-		"4": "2",
-		"5": "3"
+		"1": "0",
+		"2": "1",
+		"3": "2",
+		"4": "3"
 	}
 }`;
 
-export default testDocumentString;
+export const testDocument = Document.fromData(JSON.parse(testDocumentString) as Document);

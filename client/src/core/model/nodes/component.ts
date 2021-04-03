@@ -8,7 +8,7 @@ import {
     StatementJunctionNode, StatementNode
 } from "./";
 import {IComponentNode, INode} from "../interfaces";
-import {Arg, ComponentType, ContextType, DefaultContext, NodeType} from "../enums";
+import {Arg, ComponentType, ContextType, DefaultContext, JunctionType, NodeType} from "../enums";
 import {TextContent} from "../textcontent";
 import {DataError, DataErrorType} from "../errors";
 
@@ -321,9 +321,10 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
      * Creates a StatementJunction node as child of this node, if legal.
      * Throws an error if illegal.
      *
+     * @param junctionType (Optional) A junction type to be given to the new node immediately
      * @return The newly created node
      */
-    createStatementJunctionNode() : StatementJunctionNode {
+    createStatementJunctionNode(junctionType?: JunctionType) : StatementJunctionNode {
         switch (this.componentType) {   // Handle component types for which this operation is illegal
             case ComponentType.deontic:
                 throw new DataError(DataErrorType.CMP_DNT_ADD_DEL, this.id);
@@ -337,28 +338,7 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
                 throw new DataError(DataErrorType.CMP_CTXT_ADD_DEL, this.id);
             default:
         }
-        return this.addChild(new StatementJunctionNode(this.document, this.id)) as StatementJunctionNode;
-    }
-
-    /**
-     * Creates a ComponentJunction node as child of this node, if legal.
-     * Throws an error if illegal.
-     *
-     * @return The newly created node
-     */
-    createComponentJunctionNode() : ComponentJunctionNode {
-        switch (this.componentType) {   // Handle component types for which this operation is illegal
-            case ComponentType.deontic:
-                throw new DataError(DataErrorType.CMP_DNT_ADD_DEL, this.id);
-            case ComponentType.orelse:
-                throw new DataError(DataErrorType.CMP_ADD_CMPJUN, this.id);
-            case ComponentType.modal:
-                throw new DataError(DataErrorType.CMP_MODAL_ADD_DEL, this.id);
-            case ComponentType.simplecontext:
-                throw new DataError(DataErrorType.CMP_CTXT_ADD_DEL, this.id);
-            default:
-        }
-        return this.addChild(new ComponentJunctionNode(this.componentType, this.document, this.id)) as ComponentJunctionNode;
+        return this.addChild(new StatementJunctionNode(this.document, this.id, junctionType)) as StatementJunctionNode;
     }
 
     /**
@@ -377,6 +357,28 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
         } else {
             throw new DataError(DataErrorType.CMP_ADD_CMP, this.id, componentType);
         }
+    }
+
+    /**
+     * Creates a ComponentJunction node as child of this node, if legal.
+     * Throws an error if illegal.
+     *
+     * @param junctionType (Optional) A junction type to be given to the new node immediately
+     * @return The newly created node
+     */
+    createComponentJunctionNode(junctionType?: JunctionType) : ComponentJunctionNode {
+        switch (this.componentType) {   // Handle component types for which this operation is illegal
+            case ComponentType.deontic:
+                throw new DataError(DataErrorType.CMP_DNT_ADD_DEL, this.id);
+            case ComponentType.orelse:
+                throw new DataError(DataErrorType.CMP_ADD_CMPJUN, this.id);
+            case ComponentType.modal:
+                throw new DataError(DataErrorType.CMP_MODAL_ADD_DEL, this.id);
+            case ComponentType.simplecontext:
+                throw new DataError(DataErrorType.CMP_CTXT_ADD_DEL, this.id);
+            default:
+        }
+        return this.addChild(new ComponentJunctionNode(this.componentType, this.document, this.id, junctionType)) as ComponentJunctionNode;
     }
 
     /**
@@ -416,9 +418,10 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
      * Creates a PropertyJunction node as child of this node, if legal.
      * Does not use the helper addChild().
      *
+     * @param junctionType (Optional) A junction type to be given to the new node immediately
      * @return The newly created node
      */
-    createPropertyJunctionNode() : PropertyJunctionNode {
+    createPropertyJunctionNode(junctionType?: JunctionType) : PropertyJunctionNode {
         if (![                          // Only these Component types can have PropertyJunction nodes as children
             ComponentType.attribute,
             ComponentType.directobject,
@@ -430,13 +433,13 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
         }
 
         if (this.children.length === 0) {   // This node has no children
-            this.children.push(new PropertyJunctionNode(this.document, this.id));
+            this.children.push(new PropertyJunctionNode(this.document, this.id, junctionType));
 
         } else if ([                        // This node's first child is a Property/PropertyJunction
             NodeType.property,
             NodeType.propertyjunction
         ].includes(this.children[0].nodeType)) {
-            this.children.push(new PropertyJunctionNode(this.document, this.id));
+            this.children.push(new PropertyJunctionNode(this.document, this.id, junctionType));
 
         } else {                            // This node's first child is NOT a Property/PropertyJunction
             throw new DataError(DataErrorType.CMP_HAS_CHLD_NO_PRP, this.id);

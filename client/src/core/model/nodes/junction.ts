@@ -24,7 +24,7 @@ export default class JunctionNode extends BaseNode implements IJunctionNode {
 	 *
 	 * @param document The ID of the document this node belongs to
 	 * @param parent (Optional) The ID of the node this node is a child of (the parent's children array must be set separately)
-	 * @param junctionType (Optional) and/or/xor
+	 * @param junctionType (Optional) The logical operator of the junction [and, or, xor]
 	 * @param id (Optional) The ID of this node if one already exists (for rebuilding from existing data)
 	 */
 	constructor(document: number, parent?: number, junctionType?: JunctionType, id?: number) {

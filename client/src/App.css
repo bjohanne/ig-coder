@@ -45,6 +45,15 @@ Nav .breadcrumb {
     font-size: small;
 }
 
+/* MODAL */
+
+.modal-open {
+    overflow-y: inherit !important;
+}
+
+.modal-backdrop {
+    opacity: 0.25 !important;
+}
 
 /* OTHER/OLD */
 

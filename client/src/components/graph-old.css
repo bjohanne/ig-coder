@@ -35,8 +35,10 @@ p.component {
 
 .tooltipHover {
     pointer-events: auto !important;
+/*
     &:hover {
         visibility: visible !important;
         opacity: 1 !important;
     }
+*/
 }

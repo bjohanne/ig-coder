@@ -72,8 +72,7 @@ it('Full statement with properties', () => {
     let directObject = root.createDirectObject();
     directObject.setText("proceedings");
 
-    let dirPropJunction = directObject.createPropertyJunctionNode();
-    dirPropJunction.setJunction(JunctionType.xor);
+    let dirPropJunction = directObject.createPropertyJunctionNode(JunctionType.xor);
     dirPropJunction.setText("or");
 
     dirPropJunction.createPropertyNode(Arg.left).setText("suspension");
@@ -86,8 +85,7 @@ it('Full statement with properties', () => {
     indirectObject.createPropertyNode().setText("certified");
 
     let actConds = root.getActivationConditions();
-    let lvl2StmtJunction = actConds.createStatementJunctionNode();
-    lvl2StmtJunction.setJunction(JunctionType.or);
+    let lvl2StmtJunction = actConds.createStatementJunctionNode(JunctionType.or);
     lvl2StmtJunction.setText("or");
 
     let lvl2Stmt1 = lvl2StmtJunction.createStatementNode(Arg.regulative, Arg.left) as RegulativeStatementNode;
@@ -102,8 +100,7 @@ it('Full statement with properties', () => {
     lvl3StmtAttr.setText("operation", "a");
     lvl3StmtAttr.createPropertyNode().setText("certified");
 
-    let lvl3StmtDirJunction = lvl3Stmt.createDirectObject().createComponentJunctionNode();
-    lvl3StmtDirJunction.setJunction(JunctionType.or);
+    let lvl3StmtDirJunction = lvl3Stmt.createDirectObject().createComponentJunctionNode(JunctionType.or);
     lvl3StmtDirJunction.setText("or");
     lvl3StmtDirJunction.createComponentNode(ComponentType.directobject, Arg.left).setText("Act", "the");
 
@@ -111,8 +108,7 @@ it('Full statement with properties', () => {
     lvl3StmtDirRight.setText("regulations");
     lvl3StmtDirRight.createPropertyNode().setText("in this part");
 
-    let lvl3StmtAimJunction = lvl3Stmt.getAim().createComponentJunctionNode();
-    lvl3StmtAimJunction.setJunction(JunctionType.or);
+    let lvl3StmtAimJunction = lvl3Stmt.getAim().createComponentJunctionNode(JunctionType.or);
     lvl3StmtAimJunction.setText("or");
     lvl3StmtAimJunction.createComponentNode(ComponentType.aim, Arg.left).setText("has violated");
 
@@ -122,8 +118,7 @@ it('Full statement with properties', () => {
 
     let lvl2Stmt2 = lvl2StmtJunction.createStatementNode(Arg.regulative, Arg.right) as RegulativeStatementNode;
 
-    let lvl2Stmt2AttrJunction = lvl2Stmt2.getAttribute().createComponentJunctionNode();
-    lvl2Stmt2AttrJunction.setJunction(JunctionType.or);
+    let lvl2Stmt2AttrJunction = lvl2Stmt2.getAttribute().createComponentJunctionNode(JunctionType.or);
     lvl2Stmt2AttrJunction.setText("or");
 
     let lvl2Stmt2AttrLeft = lvl2Stmt2AttrJunction.createComponentNode(ComponentType.attribute, Arg.left);
@@ -135,8 +130,7 @@ it('Full statement with properties', () => {
     lvl2Stmt2AttrRight.createPropertyNode().setText("State organic program's");
     lvl2Stmt2AttrRight.createPropertyNode().setText("governing");
 
-    let lvl2Stmt2DirJunction = lvl2Stmt2.createDirectObject().createComponentJunctionNode();
-    lvl2Stmt2DirJunction.setJunction(JunctionType.or);
+    let lvl2Stmt2DirJunction = lvl2Stmt2.createDirectObject().createComponentJunctionNode(JunctionType.or);
     lvl2Stmt2DirJunction.setText("or");
     lvl2Stmt2DirJunction.createComponentNode(ComponentType.directobject, Arg.left).setText("Act", "the");
 
@@ -216,6 +210,7 @@ it("Set and unset text content", () => {
 
     attr.unsetText();								        // Unsetting content
     expect(attr.text.main).toBeUndefined();
+    expect(attr.text.isSet()).toBeFalsy();
 
     attr.setText(undefined, "one");				// Setting prefix only
     expect(attr.text.main).toBeUndefined();
@@ -384,7 +379,7 @@ it('Elevate isFunctionallyDependent', () => {
 
     // Create a chain of PropertyJunction nodes followed by a leaf Property node
     let attr = root.getAttribute();
-    let propJun1 = attr.createPropertyJunctionNode();
+    let propJun1 = attr.createPropertyJunctionNode(JunctionType.and);
     let propJun2 = propJun1.createPropertyJunctionNode(Arg.left);
     let prop1 = propJun2.createPropertyNode(Arg.left);
 
@@ -412,7 +407,7 @@ it('Rebuild a tree', () => {
     attrProp1.setText("proposed");
 
     let dirobj = root.createDirectObject();
-    let dirObjJun = dirobj.createComponentJunctionNode();
+    let dirObjJun = dirobj.createComponentJunctionNode(JunctionType.xor);
     let dirObjJunLeft = dirObjJun.createComponentNode(ComponentType.directobject, Arg.left);
     dirObjJunLeft.setText("left");
 
@@ -452,6 +447,8 @@ it('Rebuild a tree', () => {
     expect(newDirObj instanceof ComponentNode).toBeTruthy();
     let newDirObjJun = newDirObj.getChild(Arg.only);
     expect(newDirObjJun instanceof ComponentJunctionNode).toBeTruthy();
+    expect((newDirObjJun as ComponentJunctionNode).junctionType).toBeDefined();
+    expect((newDirObjJun as ComponentJunctionNode).junctionType).toEqual(JunctionType.xor);
 
     let newActConds = newRoot.getActivationConditions();
     expect(newActConds instanceof ComponentNode).toBeTruthy();

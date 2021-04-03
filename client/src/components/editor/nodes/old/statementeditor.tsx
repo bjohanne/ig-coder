@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import ModalBody from 'react-bootstrap/ModalBody';
-import ModalFooter from 'react-bootstrap/ModalFooter';
 import Toggle from "react-toggle";
-import { INode } from "../../../core/model/interfaces";
-import {addJunction, updateEntry} from "../../../state/documents/actions";
-import { NodeType, ComponentType } from "../../../core/model/enums";
-import { ComponentNode } from "../../../core/model/nodes/";
+import { INode } from "../../../../core/model/interfaces";
+import {addJunction, updateEntry} from "../../../../state/documents/actions";
+import { ComponentType } from "../../../../core/model/enums";
+import {RegulativeStatementNode, StatementNode} from "../../../../core/model/nodes";
 
 /*
 	This is the Editor component for Norm and Convention nodes (entries).
@@ -15,7 +13,14 @@ import { ComponentNode } from "../../../core/model/nodes/";
 	props.activeNode holds the complete D3 node with references to its parent and children.
 */
 
-const EntryEditor = (props: any) => {
+interface IProps {
+    activeNode: StatementNode,
+    close: Function
+}
+
+const StatementEditor = (props: IProps) => {
+    const { activeNode } = props;
+
 	// State variables for expanding and collapsing the various UI elements
     const [collapse, setCollapse] = useState({ collapseTop: true, collapseBottom: true, collapseObjects: false, collapseConditions: false });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -40,34 +45,31 @@ const EntryEditor = (props: any) => {
         });
     };
 
+    /*
     const saveEntryData = () => {
         try {
-            props.activeNode.node.data.entry.content = entryText;
             // buildEntrySubTree(props.activeNode.node.data, atoms, conditions, props.updateEntry); // Function removed - it updated text content but was old
-            props.close();
         } catch(error) {
             alert(error);
         }
     }
+    */
 
 	/* Functions to get the initial status for Negation and Sanction */
 
 	const getIsNegated = () : boolean => {
 		// Check if this node is negated
-        let activeNode = (props.activeNode && props.activeNode.node.data);
-		return (activeNode.isNegated);
+		return activeNode.isNegated;
 	}
 
 	const getHasObject = () : boolean => {
 		// Check if this node has an Object child
-		let activeNode = (props.activeNode && props.activeNode.node.data);
-		return (activeNode.hasDirectObject());  // NB: Split to Direct and Indirect
+		return (activeNode as RegulativeStatementNode).hasDirectObject();  // NB: Split to Direct and Indirect
 	}
 
 	const getHasOrElse = () : boolean => {
 	    // Check if this node has an OrElse child
-        let activeNode = (props.activeNode && props.activeNode.node.data);
-        return (activeNode.hasOrElse());
+        return (activeNode as RegulativeStatementNode).hasOrElse();
 	}
 
 	// State variables for Negation and Sanction status
@@ -128,18 +130,6 @@ const EntryEditor = (props: any) => {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const getValue = (type: ComponentType) : string => {
-        if (props.activeNode.node.data.activeNode && props.activeNode.node.data.children) {
-			// Find out whether this node has a child of the passed in type
-            let node = props.activeNode.node.data.children.find((node: INode) => {
-                if (node.nodeType === NodeType.component) {
-                    return (node as ComponentNode).componentType === type;
-                }
-                return false;
-            });
-            if (node && node.component.content)
-                return node.component.content.main;
-            return "";
-        }
         return "";
     }
 
@@ -149,18 +139,17 @@ const EntryEditor = (props: any) => {
     }
 
     useEffect(() => {
-        setEntryText(props.activeNode.node.data.entry.content);
-    }, [props.activeNode.node.data.entry.content])
+    }, [])
 
     return (
         props.activeNode &&
-        (<><ModalBody>
-        <div className="container-fluid entry-editor">
+        (<>
+        <div className="card-body entry-editor">
             <div className="row">
 				<div className="col-md-2 pl-4 py-4">
 					{/*<button className="accordion" onClick={() => toggleAccordion("collapseTop", collapse.collapseTop)}>*/}
 						{/*<Chevron className={`${rotateTop}`} width={10} fill={"#777"} />*/}
-						<strong className="accordion__title">{props.activeNode.node.data.nodeType} (entry)</strong>
+						<strong className="accordion__title">{props.activeNode.nodeType} (entry)</strong>
 					{/*</button>*/}
 				</div>
 				<div className="col-md-10 d-flex justify-content-start align-items-center">
@@ -291,11 +280,8 @@ const EntryEditor = (props: any) => {
 			</button>
 			</Col>
 			</Row>*/}
-		</div></ModalBody>
-		<ModalFooter className="d-flex justify-content-between">
-		    <button type="button" className="btn btn-secondary" onClick={props.close}>Cancel</button>
-			<button id="save-button-bottom" type="button" className="btn btn-primary" onClick={saveEntryData}>Save Changes</button>
-		</ModalFooter></>)
+		</div>
+        </>)
 	)
 }
 
@@ -312,4 +298,4 @@ const mapDispatchToProps = (dispatch: any) => ({
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-  )(EntryEditor);
+  )(StatementEditor);
