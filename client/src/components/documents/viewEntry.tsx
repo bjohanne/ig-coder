@@ -7,6 +7,7 @@ import Spinner from "react-bootstrap/Spinner";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Accordion from "react-bootstrap/Accordion";
 
 import "./viewEntry.css";
@@ -19,7 +20,6 @@ import {createRootNode, clearTree} from "../../state/model/actions";
 import {setSaved} from "../../state/documents/actions";
 import {openSnackbarWithData} from "../../state/ui/actions";
 import {AccordionToggle} from "../common/accordionToggle";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
 
 export function ViewEntryComponent(props) {
     // Set page title

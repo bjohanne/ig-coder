@@ -1,33 +1,16 @@
 import React from "react";
 import {connect} from "react-redux";
-import {INode} from "../../../core/model/interfaces";
-import CommonBarComponent from "../common/commonBar";
+import CommonEditorTable from "../common/commonTable";
 import ComponentChildren from "../children/componentChildren";
 import TextContentComponent from "../common/textContent";
-import ContextTypeComponent from "../common/contextType";
 
-interface IProps {
-    activeNode: INode
-}
-
-const ComponentEditor = (props: IProps) => {
-    const {
-        activeNode
-    } = props;
+const ComponentEditor = (props) => {
 
     return (
-        <>
-            <CommonBarComponent/>
-            <ComponentChildren>
-
-            </ComponentChildren>
-            <TextContentComponent>
-
-            </TextContentComponent>
-            <ContextTypeComponent>
-
-            </ContextTypeComponent>
-        </>
+        <CommonEditorTable>
+            <ComponentChildren/>
+            <TextContentComponent/>
+        </CommonEditorTable>
     )
 }
 

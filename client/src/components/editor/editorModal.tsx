@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { connect } from "react-redux";
 import Modal from "react-bootstrap/Modal";
 import ModalBody from "react-bootstrap/ModalBody";
 import ModalFooter from 'react-bootstrap/ModalFooter';
 import Button from 'react-bootstrap/Button';
+import Spinner from "react-bootstrap/Spinner";
 
 import { INode } from "../../core/model/interfaces";
 import { NodeType } from "../../core/model/enums";
@@ -31,12 +32,9 @@ const EditorModal = (props: IProps) => {
 		openSnackbarWithData
 	} = props;
 
-    useEffect((): void => {
-    }, [])
-
 	const onSave = (e) => {
 		// Like the save button in ViewEntry, this doesn't actually save anything,
-		//  because work is saved automatically in the browser.
+		// because work is saved automatically in the browser.
 		// It's implemented for users who feel they need to click a save button.
 		setSaved();
 		closeModal(e);
@@ -45,25 +43,27 @@ const EditorModal = (props: IProps) => {
 
 	const renderEditor = () => {
 		if (activeNode && activeNode.nodeType) {
-			switch(activeNode.nodeType) {
+			switch (activeNode.nodeType) {
 				case NodeType.regulativestatement:
-					return <StatementEditor activeNode={activeNode}/>;
+					return <StatementEditor/>;
 				case NodeType.constitutivestatement:
-					return <StatementEditor activeNode={activeNode}/>;
+					return <StatementEditor/>;
 				case NodeType.statementjunction:
-					return <JunctionEditor activeNode={activeNode}/>;
+					return <JunctionEditor/>;
 				case NodeType.componentjunction:
-					return <JunctionEditor activeNode={activeNode}/>;
+					return <JunctionEditor/>;
 				case NodeType.propertyjunction:
-					return <JunctionEditor activeNode={activeNode}/>;
+					return <JunctionEditor/>;
 				case NodeType.component:
-					return <ComponentEditor activeNode={activeNode}/>;
+					return <ComponentEditor/>;
 				case NodeType.property:
-					return <PropertyEditor activeNode={activeNode}/>;
+					return <PropertyEditor/>;
 				default:
+					console.error("Invalid node type for active node: " + activeNode.nodeType);
 					return <></>;
 			}
 		}
+		return <Spinner animation="border" role="status" />;
 	}
 
 	return (

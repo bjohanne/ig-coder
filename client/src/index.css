@@ -24,12 +24,21 @@ code {
     monospace;
 }
 
-.dark-igc-gray-bg {
-    background-color: rgb(129, 144, 165);
+.dark-igc-gray-bg, .dark-igc-gray-text {
+    background-color: #8190a5;
 }
 
-.dark-igc-gray-text {
-    color: rgb(129, 144, 165);
+.dark-igc-gray-bg:hover {
+    background-color: #647489;
+}
+
+.dark-igc-gray-txt {
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    color: #8190a5;
+}
+
+.dark-igc-gray-txt:hover {
+    color: #647489;
 }
 
 .container-fluid, .navbar {

@@ -33,6 +33,7 @@ export enum DataErrorType {
 
 	// Entry
 	ENT_NO_ROOT 			= "This Entry has no root",
+	ENT_FIND_FAIL 			= "Cannot find a node with the given ID in this Entry",
 
 	// Junction
 	JUN_BAD_CHILD_IDX 		= "Junction child index out of bounds",

@@ -42,7 +42,7 @@ Some guidelines for the data model
 */
 
 /*
-it('Template for tests', () => {
+it("Template for tests", () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
 
@@ -55,7 +55,7 @@ it('Template for tests', () => {
 /**
  * This test verifies that a complete tree is built without any errors being thrown. (NB: Does not test Or else.)
  */
-it('Full statement with properties', () => {
+it("Full statement with properties", () => {
     // Setup
     const statement = "The Program Manager may initiate suspension or revocation proceedings against a certified operation: (1) When the Program Manager has reason to believe that a certified operation has violated or is not in compliance with the Act or regulations in this part; or (2) When a certifying agent or a State organic program's governing State official fails to take appropriate action to enforce the Act or regulations in this part.";
     const document = new Document("Program Manager Policy", "", documentId);
@@ -243,7 +243,7 @@ it("Concatenate text content", () => {
 
 //------------------------------------------------------------------------------
 
-it('Check if text content is empty for Junction nodes', () => {
+it("Check if text content is empty for Junction nodes", () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
     let entry = document.createEntry();
@@ -262,7 +262,7 @@ it('Check if text content is empty for Junction nodes', () => {
 
 //------------------------------------------------------------------------------
 
-it('Set text content on Junction nodes', () => {
+it("Set text content on Junction nodes", () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
     let entry = document.createEntry();
@@ -332,20 +332,23 @@ it("Find a node by ID in a Document", () => {
     let entry = document.createEntry();
     entry.createRoot(Arg.regulative);
 
-    // Without tree index
+    // Without entry index
     let node1 = document.find(7);
     expect(node1).toBeDefined();
     expect(node1.id).toEqual(7);
 
-    // With tree index
+    // With entry index
 	let node2 = document.find(2, 0);
     expect(node2).toBeDefined();
     expect(node2.id).toEqual(2);
+
+    // Throw if not found
+    expect(() => { document.find(999) }).toThrow();
 });
 
 //------------------------------------------------------------------------------
 
-it("Find a child of a node by ID", () => {
+it("Find child index of a node by ID", () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
     let entry = document.createEntry();
@@ -371,7 +374,7 @@ it("Find a child of a node by ID", () => {
 
 //------------------------------------------------------------------------------
 
-it('Elevate isFunctionallyDependent', () => {
+it("Elevate isFunctionallyDependent", () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);
     let entry = document.createEntry();
@@ -394,7 +397,7 @@ it('Elevate isFunctionallyDependent', () => {
 
 //------------------------------------------------------------------------------
 
-it('Rebuild a tree', () => {
+it("Rebuild a tree", () => {
     // Setup
     let document = new Document("Test Policy", "Description", documentId);
     let entry = document.createEntry();

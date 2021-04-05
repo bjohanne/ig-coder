@@ -24,6 +24,8 @@ export interface INode {
     nodeType:   NodeType,
     /* Whether this Node's meaning is negated */
     isNegated:  boolean,
+    /* Optional context type for using the Circumstances Taxonomy on this Node */
+    contextType?: ContextType;
     /* ID of the node this node is a child of (undefined if root) */
     parent?:    number,
     /* The time and date this Node was created */
@@ -36,7 +38,9 @@ export interface INode {
     isDummy(): boolean,
     update():  void,
     turnNegationOn(): void,
-    turnNegationOff(): void
+    turnNegationOff(): void,
+    setContextType(contextType: ContextType): void,
+    unsetContextType()
 }
 
  /**
@@ -90,9 +94,7 @@ export interface ITextContent {
  * The base contract for Statement nodes
  */
 export interface IStatementNode extends INode {
-    contextType?: ContextType,
-    setContextType(contextType: ContextType): void,
-    unsetContextType(): void
+    // Empty, but kept for consistency
 }
 
 /**
@@ -149,12 +151,9 @@ export interface IConstitutiveStatementNode extends IStatementNode {
 export interface IComponentNode extends INode {
     componentType: ComponentType,
     text: TextContent,
-    contextType?: ContextType,
     getText(): TextContent,
     setText(main?: string, prefix?: string, suffix?: string): void,
     unsetText(): void,
-    setContextType(contextType: ContextType): void,
-    unsetContextType(): void,
     getChild(childPos: number): INode,
     deleteChild(childPos: number): void,
     elevateFunctionallyDependent(targetId: number, isFD: Boolean): void,
@@ -218,15 +217,12 @@ export interface IPropertyJunctionNode extends IJunctionNode {
 export interface IPropertyNode extends INode {
     text: TextContent,
     isFunctionallyDependent: Boolean,
-    contextType?: ContextType,
     makeFunctionallyDependent(): void,
     makeNotFunctionallyDependent(): void,
     setFunctionallyDependent(isFD: Boolean): void,
     getText(): TextContent,
     setText(content?: string, prefix?: string, suffix?: string): void,
     unsetText(): void,
-    setContextType(contextType: ContextType): void,
-    unsetContextType(): void,
     deleteChild(childPos: number): void,
     createStatementNode(type: Arg.regulative | Arg.constitutive): StatementNode,
     createStatementJunctionNode(junctionType?: JunctionType): StatementJunctionNode,

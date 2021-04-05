@@ -1,5 +1,5 @@
 import {INode} from "../interfaces";
-import {NodeType} from "../enums";
+import {ContextType, NodeType} from "../enums";
 import {IDCounter} from "../document";
 import {
 	ComponentJunctionNode,
@@ -25,6 +25,8 @@ export default class BaseNode implements INode {
     nodeType!: NodeType;
     /* Whether this Node's meaning is negated */
     isNegated: boolean = false;
+	/* Optional context type for using the Circumstances Taxonomy on this Node */
+	contextType?: ContextType;
     /* ID of the node this node is a child of (undefined if root) */
     parent?: number;
     /* The time and date this Node was created */
@@ -147,6 +149,7 @@ export default class BaseNode implements INode {
 	 */
 	turnNegationOn() : void {
 		this.isNegated = true;
+		this.update();
 	}
 
 	/**
@@ -154,5 +157,24 @@ export default class BaseNode implements INode {
 	 */
 	turnNegationOff() : void {
 		this.isNegated = false;
+		this.update();
+	}
+
+	/**
+	 * Sets the context type to the passed in context type.
+	 *
+	 * @param contextType The context type to set
+	 */
+	setContextType(contextType: ContextType) : void {
+		this.contextType = contextType;
+		this.update();
+	}
+
+	/**
+	 * Unsets the context type (sets it to undefined).
+	 */
+	unsetContextType() : void {
+		this.contextType = undefined;
+		this.update();
 	}
 }

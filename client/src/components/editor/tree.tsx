@@ -337,7 +337,7 @@ const TreeComponent = (props: IProps) => {
 
         ReactTooltip.rebuild();
 
-    }, [svgEl, currentEntry.root, useNodeLabels, setActiveNode, showModal])
+    }, [svgEl, currentEntry.root, setActiveNode, showModal, useNodeLabels])
 
     return (
         <div className="treeContainer">

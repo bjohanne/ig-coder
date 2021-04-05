@@ -1,4 +1,3 @@
-import {BaseNode} from "./nodes";
 import {IDocument, INode} from "./interfaces";
 import {Entry} from "./entry";
 import {DataError, DataErrorType} from "./errors";
@@ -175,7 +174,7 @@ export default class Document implements IDocument {
 
 	/**
 	 * Find and return a node by ID.
-     * Iteratively searches for a node with ID equals targetId, in the provided entry or all entries of the document.
+     * Iteratively searches for a node with ID equals targetId, in the provided Entry or all Entries of this Document.
 	 *
 	 * @param targetId The ID of the node to be retrieved.
 	 * @param index (Optional) The entries array index of the entry to search in.
@@ -186,21 +185,17 @@ export default class Document implements IDocument {
 			throw new DataError(DataErrorType.DOC_BAD_ENTRY_IDX, this.id);
 		}
 
-		let stack;
+		let node: INode | undefined;
 		if (typeof index === "undefined") {	// An entry index is not provided
-			stack = this.getRootNodes();	// Search the entire entry list
-		} else {							// An entry index is provided - can be 0
-			stack = [ this.entries[index].root ];	// Search only in the provided entry
-		}
-
-		while (stack.length) {
-			const node = stack.shift() as BaseNode;
-			if (node.id === targetId) {
-				return node;
+			for (let i = 0; i < this.entries.length; i++) {
+				node = this.entries[i].find(targetId);
+				if (node) {
+					return node;
+				}
 			}
-			node && node.children && stack.push(...node.children);	// Push the children to the stack, if any
+		} else {							// An entry index is provided - can be 0
+			return this.entries[index].find(targetId);
 		}
-		return undefined;
 	}
 
     /**

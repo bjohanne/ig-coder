@@ -102,8 +102,7 @@ export function NavbarComponent(props) {
                                 <Link className="nav-link" to="/projects/myprojects">My projects </Link>
                                 <Nav.Link onClick={handleSignout}>
                                     Sign out
-                                    {loading && <Spinner animation="border" variant="primary" size="sm"
-                                                         className="ml-2" role="status"/>}
+                                    {loading && <Spinner animation="border"size="sm" className="ml-2" role="status"/>}
                                 </Nav.Link>
                             </Nav>
                             :

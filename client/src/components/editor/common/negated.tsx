@@ -5,6 +5,7 @@ const NegatedComponent = (props) => {
 
     return (
         <>
+            NegatedComponent
         </>
     )
 }

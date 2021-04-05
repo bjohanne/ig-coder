@@ -8,7 +8,7 @@ import {
     StatementJunctionNode, StatementNode
 } from "./";
 import {IComponentNode, INode} from "../interfaces";
-import {Arg, ComponentType, ContextType, DefaultContext, JunctionType, NodeType} from "../enums";
+import {Arg, ComponentType, DefaultContext, JunctionType, NodeType} from "../enums";
 import {TextContent} from "../textcontent";
 import {DataError, DataErrorType} from "../errors";
 
@@ -21,9 +21,6 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
     componentType!: ComponentType;
     /* Holds the text content of the institutional component. Should always be defined */
     text!: TextContent;
-    /* Optional context type for using the Circumstances Taxonomy on Components.
-       For the SimpleContext component type. */
-    contextType?: ContextType;
     /* Array of child nodes of this Node */
     children!: INode[];
 
@@ -131,30 +128,6 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
 		this.text.unset();
 		this.update();
 	}
-
-    /**
-     * Sets the context type to the passed in context type.
-     *
-     * @param contextType The context type to set
-     */
-	setContextType(contextType: ContextType) : void {
-	    if (this.componentType !== ComponentType.simplecontext) {
-	        throw new DataError(DataErrorType.CMP_CTXT_TYPE, this.id);
-        }
-	    this.contextType = contextType;
-        this.update();
-    }
-
-    /**
-     * Unsets the context type (sets it to undefined).
-     */
-    unsetContextType() : void {
-        if (this.componentType !== ComponentType.simplecontext) {
-            throw new DataError(DataErrorType.CMP_CTXT_TYPE, this.id);
-        }
-	    this.contextType = undefined;
-        this.update();
-    }
 
     /**
      * Internal function that is called by all create*() functions except Property and PropertyJunction.

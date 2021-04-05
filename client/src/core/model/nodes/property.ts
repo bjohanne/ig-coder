@@ -6,7 +6,7 @@ import {
     StatementJunctionNode, StatementNode
 } from "./";
 import {INode, IPropertyNode} from "../interfaces";
-import {Arg, ContextType, JunctionType, NodeType} from "../enums";
+import {Arg, JunctionType, NodeType} from "../enums";
 import {TextContent} from "../textcontent";
 import {DataError, DataErrorType} from "../errors";
 
@@ -19,8 +19,6 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
     text!: TextContent;
     /* Whether this property/object is functionally dependent on its parent */
     isFunctionallyDependent: Boolean = false;
-    /* Optional context type for using the Circumstances Taxonomy on Properties */
-    contextType?: ContextType;
     /* Array of child nodes of this Node */
     children!: INode[];
 
@@ -123,24 +121,6 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
             throw new DataError(DataErrorType.PRP_GET_TXT_UNDEF, this.id);
         }
         this.text.unset();
-        this.update();
-    }
-
-    /**
-     * Sets the context type to the passed in context type.
-     *
-     * @param contextType The context type to set
-     */
-    setContextType(contextType: ContextType) : void {
-        this.contextType = contextType;
-        this.update();
-    }
-
-    /**
-     * Unsets the context type (sets it to undefined).
-     */
-    unsetContextType() : void {
-        this.contextType = undefined;
         this.update();
     }
 

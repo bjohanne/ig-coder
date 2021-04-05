@@ -5,6 +5,7 @@ const FunctionallyDependentComponent = (props) => {
 
     return (
         <>
+            FunctionallyDependentComponent
         </>
     )
 }

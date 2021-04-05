@@ -14,7 +14,11 @@ import {
 
 import {
     CREATE_ROOT_NODE_RESPONSE,
-    CLEAR_TREE_RESPONSE
+    CLEAR_TREE_RESPONSE,
+    TURN_NEGATION_ON_RESPONSE,
+    TURN_NEGATION_OFF_RESPONSE,
+    SET_CONTEXT_TYPE_RESPONSE,
+    UNSET_CONTEXT_TYPE_RESPONSE
 } from "../model/actions";
 
 import {API_CALL_BEGIN, API_CALL_SUCCESS, API_CALL_ERROR} from "../apiCall/actions";
@@ -148,6 +152,50 @@ const documents = (state: IDocumentState = initialState, action: any) => {
                             root: {
                                 $set: undefined
                             }
+                        }
+                    }
+                },
+                changed: { $set: true }
+            });
+        case TURN_NEGATION_ON_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                changed: { $set: true }
+            });
+        case TURN_NEGATION_OFF_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                changed: { $set: true }
+            });
+        case SET_CONTEXT_TYPE_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                changed: { $set: true }
+            });
+        case UNSET_CONTEXT_TYPE_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
                         }
                     }
                 },

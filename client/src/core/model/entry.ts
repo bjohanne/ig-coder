@@ -1,9 +1,4 @@
-import {
-	BaseNode,
-	ConstitutiveStatementNode,
-	RegulativeStatementNode,
-	StatementJunctionNode,
-} from "./nodes";
+import {BaseNode, ConstitutiveStatementNode, RegulativeStatementNode, StatementJunctionNode,} from "./nodes";
 import {IEntry, INode} from "./interfaces";
 import {Arg} from "./enums";
 import {IDCounter} from "./document";
@@ -118,5 +113,25 @@ export class Entry implements IEntry {
 	 */
 	unsetPrepared() : void {
 		this.rephrased = undefined;
+	}
+
+	/**
+	 * Find and return a node by ID.
+	 * Iteratively searches for a node with ID equals targetId, in this Entry.
+	 *
+	 * @param targetId The ID of the node to be retrieved.
+	 * @return A reference to the node if found, undefined otherwise. You must type assert its node type.
+	 */
+	find(targetId: number) : INode | undefined {
+		let stack = [ this.root ];
+
+		while (stack.length) {
+			const node = stack.shift() as BaseNode;
+			if (node.id === targetId) {
+				return node;
+			}
+			node && node.children && stack.push(...node.children);	// Push the children to the stack, if any
+		}
+		throw new DataError(DataErrorType.ENT_FIND_FAIL, targetId);
 	}
 }

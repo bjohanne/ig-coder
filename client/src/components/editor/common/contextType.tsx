@@ -5,6 +5,7 @@ const ContextTypeComponent = (props) => {
 
     return (
         <>
+            ContextTypeComponent
         </>
     )
 }
