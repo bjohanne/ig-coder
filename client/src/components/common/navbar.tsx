@@ -33,7 +33,7 @@ export function NavbarComponent(props) {
         { name: 'IG Core', value: '1' },
         { name: 'Open', value: '2' }
     ];
-    const onChangeCodingMode = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChangeCodingMode = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCodingMode(e.currentTarget.value)
         if (e.currentTarget.value === '1') {
             turnCoreOn();
@@ -47,7 +47,7 @@ export function NavbarComponent(props) {
         { name: 'On', value: '1' },
         { name: 'Off', value: '2' }
     ];
-    const onChangeLabelMode = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChangeLabelMode = (e: React.ChangeEvent<HTMLInputElement>) => {
         setLabelMode(e.currentTarget.value)
         if (e.currentTarget.value === '1') {
             turnLabelsOn();
@@ -61,7 +61,7 @@ export function NavbarComponent(props) {
         { name: 'On', value: '1' },
         { name: 'Off', value: '2' }
     ];
-    const onChangePrefixMode = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChangePrefixMode = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPrefixMode(e.currentTarget.value)
         if (e.currentTarget.value === '1') {
             turnPrefixSuffixOn();
@@ -127,7 +127,7 @@ export function NavbarComponent(props) {
                                             name="radio"
                                             value={mode.value}
                                             checked={codingMode === mode.value}
-                                            onChange={onChangeCodingMode}
+                                            onChange={handleChangeCodingMode}
                                             role="menuitemradio"
                                         >
                                             {mode.name}
@@ -148,7 +148,7 @@ export function NavbarComponent(props) {
                                             name="radio"
                                             value={mode.value}
                                             checked={labelMode === mode.value}
-                                            onChange={onChangeLabelMode}
+                                            onChange={handleChangeLabelMode}
                                             role="menuitemradio"
                                         >
                                             {mode.name}
@@ -169,7 +169,7 @@ export function NavbarComponent(props) {
                                             name="radio"
                                             value={mode.value}
                                             checked={prefixMode === mode.value}
-                                            onChange={onChangePrefixMode}
+                                            onChange={handleChangePrefixMode}
                                             role="menuitemradio"
                                         >
                                             {mode.name}

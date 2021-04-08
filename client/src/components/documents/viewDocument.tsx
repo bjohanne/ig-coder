@@ -4,15 +4,13 @@ import {connect} from "react-redux";
 import Spinner from "react-bootstrap/Spinner";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
-import DropdownButton from "react-bootstrap/DropdownButton";
-import Dropdown from "react-bootstrap/Dropdown";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
 
 import "./viewDocument.css";
 import {getDocument, saveDocumentRequest} from "../../state/documents/actions";
 import pageTitles from "../../core/config/pageTitles";
 import {Entry} from "../../core/model/entry";
+import DocumentActionBar from "./components/documentActionBar";
 
 export function ViewDocumentComponent(props) {
     const {
@@ -36,18 +34,6 @@ export function ViewDocumentComponent(props) {
             getDocument(Number(id));	// Fetch the document if it's not already in store
         }
 	}, [currentDocument, id, getDocument, inManagementMode]);
-
-    const onSave = () => {
-    }
-
-    const onLoad = () => {
-    }
-
-    const onExportUIMACAS = () => {
-    }
-
-    const onExportShorthand = () => {
-    }
 
     const handleRowClicked = (e: React.MouseEvent<HTMLTableRowElement>) => {
         // The entry ID is stored in the data-id attribute of the row
@@ -76,22 +62,7 @@ export function ViewDocumentComponent(props) {
                         }
                     </div>
                     <div className="col-md-6 text-right">
-                        <ButtonGroup>
-                            <Button onClick={onSave} title="Save the document to a JSON file">
-                                Save to file
-                            </Button>
-                            <Button onClick={onLoad} title="Load a document from a JSON file">
-                                Load from file
-                            </Button>
-                            <DropdownButton id="export-dropdown" title="Export" as={ButtonGroup} className="d-inline-block">
-                                <Dropdown.Item onClick={onExportUIMACAS} title="Save the document to a file" role="menuitem">
-                                    UIMA CAS
-                                </Dropdown.Item>
-                                <Dropdown.Item onClick={onExportShorthand} title="Save the document to a file" role="menuitem">
-                                    Shorthand
-                                </Dropdown.Item>
-                            </DropdownButton>
-                        </ButtonGroup>
+                        <DocumentActionBar/>
                     </div>
                 </div>
 

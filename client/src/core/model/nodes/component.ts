@@ -93,10 +93,9 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
      * @param main (Optional) The text that most narrowly fits the component/property
      * @param prefix (Optional) Text from the raw statement that precedes the main part
      * @param suffix (Optional) Text from the raw statement that succeeds the main part
-     * @param explicit (Optional) If the raw text is tacit/implicit, this is an explicit specification
-     * @param rephrased (Optional) A rephrased version of the text in the main field
+     * @param inferredOrRephrased (Optional) An explicit specification and/or rephrasing of the main part
      */
-    setText(main?: string, prefix?: string, suffix?: string, explicit?: string, rephrased?: string) : void {
+    setText(main?: string, prefix?: string, suffix?: string, inferredOrRephrased?: string) : void {
         switch (this.componentType) {   // Handle component types that cannot have text content
             case ComponentType.activationconditions:
                 throw new DataError(DataErrorType.CMP_AC_TXT, this.id);
@@ -114,7 +113,7 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
                 throw new DataError(DataErrorType.CMP_HAS_CHLD_NO_PRP, this.id);
             }
         }
-        this.text.set(main, prefix, suffix, explicit, rephrased);
+        this.text.set(main, prefix, suffix, inferredOrRephrased);
         this.update();
     }
 

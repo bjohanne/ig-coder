@@ -13,8 +13,7 @@ const ComponentEditor = (props: any) => {
         main: "",
         prefix: "",
         suffix: "",
-        explicit: "",
-        rephrased: ""
+        inferredOrRephrased: ""
 	});
     const [entryContentVal, setEntryContentVal] = useState("");
     //const [saveEnabled, setSaveEnabled] = useState(false);

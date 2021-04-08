@@ -6,8 +6,9 @@ import ModalFooter from 'react-bootstrap/ModalFooter';
 import Button from 'react-bootstrap/Button';
 import Spinner from "react-bootstrap/Spinner";
 
-import { INode } from "../../core/model/interfaces";
-import { NodeType } from "../../core/model/enums";
+import {INode} from "../../core/model/interfaces";
+import {NodeType} from "../../core/model/enums";
+import {Entry} from "../../core/model/entry";
 import StatementEditor from "./nodes/statementEditor";
 import JunctionEditor from "./nodes/junctionEditor";
 import ComponentEditor from "./nodes/componentEditor";
@@ -18,6 +19,7 @@ import {openSnackbarWithData} from "../../state/ui/actions";
 interface IProps {
 	activeNode: INode,
 	modalState: Boolean,
+	currentEntry: Entry,
 	closeModal: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void,
 	setSaved: Function,
 	openSnackbarWithData: Function
@@ -27,21 +29,21 @@ const EditorModal = (props: IProps) => {
 	const {
 		activeNode,
 		modalState,
+		currentEntry,
 		closeModal,
 		setSaved,
 		openSnackbarWithData
 	} = props;
 
-	const onSave = (e) => {
+	const handleSave = () => {
 		// Like the save button in ViewEntry, this doesn't actually save anything,
 		// because work is saved automatically in the browser.
 		// It's implemented for users who feel they need to click a save button.
 		setSaved();
-		closeModal(e);
 		openSnackbarWithData("success", "Your changes have been saved locally.", 3000);
     }
 
-	const renderEditor = () => {
+	const renderEditor = () => {	// Node types with text content receive currentEntry to display the statement.
 		if (activeNode && activeNode.nodeType) {
 			switch (activeNode.nodeType) {
 				case NodeType.regulativestatement:
@@ -49,15 +51,15 @@ const EditorModal = (props: IProps) => {
 				case NodeType.constitutivestatement:
 					return <StatementEditor/>;
 				case NodeType.statementjunction:
-					return <JunctionEditor/>;
+					return <JunctionEditor currentEntry={currentEntry}/>;
 				case NodeType.componentjunction:
-					return <JunctionEditor/>;
+					return <JunctionEditor currentEntry={currentEntry}/>;
 				case NodeType.propertyjunction:
-					return <JunctionEditor/>;
+					return <JunctionEditor currentEntry={currentEntry}/>;
 				case NodeType.component:
-					return <ComponentEditor/>;
+					return <ComponentEditor currentEntry={currentEntry}/>;
 				case NodeType.property:
-					return <PropertyEditor/>;
+					return <PropertyEditor currentEntry={currentEntry}/>;
 				default:
 					console.error("Invalid node type for active node: " + activeNode.nodeType);
 					return <></>;
@@ -73,7 +75,7 @@ const EditorModal = (props: IProps) => {
 			</ModalBody>
 			<ModalFooter className="d-flex justify-content-between">
 				<Button variant="secondary" onClick={closeModal}>Cancel</Button>
-				<Button variant="primary" id="save-button-bottom" onClick={onSave}>Save changes</Button>
+				<Button variant="primary" id="save-button-bottom" onClick={handleSave}>Save changes</Button>
 			</ModalFooter>
 		</Modal>
 	);

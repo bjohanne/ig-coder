@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import {QuestionCircleFill} from 'react-bootstrap-icons';
 import {INode} from "../../../core/model/interfaces";
 import {NodeType} from "../../../core/model/enums";
-import "./helpText.css";
+import "../editor.css";
 
 interface IProps {
     activeNode: INode,

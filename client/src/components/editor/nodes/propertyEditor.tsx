@@ -3,25 +3,25 @@ import {connect} from "react-redux";
 import CommonEditorTable from "../common/commonTable";
 import PropertyChildren from "../children/propertyChildren";
 import TextContentComponent from "../common/textContent";
+import {Entry} from "../../../core/model/entry";
 
-const PropertyEditor = (props) => {
+interface IProps {
+    currentEntry: Entry
+}
+
+const PropertyEditor = (props: IProps) => {
+    const {currentEntry} = props;
 
     return (
         <CommonEditorTable>
+            <TextContentComponent currentEntry={currentEntry}/>
             <PropertyChildren/>
-            <TextContentComponent/>
         </CommonEditorTable>
     )
 }
 
-const mapStateToProps = (state: any) => ({
-});
-
-const mapDispatchToProps = (dispatch: any) => ({
-});
-
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps
+    null,
+    null
 )(PropertyEditor);
 

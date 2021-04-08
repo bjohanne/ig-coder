@@ -13,31 +13,30 @@ import {ITextContent} from "./interfaces"
  */
  export class TextContent implements ITextContent {
 	/* The text that most narrowly fits the component/property, taken directly from the raw statement */
-	main?: string;
+	main: string;
 	/* Text from the raw statement that precedes the main part, e.g. prepositions and articles */
-	prefix?: string;
+	prefix: string;
 	/* Text from the raw statement that succeeds the main part */
-	suffix?: string;
-	/* If the raw text is tacit/implicit, this is an explicit specification */
-	explicit?: string;
-	/* A rephrased version of the text in the main field */
-	rephrased?: string;
+	suffix: string;
+	/* An explicit specification and/or rephrasing of the main part */
+	inferredOrRephrased: string;
 
     /**
 	 * Create a new TextContent object that holds text content.
-	 * Only sets those fields that are provided. The existence of the main field determines whether the
-	 *  text content is considered set.
+	 * Only sets those fields that are provided.
 	 * Any undefined arguments will result in the corresponding field undefined.
 	 * You can pass an empty string to any field.
 	 *
 	 * @param main (Optional) The text that most narrowly fits the component/property
 	 * @param prefix (Optional) Text from the raw statement that precedes the main part
 	 * @param suffix (Optional) Text from the raw statement that succeeds the main part
-	 * @param explicit (Optional) If the raw text is tacit/implicit, this is an explicit specification
-	 * @param rephrased (Optional) A rephrased version of the text in the main field
+	 * @param inferredOrRephrased (Optional) An explicit specification and/or rephrasing of the main part
 	 */
-    constructor(main?: string, prefix?: string, suffix?: string, explicit?: string, rephrased?: string) {
-    	this.set(main, prefix, suffix, explicit, rephrased);
+    constructor(main?: string, prefix?: string, suffix?: string, inferredOrRephrased?: string) {
+		this.main = (typeof main !== "undefined") ? main : "";
+		this.prefix = (typeof prefix !== "undefined") ? prefix : "";
+		this.suffix = (typeof suffix !== "undefined") ? suffix : "";
+		this.inferredOrRephrased = (typeof inferredOrRephrased !== "undefined") ? inferredOrRephrased : "";
     }
 
 	/**
@@ -46,21 +45,29 @@ import {ITextContent} from "./interfaces"
 	 * @param data An object of type ITextContent
 	 */
 	static fromData(data: ITextContent) : TextContent {
-		return new this(data.main, data.prefix, data.suffix, data.explicit, data.rephrased);
+		return new this(data.main, data.prefix, data.suffix, data.inferredOrRephrased);
     }
 
 	/**
+	 * Conveniently set text content with a single parameter.
+	 * NB: Will overwrite all fields.
+	 * @param data An object of type ITextContent
+	 */
+	setFromData(data: ITextContent) : void {
+		this.set(data.main, data.prefix, data.suffix, data.inferredOrRephrased);
+	}
+
+	/**
 	 * Set each part of the TextContent individually.
-	 * Only the provided parameters are changed, but you can pass an empty string to set to that.
-	 * If an argument is undefined, the corresponding string is unchanged.
+	 * Only sets those fields that are provided. Pass undefined to ignore a field, pass a string to set
+	 * the field to that string, including an empty string.
 	 *
 	 * @param main (Optional) The text that most narrowly fits the component/property
 	 * @param prefix (Optional) Text from the raw statement that precedes the main part
 	 * @param suffix (Optional) Text from the raw statement that succeeds the main part
-	 * @param explicit (Optional) If the raw text is tacit/implicit, this is an explicit specification
-	 * @param rephrased (Optional) A rephrased version of the text in the main field
+	 * @param inferredOrRephrased (Optional) An explicit specification and/or rephrasing of the main part
 	 */
-	set(main?: string, prefix?: string, suffix?: string, explicit?: string, rephrased?: string) : void {
+	set(main?: string, prefix?: string, suffix?: string, inferredOrRephrased?: string) : void {
 		// All parameters are optional - set only those that are defined. These checks allow setting to an empty string.
 		if (typeof main !== "undefined") {
 			this.main = main;
@@ -71,65 +78,68 @@ import {ITextContent} from "./interfaces"
 		if (typeof suffix !== "undefined") {
 			this.suffix = suffix;
 		}
-		if (typeof explicit !== "undefined") {
-			this.explicit = explicit;
+		if (typeof inferredOrRephrased !== "undefined") {
+			this.inferredOrRephrased = inferredOrRephrased;
 		}
-		if (typeof rephrased !== "undefined") {
-			this.rephrased = rephrased;
-		}
-		// Note that we can set fields even if main is undefined. This is necessary for fromData() rebuilding, which
-		// does not need the tree to be strictly valid.
+		// Note that this ignores the rules for when text content is considered set/unset.
+		// This is necessary for fromData() rebuilding, which does not need the tree to be strictly valid.
 	}
 
 	/**
-	 * Set all fields to undefined, reverting the text content to a "not yet coded" state.
+	 * Set all fields to an empty string, reverting the text content to a "not yet coded" state.
 	 */
 	unset() : void {
-		this.main = undefined;
-		this.prefix = undefined;
-		this.suffix = undefined;
-		this.explicit = undefined;
-		this.rephrased = undefined;
+		this.main = "";
+		this.prefix = "";
+		this.suffix = "";
+		this.inferredOrRephrased = "";
 	}
 
 	/**
-	 * Returns whether the text content has been set (which is determined by whether the main field is defined).
-	 * This function will return true if main is an empty string, which is considered intentionally empty.
-	 * NB: This function ignores all other fields than main.
+	 * Returns whether the text content is set. If at least one of main and inferredOrRephrased is
+	 * a non-empty string, the text content is considered set.
+	 * NB: This function ignores the prefix and suffix fields.
 	 */
 	isSet() : Boolean {
-		return (typeof this.main !== "undefined");
+		return !(this.main === "" && this.inferredOrRephrased === "");
 	}
 
 	/**
-	 * Returns true if all text fields are empty/undefined OR
-	 *  the main field is defined and has one of the default values for Junction text content,
+	 * Returns true if all text fields are empty OR
+	 *  the main field has one of the default values for Junction text content,
 	 *  which are ["and", "or"]. In that case, non-main fields are ignored.
 	 */
 	isEmptyOrJunctionDefault() : Boolean {
 		return (
-			(!this.main && !this.prefix && !this.suffix && !this.explicit && !this.rephrased) ||
-			(typeof this.main !== undefined && ["and", "or"].includes(this.main))
+			(this.main === "" && this.prefix === "" && this.suffix === "" && this.inferredOrRephrased === "") ||
+			(["and", "or"].includes(this.main))
 		)
 	}
 
 	/**
-	 * Concatenates the text content's prefix, main and suffix and returns the resulting string.
+	 * Concatenates the text content's prefix, main/inferredOrRephrased and suffix and returns the resulting string.
+	 * If inferredOrRephrased is set, prints that in place of main, otherwise prints main.
 	 * The resulting string will have exactly one space between each present component and no superfluous spaces.
-	 * @return A string concatenated from the present components out of prefix, main and suffix
+	 * @return A string concatenated from the present components out of prefix, main, inferredOrRephrased and suffix
 	 */
 	getString() : string {
 		let str: string = "";
 
 		if (this.prefix) {
 			str += this.prefix;
-			if (this.main || this.suffix) {
+			if (this.main || this.inferredOrRephrased || this.suffix) {
 				str += " ";
 			}
 		}
 
 		if (this.main) {
 			str += this.main;
+
+			if (this.suffix) {
+				str += " ";
+			}
+		} else if (this.inferredOrRephrased) {
+			str += this.inferredOrRephrased;
 
 			if (this.suffix) {
 				str += " ";

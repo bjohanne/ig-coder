@@ -16,9 +16,9 @@ export class Entry implements IEntry {
 	/* This Entry's root node */
 	root?: INode;
 	/* The complete statement */
-	original?: string;
+	original: string;
 	/* Optionally, the statement can be rephrased before coding. The rephrased version is stored here. */
-	rephrased?: string;
+	rephrased: string;
 
     /**
      * Create a new Entry without a statement or root node.
@@ -30,6 +30,8 @@ export class Entry implements IEntry {
     constructor(document: number, id?: number) {
     	this.id = (id) ? id : IDCounter.getInstance().getNextId(document);
 		this.document = document;
+		this.original = "";
+		this.rephrased = "";
     }
 
 	/**
@@ -94,25 +96,25 @@ export class Entry implements IEntry {
 	}
 
 	/**
-	 * Set this Entry's original statement to undefined.
+	 * Set this Entry's original statement to an empty string.
 	 */
 	unsetOriginal() : void {
-		this.original = undefined;
+		this.original = "";
 	}
 
 	/**
 	 * Assign this Entry's prepared statement.
 	 * @param statement The full text of the prepared statement
 	 */
-	setPrepared(statement: string) : void {
+	setRephrased(statement: string) : void {
 		this.rephrased = statement;
 	}
 
 	/**
-	 * Set this Entry's prepared statement to undefined.
+	 * Set this Entry's prepared statement to an empty string.
 	 */
-	unsetPrepared() : void {
-		this.rephrased = undefined;
+	unsetRephrased() : void {
+		this.rephrased = "";
 	}
 
 	/**

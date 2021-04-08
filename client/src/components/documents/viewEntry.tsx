@@ -1,27 +1,41 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {withRouter, Link, Redirect} from "react-router-dom";
+import {RouteComponentProps} from "react-router";
 import {connect} from "react-redux";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Spinner from "react-bootstrap/Spinner";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
-import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
-import Accordion from "react-bootstrap/Accordion";
 
-import "./viewEntry.css";
 import pageTitles from "../../core/config/pageTitles";
 import {Arg} from "../../core/model/enums";
 import {Entry} from "../../core/model/entry";
+import Document from "../../core/model/document";
 import TreeComponent from "../editor/tree";
 import EditorModal from "../editor/editorModal";
 import {createRootNode, clearTree} from "../../state/model/actions";
-import {setSaved} from "../../state/documents/actions";
+import {setEntryIndex, setSaved} from "../../state/documents/actions";
 import {openSnackbarWithData} from "../../state/ui/actions";
-import {AccordionToggle} from "../common/accordionToggle";
+import StatementAccordion from "./components/statementAccordion";
 
-export function ViewEntryComponent(props) {
+type PathParamsType = {
+    docid: string,
+    entryid: string
+}
+
+interface IProps extends RouteComponentProps<PathParamsType> {
+    currentDocument: Document | null,
+    loading: Boolean,
+    createRootNode: Function,
+    clearTree: Function,
+    setSaved: Function,
+    openSnackbarWithData: Function,
+    setEntryIndex: Function
+}
+
+export function ViewEntryComponent(props: IProps) {
     // Set page title
     document.title = pageTitles.prefix + "Entry";
 
@@ -29,13 +43,14 @@ export function ViewEntryComponent(props) {
         match: {params: {docid, entryid}},
         currentDocument,
         loading,
-        changed,
         createRootNode,
         clearTree,
         setSaved,
-        openSnackbarWithData
+        openSnackbarWithData,
+        setEntryIndex
     } = props;
 
+    // The current entry extracted from currentDocument
     const currentEntry: Entry = currentDocument.entries[currentDocument.entryMap[entryid]];
 
     // Base modal for node editors
@@ -43,38 +58,26 @@ export function ViewEntryComponent(props) {
     const handleCloseModal = () => setModalState(false);
     const handleShowModal = () => setModalState(true);
 
-    const rawTextArea = useRef(null);
-    const rephrasedTextArea = useRef(null);
-
     useEffect(() => {
-        if (rawTextArea.current && rephrasedTextArea.current) {
-            // For the 2 textareas that display the statement, adapt the number of rows to the length of the statement
-            rawTextArea.current.rows = 1;
-            rephrasedTextArea.current.rows = 1;
-            if (rawTextArea.current.scrollHeight > 36) {
-                const newRowsNumber = (rawTextArea.current.scrollHeight - 12) / 24;
-                rawTextArea.current.rows = newRowsNumber;
-                rephrasedTextArea.current.rows = newRowsNumber;
-            }
-        }
-    }, []); // Run only once on mount
+        setEntryIndex(currentDocument.entryMap[Number(entryid)]);
+    }, [setEntryIndex, currentDocument, entryid]);
 
-    const onRootRegulative = () => {
+    const handleCreateRootRegulative = () => {
         createRootNode(currentDocument.entryMap[entryid], Arg.regulative);
     };
 
-    const onRootConstitutive = () => {
+    const handleCreateRootConstitutive = () => {
         createRootNode(currentDocument.entryMap[entryid], Arg.constitutive);
     };
 
-    const onClearTree = () => {
+    const handleClearTree = () => {
         if (!window.confirm("The entire tree for this entry will be deleted. Proceed?")) {
             return;
         }
         clearTree(currentDocument.entryMap[entryid]);
     };
 
-    const onSave = () => {
+    const handleSave = () => {
         // This doesn't actually save anything, because work is saved automatically in the browser.
         // It's implemented for users who feel they need to click a save button.
         setSaved();
@@ -97,25 +100,7 @@ export function ViewEntryComponent(props) {
                 </Breadcrumb>
 
                 <div className="card-body">
-                    <Form id="textarea-container">
-                        <Accordion defaultActiveKey="0">
-                            <AccordionToggle text="Raw" openByDefault eventKey="0"/>
-                            <Accordion.Collapse eventKey="0">
-                                <Form.Group controlId="original-textarea" id="original-textarea">
-                                    <Form.Control as="textarea" ref={rawTextArea} disabled
-                                                  value={currentEntry.original}/>
-                                </Form.Group>
-                            </Accordion.Collapse>
-                        </Accordion>
-                        <Accordion>
-                            <AccordionToggle text="Rephrased" isLast eventKey="0" id="rephrased-toggle"/>
-                            <Accordion.Collapse eventKey="0">
-                                <Form.Group controlId="rephrased-textarea" id="rephrased-textarea">
-                                    <Form.Control as="textarea" ref={rephrasedTextArea}/>
-                                </Form.Group>
-                            </Accordion.Collapse>
-                        </Accordion>
-                    </Form>
+                    <StatementAccordion currentEntry={currentEntry}/>
 
                     {currentEntry.root ?                /* The Entry has a root node */
                     <>
@@ -126,8 +111,8 @@ export function ViewEntryComponent(props) {
                         <Col className="d-flex align-items-center">
                             <small className="mr-2">Statement type:</small>
                             <ButtonGroup>
-                                <Button onClick={onRootRegulative}>Regulative</Button>
-                                <Button onClick={onRootConstitutive}>Constitutive</Button>
+                                <Button onClick={handleCreateRootRegulative}>Regulative</Button>
+                                <Button onClick={handleCreateRootConstitutive}>Constitutive</Button>
                             </ButtonGroup>
                         </Col>
 
@@ -136,10 +121,10 @@ export function ViewEntryComponent(props) {
                     {currentEntry.root &&
                     <Row className="pt-2">
                         <Col className="d-flex justify-content-start">
-                            <Button onClick={onClearTree} variant="danger">Clear tree</Button>
+                            <Button onClick={handleClearTree} variant="danger">Clear tree</Button>
                         </Col>
                         <Col className="d-flex justify-content-end">
-                            <Button onClick={onSave} variant="primary" disabled={!changed}>Save changes</Button>
+                            <Button onClick={handleSave} variant="primary">Save changes</Button>
                         </Col>
                     </Row>
                     }
@@ -147,7 +132,7 @@ export function ViewEntryComponent(props) {
             </div>
 
             {/* Editor base modal */}
-            <EditorModal modalState={modalState} closeModal={handleCloseModal} />
+            <EditorModal modalState={modalState} closeModal={handleCloseModal} currentEntry={currentEntry} />
         </>
         :
         <Redirect to="/404"/>
@@ -157,11 +142,11 @@ export function ViewEntryComponent(props) {
 
 const mapStateToProps = (state: any) => ({
     currentDocument: state.documents.currentDocument,
-    loading: state.documents.loading,
-    changed: state.documents.changed
+    loading: state.documents.loading
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
+    setEntryIndex: (entryIndex: number) => dispatch(setEntryIndex(entryIndex)),
     createRootNode: (entryIndex: number, nodeType: Arg.regulative | Arg.constitutive | Arg.statementjunction) =>
         dispatch(createRootNode(entryIndex, nodeType)),
     clearTree: (entryIndex: number) => dispatch(clearTree(entryIndex)),

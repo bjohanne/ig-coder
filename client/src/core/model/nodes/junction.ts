@@ -12,7 +12,7 @@ import {TextContent} from "../textcontent";
 export default class JunctionNode extends BaseNode implements IJunctionNode {
 	nodeType: NodeType = NodeType.junction;
 	/* Logical operator of the junction */
-	junctionType!: JunctionType;
+	junctionType: JunctionType = JunctionType.none;
 	/* Holds the text content of the junction. Should always be defined */
 	text!: TextContent;
 	/* Two fixed children for Junction nodes */
@@ -41,28 +41,19 @@ export default class JunctionNode extends BaseNode implements IJunctionNode {
 
 	/**
 	 * Assigns a junction type to this node.
-	 * If this node's text content is empty or one of the defaults,
-	 * sets it to the default value determined by the new junction type.
 	 * @param junctionType and/or/xor
 	 */
-	setJunction(junctionType: JunctionType) : void {
+	setJunctionType(junctionType: JunctionType) : void {
 		this.junctionType = junctionType;
 		this.update();
-		// Set text to a default value if empty or one of the default values
-		if (this.text.isEmptyOrJunctionDefault()) {
-			switch (junctionType) {
-				case JunctionType.and:
-					this.setText("and");
-					break;
-				case JunctionType.or:
-					this.setText("or");
-					break;
-				case JunctionType.xor:
-					this.setText("or");
-					break;
-				default:
-			}
-		}
+	}
+
+	/**
+	 * Sets this node's junction type to the default none type.
+	 */
+	unsetJunctionType() : void {
+		this.junctionType = JunctionType.none;
+		this.update();
 	}
 
 	/**
@@ -71,9 +62,6 @@ export default class JunctionNode extends BaseNode implements IJunctionNode {
 	 * @return A full-text specification of the logical operator (e.g. conjunction, disjunction)
 	 */
 	getOperatorString() : string {
-		if (!this.junctionType) {
-			return "";
-		}
 		switch (this.junctionType) {
 			case JunctionType.and:
 				return "Conjunction";
@@ -82,6 +70,7 @@ export default class JunctionNode extends BaseNode implements IJunctionNode {
 			case JunctionType.xor:
 				return "Exclusive disjunction";
 			default:
+				return ""
 		}
 	}
 
@@ -102,14 +91,13 @@ export default class JunctionNode extends BaseNode implements IJunctionNode {
 	 * @param main (Optional) The text that most narrowly fits the component/property
 	 * @param prefix (Optional) Text from the raw statement that precedes the main part
 	 * @param suffix (Optional) Text from the raw statement that succeeds the main part
-	 * @param explicit (Optional) If the raw text is tacit/implicit, this is an explicit specification
-	 * @param rephrased (Optional) A rephrased version of the text in the main field
+	 * @param inferredOrRephrased (Optional) An explicit specification and/or rephrasing of the main part
 	 */
-	setText(main?: string, prefix?: string, suffix?: string, explicit?: string, rephrased?: string) : void {
+	setText(main?: string, prefix?: string, suffix?: string, inferredOrRephrased?: string) : void {
 		if (!this.text) {
 			throw new DataError(DataErrorType.JUN_GET_TXT_UNDEF, this.id);
 		}
-		this.text.set(main, prefix, suffix, explicit, rephrased);
+		this.text.set(main, prefix, suffix, inferredOrRephrased);
 		this.update();
 	}
 

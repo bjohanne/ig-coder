@@ -25,7 +25,7 @@ export default class BaseNode implements INode {
     nodeType!: NodeType;
     /* Whether this Node's meaning is negated */
     isNegated: boolean = false;
-	/* Optional context type for using the Circumstances Taxonomy on this Node */
+	/* Optional context type for using the Context Taxonomy on this Node */
 	contextType?: ContextType;
     /* ID of the node this node is a child of (undefined if root) */
     parent?: number;

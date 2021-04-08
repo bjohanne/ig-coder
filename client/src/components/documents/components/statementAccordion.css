@@ -1,0 +1,34 @@
+#textarea-container {
+    position: sticky;
+    top: 0;
+    padding-top: 20px;
+    margin-top: -20px;
+    background-color: white;
+    margin-bottom: 15px;
+}
+
+#original-textarea, #rephrased-textarea textarea {
+    min-height: 38px;   /* One line with padding & border */
+}
+
+#original-textarea {
+    margin-bottom: 0 !important;
+}
+
+#rephrased-textarea {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important; /* Without this, transition is choppy */
+}
+
+#original-textarea textarea:disabled {
+    background-color: white !important;
+}
+
+#rephrased-toggle {
+    border-radius: 0 !important;
+}
+
+#rephrased-button-container {
+    padding-left: 1px;
+    background-color: rgba(0, 0, 0, 0.03);
+}

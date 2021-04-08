@@ -24,7 +24,7 @@ export interface INode {
     nodeType:   NodeType,
     /* Whether this Node's meaning is negated */
     isNegated:  boolean,
-    /* Optional context type for using the Circumstances Taxonomy on this Node */
+    /* Optional context type for using the Context Taxonomy on this Node */
     contextType?: ContextType;
     /* ID of the node this node is a child of (undefined if root) */
     parent?:    number,
@@ -40,7 +40,7 @@ export interface INode {
     turnNegationOn(): void,
     turnNegationOff(): void,
     setContextType(contextType: ContextType): void,
-    unsetContextType()
+    unsetContextType(): void
 }
 
  /**
@@ -73,9 +73,9 @@ export interface IEntry {
     /* The statement's root node */
     root?:     INode,
     /* The complete, undivided text of the statement */
-    original?: string,
+    original:  string,
     /* Rephrased, prepared version of the statement for coding */
-    rephrased?: string
+    rephrased: string
 }
 
 /**
@@ -83,18 +83,17 @@ export interface IEntry {
  * Defines no functions in order to support TextContent objects without a class.
  */
 export interface ITextContent {
-    main?: string,
-    prefix?: string,
-    suffix?: string,
-    explicit?: string,
-    rephrased?: string
+    main:   string,
+    prefix: string,
+    suffix: string,
+    inferredOrRephrased: string,
 }
 
 /**
  * The base contract for Statement nodes
  */
 export interface IStatementNode extends INode {
-    // Empty, but kept for consistency
+    // It's empty, but kept in case of future additions
 }
 
 /**
@@ -171,7 +170,8 @@ export interface IComponentNode extends INode {
 export interface IJunctionNode extends INode {
     junctionType: JunctionType,
     text: TextContent,
-    setJunction(junctionType: JunctionType): void,
+    setJunctionType(junctionType: JunctionType): void,
+    unsetJunctionType(): void,
     getOperatorString(): string,
     getText(): TextContent,
     setText(main?: string, prefix?: string, suffix?: string): void,
@@ -186,8 +186,8 @@ export interface IJunctionNode extends INode {
  * The contract for StatementJunction nodes
  */
 export interface IStatementJunctionNode extends IJunctionNode {
-    createStatementNode(type: Arg.regulative | Arg.constitutive, position: Arg.left | Arg.right): StatementNode
-    createStatementJunctionNode(position: Arg.left | Arg.right, junctionType?: JunctionType): StatementJunctionNode,
+    createStatementNode(type: Arg.regulative | Arg.constitutive, position: Arg.left | Arg.right): StatementNode,
+    createStatementJunctionNode(position: Arg.left | Arg.right, junctionType?: JunctionType): StatementJunctionNode
 }
 
 /**
@@ -195,8 +195,8 @@ export interface IStatementJunctionNode extends IJunctionNode {
  */
 export interface IComponentJunctionNode extends IJunctionNode {
     componentType: ComponentType,
-    createComponentNode(componentType: ComponentType, position: Arg.left | Arg.right): ComponentNode
-    createComponentJunctionNode(position: Arg.left | Arg.right, junctionType?: JunctionType): ComponentJunctionNode,
+    createComponentNode(componentType: ComponentType, position: Arg.left | Arg.right): ComponentNode,
+    createComponentJunctionNode(position: Arg.left | Arg.right, junctionType?: JunctionType): ComponentJunctionNode
 }
 
 /**
@@ -206,7 +206,7 @@ export interface IPropertyJunctionNode extends IJunctionNode {
     isFunctionallyDependent: Boolean,
     makeFunctionallyDependent(): void,
     makeNotFunctionallyDependent(): void,
-    setFunctionallyDependent(isFD: Boolean): void
+    setFunctionallyDependent(isFD: Boolean): void,
     createPropertyNode(position: Arg.left | Arg.right): PropertyNode,
     createPropertyJunctionNode(position: Arg.left | Arg.right, junctionType?: JunctionType): PropertyJunctionNode
 }

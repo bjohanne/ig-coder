@@ -15,6 +15,7 @@ export default class Document implements IDocument {
 
 	/**
 	 * Constructor with separate parameters for name, description and ID.
+	 * If entries is provided, rebuilds the Document tree from that list of entries.
 	 * @param name The document's title
 	 * @param description A free-text field describing the document
 	 * @param id The document's identifier, assigned by the backend server
@@ -43,7 +44,7 @@ export default class Document implements IDocument {
     }
 
 	/**
-	 * Static factory method that takes an object containing name, description and ID
+	 * Static factory method that takes an object containing name, description, ID and entries
 	 * and creates a new Document object. Convenience for when you have long arguments.
 	 * @param data An object of type IDocument
 	 * @return A new Document with the passed in properties

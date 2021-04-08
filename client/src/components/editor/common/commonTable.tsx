@@ -31,24 +31,27 @@ const CommonEditorTable = (props: IProps) => {
             <Row>
                 <Col xs={8} md={9}>
                     <Row>
-                        <Col xs={12} md={6} lg={4}>
+                        <Col xs={12} lg={7} xl={4} className="d-flex align-items-center pb-2">
+                            {activeNode && <h4>{activeNode.nodeType}</h4>}
+                        </Col>
+                        <Col xs={12} lg={5} xl={3} className="d-flex align-items-center pb-2">
                             <NegatedComponent/>
                         </Col>
                         {activeNode.nodeType && [NodeType.property, NodeType.propertyjunction]
                             .includes(activeNode.nodeType) &&
-                            <Col xs={12} md={6} lg={4}>
+                            <Col xs={12} lg={7} xl={4} className="d-flex align-items-center pb-2">
                                 <FunctionallyDependentComponent/>
                             </Col>
                         }
                         {activeNode.nodeType && [NodeType.regulativestatement, NodeType.constitutivestatement,
                                                  NodeType.component, NodeType.property].includes(activeNode.nodeType) &&
-                            <Col xs={12} md={6} lg={4}>
+                            <Col xs={12} lg={12} xl={5} className="d-flex align-items-center pb-2">
                                 <ContextTypeComponent/>
                             </Col>
                         }
 
                         {React.Children.map(children, (child) => (
-                            <Col xs={12}>
+                            <Col xs={12} className="pt-2">
                                 {child}
                             </Col>
                         ))}

@@ -5,7 +5,7 @@ const JunctionChildren = (props) => {
 
     return (
         <>
-            JunctionChildren
+
         </>
     )
 }

@@ -1,9 +1,12 @@
 import update from 'immutability-helper';
+import {AxiosError} from "axios";
 import {
     SET_SAVED,
+    SET_ENTRY_INDEX,
     GET_DOCUMENT_RESPONSE,
     GET_DOCUMENT_RESPONSE_FETCHED,
     CREATE_DOCUMENT_RESPONSE_THEN,
+    LOAD_DOCUMENT_RESPONSE,
     ADD_ENTRY_TO_DOCUMENT,
     SET_ACTIVE_NODE,
     UPDATE_ENTRY,
@@ -15,10 +18,18 @@ import {
 import {
     CREATE_ROOT_NODE_RESPONSE,
     CLEAR_TREE_RESPONSE,
+    SET_REPHRASED_RESPONSE,
+    UNSET_REPHRASED_RESPONSE,
     TURN_NEGATION_ON_RESPONSE,
     TURN_NEGATION_OFF_RESPONSE,
+    TURN_FUNCDEP_ON_RESPONSE,
+    TURN_FUNCDEP_OFF_RESPONSE,
     SET_CONTEXT_TYPE_RESPONSE,
-    UNSET_CONTEXT_TYPE_RESPONSE
+    UNSET_CONTEXT_TYPE_RESPONSE,
+    SET_TEXT_CONTENT_RESPONSE,
+    UNSET_TEXT_CONTENT_RESPONSE,
+    SET_JUNCTION_TYPE_RESPONSE,
+    UNSET_JUNCTION_TYPE_RESPONSE
 } from "../model/actions";
 
 import {API_CALL_BEGIN, API_CALL_SUCCESS, API_CALL_ERROR} from "../apiCall/actions";
@@ -34,6 +45,8 @@ interface IDocumentState {
     documentList: Array<Document>,
     // The document that's currently being viewed
     currentDocument: Document | null,
+    // The index of the entry that's currently being viewed
+    currentEntryIndex: Number,
     // The node for which the editor modal is currently open
     activeNode: INode,
     // Whether the document has changed since last save
@@ -41,12 +54,13 @@ interface IDocumentState {
     // Whether an API request is currently being processed
     loading: Boolean,
     // The error object for the last API error that occurred
-    error: any
+    error: AxiosError
 }
 
 const initialState: IDocumentState = {
     documentList: [],
     currentDocument: testDocument, // NB: Test document set as default regardless of whether management mode is on! Should be null if on.
+    currentEntryIndex: null,
     activeNode: null,
     changed: false,
     loading: false,
@@ -81,6 +95,8 @@ const documents = (state: IDocumentState = initialState, action: any) => {
 
         case SET_SAVED:
             return update(state, {changed: {$set: false}});
+        case SET_ENTRY_INDEX:
+            return update(state, {currentEntryIndex: {$set: action.payload}});
         case GET_DOCUMENT_RESPONSE:
             return update(state, {currentDocument: {$set: action.payload}});
         case GET_DOCUMENT_RESPONSE_FETCHED:
@@ -91,8 +107,15 @@ const documents = (state: IDocumentState = initialState, action: any) => {
                 currentDocument: {$set: action.payload},
                 changed: { $set: true }
             });
+        case LOAD_DOCUMENT_RESPONSE:    // NB: This does not currently update documentList - it should do so in the future.
+            return update(state, {
+                currentDocument: {$set: action.payload},
+                loading: { $set: false }
+            });
         case SET_ACTIVE_NODE:
             return update(state, {activeNode: {$set: action.payload}});
+
+        /* OLD */
         case ADD_JUNCTION:
             node = action.payload as INode;
             currentDocument = state.currentDocument as Document;
@@ -104,7 +127,7 @@ const documents = (state: IDocumentState = initialState, action: any) => {
             let junctionNode = action.payload.node as JunctionNode;
             currentDocument = state.currentDocument as Document;
             currentDocument.entries[0].root.updatedAt = new Date();
-            junctionNode.setJunction(action.payload.junctionType);
+            junctionNode.setJunctionType(action.payload.junctionType);
             currentDocument.replaceNode(junctionNode);
             newDocument = Object.assign(new Document("", "", -1), currentDocument);
             return update(state, {currentDocument: {$set: newDocument }});
@@ -157,6 +180,28 @@ const documents = (state: IDocumentState = initialState, action: any) => {
                 },
                 changed: { $set: true }
             });
+        case SET_REPHRASED_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                changed: { $set: true }
+            });
+        case UNSET_REPHRASED_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                changed: { $set: true }
+            });
         case TURN_NEGATION_ON_RESPONSE:
             return update(state, {
                 currentDocument: {
@@ -179,6 +224,28 @@ const documents = (state: IDocumentState = initialState, action: any) => {
                 },
                 changed: { $set: true }
             });
+        case TURN_FUNCDEP_ON_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                changed: { $set: true }
+            });
+        case TURN_FUNCDEP_OFF_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                changed: { $set: true }
+            });
         case SET_CONTEXT_TYPE_RESPONSE:
             return update(state, {
                 currentDocument: {
@@ -191,6 +258,50 @@ const documents = (state: IDocumentState = initialState, action: any) => {
                 changed: { $set: true }
             });
         case UNSET_CONTEXT_TYPE_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                changed: { $set: true }
+            });
+        case SET_TEXT_CONTENT_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                changed: { $set: true }
+            });
+        case UNSET_TEXT_CONTENT_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                changed: { $set: true }
+            });
+        case SET_JUNCTION_TYPE_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                changed: { $set: true }
+            });
+        case UNSET_JUNCTION_TYPE_RESPONSE:
             return update(state, {
                 currentDocument: {
                     entries: {

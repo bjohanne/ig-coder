@@ -29,7 +29,7 @@ const JunctionEditor = (props: any) => {
 
     const [junctionType, setJunctionType] = useState(null);
 
-    const onChange = (value: string) => {
+    const handleChange = (value: string) => {
         const jType: JunctionType = (JunctionType)[value.toLowerCase()];
         setJunctionType(jType);
     }
@@ -68,16 +68,16 @@ const JunctionEditor = (props: any) => {
             <div className="radio-wrap">
                 <div className="radio">
                 <label>
-                    <input type="radio" onChange={() => onChange("AND")} value="AND" name="optradio" checked={junctionType === JunctionType.and}/>
+                    <input type="radio" onChange={() => handleChange("AND")} value="AND" name="optradio" checked={junctionType === JunctionType.and}/>
                     AND</label>
                 </div>
                 <div className="radio">
                 <label>
-                    <input type="radio" onChange={() => onChange("OR")} value="OR" name="optradio" checked={junctionType === JunctionType.or}/>
+                    <input type="radio" onChange={() => handleChange("OR")} value="OR" name="optradio" checked={junctionType === JunctionType.or}/>
                     OR</label>
                 </div>
                 <div className="radio">
-                    <label><input type="radio" onChange={() => onChange("XOR")} value="XOR" name="optradio" checked={junctionType === JunctionType.xor}/>
+                    <label><input type="radio" onChange={() => handleChange("XOR")} value="XOR" name="optradio" checked={junctionType === JunctionType.xor}/>
                     XOR</label>
                 </div>
             </div>

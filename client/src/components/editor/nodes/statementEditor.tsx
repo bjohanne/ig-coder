@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import CommonEditorTable from "../common/commonTable";
 import StatementChildren from "../children/statementChildren";
 
-const StatementEditor = (props) => {
+const StatementEditor = () => {
 
     return (
         <CommonEditorTable>
@@ -12,14 +12,8 @@ const StatementEditor = (props) => {
     )
 }
 
-const mapStateToProps = (state: any) => ({
-});
-
-const mapDispatchToProps = (dispatch: any) => ({
-});
-
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps
+    null,
+    null
 )(StatementEditor);
 

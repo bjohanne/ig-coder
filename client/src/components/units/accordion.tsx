@@ -9,6 +9,7 @@ import "./accordion.css";
 let newEntryRoot: HTMLElement | null;
 
 /*
+    UNUSED
 	This component governs the Create New Entry form.
 */
 

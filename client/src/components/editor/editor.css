@@ -1,0 +1,17 @@
+.help-text {
+    text-align: right;
+    visibility: hidden;
+}
+
+.question-mark:hover + .help-text {
+    visibility: visible;
+}
+
+#textContentForm label {
+    padding-top: 0 !important;
+    padding-left: 1px !important;
+}
+
+#statement-textarea {
+    min-height: 38px;   /* One line with padding & border */
+}

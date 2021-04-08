@@ -92,10 +92,9 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
      * @param main (Optional) The text that most narrowly fits the component/property
      * @param prefix (Optional) Text from the raw statement that precedes the main part
      * @param suffix (Optional) Text from the raw statement that succeeds the main part
-     * @param explicit (Optional) If the raw text is tacit/implicit, this is an explicit specification
-     * @param rephrased (Optional) A rephrased version of the text in the main field
+     * @param inferredOrRephrased (Optional) An explicit specification and/or rephrasing of the main part
      */
-    setText(main?: string, prefix?: string, suffix?: string, explicit?: string, rephrased?: string) : void {
+    setText(main?: string, prefix?: string, suffix?: string, inferredOrRephrased?: string) : void {
         if (!this.text) {
             throw new DataError(DataErrorType.PRP_GET_TXT_UNDEF, this.id);
         } else {
@@ -108,7 +107,7 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
                 }
                 this.children.length = 0;
             }
-            this.text.set(main, prefix, suffix, explicit, rephrased);
+            this.text.set(main, prefix, suffix, inferredOrRephrased);
             this.update();
         }
     }

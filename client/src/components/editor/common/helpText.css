@@ -1,8 +1,0 @@
-.help-text {
-    text-align: right;
-    visibility: hidden;
-}
-
-.question-mark:hover + .help-text {
-    visibility: visible;
-}

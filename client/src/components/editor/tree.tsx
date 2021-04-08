@@ -4,7 +4,7 @@ import {hierarchy, select, tree, TreeLayout} from "d3";
 import ReactTooltip from "react-tooltip";
 
 import {INode} from "../../core/model/interfaces";
-import {ComponentType, NodeType, getContextString} from "../../core/model/enums";
+import {ComponentType, NodeType, getContextString, JunctionType} from "../../core/model/enums";
 import {Entry} from "../../core/model/entry";
 
 import "./tree.css";
@@ -158,52 +158,47 @@ const TreeComponent = (props: IProps) => {
                 switch (d.data.nodeType) {
                     case NodeType.regulativestatement:
                         html = `<strong>${NodeType.regulativestatement}</strong>`;
-                        if (d.data.contextType) {
-                            html += `<br/>Context type: ${getContextString(d.data.contextType)}`;
-                        }
                         break;
                     case NodeType.constitutivestatement:
                         html = `<strong>${NodeType.constitutivestatement}</strong>`;
-                        if (d.data.contextType) {
-                            html += `<br/>Context type: ${getContextString(d.data.contextType)}`;
-                        }                        break;
+                        break;
                     case NodeType.statementjunction:
                         html = `<strong>${NodeType.statementjunction}</strong><br/>` +
-                            ((d.data.junctionType) ? `${d.data.getOperatorString()}` : `<em>No operator</em>`) + `<br/>` +
+                            ((d.data.junctionType && d.data.junctionType !== JunctionType.none) ?
+                                `${d.data.getOperatorString()}` :`<em>No junction type</em>`) + `<br/>` +
                             ((d.data.text) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
                         break;
                     case NodeType.componentjunction:
                         html = `<strong>${NodeType.componentjunction}</strong><br/>` +
-                            ((d.data.junctionType) ? `${d.data.getOperatorString()}` : `<em>No operator</em>`) + `<br/>` +
+                            ((d.data.junctionType && d.data.junctionType !== JunctionType.none) ?
+                                `${d.data.getOperatorString()}` : `<em>No junction type</em>`) + `<br/>` +
                             ((d.data.text) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
                         break;
                     case NodeType.propertyjunction:
                         html = `<strong>${NodeType.propertyjunction}</strong><br/>` +
-                            ((d.data.junctionType) ? `${d.data.getOperatorString()}` : `<em>No operator</em>`) + `<br/>` +
+                            ((d.data.junctionType && d.data.junctionType !== JunctionType.none) ?
+                                `${d.data.getOperatorString()}` : `<em>No junction type</em>`) + `<br/>` +
                             ((d.data.text) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
                         break;
                     case NodeType.component:
                         textContent = (d.data.text) ? d.data.text.getString() : undefined;
                         html = `<strong>${NodeType.component}</strong><br/>` +
-                            `${d.data.componentType}<br/>` +
+                            `${d.data.componentType}` +
                             (![ComponentType.activationconditions, ComponentType.executionconstraints].includes(d.data.componentType) ?
-                            (textContent ? `"${textContent}"` : `<em>No text content</em>`) : ``);
-                        if (d.data.contextType) {
-                            html += `<br/>Context type: ${getContextString(d.data.contextType)}`;
-                        }
+                            (textContent ? `<br/>"${textContent}"` : `<br/><em>No text content</em>`) : ``);
                         break;
                     case NodeType.property:
                         textContent = (d.data.text) ? d.data.text.getString() : undefined;
                         html = `<strong>${NodeType.property}</strong><br/>` +
                             `Functionally dependent: ${d.data.isFunctionallyDependent ? "Yes" : "No"}<br/>` +
                             (textContent ? `"${textContent}"` : `<em>No text content</em>`);
-                        if (d.data.contextType) {
-                            html += `<br/>Context type: ${getContextString(d.data.contextType)}`;
-                        }
                         break;
                     default:
                         html = `<em>Missing node type</em>`;
                         break;
+                }
+                if (typeof d.data.contextType !== "undefined") {
+                    html += `<br/>Context type: ${getContextString(Number(d.data.contextType))}`;
                 }
                 if (d.data.isNegated) {
                     html += `<br/><em style="color:red">Negated</em>`;
@@ -213,7 +208,6 @@ const TreeComponent = (props: IProps) => {
             .attr("data-html", true)
             .on("click", (d: any) => {
                 // This is the function called on node click, opening that node's modal.
-                // (It does so by setting the activeNode branch in Redux state, which the Edit component responds to.)
                 setActiveNode(d.data);
                 showModal();
             })
@@ -299,7 +293,10 @@ const TreeComponent = (props: IProps) => {
             .style("color", "#222")
             .html((d: any) => {
                 if (d.data.junctionType) {
-                    return d.data.junctionType;
+                    const jtype = d.data.junctionType;
+                    if (jtype !== JunctionType.none) {
+                        return jtype;
+                    }
                 }
                 if (d.data.componentType && d.data.nodeType !== NodeType.junction) {
                     switch (d.data.componentType) {

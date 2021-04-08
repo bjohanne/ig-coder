@@ -10,7 +10,7 @@ interface IProps {
 }
 
 /*
-	This file is unused, but kept for some potentially useful D3 snippets.
+	This file is UNUSED, but kept for some potentially useful D3 snippets.
 */
 
 export function GraphComponent(props: IProps) {
