@@ -2,7 +2,8 @@ import React from "react";
 import {connect} from "react-redux";
 import {QuestionCircleFill} from 'react-bootstrap-icons';
 import {INode} from "../../../core/model/interfaces";
-import {NodeType} from "../../../core/model/enums";
+import {ComponentType, NodeType} from "../../../core/model/enums";
+import {ComponentNode} from "../../../core/model/nodes";
 import "../editor.css";
 
 interface IProps {
@@ -20,6 +21,20 @@ const HelpTextComponent = (props: IProps) => {
         usePrefixSuffix
     } = props;
 
+    const TextContentHtml = () => {
+        // Todo: Give an example. Explain the inferredRephrased slot.
+        if (usePrefixSuffix) {
+            return <>
+                The Prefix slot can be filled with prepositions or articles that precede the main component.<br/>
+                Similarly, the Suffix slot can be filled with such text that succeeds the main component.<br/>
+            </>;
+        } else {
+            return <>
+                Place the entire text of the component in the Main slot, even if it contains prepositions or articles.<br/>
+            </>;
+        }
+    }
+
     const displayHelpText = () => {
         if (activeNode && activeNode.nodeType) {
             switch (activeNode.nodeType) {
@@ -33,28 +48,47 @@ const HelpTextComponent = (props: IProps) => {
                     </>;
                 case NodeType.statementjunction:
                     return <>
+                        {TextContentHtml()}
                         Help text
                     </>;
                 case NodeType.componentjunction:
                     return <>
+                        {TextContentHtml()}
                         Help text
                     </>;
                 case NodeType.propertyjunction:
                     return <>
+                        {TextContentHtml()}
                         Help text
                     </>;
                 case NodeType.component:
-                    if (usePrefixSuffix) {
-                        return <>
-                            The Prefix slot can be filled with prepositions or articles that precede the main component.<br/>
-                            Similarly, the Suffix slot can be filled with such text that succeeds the main component.
-                        </>
-                    }
                     return <>
-                        Place the entire text of the component in the Main slot, even if it contains prepositions or articles.
+                        {![ComponentType.activationconditions, ComponentType.executionconstraints]
+                            .includes((activeNode as ComponentNode).componentType) &&
+                        TextContentHtml()}
+                        {/* If ActivationConditions/ExecutionConstraints (can never have text content):
+                            Creating a new child node will automatically delete the default child node.
+                            Also, deleting the last child node will automatically create the default child node.
+
+                            If OrElse/Aim/ConFunc:
+                            Warn that it cannot have both children and text content, only one of the two.
+
+                            If Attribute/DirObj/IndirObj/ConProp/ConEnt:
+                            Notify that this component type can have Property/PropertyJunction children and text content simultaneously,
+                            but not text content and children of other types.
+
+                            If Deontic/Modal/SimpleContext (can never have children):
+                            Nothing extra.
+                        */}
+                        Help text
                     </>;
                 case NodeType.property:
                     return <>
+                        {TextContentHtml()}
+                        {/*
+                            Can have a child and text content simultaneously, but only if its child is either Property
+                            or PropertyJunction.
+                        */}
                         Help text
                     </>;
                 default:
@@ -66,10 +100,10 @@ const HelpTextComponent = (props: IProps) => {
     }
 
     return (
-        <>
-            <QuestionCircleFill className="dark-igc-gray-txt question-mark" size={28}/>
+        <div className="d-flex flex-column align-items-end">
+            <QuestionCircleFill className="dark-igc-gray-txt question-mark mb-2" size={30}/>
             <small className="help-text">{displayHelpText()}</small>
-        </>
+        </div>
     )
 }
 

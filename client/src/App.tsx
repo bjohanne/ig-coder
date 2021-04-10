@@ -40,12 +40,17 @@ import axios from "axios";
 import firebase, { rrfConfig } from "./core/config/firebase";
 
 function App(props) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { inManagementMode, changed } = props;
 
 	useEffect(() => {
 		axios.defaults.baseURL = appConfig.api.baseUrl;
 		axios.defaults.timeout = 1500;
 	}, []);
+
+	/*	This creates a pop-up every time the user closes the tab/browser if they have unsaved work.
+		However, everything is saved automatically so it uses an artificial check for whether there is unsaved work.
+		It's annoying, so commented away for now.
 
 	const alertUser = (e: BeforeUnloadEvent) => {
 		if (changed) {
@@ -63,6 +68,7 @@ function App(props) {
 			window.removeEventListener("beforeunload", alertUser)
 		}
 	})
+	*/
 
 	const reactReduxFirebaseProps = {
 		firebase,

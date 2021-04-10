@@ -47,6 +47,42 @@ export enum ComponentType {
 }
 
 /**
+ * Return whether the given component type is optional in a Statement.
+ * If it's not optional, it's mandatory.
+ * @return True if the given component type is optional, false if it's mandatory
+ */
+export function componentTypeIsOptional(componentType: ComponentType): boolean {
+    switch (componentType) {
+        case ComponentType.activationconditions:
+            return false;
+        case ComponentType.executionconstraints:
+            return false;
+        case ComponentType.orelse:
+            return true;
+        case ComponentType.attribute:
+            return false;
+        case ComponentType.directobject:
+            return true;
+        case ComponentType.indirectobject:
+            return true;
+        case ComponentType.deontic:
+            return true;
+        case ComponentType.aim:
+            return false;
+        case ComponentType.constitutingproperties:
+            return true;
+        case ComponentType.modal:
+            return true;
+        case ComponentType.constitutivefunction:
+            return false;
+        case ComponentType.constitutedentity:
+            return false;
+        default:            // SimpleContext and undefined - not applicable
+            return false;
+    }
+}
+
+/**
  * Primitive logical operators.
  * Their negated counterparts are not included because
  * when a Junction node is negated, the negation of its operator is understood.
@@ -102,6 +138,58 @@ export enum Arg {
     con_activationconditions    = 4,
     con_executionconstraints    = 5,
     con_orelse                  = 6
+}
+
+/**
+ * Get the full, human-readable string of the component in the given position
+ * of a Regulative or Constitutive Statement.
+ * E.g. regulative 4 is Indirect Object.
+ * @param type The statement type of the parent node
+ * @param index The children array index of the child node
+ * @return The full string associated with the component type in the given position
+ */
+export function getComponentStringByIndex(type: Arg.regulative | Arg.constitutive, index: number): string {
+    if (type === Arg.regulative) {
+        switch (index) {
+            case Arg.reg_attribute:
+                return ComponentType.attribute;
+            case Arg.reg_deontic:
+                return ComponentType.deontic;
+            case Arg.reg_aim:
+                return ComponentType.aim;
+            case Arg.reg_directobject:
+                return ComponentType.directobject;
+            case Arg.reg_indirectobject:
+                return ComponentType.indirectobject;
+            case Arg.reg_activationconditions:
+                return ComponentType.activationconditions;
+            case Arg.reg_executionconstraints:
+                return ComponentType.executionconstraints;
+            case Arg.reg_orelse:
+                return ComponentType.orelse;
+            default:
+                return "";
+        }
+    } else {
+        switch (index) {
+            case Arg.con_constitutedentity:
+                return ComponentType.constitutedentity;
+            case Arg.con_modal:
+                return ComponentType.modal;
+            case Arg.con_constitutivefunction:
+                return ComponentType.constitutivefunction;
+            case Arg.con_constitutingproperties:
+                return ComponentType.constitutingproperties;
+            case Arg.con_activationconditions:
+                return ComponentType.activationconditions;
+            case Arg.con_executionconstraints:
+                return ComponentType.executionconstraints;
+            case Arg.con_orelse:
+                return ComponentType.orelse;
+            default:
+                return "";
+        }
+    }
 }
 
 /**
@@ -206,7 +294,7 @@ export function getContextString(contextType: ContextType): string {
 
 /**
  * Get the full, human-readable string for a given ContextType,
- * including dashes (-) that show the hierarchy.
+ * including dashes (-) that show the hierarchy when printed in a list.
  * @param contextType The enum value for the context type to get
  * @return The full string associated with the passed in context type, with indentation dashes
  */

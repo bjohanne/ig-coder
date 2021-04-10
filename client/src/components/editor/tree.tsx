@@ -249,7 +249,7 @@ const TreeComponent = (props: IProps) => {
                     return "none";
                 })
 
-            // Text content labels here
+            // Text content labels
             nodeEnter.append("text")
                 .attr('text-anchor', 'middle')
                 .attr('alignment-baseline', 'middle')
@@ -296,6 +296,8 @@ const TreeComponent = (props: IProps) => {
                     const jtype = d.data.junctionType;
                     if (jtype !== JunctionType.none) {
                         return jtype;
+                    } else {
+                        return "";
                     }
                 }
                 if (d.data.componentType && d.data.nodeType !== NodeType.junction) {
@@ -333,6 +335,10 @@ const TreeComponent = (props: IProps) => {
             })
 
         ReactTooltip.rebuild();
+
+        return () => { // Cleanup
+            ReactTooltip.hide();
+        };
 
     }, [svgEl, currentEntry.root, setActiveNode, showModal, useNodeLabels])
 

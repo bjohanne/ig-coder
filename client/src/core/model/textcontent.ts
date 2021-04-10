@@ -105,6 +105,7 @@ import {ITextContent} from "./interfaces"
 	}
 
 	/**
+	 * UNUSED, only in tests
 	 * Returns true if all text fields are empty OR
 	 *  the main field has one of the default values for Junction text content,
 	 *  which are ["and", "or"]. In that case, non-main fields are ignored.
@@ -132,14 +133,14 @@ import {ITextContent} from "./interfaces"
 			}
 		}
 
-		if (this.main) {
-			str += this.main;
+		if (this.inferredOrRephrased) {	// Takes precedence over main if both are set
+			str += this.inferredOrRephrased;
 
 			if (this.suffix) {
 				str += " ";
 			}
-		} else if (this.inferredOrRephrased) {
-			str += this.inferredOrRephrased;
+		} else if (this.main) {
+			str += this.main;
 
 			if (this.suffix) {
 				str += " ";

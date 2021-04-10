@@ -33,11 +33,13 @@ const NegatedComponent = (props: IProps) => {
     }
 
     return (
-        <div className="custom-control custom-switch">
+        <div className="custom-control custom-switch" id="negated-toggle">
             <input defaultChecked={negatedState} type="checkbox"
                    onChange={handleChange} onBlur={handleSave} onMouseOut={handleSave}
                    className="custom-control-input" id="negated-switch"/>
-            <label className="custom-control-label" htmlFor="negated-switch" title="This node's meaning is negative">Negated</label>
+            <label className="custom-control-label" htmlFor="negated-switch" title="This node's meaning is negative">
+                Negated
+            </label>
         </div>
     )
 }

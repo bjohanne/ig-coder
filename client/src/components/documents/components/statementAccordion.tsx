@@ -38,7 +38,7 @@ const StatementAccordion = (props: IProps) => {
             rawTextArea.current.rows = 1;
             rephrasedTextArea.current.rows = 1;
             if (rawTextArea.current.scrollHeight > 36) {
-                const newRowsNumber = (rawTextArea.current.scrollHeight - 12) / 24;
+                const newRowsNumber = ((rawTextArea.current.scrollHeight - 12) / 24) + 1;   // +1 in case of scrollbar
                 rawTextArea.current.rows = newRowsNumber;
                 rephrasedTextArea.current.rows = newRowsNumber;
             }

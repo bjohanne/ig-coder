@@ -118,16 +118,17 @@ export function ViewEntryComponent(props: IProps) {
 
                     </Row>
                     }
-                    {currentEntry.root &&
+
                     <Row className="pt-2">
+                        {currentEntry.root &&
                         <Col className="d-flex justify-content-start">
                             <Button onClick={handleClearTree} variant="danger">Clear tree</Button>
                         </Col>
+                        }
                         <Col className="d-flex justify-content-end">
                             <Button onClick={handleSave} variant="primary">Save changes</Button>
                         </Col>
                     </Row>
-                    }
                 </div>
             </div>
 

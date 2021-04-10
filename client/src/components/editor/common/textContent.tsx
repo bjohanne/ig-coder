@@ -19,6 +19,7 @@ interface IProps {
     activeNode: ComponentNode | PropertyNode | PropertyJunctionNode | ComponentJunctionNode | StatementJunctionNode,
     currentEntry: Entry,
     currentEntryIndex: number,
+    disabled: boolean,
     setTextContent: Function,
     unsetTextContent: Function,
     usePrefixSuffix: Boolean
@@ -29,6 +30,7 @@ const TextContentComponent = (props: IProps) => {
         activeNode,
         currentEntry,
         currentEntryIndex,
+        disabled,
         setTextContent,
         unsetTextContent,
         usePrefixSuffix
@@ -43,7 +45,7 @@ const TextContentComponent = (props: IProps) => {
             // For the textarea that displays the statement, adapt the number of rows to the length of the statement
             statementTextArea.current.rows = 1;
             if (statementTextArea.current.scrollHeight > 36) {
-                statementTextArea.current.rows = (statementTextArea.current.scrollHeight - 12) / 24;
+                statementTextArea.current.rows = ((statementTextArea.current.scrollHeight - 12) / 24) + 1; // +1 in case of scrollbar
             }
         }
     }, []); // Run only once on mount
@@ -54,24 +56,26 @@ const TextContentComponent = (props: IProps) => {
     }
 
     const handleSaveText = () => {
-        let trimmedTextState: ITextContent;
-        if (usePrefixSuffix) {
-            trimmedTextState = {
-                main: textState.main.trim(),
-                prefix: textState.prefix.trim(),
-                suffix: textState.suffix.trim(),
-                inferredOrRephrased: textState.inferredOrRephrased.trim(),
-            };
-        } else {    // Use prefix/suffix OFF: prefix and suffix are emptied when saving
-            trimmedTextState = {
-                main: textState.main.trim(),
-                prefix: "",
-                suffix: "",
-                inferredOrRephrased: textState.inferredOrRephrased.trim(),
-            };
+        if (!disabled) {
+            let trimmedTextState: ITextContent;
+            if (usePrefixSuffix) {
+                trimmedTextState = {
+                    main: textState.main.trim(),
+                    prefix: textState.prefix.trim(),
+                    suffix: textState.suffix.trim(),
+                    inferredOrRephrased: textState.inferredOrRephrased.trim(),
+                };
+            } else {    // Use prefix/suffix OFF: prefix and suffix are emptied when saving
+                trimmedTextState = {
+                    main: textState.main.trim(),
+                    prefix: "",
+                    suffix: "",
+                    inferredOrRephrased: textState.inferredOrRephrased.trim(),
+                };
+            }
+            setTextState(trimmedTextState);                                     // Set local state
+            setTextContent(currentEntryIndex, activeNode.id, trimmedTextState); // Set app-wide state
         }
-        setTextState(trimmedTextState);                                     // Set local state
-        setTextContent(currentEntryIndex, activeNode.id, trimmedTextState); // Set app-wide state
     }
 
     const handleClearText = () => {
@@ -100,7 +104,7 @@ const TextContentComponent = (props: IProps) => {
                             <Form.Label column="sm">Prefix</Form.Label>
                             <Form.Control type="text" name="prefix" onChange={handleChange}
                                           onBlur={handleSaveText} onMouseOut={handleSaveText}
-                                          value={textState.prefix} />
+                                          value={textState.prefix} disabled={disabled} />
                         </Form.Group>
                     }
                 </Col>
@@ -109,7 +113,7 @@ const TextContentComponent = (props: IProps) => {
                         <Form.Label column="sm">Main</Form.Label>
                         <Form.Control type="text" name="main" onChange={handleChange}
                                       onBlur={handleSaveText} onMouseOut={handleSaveText}
-                                      value={textState.main} />
+                                      value={textState.main} disabled={disabled} />
                     </Form.Group>
                 </Col>
                 <Col>
@@ -118,22 +122,22 @@ const TextContentComponent = (props: IProps) => {
                             <Form.Label column="sm">Suffix</Form.Label>
                             <Form.Control type="text" name="suffix" onChange={handleChange}
                                           onBlur={handleSaveText} onMouseOut={handleSaveText}
-                                          value={textState.suffix}/>
+                                          value={textState.suffix} disabled={disabled}/>
                         </Form.Group>
                     }
                 </Col>
             </Row>
             <Row className="justify-content-center">
                 <Col xs={{ order: 'last', span: 12 }} lg={{ order: 'first', span: 4 }}
-                     className="d-flex justify-content-center align-items-end pb-3">
-                    <Button variant="warning" onClick={handleClearText}>Clear text content</Button>
+                     className="d-flex justify-content-start align-items-end pb-3">
+                    <Button variant="warning" onClick={handleClearText} disabled={disabled}>Clear text content</Button>
                 </Col>
                 <Col xs={12} lg={4}>
                     <Form.Group controlId="textContentForm.inferredOrRephrased">
                         <Form.Label column="sm">Inferred/Rephrased</Form.Label>
                         <Form.Control type="text" name="inferredOrRephrased" onChange={handleChange}
                                       onBlur={handleSaveText} onMouseOut={handleSaveText}
-                                      value={textState.inferredOrRephrased} />
+                                      value={textState.inferredOrRephrased} disabled={disabled} />
                     </Form.Group>
                 </Col>
                 <Col xs={0} lg={4} className="pb-3">

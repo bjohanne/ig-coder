@@ -2,13 +2,15 @@ import React from "react";
 import {connect} from "react-redux";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Spinner from "react-bootstrap/Spinner";
 import NegatedComponent from "./negated";
 import FunctionallyDependentComponent from "./functionallyDependent";
 import ContextTypeComponent from "./contextType";
+import JunctionTypeComponent from "./junctionType";
 import HelpTextComponent from "./helpText";
 import {INode} from "../../../core/model/interfaces";
 import {NodeType} from "../../../core/model/enums";
-import Spinner from "react-bootstrap/Spinner";
+import {ComponentNode} from "../../../core/model/nodes";
 
 interface IProps extends React.HTMLProps<HTMLElement> {
     activeNode: INode
@@ -31,21 +33,30 @@ const CommonEditorTable = (props: IProps) => {
             <Row>
                 <Col xs={8} md={9}>
                     <Row>
-                        <Col xs={12} lg={7} xl={4} className="d-flex align-items-center pb-2">
-                            {activeNode && <h4>{activeNode.nodeType}</h4>}
+                        <Col xs={12} lg={"auto"} xl={"auto"} className="d-flex align-items-center pb-2">
+                            <h4>{activeNode.nodeType}
+                                {activeNode.nodeType &&
+                                    activeNode.nodeType === NodeType.component &&
+                                    ": " + (activeNode as ComponentNode).componentType}</h4>
                         </Col>
-                        <Col xs={12} lg={5} xl={3} className="d-flex align-items-center pb-2">
+                        <Col xs={12} lg={5} xl={2} className="d-flex align-items-center pb-2">
                             <NegatedComponent/>
                         </Col>
                         {activeNode.nodeType && [NodeType.property, NodeType.propertyjunction]
                             .includes(activeNode.nodeType) &&
-                            <Col xs={12} lg={7} xl={4} className="d-flex align-items-center pb-2">
+                            <Col xs={12} lg={7} xl={3} className="d-flex align-items-center pb-2">
                                 <FunctionallyDependentComponent/>
+                            </Col>
+                        }
+                        {activeNode.nodeType && [NodeType.statementjunction, NodeType.componentjunction, NodeType.propertyjunction]
+                            .includes(activeNode.nodeType) &&
+                            <Col xs={12} lg={12} xl={3} className="d-flex align-items-center">
+                                <JunctionTypeComponent/>
                             </Col>
                         }
                         {activeNode.nodeType && [NodeType.regulativestatement, NodeType.constitutivestatement,
                                                  NodeType.component, NodeType.property].includes(activeNode.nodeType) &&
-                            <Col xs={12} lg={12} xl={5} className="d-flex align-items-center pb-2">
+                            <Col xs={12} lg={12} xl={4} className="d-flex align-items-center pb-2 down-1">
                                 <ContextTypeComponent/>
                             </Col>
                         }
@@ -58,7 +69,7 @@ const CommonEditorTable = (props: IProps) => {
 
                     </Row>
                 </Col>
-                <Col xs={4} md={3} className="d-flex flex-column align-items-end">
+                <Col xs={4} md={3}>
                     <HelpTextComponent/>
                 </Col>
             </Row>

@@ -74,7 +74,7 @@ const EditorModal = (props: IProps) => {
 				{renderEditor()}
 			</ModalBody>
 			<ModalFooter className="d-flex justify-content-between">
-				<Button variant="secondary" onClick={closeModal}>Cancel</Button>
+				<Button variant="secondary" onClick={closeModal}>Close</Button>
 				<Button variant="primary" id="save-button-bottom" onClick={handleSave}>Save changes</Button>
 			</ModalFooter>
 		</Modal>

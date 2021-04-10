@@ -422,6 +422,20 @@ it("Create nested children of the same type", () => {
 
 //------------------------------------------------------------------------------
 
+it("Pass down component type of Context node", () => {
+    // Setup
+    const document = new Document("Test Policy", "Description", documentId);
+    let entry = document.createEntry();
+    let root = entry.createRoot(Arg.regulative) as RegulativeStatementNode;
+
+    let actconds = root.getActivationConditions();
+    let junction = actconds.createComponentJunctionNode();
+    expect(junction.componentType).toEqual(ComponentType.activationconditions);
+    junction.createComponentNode(ComponentType.simplecontext, Arg.left);
+});
+
+//------------------------------------------------------------------------------
+
 it("Delete a node", () => {
     // Setup
     const document = new Document("Test Policy", "Description", documentId);

@@ -277,6 +277,7 @@ const documents = (state: IDocumentState = initialState, action: any) => {
                         }
                     }
                 },
+                activeNode: { $set: action.newNode },
                 changed: { $set: true }
             });
         case UNSET_TEXT_CONTENT_RESPONSE:
@@ -288,6 +289,7 @@ const documents = (state: IDocumentState = initialState, action: any) => {
                         }
                     }
                 },
+                activeNode: { $set: action.newNode },
                 changed: { $set: true }
             });
         case SET_JUNCTION_TYPE_RESPONSE:

@@ -94,19 +94,11 @@ const testDocumentString = `
                       {
                         "id": 18,
                         "document": 1,
-                        "nodeType": "Property",
                         "isNegated": false,
                         "parent": 15,
                         "createdAt": "2021-04-08T10:03:53.693Z",
                         "updatedAt": "2021-04-08T10:03:53.693Z",
-                        "children": [],
-                        "text": {
-                          "main": "suspension",
-                          "prefix": "",
-                          "suffix": "",
-                          "inferredOrRephrased": ""
-                        },
-                        "isFunctionallyDependent": false
+                        "children": []
                       },
                       {
                         "id": 19,

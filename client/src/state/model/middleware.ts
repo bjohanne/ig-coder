@@ -227,6 +227,7 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                 store.dispatch({
                     type: SET_TEXT_CONTENT_RESPONSE,
                     entryIndex: action.entryIndex,
+                    newNode: node,
                     newEntry: entryCopy
                 });
             }
@@ -246,6 +247,7 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                 store.dispatch({
                     type: UNSET_TEXT_CONTENT_RESPONSE,
                     entryIndex: action.entryIndex,
+                    newNode: node,
                     newEntry: entryCopy
                 });
             }

@@ -1,5 +1,4 @@
 .help-text {
-    text-align: right;
     visibility: hidden;
 }
 
@@ -14,4 +13,21 @@
 
 #statement-textarea {
     min-height: 38px;   /* One line with padding & border */
+}
+
+.down-1 {
+    padding-top: 2px !important;
+}
+
+#negated-toggle .custom-control-input:checked ~ .custom-control-label::before {
+    border-color: #e2212a !important;
+    background-color: #e2212a !important;
+}
+
+.node-title-empty {
+    color: #495057 !important;
+}
+
+.node-card-empty {
+    background-color: rgba(0, 0, 0, 0.03) !important;
 }

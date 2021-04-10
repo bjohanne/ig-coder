@@ -1,7 +1,6 @@
 import React from "react";
 import {connect} from "react-redux";
 import CommonEditorTable from "../common/commonTable";
-import JunctionTypeComponent from "../common/junctionType";
 import TextContentComponent from "../common/textContent";
 import JunctionChildren from "../children/junctionChildren";
 import {Entry} from "../../../core/model/entry";
@@ -15,8 +14,7 @@ const JunctionEditor = (props: IProps) => {
 
     return (
         <CommonEditorTable>
-            <JunctionTypeComponent/>
-            <TextContentComponent currentEntry={currentEntry}/>
+            <TextContentComponent currentEntry={currentEntry} disabled={false}/> {/* Text content is always present on Junction nodes */}
             <JunctionChildren/>
         </CommonEditorTable>
     )

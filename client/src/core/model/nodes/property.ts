@@ -105,7 +105,6 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
                 } else if (this.children[0].nodeType === NodeType.statementjunction) {
                     throw new DataError(DataErrorType.PRP_HAS_STMTJUN_CHLD, this.id);
                 }
-                this.children.length = 0;
             }
             this.text.set(main, prefix, suffix, inferredOrRephrased);
             this.update();
