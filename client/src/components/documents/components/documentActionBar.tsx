@@ -5,19 +5,21 @@ import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import Dropdown from "react-bootstrap/Dropdown";
-import {loadDocumentFromString} from "../../../state/documents/actions";
+import {loadDocumentFromString, setSaved} from "../../../state/documents/actions";
 import getDateYYYYMMDDHHMM from "../../../core/helpers/date";
 import "./statementAccordion.css";
 
 interface IProps {
     currentDocument: Document | null,
-    loadDocumentFromString: Function
+    loadDocumentFromString: Function,
+    setSaved: Function
 }
 
 const DocumentActionBar = (props: IProps) => {
     const {
         currentDocument,
-        loadDocumentFromString
+        loadDocumentFromString,
+        setSaved
     } = props;
 
     const fileDownloadLink = useRef(null);
@@ -31,11 +33,12 @@ const DocumentActionBar = (props: IProps) => {
     useEffect(() => {
         if (fileDownloadUrl !== "") {    // When the URL is set, we can download the file
             fileDownloadLink.current.click();
+            setSaved();                             // Set the changed flag to false
             URL.revokeObjectURL(fileDownloadUrl);   // Cleanup
             setFileDownloadUrl("");
             setFileName("");
         }
-    }, [fileDownloadUrl, setFileDownloadUrl]);
+    }, [fileDownloadUrl, setFileDownloadUrl, setSaved]);
 
     const handleSaveFile = () => {
         setFileName("igc_document_" + getDateYYYYMMDDHHMM(new Date()) + ".json");
@@ -84,6 +87,8 @@ const DocumentActionBar = (props: IProps) => {
         }
     }
 
+    const useExport = false;    // Flag to hide the export button until it's implemented
+
     const handleExportUIMACAS = () => {
     }
 
@@ -93,7 +98,8 @@ const DocumentActionBar = (props: IProps) => {
     return (
         <>
             <ButtonGroup>
-                <DropdownButton id="savefile-dropdown" title="Load file" as={ButtonGroup} className="d-inline-block">
+                <DropdownButton menuAlign="right" id="savefile-dropdown" title="Load file" as={ButtonGroup}
+                                className="d-inline-block">
                     <Form>
                         <Dropdown.ItemText role="menuitem"> {/* LOAD */}
                             <Form.Group>
@@ -116,7 +122,9 @@ const DocumentActionBar = (props: IProps) => {
                 <Button title="Save the document to a JSON file" onClick={handleSaveFile}> {/* SAVE */}
                     Save file
                 </Button>
-                <DropdownButton id="export-dropdown" title="Export" as={ButtonGroup} className="d-inline-block">
+                {useExport &&
+                <DropdownButton menuAlign="right" id="export-dropdown" title="Export" as={ButtonGroup}
+                                className="d-inline-block">
                     <Dropdown.Item onClick={handleExportUIMACAS} title="Export the document to a file" role="menuitem">
                         UIMA CAS
                     </Dropdown.Item>
@@ -124,6 +132,7 @@ const DocumentActionBar = (props: IProps) => {
                         Shorthand
                     </Dropdown.Item>
                 </DropdownButton>
+                }
             </ButtonGroup>
             {/* Hidden download link */}
             <a style={{display: "none"}}
@@ -141,7 +150,8 @@ const mapStateToProps = (state: any) => ({
 
 const mapDispatchToProps = (dispatch: any) => ({
     loadDocumentFromString: (documentString: string, onSuccess: Function, onError: Function) =>
-        dispatch(loadDocumentFromString(documentString, onSuccess, onError))
+        dispatch(loadDocumentFromString(documentString, onSuccess, onError)),
+    setSaved: () => dispatch(setSaved())
 });
 
 export default connect(

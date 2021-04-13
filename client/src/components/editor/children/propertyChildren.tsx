@@ -8,30 +8,41 @@ import {INode} from "../../../core/model/interfaces";
 import {NodeType} from "../../../core/model/enums";
 import {PropertyNode} from "../../../core/model/nodes";
 import ViewChildNode from "../common/viewChildNode";
+import {addChildToProperty, deleteChildFromProperty} from "../../../state/model/actions";
 
 interface IProps {
-    activeNode: PropertyNode
+    activeNode: PropertyNode,
+    currentEntryIndex: number,
+    useCoreOnly: boolean,
+    addChildToProperty: Function,
+    deleteChildFromProperty: Function
 }
 
 const PropertyChildren = (props: IProps) => {
     const {
-        activeNode
+        activeNode,
+        currentEntryIndex,
+        useCoreOnly,
+        addChildToProperty,
+        deleteChildFromProperty
     } = props;
 
     const children: INode[] = activeNode.children;
 
-    const addChild = () => {    // Add new child node
-
+    const addChild = (e) => {    // Add new child node
+        e.stopPropagation();
+        addChildToProperty(currentEntryIndex, activeNode.id, e.target.dataset.type);
     }
 
-    const deleteChild = () => { // Delete fixed child node
-
+    const deleteChild = (e) => { // Delete child node
+        e.stopPropagation();
+        deleteChildFromProperty(currentEntryIndex, activeNode.id);
     }
 
     return (
         <>
             {(children.length === 0) ?
-                <DropdownButton size="lg" title="Create">
+                <DropdownButton size="lg" title="Create" disabled={useCoreOnly}>
                     <Dropdown.Item data-type={NodeType.regulativestatement} onClick={addChild}>Regulative Statement</Dropdown.Item>
                     <Dropdown.Item data-type={NodeType.constitutivestatement} onClick={addChild}>Constitutive Statement</Dropdown.Item>
                     <Dropdown.Item data-type={NodeType.statementjunction} onClick={addChild}>Statement Junction</Dropdown.Item>
@@ -52,10 +63,16 @@ const PropertyChildren = (props: IProps) => {
 }
 
 const mapStateToProps = (state: any) => ({
-    activeNode: state.documents.activeNode
+    activeNode: state.documents.activeNode,
+    currentEntryIndex: state.documents.currentEntryIndex,
+    useCoreOnly: state.appSettings.preferences.useCoreOnly
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
+    addChildToProperty: (entryIndex: number, parentId: number, childType: NodeType) =>
+        dispatch(addChildToProperty(entryIndex, parentId, childType)),
+    deleteChildFromProperty: (entryIndex: number, parentId: number) =>
+        dispatch(deleteChildFromProperty(entryIndex, parentId))
 });
 
 export default connect(

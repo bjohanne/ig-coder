@@ -29,7 +29,15 @@ import {
     SET_TEXT_CONTENT_RESPONSE,
     UNSET_TEXT_CONTENT_RESPONSE,
     SET_JUNCTION_TYPE_RESPONSE,
-    UNSET_JUNCTION_TYPE_RESPONSE
+    UNSET_JUNCTION_TYPE_RESPONSE,
+    ADD_CHILD_TO_STATEMENT_RESPONSE,
+    ADD_CHILD_TO_COMPONENT_RESPONSE,
+    ADD_CHILD_TO_JUNCTION_RESPONSE,
+    ADD_CHILD_TO_PROPERTY_RESPONSE,
+    DELETE_CHILD_FROM_STATEMENT_RESPONSE,
+    DELETE_CHILD_FROM_COMPONENT_RESPONSE,
+    DELETE_CHILD_FROM_JUNCTION_RESPONSE,
+    DELETE_CHILD_FROM_PROPERTY_RESPONSE
 } from "../model/actions";
 
 import {API_CALL_BEGIN, API_CALL_SUCCESS, API_CALL_ERROR} from "../apiCall/actions";
@@ -312,6 +320,105 @@ const documents = (state: IDocumentState = initialState, action: any) => {
                         }
                     }
                 },
+                changed: { $set: true }
+            });
+        /* ---------------------Children--------------------- */
+        // Add
+        case ADD_CHILD_TO_STATEMENT_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                activeNode: { $set: action.newParentNode },
+                changed: { $set: true }
+            });
+        case ADD_CHILD_TO_COMPONENT_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                activeNode: { $set: action.newParentNode },
+                changed: { $set: true }
+            });
+        case ADD_CHILD_TO_JUNCTION_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                activeNode: { $set: action.newParentNode },
+                changed: { $set: true }
+            });
+        case ADD_CHILD_TO_PROPERTY_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                activeNode: { $set: action.newParentNode },
+                changed: { $set: true }
+            });
+        // Delete
+        case DELETE_CHILD_FROM_STATEMENT_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                activeNode: { $set: action.newParentNode },
+                changed: { $set: true }
+            });
+        case DELETE_CHILD_FROM_COMPONENT_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                activeNode: { $set: action.newParentNode },
+                changed: { $set: true }
+            });
+        case DELETE_CHILD_FROM_JUNCTION_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                activeNode: { $set: action.newParentNode },
+                changed: { $set: true }
+            });
+        case DELETE_CHILD_FROM_PROPERTY_RESPONSE:
+            return update(state, {
+                currentDocument: {
+                    entries: {
+                        [action.entryIndex]: {
+                            $set: action.newEntry
+                        }
+                    }
+                },
+                activeNode: { $set: action.newParentNode },
                 changed: { $set: true }
             });
 

@@ -70,6 +70,10 @@ export function ViewEntryComponent(props: IProps) {
         createRootNode(currentDocument.entryMap[entryid], Arg.constitutive);
     };
 
+    const handleCreateRootStmtJunction = () => {
+        createRootNode(currentDocument.entryMap[entryid], Arg.statementjunction);
+    };
+
     const handleClearTree = () => {
         if (!window.confirm("The entire tree for this entry will be deleted. Proceed?")) {
             return;
@@ -108,14 +112,19 @@ export function ViewEntryComponent(props: IProps) {
                     </>
                     :                                   /* The Entry does not have a root node */
                     <Row className="py-2">
-                        <Col className="d-flex align-items-center">
-                            <small className="mr-2">Statement type:</small>
+                        <Col className="d-flex flex-column align-items-start">
+                            <small className="mb-2">To start coding, choose a statement type.<br/>
+                                Use Statement Junction if there are multiple top-level statements.</small>
                             <ButtonGroup>
-                                <Button onClick={handleCreateRootRegulative}>Regulative</Button>
-                                <Button onClick={handleCreateRootConstitutive}>Constitutive</Button>
+                                <Button onClick={handleCreateRootRegulative} title="The top-level statement is regulative">
+                                    Regulative</Button>
+                                <Button onClick={handleCreateRootConstitutive} title="The top-level statement is constitutive">
+                                    Constitutive</Button>
+                                <Button onClick={handleCreateRootStmtJunction}
+                                        title="There are multiple, horizontally nested top-level statements">
+                                    Statement Junction</Button>
                             </ButtonGroup>
                         </Col>
-
                     </Row>
                     }
 

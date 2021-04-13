@@ -5,36 +5,41 @@ import Col from "react-bootstrap/Col";
 import {JunctionNode} from "../../../core/model/nodes";
 import {INode} from "../../../core/model/interfaces";
 import ViewChildNode from "../common/viewChildNode";
+import {NodeType} from "../../../core/model/enums";
+import {addChildToJunction, deleteChildFromJunction} from "../../../state/model/actions";
 
 interface IProps {
-    activeNode: JunctionNode
+    activeNode: JunctionNode,
+    currentEntryIndex: number,
+    addChildToJunction: Function,
+    deleteChildFromJunction: Function
 }
 
 const JunctionChildren = (props: IProps) => {
     const {
-        activeNode
+        activeNode,
+        currentEntryIndex,
+        addChildToJunction,
+        deleteChildFromJunction
     } = props;
 
     const children: INode[] = activeNode.children;
 
     const createChild = (e) => { // Create fixed child node
-        console.log(e.target)
+        e.stopPropagation();
+        addChildToJunction(currentEntryIndex, activeNode.id, e.target.dataset.type, e.target.dataset.index);
     }
 
-    const deleteChild = () => { // Delete fixed child node
-
+    const deleteChild = (e) => { // Delete fixed child node
+        e.stopPropagation();
+        deleteChildFromJunction(currentEntryIndex, activeNode.id, e.target.dataset.index);
     }
-
-    /*
-        If creating a Component child: Grab the component type from this node.
-        Except: if this is ActConds/ExeCstrts, the child gets SimpleContext.
-    */
 
     return (
         <Row noGutters>
             {children.map((node: INode, i: number) =>
                 <Col key={i} className="mr-2 mb-2" xs="auto">
-                    <ViewChildNode node={node} childIndex={i} junctionNodeType={activeNode.nodeType}
+                    <ViewChildNode node={node} childIndex={i} parentJunctionNodeType={activeNode.nodeType}
                                    createSelf={createChild} deleteSelf={deleteChild}/>
                 </Col>
             )}
@@ -43,10 +48,15 @@ const JunctionChildren = (props: IProps) => {
 }
 
 const mapStateToProps = (state: any) => ({
-    activeNode: state.documents.activeNode
+    activeNode: state.documents.activeNode,
+    currentEntryIndex: state.documents.currentEntryIndex
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
+    addChildToJunction: (entryIndex: number, parentId: number, childType: NodeType, childIndex: number) =>
+        dispatch(addChildToJunction(entryIndex, parentId, childType, childIndex)),
+    deleteChildFromJunction: (entryIndex: number, parentId: number, childIndex: number) =>
+        dispatch(deleteChildFromJunction(entryIndex, parentId, childIndex))
 });
 
 export default connect(

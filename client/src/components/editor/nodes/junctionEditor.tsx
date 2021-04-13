@@ -15,6 +15,7 @@ const JunctionEditor = (props: IProps) => {
     return (
         <CommonEditorTable>
             <TextContentComponent currentEntry={currentEntry} disabled={false}/> {/* Text content is always present on Junction nodes */}
+            <hr className="pb-2"/>
             <JunctionChildren/>
         </CommonEditorTable>
     )

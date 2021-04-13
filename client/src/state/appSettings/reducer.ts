@@ -14,7 +14,7 @@ interface appState {
 
 const initialState: appState = {
     mode: {                 // System modes
-        management: false,          // If true, management layer is active, including login/register, project management
+        management: false       // If true, management layer is active, including login/register, project management
     },
 
     preferences: {          // User preferences

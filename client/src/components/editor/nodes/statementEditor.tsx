@@ -7,6 +7,7 @@ const StatementEditor = () => {
 
     return (
         <CommonEditorTable>
+            <hr className="pb-2"/>
             <StatementChildren/>
         </CommonEditorTable>
     )

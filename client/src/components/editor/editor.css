@@ -24,8 +24,25 @@
     background-color: #e2212a !important;
 }
 
+
+
 .node-title-empty {
     color: #495057 !important;
+}
+
+.node-card, .node-card-empty {
+    width: 12rem;
+    height: 12rem;
+    border-radius: 6rem !important;
+}
+
+.node-card:hover {
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+.node-card:active {
+    background-color: rgba(0, 0, 0, 0.1) !important;
 }
 
 .node-card-empty {

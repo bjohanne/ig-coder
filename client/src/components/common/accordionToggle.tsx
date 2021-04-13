@@ -3,7 +3,7 @@ import {useAccordionToggle} from "react-bootstrap";
 
 import "./accordionToggle.css";
 import Card from "react-bootstrap/Card";
-import Chevron from "../units/chevron";
+import Chevron from "./chevron";
 
 interface IProps extends React.HTMLProps<HTMLElement> {
     eventKey: string,
@@ -22,20 +22,20 @@ interface IProps extends React.HTMLProps<HTMLElement> {
     on the parent Accordion element separately, and ensure the two match.
 */
 export function AccordionToggle(props: IProps) {
-    const {eventKey, text, isLast, openByDefault} = props;
+    const {eventKey, text, isLast, openByDefault, title} = props;
 
     const [toggleState, setToggleState] = useState(openByDefault);
     const [chevronClassName, setChevronClassName] = useState(
         (openByDefault) ? "accordion-icon rotate" : "accordion-icon");
 
-    const decoratedOnClick = useAccordionToggle(eventKey, () => {
+    const handleClick = useAccordionToggle(eventKey, () => {
         setToggleState(!toggleState);
         setChevronClassName(toggleState ? "accordion-icon" : "accordion-icon rotate");
     });
 
     return (
         <>
-            <Card.Header onClick={decoratedOnClick} className="toggle-header">
+            <Card.Header onClick={handleClick} className="toggle-header" title={title}>
                 <Chevron className={chevronClassName} width={10} fill={"rgb(129, 144, 165)"}/>
                 {text && <span className="ml-3 toggle-header-text">{text}</span>}
             </Card.Header>

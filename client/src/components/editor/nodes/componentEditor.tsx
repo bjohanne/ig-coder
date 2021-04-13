@@ -31,12 +31,14 @@ const ComponentEditor = (props: IProps) => {
                 activeNode.children.length > 0 && ![NodeType.property, NodeType.propertyjunction].includes(activeNode.children[0].nodeType))
             }/>
             }
+            {![ComponentType.deontic, ComponentType.modal, ComponentType.simplecontext].includes(activeNode.componentType) &&
+            <hr className="pb-2"/>
+            }
             {/* A Component node cannot have children under the following conditions (never for 3 types): */}
             {![ComponentType.deontic, ComponentType.modal, ComponentType.simplecontext].includes(activeNode.componentType) &&
             <ComponentChildren disabled={
-                !!([ComponentType.orelse, ComponentType.aim, ComponentType.constitutivefunction].includes(activeNode.componentType) &&
-                    activeNode.getText().isSet())
-            }/>
+            !!([ComponentType.orelse, ComponentType.aim, ComponentType.constitutivefunction].includes(activeNode.componentType) &&
+                activeNode.getText().isSet())}/>
             }
         </CommonEditorTable>
     )

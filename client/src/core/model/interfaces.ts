@@ -172,7 +172,6 @@ export interface IJunctionNode extends INode {
     text: TextContent,
     setJunctionType(junctionType: JunctionType): void,
     unsetJunctionType(): void,
-    getOperatorString(): string,
     getText(): TextContent,
     setText(main?: string, prefix?: string, suffix?: string): void,
     unsetText(): void,

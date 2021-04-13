@@ -38,7 +38,7 @@ const StatementAccordion = (props: IProps) => {
             rawTextArea.current.rows = 1;
             rephrasedTextArea.current.rows = 1;
             if (rawTextArea.current.scrollHeight > 36) {
-                const newRowsNumber = ((rawTextArea.current.scrollHeight - 12) / 24) + 1;   // +1 in case of scrollbar
+                const newRowsNumber = ((rawTextArea.current.scrollHeight - 12) / 24);
                 rawTextArea.current.rows = newRowsNumber;
                 rephrasedTextArea.current.rows = newRowsNumber;
             }
@@ -64,7 +64,7 @@ const StatementAccordion = (props: IProps) => {
             {currentEntry ?
             <Form id="textarea-container">
                 <Accordion defaultActiveKey="0">
-                    <AccordionToggle text="Raw" openByDefault eventKey="0"/>
+                    <AccordionToggle text="Raw" openByDefault eventKey="0" title="The raw statement"/>
                     <Accordion.Collapse eventKey="0">
                         <Form.Group controlId="original-textarea" id="original-textarea">
                             <Form.Control as="textarea" ref={rawTextArea} disabled
@@ -73,7 +73,8 @@ const StatementAccordion = (props: IProps) => {
                     </Accordion.Collapse>
                 </Accordion>
                 <Accordion>
-                    <AccordionToggle text="Rephrased" isLast eventKey="0" id="rephrased-toggle"/>
+                    <AccordionToggle text="Rephrased" isLast eventKey="0" id="rephrased-toggle"
+                                     title="Optionally rephrase the raw statement before coding"/>
                     <Accordion.Collapse eventKey="0">
                         <Form.Group controlId="rephrased-textarea" id="rephrased-textarea">
                             <InputGroup>

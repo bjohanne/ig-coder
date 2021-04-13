@@ -44,7 +44,6 @@ export const documentMiddleware: Middleware = (store: MiddlewareAPI) => (next: a
         case LOAD_DOCUMENT:
             try {   // If any error is thrown by the following line, assume the file is invalid.
                 createdDocument = Document.fromData(JSON.parse(action.payload));
-
                 action.onSuccess();
                 store.dispatch({type: LOAD_DOCUMENT_RESPONSE, payload: createdDocument});
             } catch {

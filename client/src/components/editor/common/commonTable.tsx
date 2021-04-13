@@ -62,7 +62,7 @@ const CommonEditorTable = (props: IProps) => {
                         }
 
                         {React.Children.map(children, (child) => (
-                            <Col xs={12} className="pt-2">
+                            <Col xs={12}>
                                 {child}
                             </Col>
                         ))}

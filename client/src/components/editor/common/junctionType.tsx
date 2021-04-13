@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {connect} from "react-redux";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
-import {junctionTypeToStringArray, JunctionType} from "../../../core/model/enums";
+import {JunctionType, junctionTypeToStringArray, getOperatorString} from "../../../core/model/enums";
 import {setJunctionType, unsetJunctionType} from "../../../state/model/actions";
 import {ComponentJunctionNode, PropertyJunctionNode, StatementJunctionNode} from "../../../core/model/nodes";
 
@@ -37,7 +37,7 @@ const JunctionTypeComponent = (props: IProps) => {
 
     return (
         <Form className="pb-2">
-            <Form.Row title="Set the type of junction (logical operator) for this node">
+            <Form.Row title="Set the logical operator that combines this node's two children">
                 <Col xs="auto" className="d-flex align-items-end">
                     <Form.Label htmlFor="junctionTypeSelect">
                         Junction type
@@ -55,7 +55,9 @@ const JunctionTypeComponent = (props: IProps) => {
                     >
                         <option value={JunctionType.none} style={{fontStyle: "italic"}}>None</option>
                         {junctionTypeToStringArray().map((val: string, i: number) =>
-                            <option key={i} value={val}>{val}</option>
+                            <option key={i} value={val} title={getOperatorString(val)}>
+                                {val}
+                            </option>
                         )}
                     </Form.Control>
                 </Col>

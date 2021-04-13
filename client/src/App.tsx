@@ -50,7 +50,9 @@ function App(props) {
 
 	/*	This creates a pop-up every time the user closes the tab/browser if they have unsaved work.
 		However, everything is saved automatically so it uses an artificial check for whether there is unsaved work.
-		It's annoying, so commented away for now.
+		The check is a flag that is set to true whenever changes are made to the document,
+		and false when downloading the document.
+	 */
 
 	const alertUser = (e: BeforeUnloadEvent) => {
 		if (changed) {
@@ -68,7 +70,6 @@ function App(props) {
 			window.removeEventListener("beforeunload", alertUser)
 		}
 	})
-	*/
 
 	const reactReduxFirebaseProps = {
 		firebase,

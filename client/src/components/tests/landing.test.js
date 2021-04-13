@@ -19,5 +19,5 @@ function setup() {
 it("renders with static content", () => {
     const {wrapper} = setup();
     expect(wrapper.length).toEqual(1);  // Exactly 1 React node is rendered
-    expect(wrapper.contains("Welcome to IG Coder!")).toBe(true);  // The text "The making..." is displayed
+    expect(wrapper.contains("Welcome to IG Coder!")).toBe(true);
 });

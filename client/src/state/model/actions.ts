@@ -1,4 +1,4 @@
-import {Arg, ContextType, JunctionType} from "../../core/model/enums";
+import {Arg, ContextType, JunctionType, NodeType} from "../../core/model/enums";
 import {ITextContent} from "../../core/model/interfaces";
 
 export const CREATE_ROOT_NODE = "CREATE_ROOT_NODE";
@@ -113,3 +113,80 @@ export const unsetTextContent = (entryIndex: number, nodeId: number) => ({
     nodeId
 });
 export const UNSET_TEXT_CONTENT_RESPONSE = "UNSET_TEXT_CONTENT_RESPONSE";
+
+/* ---------------------Children--------------------- */
+// Add
+
+export const ADD_CHILD_TO_STATEMENT = "ADD_CHILD_TO_STATEMENT";
+export const addChildToStatement = (entryIndex: number, parentId: number, childIndex: number) => ({
+    type: ADD_CHILD_TO_STATEMENT,
+    entryIndex,
+    parentId,
+    childIndex
+});
+export const ADD_CHILD_TO_STATEMENT_RESPONSE = "ADD_CHILD_TO_STATEMENT_RESPONSE";
+
+export const ADD_CHILD_TO_COMPONENT = "ADD_CHILD_TO_COMPONENT";
+export const addChildToComponent = (entryIndex: number, parentId: number, childType: NodeType) => ({
+    type: ADD_CHILD_TO_COMPONENT,
+    entryIndex,
+    parentId,
+    childType
+});
+export const ADD_CHILD_TO_COMPONENT_RESPONSE = "ADD_CHILD_TO_COMPONENT_RESPONSE";
+
+export const ADD_CHILD_TO_JUNCTION = "ADD_CHILD_TO_JUNCTION";
+export const addChildToJunction = (entryIndex: number, parentId: number, childType: NodeType, childIndex: number) => ({
+    type: ADD_CHILD_TO_JUNCTION,
+    entryIndex,
+    parentId,
+    childType,
+    childIndex
+});
+export const ADD_CHILD_TO_JUNCTION_RESPONSE = "ADD_CHILD_TO_JUNCTION_RESPONSE";
+
+export const ADD_CHILD_TO_PROPERTY = "ADD_CHILD_TO_PROPERTY";
+export const addChildToProperty = (entryIndex: number, parentId: number, childType: NodeType) => ({
+    type: ADD_CHILD_TO_PROPERTY,
+    entryIndex,
+    parentId,
+    childType
+});
+export const ADD_CHILD_TO_PROPERTY_RESPONSE = "ADD_CHILD_TO_PROPERTY_RESPONSE";
+
+// Delete
+
+export const DELETE_CHILD_FROM_STATEMENT = "DELETE_CHILD_FROM_STATEMENT";
+export const deleteChildFromStatement = (entryIndex: number, parentId: number, childIndex: number) => ({
+    type: DELETE_CHILD_FROM_STATEMENT,
+    entryIndex,
+    parentId,
+    childIndex
+});
+export const DELETE_CHILD_FROM_STATEMENT_RESPONSE = "DELETE_CHILD_FROM_STATEMENT_RESPONSE";
+
+export const DELETE_CHILD_FROM_COMPONENT = "DELETE_CHILD_FROM_COMPONENT";
+export const deleteChildFromComponent = (entryIndex: number, parentId: number, childIndex: number) => ({
+    type: DELETE_CHILD_FROM_COMPONENT,
+    entryIndex,
+    parentId,
+    childIndex
+});
+export const DELETE_CHILD_FROM_COMPONENT_RESPONSE = "DELETE_CHILD_FROM_COMPONENT_RESPONSE";
+
+export const DELETE_CHILD_FROM_JUNCTION = "DELETE_CHILD_FROM_JUNCTION";
+export const deleteChildFromJunction = (entryIndex: number, parentId: number, childIndex: number) => ({
+    type: DELETE_CHILD_FROM_JUNCTION,
+    entryIndex,
+    parentId,
+    childIndex
+});
+export const DELETE_CHILD_FROM_JUNCTION_RESPONSE = "DELETE_CHILD_FROM_JUNCTION_RESPONSE";
+
+export const DELETE_CHILD_FROM_PROPERTY = "DELETE_CHILD_FROM_PROPERTY";
+export const deleteChildFromProperty = (entryIndex: number, parentId: number) => ({
+    type: DELETE_CHILD_FROM_PROPERTY,
+    entryIndex,
+    parentId
+});
+export const DELETE_CHILD_FROM_PROPERTY_RESPONSE = "DELETE_CHILD_FROM_PROPERTY_RESPONSE";

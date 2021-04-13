@@ -4,7 +4,7 @@ import {hierarchy, select, tree, TreeLayout} from "d3";
 import ReactTooltip from "react-tooltip";
 
 import {INode} from "../../core/model/interfaces";
-import {ComponentType, NodeType, getContextString, JunctionType} from "../../core/model/enums";
+import {ComponentType, NodeType, JunctionType, getContextString, getOperatorString} from "../../core/model/enums";
 import {Entry} from "../../core/model/entry";
 
 import "./tree.css";
@@ -35,7 +35,7 @@ const TreeComponent = (props: IProps) => {
         useNodeLabels
     } = props;
 
-    // The entire procedure to draw the tree graphic is contained here as a side effect that runs once.
+    // The entire procedure to draw the tree graphic is contained here as a side effect.
 	useEffect(() => {
 
 	    // Vertical spacing between each level of the tree (pixels)
@@ -74,12 +74,12 @@ const TreeComponent = (props: IProps) => {
         let height: number = (treeNodes.height * levelSpacing) + margin.bottom;
 
         const svg = select(svgEl.current);
+        svg.attr("height", height + margin.top + margin.bottom);
         if(svg.select("g").empty()) {
             svg.append("g")
                 .attr("class", "links")
                 .attr("transform", "translate(" + 0 + "," + margin.top + ")");
             svg.attr("width", width)
-                .attr("height", height + margin.top + margin.bottom)
                 .append("g")
                 .attr("class", "nodes")
                 .attr("transform", "translate(" + 0 + "," + margin.top + ")");
@@ -149,9 +149,9 @@ const TreeComponent = (props: IProps) => {
                 }
             })
             .attr("cursor", "pointer")
-            .attr("r", 16)
+            .attr("r", 17)
 
-            // Tooltips
+            // Tooltips when hovering over nodes
             .attr("data-tip", (d: any) => {
                 let html: string;
                 let textContent: string | undefined;
@@ -165,30 +165,31 @@ const TreeComponent = (props: IProps) => {
                     case NodeType.statementjunction:
                         html = `<strong>${NodeType.statementjunction}</strong><br/>` +
                             ((d.data.junctionType && d.data.junctionType !== JunctionType.none) ?
-                                `${d.data.getOperatorString()}` :`<em>No junction type</em>`) + `<br/>` +
-                            ((d.data.text) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
+                                `${getOperatorString(d.data.junctionType)}` : `<em>No junction type</em>`) + `<br/>` +
+                            ((d.data.text.isSet()) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
                         break;
                     case NodeType.componentjunction:
                         html = `<strong>${NodeType.componentjunction}</strong><br/>` +
                             ((d.data.junctionType && d.data.junctionType !== JunctionType.none) ?
-                                `${d.data.getOperatorString()}` : `<em>No junction type</em>`) + `<br/>` +
-                            ((d.data.text) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
+                                `${getOperatorString(d.data.junctionType)}` : `<em>No junction type</em>`) + `<br/>` +
+                            ((d.data.text.isSet()) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
                         break;
                     case NodeType.propertyjunction:
                         html = `<strong>${NodeType.propertyjunction}</strong><br/>` +
                             ((d.data.junctionType && d.data.junctionType !== JunctionType.none) ?
-                                `${d.data.getOperatorString()}` : `<em>No junction type</em>`) + `<br/>` +
-                            ((d.data.text) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
+                                `${getOperatorString(d.data.junctionType)}` : `<em>No junction type</em>`) + `<br/>` +
+                            `Functionally dependent: ${d.data.isFunctionallyDependent ? "Yes" : "No"}<br/>` +
+                            ((d.data.text.isSet()) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
                         break;
                     case NodeType.component:
-                        textContent = (d.data.text) ? d.data.text.getString() : undefined;
+                        textContent = (d.data.text.isSet()) ? d.data.text.getString() : undefined;
                         html = `<strong>${NodeType.component}</strong><br/>` +
                             `${d.data.componentType}` +
                             (![ComponentType.activationconditions, ComponentType.executionconstraints].includes(d.data.componentType) ?
                             (textContent ? `<br/>"${textContent}"` : `<br/><em>No text content</em>`) : ``);
                         break;
                     case NodeType.property:
-                        textContent = (d.data.text) ? d.data.text.getString() : undefined;
+                        textContent = (d.data.text.isSet()) ? d.data.text.getString() : undefined;
                         html = `<strong>${NodeType.property}</strong><br/>` +
                             `Functionally dependent: ${d.data.isFunctionallyDependent ? "Yes" : "No"}<br/>` +
                             (textContent ? `"${textContent}"` : `<em>No text content</em>`);
@@ -206,8 +207,7 @@ const TreeComponent = (props: IProps) => {
                 return html;
             })
             .attr("data-html", true)
-            .on("click", (d: any) => {
-                // This is the function called on node click, opening that node's modal.
+            .on("click", (d: any) => {  // Function on node click
                 setActiveNode(d.data);
                 showModal();
             })
@@ -219,7 +219,7 @@ const TreeComponent = (props: IProps) => {
                 .attr('alignment-baseline', 'middle')
                 .attr("data-html", true)
                 .attr("pointer-events", "none")
-                .attr("dy", "-24")
+                .attr("dy", "-25")
                 .style("color", "#495057")
                 .text((d: any) => {
                     if ([NodeType.regulativestatement, NodeType.constitutivestatement].includes(d.data.nodeType)) {
@@ -234,9 +234,10 @@ const TreeComponent = (props: IProps) => {
             // White rectangles behind text content so it doesn't clash with lines
             nodeEnter.append("rect")
                 .attr("x", -10)
-                .attr("y", 17)
+                .attr("y", 18)
                 .attr("width", 20)
                 .attr("height", 17)
+                .attr("rx", 8)
                 .attr("fill", "white")
                 .style("display", (d: any) => { // Render only on nodes with text content
                     if ([NodeType.component, NodeType.property, NodeType.statementjunction,
@@ -271,7 +272,7 @@ const TreeComponent = (props: IProps) => {
                             select(this).append("tspan")    // Each line uses a separate <tspan>
                             .attr("dy",() => {
                                 if (j === 0) {
-                                    return 29;  // Place the first line below the node,
+                                    return 30;  // Place the first line below the node,
                                 }
                                 return 15;  // and the rest at a line height of 15px each
                             })
@@ -284,9 +285,9 @@ const TreeComponent = (props: IProps) => {
 
         // Label on each node showing logical operators and component letters
         nodeEnter.append("text")
-            .attr('text-anchor', 'middle')
-            .attr('alignment-baseline', 'middle')
-            .style('font-size', () => 16 * .75 + 'px')
+            .attr("text-anchor", "middle")
+            .attr('alignment-baseline', "middle")
+            .style("font-size", "14px")
             .attr("data-html", true)
             .attr("pointer-events", "none")
             .attr("dy", "1")

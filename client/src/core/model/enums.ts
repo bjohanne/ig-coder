@@ -96,6 +96,24 @@ export enum JunctionType {
 }
 
 /**
+ * Return a string representing a JunctionType logical operator.
+ * @param junctionType The JunctionType string constant to get a string for
+ * @return A full-text specification of the logical operator (e.g. conjunction, disjunction)
+ */
+export function getOperatorString(junctionType: string) : string {
+    switch (junctionType) {
+        case JunctionType.and:
+            return "Conjunction";
+        case JunctionType.or:
+            return "Disjunction";
+        case JunctionType.xor:
+            return "Exclusive disjunction";
+        default:
+            return "";
+    }
+}
+
+/**
  * Filters JunctionType into an array of its UPPERCASE string constants.
  * Excludes the NONE type.
  * @return An array of the string constants of JunctionType

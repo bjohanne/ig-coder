@@ -21,6 +21,7 @@ const PropertyEditor = (props: IProps) => {
                 activeNode.children.length > 0 &&
                 ![NodeType.property, NodeType.propertyjunction].includes(activeNode.children[0].nodeType)
             }/>
+            <hr className="pb-2"/>
             <PropertyChildren/> {/* Can always have children, no check necessary */}
         </CommonEditorTable>
     )

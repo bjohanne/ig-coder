@@ -45,7 +45,7 @@ const TextContentComponent = (props: IProps) => {
             // For the textarea that displays the statement, adapt the number of rows to the length of the statement
             statementTextArea.current.rows = 1;
             if (statementTextArea.current.scrollHeight > 36) {
-                statementTextArea.current.rows = ((statementTextArea.current.scrollHeight - 12) / 24) + 1; // +1 in case of scrollbar
+                statementTextArea.current.rows = ((statementTextArea.current.scrollHeight - 12) / 24);
             }
         }
     }, []); // Run only once on mount
