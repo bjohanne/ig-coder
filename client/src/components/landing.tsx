@@ -6,6 +6,9 @@ import Col from "react-bootstrap/Col";
 import "./home.css";
 import pageTitles from "../core/config/pageTitles";
 
+/*
+ * The Landing page is shown when the management layer is ON and the user is NOT logged in.
+ */
 export function LandingComponent(props) {
     useEffect(() => {
         document.title = pageTitles.prefix + pageTitles.landing;

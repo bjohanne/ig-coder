@@ -1,7 +1,7 @@
 import React from 'react';
-import Enzyme, {shallow, mount} from 'enzyme';
+import Enzyme, {shallow} from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import {Navbar} from '../common/navbar';
+import {NavbarComponent} from '../common/navbar';
 
 Enzyme.configure({adapter: new Adapter()});
 
@@ -10,7 +10,7 @@ function setup() {
         userLoggedIn: true
     }
 
-    const wrapper = shallow(<Navbar {...props}/>);
+    const wrapper = shallow(<NavbarComponent {...props}/>);
 
     return {
         wrapper

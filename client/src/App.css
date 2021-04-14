@@ -1,3 +1,5 @@
+/* MAIN APP.TSX */
+
 .App-logo {
     animation: App-logo-spin infinite 20s linear;
     height: 40vmin;
@@ -27,6 +29,33 @@
         transform: rotate(360deg);
     }
 }
+
+/* BREADCRUMBS */
+
+Nav .breadcrumb {
+    margin-bottom: 0 !important;
+}
+
+.breadcrumb {
+    background-color: #f8f9fa !important;
+    border-radius: 0 !important;
+}
+
+.breadcrumb-item {
+    font-size: small;
+}
+
+/* MODAL */
+
+.modal-open {
+    overflow-y: inherit !important;
+}
+
+.modal-backdrop {
+    opacity: 0.25 !important;
+}
+
+/* OTHER/OLD */
 
 .node {
     z-index: 1000;
@@ -62,10 +91,6 @@
 
 .modal-open {
     padding-right: 0 !important;
-}
-
-.App-link {
-    color: #61dafb;
 }
 
 .component-editor-entry-text {

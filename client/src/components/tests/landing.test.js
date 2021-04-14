@@ -1,5 +1,5 @@
 import React from 'react';
-import Enzyme, {shallow, mount} from 'enzyme';
+import Enzyme, {shallow} from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import {LandingComponent} from '../landing';
 
@@ -19,5 +19,5 @@ function setup() {
 it("renders with static content", () => {
     const {wrapper} = setup();
     expect(wrapper.length).toEqual(1);  // Exactly 1 React node is rendered
-    expect(wrapper.contains("Welcome to IG Coder!")).toBe(true);  // The text "The making..." is displayed
+    expect(wrapper.contains("Welcome to IG Coder!")).toBe(true);
 });

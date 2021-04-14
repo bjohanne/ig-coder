@@ -1,141 +1,152 @@
-import { BaseNode, NormNode, ConventionNode, NegationNode, ComponentNode, SubcomponentNode } from "./";
-import { INode, ITwoChildren } from "../interfaces";
-import { JunctionType, NodeType, ComponentType, SubcomponentType, SubtreeType, Arg } from "../enums";
-import { DataError, DataErrorType } from "../errors";
+import {BaseNode} from "./";
+import {IJunctionNode, INode} from "../interfaces";
+import {Arg, JunctionType, NodeType} from "../enums";
+import {DataError, DataErrorType} from "../errors";
+import {TextContent} from "../textcontent";
 
 /**
- * The Junction node is the main building block of horizontal nesting.
+ * This is the base class for StatementJunction, ComponentJunction and PropertyJunction.
+ * Junction nodes are the main building block of horizontal nesting.
  * It is used to combine nodes with logical operators.
  */
-export default class JunctionNode extends BaseNode implements ITwoChildren {
+export default class JunctionNode extends BaseNode implements IJunctionNode {
 	nodeType: NodeType = NodeType.junction;
-	junctionType!: JunctionType;
-    componentType?: ComponentType;		 // Used to check for correct type within Entry subtrees
-    subcomponentType?: SubcomponentType; // Used to check for correct type within Entry subtrees
-	children!: [INode, INode];   // Two children
+	/* Logical operator of the junction */
+	junctionType: JunctionType = JunctionType.none;
+	/* Holds the text content of the junction. Should always be defined */
+	text!: TextContent;
+	/* Two fixed children for Junction nodes */
+	children!: [INode, INode];
 
 	/**
-	 * Creates a new Junction node with dummy children.
+	 * All the Junction constructor does is call its parent constructor and set dummy children.
+	 * Can also set a junction type right off the bat.
 	 *
 	 * @param document The ID of the document this node belongs to
 	 * @param parent (Optional) The ID of the node this node is a child of (the parent's children array must be set separately)
-	 * @param subtree (Optional) The subtree this node is part of. Should be the same as its parent - used to pass that down.
-	 * @param componentType (Optional) The component type of this node's ancestor ComponentNode, if it has one.
-	 * @param subcomponentType (Optional) The subcomponent type of this node's ancestor SubcomponentNode, if it has one.
+	 * @param junctionType (Optional) The logical operator of the junction [and, or, xor]
+	 * @param id (Optional) The ID of this node if one already exists (for rebuilding from existing data)
 	 */
-	constructor(document: number, parent?: number, subtree?: SubtreeType, componentType?: ComponentType, subcomponentType?: SubcomponentType) {
-		super(document, parent, subtree);
-		this.componentType = componentType;
-		this.subcomponentType = subcomponentType;
+	constructor(document: number, parent?: number, junctionType?: JunctionType, id?: number) {
+		super(document, parent, id);
+		this.text = new TextContent();
 		this.children = [
 			new BaseNode(document, this.id),
 			new BaseNode(document, this.id)
 		]; // Dummy children
+		if (junctionType) {
+			this.junctionType = junctionType;
+		}
 	}
 
 	/**
 	 * Assigns a junction type to this node.
 	 * @param junctionType and/or/xor
 	 */
-	setJunction(junctionType: JunctionType) {
+	setJunctionType(junctionType: JunctionType) : void {
 		this.junctionType = junctionType;
+		this.update();
+	}
+
+	/**
+	 * Sets this node's junction type to the default none type.
+	 */
+	unsetJunctionType() : void {
+		this.junctionType = JunctionType.none;
+		this.update();
+	}
+
+	/**
+	 * Return this node's TextContent object. Throws an error if the TextContent object is undefined.
+	 * @return The TextContent object found in this node's text property
+	 */
+	getText() : TextContent {
+		if (!this.text) {
+			throw new DataError(DataErrorType.JUN_GET_TXT_UNDEF, this.id);
+		}
+		return this.text;
+	}
+
+	/**
+	 * Modifies the node's TextContent object with the passed in text content.
+	 *
+	 * @param main (Optional) The text that most narrowly fits the component/property
+	 * @param prefix (Optional) Text from the raw statement that precedes the main part
+	 * @param suffix (Optional) Text from the raw statement that succeeds the main part
+	 * @param inferredOrRephrased (Optional) An explicit specification and/or rephrasing of the main part
+	 */
+	setText(main?: string, prefix?: string, suffix?: string, inferredOrRephrased?: string) : void {
+		if (!this.text) {
+			throw new DataError(DataErrorType.JUN_GET_TXT_UNDEF, this.id);
+		}
+		this.text.set(main, prefix, suffix, inferredOrRephrased);
+		this.update();
+	}
+
+	/**
+	 * Unsets the TextContent's fields (not the TextContent object itself).
+	 */
+	unsetText() : void {
+		if (!this.text) {
+			throw new DataError(DataErrorType.JUN_GET_TXT_UNDEF, this.id);
+		}
+		this.text.unset();
 		this.update();
 	}
 
 	/* Getters for the children */
 
+	/**
+	 * Returns this node's left child.
+	 * Throws an error if the child is a dummy node or undefined.
+	 * @return This node's left child. You must assert its node type.
+	 */
 	getLeft() : INode {
-		if (this.children[0].isDummy()) {
-			throw new DataError(DataErrorType.JUN_GET_DUM_LEFT);
+		if (this.children[Arg.left].isDummy()) {
+			throw new DataError(DataErrorType.JUN_DUM_LEFT, this.id);
 		}
-		return this.children[0];
+		return this.children[Arg.left];
 	}
 
+	/**
+	 * Returns this node's right child.
+	 * Throws an error if the child is a dummy node or undefined.
+	 * @return This node's right child. You must assert its node type.
+	 */
 	getRight() : INode {
-		if (this.children[1].isDummy()) {
-			throw new DataError(DataErrorType.JUN_GET_DUM_RIGHT);
+		if (this.children[Arg.right].isDummy()) {
+			throw new DataError(DataErrorType.JUN_DUM_RIGHT, this.id);
 		}
-		return this.children[1];
+		return this.children[Arg.right];
 	}
 
 	/**
-	 * Creates a Norm or Convention node as child of this node.
-	 *
-	 * @param type Whether to create a Norm or Convention node
-	 * @param position Whether the new node should be the left or right child of this node
-	 * @param statement (Optional) The full text of the statement
-	 * @param origin (Optional) The ID of the node the new node is a reference to
+	 * Delete the left child of this node.
+	 * The child is overwritten with a new dummy node, deleting the old data and all its descendants,
+	 *  with a warning.
 	 */
-	createNormOrConventionNode(type: Arg.norm | Arg.convention, position: Arg.left | Arg.right, statement?: string, origin?: number) : INode | undefined {
-		let index = (position === Arg.left) ? 0 : 1;
-		this.children[index] = (type === Arg.norm) ? new NormNode(this.document, statement, this.id, origin)
-			: new ConventionNode(this.document, statement, this.id, origin);
+	deleteLeft() : void {
+		if (this.children[Arg.left].isDummy()) {
+			throw new DataError(DataErrorType.JUN_DUM_LEFT, this.id);
+		}
+		console.warn("Deleting left child with ID " + this.children[Arg.left].id + " of Junction node with ID " +
+			this.id);
+		this.children[Arg.left] = new BaseNode(this.document, this.id);
 		this.update();
-		return this.children[index];
 	}
 
 	/**
-	 * Creates a Junction node as child of this node.
-	 * @param position Whether the new node should be the left or right child of this node
+	 * Delete the right child of this node.
+	 * The child is overwritten with a new dummy node, deleting the old data and all its descendants,
+	 *  with a warning.
 	 */
-	createJunctionNode(position: Arg.left | Arg.right) : INode | undefined {
-		let index = (position === Arg.left) ? 0 : 1;
-		this.children[index] = new JunctionNode(this.document, this.id, this.subtree, this.componentType, this.subcomponentType);
+	deleteRight() : void {
+		if (this.children[Arg.right].isDummy()) {
+			throw new DataError(DataErrorType.JUN_DUM_RIGHT, this.id);
+		}
+		console.warn("Deleting right child with ID " + this.children[Arg.right].id + " of Junction node with ID " +
+			this.id);
+		this.children[Arg.right] = new BaseNode(this.document, this.id);
 		this.update();
-		return this.children[index];
-	}
-
-	/**
-	 * Creates a Negation node as child of this node.
-	 * @param position Whether the new node should be the left or right child of this node
-	 */
-	createNegationNode(position: Arg.left | Arg.right) : INode | undefined {
-		let index = (position === Arg.left) ? 0 : 1;
-		this.children[index] = new NegationNode(this.document, this.id, this.subtree, this.componentType, this.subcomponentType);
-		this.update();
-		return this.children[index];
-	}
-
-	/**
-	 * Creates a Component node as child of this node, if legal.
-	 *
-	 * @param componentType The type of component (Attributes, Object, Deontic, Aim or Conditions)
-	 * @param position Whether the new node should be the left or right child of this node
-	 * @param origin (Optional) The ID of the node this node is a reference to
-	 */
-	createComponentNode(componentType: ComponentType, position: Arg.left | Arg.right, origin?: number) : INode | undefined {
-		if (this.subtree !== SubtreeType.entry) {
-			throw new DataError(DataErrorType.JUN_ADD_CMP_NO_NC);
-		}
-		if (this.subcomponentType) {
-			throw new DataError(DataErrorType.JUN_ADD_CMP_SUB);
-		}
-		if (this.componentType !== componentType) {
-			throw new DataError(DataErrorType.JUN_CMP_MISMATCH);
-		}
-		let index = (position === Arg.left) ? 0 : 1;
-		this.children[index] = new ComponentNode(componentType, this.document, this.id, this.subtree, origin);
-		this.update();
-		return this.children[index];
-	}
-
-	/**
-	 * Creates a Subcomponent node as child of this node, if legal.
-	 *
-	 * @param subcomponentType The type of component (Attributes, Object, Deontic, Aim or Conditions)
-	 * @param position Whether the new node should be the left or right child of this node
-	 * @param origin (Optional) The ID of the node this node is a reference to
-	 */
-	createSubcomponentNode(subcomponentType: SubcomponentType, position: Arg.left | Arg.right, origin?: number) : INode | undefined {
-		if (this.subtree !== SubtreeType.entry) {
-			throw new DataError(DataErrorType.JUN_ADD_CMP_NO_NC);
-		}
-		if (this.subcomponentType !== subcomponentType) {
-			throw new DataError(DataErrorType.JUN_SUB_MISMATCH);
-		}
-		let index = (position === Arg.left) ? 0 : 1;
-		this.children[index] = new SubcomponentNode(subcomponentType, this.document, this.id, this.subtree, origin);
-		this.update();
-		return this.children[index];
 	}
 }

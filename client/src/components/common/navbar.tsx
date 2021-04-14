@@ -1,111 +1,78 @@
-import React, { useState } from "react";
-import { connect } from "react-redux";
-import { Link, useHistory } from "react-router-dom";
-import {IconButton,Menu,MenuItem,Fade} from "@material-ui/core";
-import {AccountCircle} from "@material-ui/icons";
+import React from "react";
+import {connect} from "react-redux";
+import {Link, useHistory} from "react-router-dom";
+import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
 import Spinner from "react-bootstrap/Spinner";
 
 import "./navbar.css";
 import {signOut} from "../../state/user/actions";
 import {openSnackbar} from "../../state/ui/actions";
+import Preferences from "./preferences";
 
-export function Navbar(props) {
-    const {auth, loading, signOut, openSnackbar} = props;
-
-    const [anchorEl, setAnchorEl]=useState(null)
-
+export function NavbarComponent(props) {
     const history=useHistory()
 
-    const handleMenu=(event)=>{
-        setAnchorEl(event.target)
-    }
-
-    const handleClose=()=>{
-        setAnchorEl(null)
-    }
+    const {
+        auth, loading, signOut, openSnackbar,
+        inManagementMode
+    } = props;
 
     const handleSignout=()=>{
         signOut(
             () => {
-                setAnchorEl(null)
                 history.push("/")
                 openSnackbar()
             },
-            (errorMsg) => {
+            () => {
                 openSnackbar()
             }
         );
     }
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-light bg-light navbar-wrapper">
-            <Link to="/">
-                <h2>
-                    <span className="dark-igc-gray-bg badge text-light">IG Coder</span>
-                </h2>
-            </Link>
-            <button className="navbar-toggler" type="button" data-toggle="collapse"
-                    data-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span className="navbar-toggler-icon"></span>
-            </button>
-
-            <div className="navbar-collapse collapse w-100 order-3 dual-collapse2">
-				{/*<form className="navbar-form ml-3" role="search">*/}
-                {/*    <div className="search">*/}
-                {/*        <input type="text" className="form-control" placeholder="Search" name="ig-q"/>*/}
-                {/*        <span className="dark-igc-gray-text oi oi-magnifying-glass"></span>*/}
-                {/*    </div>*/}
-                {/*</form>*/}
-                <ul className="navbar-nav ml-auto">
-                    {!auth.isEmpty ?
-                    <li className="nav-item">
-                        <IconButton
-                            aria-label="account of current user"
-                            aria-controls="menu-appbar"
-                            aria-haspopup="true"
-                            onClick={handleMenu}
-                            color="inherit"
-                            className="p-0"
-                        >
-                            <AccountCircle style={{color:"#8190A5"}} fontSize={"large"}/>
-                        </IconButton>
-                    </li>
+        <Navbar bg="light" expand="lg">
+            <Navbar.Brand>
+                <Link to="/">
+                    <h2>
+                        <span className="dark-igc-gray-bg badge text-light">IG Coder</span>
+                    </h2>
+                </Link>
+            </Navbar.Brand>
+            <Navbar.Toggle aria-controls="basic-navbar-nav" />
+            <Navbar.Collapse id="basic-navbar-nav">
+                    {inManagementMode ?
+                        <div>
+                        {!auth.isEmpty ?
+                            <Nav className="mr-auto" id="navbar-nav">
+                                <Link className="nav-link" to="/">Home</Link>
+                                <Link className="nav-link" to="#">My profile</Link>
+                                <Link className="nav-link" to="/projects/myprojects">My projects </Link>
+                                <Nav.Link onClick={handleSignout}>
+                                    Sign out
+                                    {loading && <Spinner animation="border" size="sm" className="ml-2" role="status"/>}
+                                </Nav.Link>
+                            </Nav>
+                            :
+                            <Nav className="mr-auto">
+                                <Link className="text-dark" to="/login">Sign in</Link>
+                            </Nav>
+                        }
+                        </div>
                     :
-                    <li className="nav-item">
-                        <Link className="text-dark" to="/login">Sign in</Link>
-                    </li>
+                    <Nav className="mr-auto">
+                        <Preferences/>
+                    </Nav>
                     }
-                </ul>
-            </div>
-            <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-                TransitionComponent={Fade}
-            >
-                <Link to="#">
-                    <MenuItem onClick={handleClose}>My profile</MenuItem>
-                </Link>
-                <Link to="/projects/myprojects">
-                    <MenuItem onClick={handleClose}>My projects</MenuItem>
-                </Link>
-                <div className="dropdown-divider"></div>
-                <MenuItem onClick={handleSignout}>
-                    Sign out
-                    {loading && <Spinner animation="border" variant="primary" size="sm"
-                        className="ml-2" role="status" />}
-                </MenuItem>
-            </Menu>
-        </nav>
+            </Navbar.Collapse>
+        </Navbar>
     );
 }
 
 const mapStateToProps = (state: any) => ({
     auth: state.firebase.auth,
-    loading: state.user.loading
+    loading: state.user.loading,
+    inManagementMode: state.appSettings.mode.management
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
@@ -116,4 +83,4 @@ const mapDispatchToProps = (dispatch: any) => ({
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(Navbar);
+)(NavbarComponent);

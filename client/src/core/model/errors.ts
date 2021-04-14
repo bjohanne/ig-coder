@@ -1,64 +1,90 @@
+import {ComponentType} from "./enums";
 
-
+/**
+ * A mapping of error codes to full error messages, for errors specific to the IG 2.0 data model.
+ */
 export enum DataErrorType {
 	// Base
-	BAS_DEL_DUM				= "Cannot delete a dummy node",
-	BAS_DEL_FIX				= "Cannot delete fixed children of Norm and Convention nodes",
-	BAS_DEL_LR				= "Cannot delete left or right child of a Component, Subcomponent or Negation node",
-	BAS_DEL_ONLY			= "Cannot delete only child of a Junction or Sanction node",
-	BAS_DEL_SUB				= "Cannot delete Subcomponent child of a Component node",
+	BAS_BAD_NODETYPE		= "This Node has an invalid node type (probably base Statement or Junction)",
 
 	// Component
-	CMP_AIM_ADD_NC			= "Component nodes of type Aim cannot have Norm/Convention nodes as children",
-	CMP_AIM_ATR_GET_ONLY	= "Component type must be Attributes or Aim in order to get single child",
-	CMP_ATR_ADD_NRM			= "Component nodes of type Attributes cannot have Norm nodes as children",
-	CMP_CND_ADD				= "Cannot add children to Component nodes of type Conditions",
-	CMP_DNT_ADD				= "Component nodes of type Deontic cannot have children",
-	CMP_GET_DUM				= "The child of this Component node is a dummy node",
-	CMP_GET_UNDEF			= "This Component node has no children",
-	CMP_OBJ_ADD				= "Cannot add children to Component nodes of type Object",
-	CMP_OBJ_CND_GET_LR		= "Component type must be Object or Conditions in order to get left or right child",
-	CMP_OBJ_CND_TXT			= "Component nodes of type Object or Conditions cannot have text content",
-
-	// Convention
-	CNV_GET_OBJ_UNDEF		= "This Convention node does not have an Object child",
+	CMP_AC_TXT				= "Component nodes of type Activation Conditions cannot have text content",
+	CMP_ADD_CMP 			= "Cannot create the specified Component child of this Component node",
+	CMP_ADD_CMPJUN			= "This Component type cannot have a ComponentJunction child",
+	CMP_ADD_PRP 			= "This Component type cannot have a Property child",
+	CMP_ADD_PRPJUN 			= "This Component type cannot have a PropertyJunction child",
+	CMP_ADD_STMT			= "This Component type cannot have a Statement child",
+	CMP_ADD_STMTJUN			= "This Component type cannot have a StatementJunction child",
+	CMP_BAD_CHILD_IDX		= "Component child index out of bounds",
+	CMP_CTXT_ADD_DEL		= "Component nodes of type SimpleContext cannot have children",
+	CMP_CTXT_TYPE			= "Component type must be SimpleContext to set and unset context type",
+	CMP_DNT_ADD_DEL			= "Component nodes of type Deontic cannot have children",
+	CMP_EC_TXT 				= "Component nodes of type Execution Constraints cannot have text content",
+	CMP_GET_TXT_UNDEF		= "This Component node's TextContent is undefined",
+	CMP_HAS_CHLD 			= "This Component node already has one or more children",
+	CMP_HAS_CHLD_NO_PRP		= "This Component node already has a child not of type Property or PropertyJunction",
+	CMP_MODAL_ADD_DEL		= "Component nodes of type Modal cannot have children",
+	CMP_NO_CHLD 			= "This Component node has no children",
+	CMP_TYPE_MISMATCH		= "Provided child component type does not match ancestor's component type",
 
 	// Document
-	DOC_TOG_NEG				= "Cannot toggle negation of node types other than Norm, Convention and Junction",
-	DOC_TOG_NEG_BAD_PARENT	= "Could not find the child index of the parent that holds the parent's child",
+	DOC_BAD_ENTRY_IDX		= "Document's entry index out of bounds",
+	DOC_NO_ENTRIES			= "This Document has no entries",
+
+	// Entry
+	ENT_NO_ROOT 			= "This Entry has no root",
+	ENT_FIND_FAIL 			= "Cannot find a node with the given ID in this Entry",
 
 	// Junction
-	JUN_ADD_CMP_NO_NC		= "Cannot create a Component node outside of a Norm/Convention subtree",
-	JUN_ADD_CMP_SUB			= "Cannot create a Component node as descendant of a Subcomponent node",
-	JUN_CMP_MISMATCH		= "The provided component type does not match ancestor's component type",
-	JUN_GET_DUM_LEFT		= "Left child of this Junction node is a dummy node",
-	JUN_GET_DUM_RIGHT		= "Right child of this Junction node is a dummy node",
-	JUN_SUB_MISMATCH		= "The provided subcomponent type does not match ancestor's subcomponent type",
+	JUN_BAD_CHILD_IDX 		= "Junction child index out of bounds",
+	JUN_DUM_LEFT			= "Left child of this Junction node is a dummy node",
+	JUN_DUM_RIGHT			= "Right child of this Junction node is a dummy node",
+	JUN_GET_TXT_UNDEF 		= "This Junction node's TextContent is undefined",
 
-	// Negation
-	NEG_GET_DUM				= "The child of this Negation node is a dummy node",
+	// RegulativeStatement
+	REG_HAS_DIROBJ			= "This RegulativeStatement node already has a DirectObject child",
+	REG_HAS_INDIROBJ		= "This RegulativeStatement node already has an IndirectObject child",
+	REG_HAS_DNT				= "This RegulativeStatement node already has a Deontic child",
+	REG_HAS_ORELSE			= "This RegulativeStatement node already has an Or Else child",
+	REG_NO_DIROBJ			= "This RegulativeStatement node does not have a DirectObject child",
+	REG_NO_INDIROBJ			= "This RegulativeStatement node does not have an IndirectObject child",
+	REG_NO_DNT				= "This RegulativeStatement node does not have a Deontic child",
+	REG_NO_ORELSE			= "This RegulativeStatement node does not have an Or Else child",
 
-	// Norm
-	NRM_GET_OBJ_UNDEF		= "This Norm node does not have an Object child",
+	// ConstitutiveStatement
+	CON_HAS_CONPROP			= "This ConstitutiveStatement node already has a ConstitutingProperties child",
+	CON_HAS_MODAL			= "This ConstitutiveStatement node already has a Modal child",
+	CON_HAS_ORELSE			= "This ConstitutiveStatement node already has an Or Else child",
+	CON_NO_CONPROP			= "This ConstitutiveStatement node does not have a ConstitutingProperties child",
+	CON_NO_MODAL			= "This ConstitutiveStatement node does not have a Modal child",
+	CON_NO_ORELSE			= "This ConstitutiveStatement node does not have an Or Else child",
 
-	// Sanction
-	SAN_GET_DUM_LEFT		= "Left child of this Sanction node is a dummy node",
-	SAN_GET_DUM_RIGHT		= "Right child of this Sanction node is a dummy node",
-
-	// Subcomponent
-	SUB_ADD_CND				= "Subcomponent nodes of a Conditions subtype cannot have Subcomponent nodes as children",
-	SUB_CND_TXT				= "Cannot modify text content of Activation or Execution nodes",
-	SUB_GET_DUM				= "The child of this Subcomponent node is a dummy node",
-	SUB_GET_UNDEF			= "This Subcomponent node has no children",
-	SUB_OBJ_ADD_NRM			= "Subcomponent nodes of an Object subtype cannot have Norm nodes as children"
+	// Property
+	PRP_HAS_CHLD			= "This Property node already has a child",
+	PRP_HAS_STMT_CHLD		= "This Property node already has a Statement child",
+	PRP_HAS_STMTJUN_CHLD	= "This Property node already has a StatementJunction child",
+	PRP_GET_TXT_UNDEF 		= "This Property node's TextContent is undefined",
+	PRP_NO_CHLD				= "This Property node has no children",
+	PRP_TOO_MANY_CHLD 		= "This Property node has more than one child"
 }
 
+/**
+ * An error specific to the IG 2.0 data model.
+ */
 export class DataError extends Error {
-	type: DataErrorType;
+	name = "DataError";
 
-	constructor(type: DataErrorType) {
+	/**
+	 * @param type The type of error, specified by the enum DataErrorType which maps error codes to full error messages
+	 * @param id The ID of the Node, Document or Entry on which the error occurred
+	 * @param componentType (Optional) If the error involves a component type, it is given here
+	 */
+	constructor(public type: DataErrorType, public id: number, public componentType?: ComponentType) {
 		super(type);
-		this.name = "DataError";
 		this.type = type;
+		this.id = id;
+		if (componentType) {
+			this.componentType = componentType;
+		}
 	}
 }

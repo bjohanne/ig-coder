@@ -1,108 +1,180 @@
-import { INode } from "../interfaces";
-import { NodeType, SubtreeType, Arg } from "../enums";
-import { NodeCounter } from "../document";
-import { DataError, DataErrorType } from "../errors";
+import {INode} from "../interfaces";
+import {ContextType, NodeType} from "../enums";
+import {IDCounter} from "../document";
+import {
+	ComponentJunctionNode,
+	ComponentNode,
+	ConstitutiveStatementNode,
+	PropertyJunctionNode,
+	PropertyNode,
+	RegulativeStatementNode,
+	StatementJunctionNode
+} from ".";
+import {DataError, DataErrorType} from "../errors";
 
 /**
- * The base node has the implementation of INode.
+ * This is the base class for nodes, which implements INode.
  * It is also used as dummy children for several node types.
  */
 export default class BaseNode implements INode {
+	/* ID of this Node, unique within its Document */
     id!: number;
+    /* ID of the Document this node belongs to */
     document!: number;
+    /* This Node's type/archetype/role in the statement tree */
     nodeType!: NodeType;
-	subtree?: SubtreeType;
+    /* Whether this Node's meaning is negated */
+    isNegated: boolean = false;
+	/* Optional context type for using the Context Taxonomy on this Node */
+	contextType?: ContextType;
+    /* ID of the node this node is a child of (undefined if root) */
     parent?: number;
-    origin?: number;
+    /* The time and date this Node was created */
     createdAt!: Date;
+    /* The time and date this Node was last changed */
     updatedAt!: Date;
+    /* Array of child nodes of this Node */
     children!: INode[];
 
     /**
-     * The base constructor for all nodes
+     * The base constructor for all nodes. Generates an ID for the node unless one is provided.
+	 * Sets the createdAt and updatedAt fields.
      *
      * @param document The ID of the document this node belongs to
      * @param parent (Optional) The ID of the node this node is a child of (the parent's children array must be set separately)
-	 * @param subtree (Optional) The subtree this node is part of. Should be the same as its parent - used to pass that down.
-     * @param origin (Optional) The ID of the node this node is a reference to
+	 * @param id (Optional) The ID of this node if one already exists (for rebuilding from existing data)
      */
-    constructor(document: number, parent?: number, subtree?: SubtreeType, origin?: number) {
-        this.id = NodeCounter.getInstance().getNextNodeId(document);
+    constructor(document: number, parent?: number, id?: number) {
+		this.id = (id) ? id : IDCounter.getInstance().getNextId(document);
         this.document = document;
         if (parent) {
             this.parent = parent;
-        }
-		if (subtree) {
-			this.subtree = subtree;
-		}
-        if (origin) {
-            this.origin = origin;
         }
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }
 
+	/**
+	 * Build a new node from existing data. Properties are copied to the new node from the passed in data.
+	 * This function handles common BaseNode properties and calls the class-specific fromData() function
+	 * based on the passed in data's node type. Those functions handle the node's children.
+	 *
+	 * @param data An object of type INode (can be of a more specific type that extends INode)
+	 * @return A new node with the passed in properties
+	 */
+	static fromData(data: INode) : INode {
+		let newNode;
+
+		if (data.nodeType) {
+			switch (data.nodeType) {
+				case NodeType.regulativestatement:
+					newNode = RegulativeStatementNode.fromData(data as RegulativeStatementNode);
+					break;
+				case NodeType.constitutivestatement:
+					newNode = ConstitutiveStatementNode.fromData(data as ConstitutiveStatementNode);
+					break;
+				case NodeType.statementjunction:
+					newNode = StatementJunctionNode.fromData(data as StatementJunctionNode);
+					break;
+				case NodeType.componentjunction:
+					newNode = ComponentJunctionNode.fromData(data as ComponentJunctionNode);
+					break;
+				case NodeType.component:
+					newNode = ComponentNode.fromData(data as ComponentNode);
+					break;
+				case NodeType.property:
+					newNode = PropertyNode.fromData(data as PropertyNode);
+					break;
+				case NodeType.propertyjunction:
+					newNode = PropertyJunctionNode.fromData(data as PropertyJunctionNode);
+					break;
+				default:
+					throw new DataError(DataErrorType.BAS_BAD_NODETYPE, data.id);
+			}
+
+			// Rebuild children - not for dummy nodes
+			newNode.children = [];	// Make sure we start with an empty array (some constructors create children)
+			for (let i = 0; i < data.children.length; i++) {
+				newNode.children.push(BaseNode.fromData(data.children[i]));	// Call this same function for each child
+			}
+		} else {	// This is a dummy node, which can't have children
+			newNode = new BaseNode(data.document, data.parent, data.id);
+		}
+
+		// Set common properties - for both normal and dummy nodes
+		newNode.isNegated = data.isNegated;
+		newNode.createdAt = new Date(data.createdAt);
+		newNode.updatedAt = new Date(data.updatedAt);
+
+		return newNode;
+	}
+
+	/**
+	 * Find the index of a child of this node.
+	 * Returns undefined if no child with ID targetId exists.
+	 * Used for finding children of node types that can have many non-fixed children.
+	 *
+	 * @param targetId The ID of the child to locate
+	 * @return The index of the child if found, -1 otherwise
+	 */
+	getChildIndexById(targetId: number) : number {
+		for (let i = 0; i < this.children.length; i++) {
+			if (this.children[i].id === targetId) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
     /**
      * Check whether this node is a dummy node, i.e. a BaseNode.
-     * (Defined here in order to be available to all node classes)
      * Plain base nodes do not have the nodeType field.
-     * NB: The check must be done in this way, not simply "instanceof BaseNode",
-     * because that test counts inheritance => all node types pass.
+     * NB: The check must be done in this way, not "instanceof BaseNode"
+     * because that test counts inheritance, meaning all node types pass.
      */
     isDummy() : boolean {
         return (typeof this.nodeType === "undefined");
     }
 
 	/**
-	 * Small abstraction/convenience to set the updatedAt field.
+	 * Small abstraction/convenience to set the updatedAt field to the current time.
 	 * Called when a property on the node is modified or when a child is created on the node.
 	 */
-	update() {
+	update() : void {
 		this.updatedAt = new Date();
 	}
 
 	/**
-     * The standard way of deleting a node.
-     * If a node with the given ID is found in this node's children array,
-     * that child will be replaced with a new dummy node, deleting the old data.
-     * If the node is not found, an error will be thrown and no nodes will be deleted.
-	 * Does not throw a specific error if called on a Deontic node, because componentType does not exist on BaseNode.
-     * Like Document.deleteTree(), all the node's descendants are also deleted.
-     * Does not delete children that were automatically created (fixed children).
+	 * Small abstraction to set isNegated to true.
+	 */
+	turnNegationOn() : void {
+		this.isNegated = true;
+		this.update();
+	}
+
+	/**
+	 * Small abstraction to set isNegated to false.
+	 */
+	turnNegationOff() : void {
+		this.isNegated = false;
+		this.update();
+	}
+
+	/**
+	 * Sets the context type to the passed in context type.
 	 *
-	 * To delete an Object child of a Norm/Convention, use instead deleteObject().
-     *
-	 * @param childPos Which child to delete (left, right, only)
-     */
-	deleteChild(childPos: Arg.left | Arg.right | Arg.only) {
-		let index;    // The child's index in the parent's child array
+	 * @param contextType The context type to set
+	 */
+	setContextType(contextType: ContextType) : void {
+		this.contextType = contextType;
+		this.update();
+	}
 
-		if (this.nodeType === NodeType.norm || this.nodeType === NodeType.convention) {
-			throw new DataError(DataErrorType.BAS_DEL_FIX);
-        // Node types that have two non-fixed children
-		} else if (this.nodeType === NodeType.junction || this.nodeType === NodeType.sanction) {
-			if (childPos === Arg.only) {
-				throw new DataError(DataErrorType.BAS_DEL_ONLY);
-			}
-			index = (childPos === Arg.left) ? 0 : 1;
-		} else { // The remaining three node types have one or no children
-			// A left or right child of a Component node must be a fixed child, which should not be deleted
-			if (childPos !== Arg.only) {
-				throw new DataError(DataErrorType.BAS_DEL_LR);
-			}
-			if (this.nodeType === NodeType.component) {
-				// In case this is called with Arg.left (0), also check the child in index 0 for type Subcomponent
-				if (this.children[0].nodeType === NodeType.subcomponent) {
-					throw new DataError(DataErrorType.BAS_DEL_SUB);
-				}
-			}
-			index = 0;
-		}
-
-		if (this.children[index].isDummy()) {
-			throw new DataError(DataErrorType.BAS_DEL_DUM);
-		}
-		// Should log this as a warning
-		this.children[index] = new BaseNode(this.document, this.id);
-    }
+	/**
+	 * Unsets the context type (sets it to undefined).
+	 */
+	unsetContextType() : void {
+		this.contextType = undefined;
+		this.update();
+	}
 }

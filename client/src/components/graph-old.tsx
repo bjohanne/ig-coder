@@ -10,13 +10,13 @@ interface IProps {
 }
 
 /*
-	This file is unused, but kept for some potentially useful D3 snippets.
+	This file is UNUSED, but kept for some potentially useful D3 snippets.
 */
 
 export function GraphComponent(props: IProps) {
     const d3Container = useRef(null);
 
-	const [tree, updateTree] = useState({"id": 1, "nodeType": "Root"});	// D3 renders the graph from the state variable tree
+	const [tree,] = useState({"id": 1, "nodeType": "Root"});	// D3 renders the graph from the state variable tree
 
     useEffect(() => {
         if (tree && d3Container.current) {

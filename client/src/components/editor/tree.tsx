@@ -1,223 +1,363 @@
-import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
-import { select, tree, hierarchy, TreeLayout } from "d3";
-import { INode, IDocument } from "../../core/model/interfaces";
-import Modal from 'react-bootstrap/Modal';
-import { preSetActiveNode } from "../../state/documents/actions";
-import "./tree.css";
-import Edit from "./edit";
-import { NodeType, ComponentType } from "../../core/model/enums";
-import { Component } from "../../core/model/component";
+import React, {useEffect, useRef} from "react";
+import {connect} from "react-redux";
+import {hierarchy, select, tree, TreeLayout} from "d3";
 import ReactTooltip from "react-tooltip";
-import { nodeColorScaler, strokeColorScaler } from "../../core/config/scales";
 
-interface Proptype {
-    node: INode,
-    currentDocument: IDocument,
-    preSetActiveNode?: Function
+import {INode} from "../../core/model/interfaces";
+import {ComponentType, NodeType, JunctionType, getContextString, getOperatorString} from "../../core/model/enums";
+import {Entry} from "../../core/model/entry";
+
+import "./tree.css";
+import {
+    componentColorScaler,
+    componentStrokeColorScaler,
+    negatedStroke,
+    nodeColorScaler,
+    strokeColorScaler
+} from "../../core/config/scales";
+import {setActiveNode} from "../../state/documents/actions";
+
+interface IProps {
+    currentEntry: Entry,
+    setActiveNode: Function,
+    showModal: Function,
+    useNodeLabels: Boolean
 }
 
-const TreeComponent = (props: Proptype) => {
-    const [modal, setModal] = useState(false);
-    const toggle = () => setModal(!modal);
+const TreeComponent = (props: IProps) => {
 
-    let svgNode: any;
-    // let diagonal: any;
-    let height: number;
-    let width: number;
-    let treeLayout: TreeLayout<INode>;
+    const svgEl = useRef(null); // The SVG HTML element containing the tree graphic
 
-    const createTreeModel = (forestNode: INode) => {
-        let margin = { top: 20, right: 40, bottom: 20, left: 40 };
-        width = 1800 - margin.right - margin.left;
-        height = 650 - margin.top - margin.bottom;	// This affects how the tree looks
+    const {
+        currentEntry,
+        setActiveNode,
+        showModal,
+        useNodeLabels
+    } = props;
 
-        // diagonal = linkHorizontal().x((d) => d[1]).y((d) => d[0]);
-
-        const svg = select(svgNode);
-        if(svg.select("g").empty()) {
-        svg.append("g")
-            .attr("class", "links")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-        svg.attr("width", width + margin.right + margin.left)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("class", "nodes")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-        }
-        treeLayout = tree<INode>().size([height, width]);
-
-        update(forestNode);
-    };
-
+    // The entire procedure to draw the tree graphic is contained here as a side effect.
 	useEffect(() => {
-		createTreeModel(props.currentDocument.forest[0]);	// NOTE: This needs to be changed when allowing multiple trees per document
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.currentDocument])
 
-    const update = (rootNode: INode) => {
-        select(svgNode).selectAll("g.node").remove();
-        select(svgNode).selectAll("path.link").remove();
-        let root = hierarchy(rootNode, (d: INode) => d.children);
+	    // Vertical spacing between each level of the tree (pixels)
+	    const levelSpacing: number = 120;
+
+	    // Calculate the width of the SVG element based on Bootstrap breakpoints
+	    let containerWidth: number;
+	    if (window.innerWidth <= 576) {         // breakpoint xs
+            containerWidth = 400;
+        } else if (window.innerWidth <= 768) {  // breakpoint s
+            containerWidth = 488;
+        } else if (window.innerWidth <= 992) {  // breakpoint m
+            containerWidth = 679;
+        } else if (window.innerWidth <= 1100) { // custom breakpoint
+	        containerWidth = 792;
+        } else if (window.innerWidth <= 1200) { // breakpoint l
+            containerWidth = 892;
+        } else if (window.innerWidth <= 1400) { // breakpoint xl
+	        containerWidth = 792;
+        } else if (window.innerWidth <= 1600) { // breakpoint xxl
+            containerWidth = 992;
+        } else {                                // anything above 1600
+	        containerWidth = 1511;
+        }
+
+	    // Set dimensions for the SVG element
+        let margin = { top: 40, bottom: 40 };
+        let width: number = containerWidth;
+
+        // Create tree layout and root node
+        let treeLayout: TreeLayout<INode> = tree<INode>().size([width, 500]); // height is initially 500
+        let root = hierarchy(currentEntry.root, (d: INode) => d.children);
         let treeNodes = treeLayout(root);
-        let nodes = treeNodes.descendants().filter((node: any) => !!node.data.nodeType);
-        let links = treeNodes.descendants().filter((node: any) => !!node.data.nodeType).slice(1);
-        nodes.forEach((d) => d.y = d.depth * 180);
 
-        let allNodes = select(svgNode).select("g.nodes").selectAll("g.node")
+        // Set SVG height based on the depth of the tree
+        let height: number = (treeNodes.height * levelSpacing) + margin.bottom;
+
+        const svg = select(svgEl.current);
+        svg.attr("height", height + margin.top + margin.bottom);
+        if(svg.select("g").empty()) {
+            svg.append("g")
+                .attr("class", "links")
+                .attr("transform", "translate(" + 0 + "," + margin.top + ")");
+            svg.attr("width", width)
+                .append("g")
+                .attr("class", "nodes")
+                .attr("transform", "translate(" + 0 + "," + margin.top + ")");
+        }
+        select(svgEl.current).selectAll("g.node").remove();
+        select(svgEl.current).selectAll("path.link").remove();
+
+        // Filter out dummy nodes
+        let nodes = treeNodes.descendants().filter((node: any) => typeof node.data.nodeType !== "undefined");
+        let links = treeNodes.descendants().filter((node: any) => typeof node.data.nodeType !== "undefined").slice(1);
+
+        // Set vertical spacing between levels of the tree
+        nodes.forEach((d) => d.y = d.depth * levelSpacing);
+
+        let allNodes = select(svgEl.current).select("g.nodes").selectAll("g.node")
             .data(nodes, (d: any) => d.id);
 
-        buildNodes(allNodes);
-        buildLinks(links);
-        ReactTooltip.rebuild();
-    }
-
-    const buildNodes = (allNodes: any) => {
+        // Give each node ID and position
         let nodeEnter = allNodes.enter().append("g");
         nodeEnter.attr("class", "node")
             .attr("id", (d: any) => `node-${d.data.id}`)
             .attr("transform", (d: any) => {
-                return "translate(" + d.y + "," + d.x + ")";
+                return "translate(" + d.x + "," + d.y + ")";
             });
 
-		// Graphical circles for nodes
-        nodeEnter.append("circle")
-            .attr("fill", (d: any) => {
-                return nodeColorScaler(d.data.nodeType);
-            })
-			.style("stroke", (d: any) => {
-                return strokeColorScaler(d.data.nodeType);
-            })
-			.attr("cursor", "pointer")
-            .attr("r", 16)
-			// Tooltips
-            .attr("data-tip", (d: any) => {
-				let html: string;
-				switch (d.data.nodeType) {
-					case NodeType.norm:
-						html = `<strong>Norm (entry)</strong><br/>` +
-							((d.data.entry.content) ? `"${d.data.entry.content.toString()}"` : `<em>No content</em>`);
-						break;
-					case NodeType.convention:
-						html = `<strong>Convention (entry)</strong><br/>` +
-							((d.data.entry.content) ? `"${d.data.entry.content.toString()}"` : `<em>No content</em>`);
-						break;
-					case NodeType.junction:
-						html = `<strong>Junction</strong><br/>` +
-							((d.data.junctionType) ? `Operator: ${d.data.junctionType.toString()}` : `<em>No operator</em>`);
-						break;
-					case NodeType.negation:
-						html = `<strong>Negation</strong>`;
-						break;
-					case NodeType.sanction:
-						html = `<strong>Sanction</strong>`;
-						break;
-					case NodeType.component:
-						// Object.assign() bypasses our constructor but for the purposes of this, we just need to print the string
-						let comp = Object.assign(new Component(), d.data.component).string();
-						html = `<strong>Component</strong><br/>Type: ${d.data.componentType.toString()}<br/>` +
-							((comp) ? `"${comp}"` : `<em>No content</em>`);
-						break;
-					case NodeType.subcomponent:
-						let scomp = Object.assign(new Component(), d.data.component).string();
-						html = `<strong>Subcomponent</strong><br/>Type: ${d.data.subcomponentType.toString()}<br/>` +
-							((scomp) ? `"${scomp}"` : `<em>No content</em>`);
-						break;
-					default:
-						html = `<em>Missing type</em>`;
-						break;
-				}
-				return html;
-            })
-            .attr("data-html", true)
-            .on("click", nodeToggle)
-
-		// Label above each node showing node type
-        nodeEnter.append("text")
-            .attr('text-anchor', 'middle')
-            .attr('alignment-baseline', 'middle')
-            .attr("data-html", true)
-			.attr("pointer-events", "none")
-			.attr("dy", "-24")
-			.text((d: any) => d.data.nodeType);
-
-		// Labels on nodes showing logical operators and ABDICO components
-        nodeEnter.append("text")
-            .attr('text-anchor', 'middle')
-            .attr('alignment-baseline', 'middle')
-            .style('font-size', (d: any) => 16 * .75 + 'px')
-            .attr("data-html", true)
-            .attr("pointer-events", "none")
-			.attr("dy", "1")
-            .text((d: any) => {
-				if (d.data.junctionType) {
-					return d.data.junctionType;
-				} else if (d.data.nodeType === NodeType.negation) {
-					return "NOT";
-				} else if (d.data.componentType) {
-					switch (d.data.componentType) {
-						case ComponentType.attributes:
-						return "A";
-						case ComponentType.object:
-						return "B";
-						case ComponentType.deontic:
-						return "D"
-						case ComponentType.aim:
-						return "I";
-						case ComponentType.conditions:
-						return "C";
-					}
-				}
-			});
-
-    }
-
-    const buildLinks = (links: any) => {
-        select(svgNode).select("g.links").selectAll("g.link")
+        // Links (edges between nodes)
+        select(svgEl.current).select("g.links").selectAll("g.link")
             .data(links)
             .enter().append("path")
             .attr("class", "link")
-            .attr("d", (d: any) => {
-                return "M" + d.y + "," + d.x
-                    + "C" + (d.y + d.parent.y) / 2 + "," + d.x
-                    + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
-                    + " " + d.parent.y + "," + d.parent.x;
+            .attr("d", (d: any) => {    // Curves
+                return "M" + d.x + "," + d.y
+                    + "C" + d.x + "," + (d.y + d.parent.y) / 2
+                    + " " + d.parent.x + "," + (d.y + d.parent.y) / 2
+                    + " " + d.parent.x + "," + d.parent.y;
             })
-			.style("stroke-width", "1")
-			//.style('opacity', .8);
-    }
+            .style("stroke-color", "#495057")
+            .style("stroke-width", "1")
+            // Dashed line to parent for Property nodes that are not functionally dependent on their parent
+            .style("stroke-dasharray", (d: any) => {
+                if ([NodeType.property, NodeType.propertyjunction].includes(d.data.nodeType)
+                    && !d.data.isFunctionallyDependent) {
+                    return "4";
+                }
+            })
 
-	// This is the function called on node click, opening that node's modal.
-	// (It does so by setting the activeNode branch in Redux state, which the Edit component responds to.)
-    const nodeToggle = (treeNode: any) => {
-        if (props.preSetActiveNode) {
-            props.preSetActiveNode({ node: treeNode, togglefunc: toggle, modalState: setModal });
+        // Node circles
+        nodeEnter.append("circle")
+            .attr("fill", (d: any) => {
+                if (d.data.nodeType === NodeType.component) {
+                    return componentColorScaler(d.data.componentType);
+                }
+                return nodeColorScaler(d.data.nodeType);
+            })
+            .style("stroke", (d: any) => {
+                if (d.data.isNegated) {
+                    return negatedStroke;
+                }
+                if (d.data.nodeType === NodeType.component) {
+                    return componentStrokeColorScaler(d.data.componentType);
+                }
+                return strokeColorScaler(d.data.nodeType);
+            })
+            .style("stroke-width", (d: any) => {
+                if (d.data.isNegated) {
+                    return "3px";
+                }
+            })
+            .attr("cursor", "pointer")
+            .attr("r", 17)
+
+            // Tooltips when hovering over nodes
+            .attr("data-tip", (d: any) => {
+                let html: string;
+                let textContent: string | undefined;
+                switch (d.data.nodeType) {
+                    case NodeType.regulativestatement:
+                        html = `<strong>${NodeType.regulativestatement}</strong>`;
+                        break;
+                    case NodeType.constitutivestatement:
+                        html = `<strong>${NodeType.constitutivestatement}</strong>`;
+                        break;
+                    case NodeType.statementjunction:
+                        html = `<strong>${NodeType.statementjunction}</strong><br/>` +
+                            ((d.data.junctionType && d.data.junctionType !== JunctionType.none) ?
+                                `${getOperatorString(d.data.junctionType)}` : `<em>No junction type</em>`) + `<br/>` +
+                            ((d.data.text.isSet()) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
+                        break;
+                    case NodeType.componentjunction:
+                        html = `<strong>${NodeType.componentjunction}</strong><br/>` +
+                            ((d.data.junctionType && d.data.junctionType !== JunctionType.none) ?
+                                `${getOperatorString(d.data.junctionType)}` : `<em>No junction type</em>`) + `<br/>` +
+                            ((d.data.text.isSet()) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
+                        break;
+                    case NodeType.propertyjunction:
+                        html = `<strong>${NodeType.propertyjunction}</strong><br/>` +
+                            ((d.data.junctionType && d.data.junctionType !== JunctionType.none) ?
+                                `${getOperatorString(d.data.junctionType)}` : `<em>No junction type</em>`) + `<br/>` +
+                            `Functionally dependent: ${d.data.isFunctionallyDependent ? "Yes" : "No"}<br/>` +
+                            ((d.data.text.isSet()) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
+                        break;
+                    case NodeType.component:
+                        textContent = (d.data.text.isSet()) ? d.data.text.getString() : undefined;
+                        html = `<strong>${NodeType.component}</strong><br/>` +
+                            `${d.data.componentType}` +
+                            (![ComponentType.activationconditions, ComponentType.executionconstraints].includes(d.data.componentType) ?
+                            (textContent ? `<br/>"${textContent}"` : `<br/><em>No text content</em>`) : ``);
+                        break;
+                    case NodeType.property:
+                        textContent = (d.data.text.isSet()) ? d.data.text.getString() : undefined;
+                        html = `<strong>${NodeType.property}</strong><br/>` +
+                            `Functionally dependent: ${d.data.isFunctionallyDependent ? "Yes" : "No"}<br/>` +
+                            (textContent ? `"${textContent}"` : `<em>No text content</em>`);
+                        break;
+                    default:
+                        html = `<em>Missing node type</em>`;
+                        break;
+                }
+                if (typeof d.data.contextType !== "undefined") {
+                    html += `<br/>Context type: ${getContextString(Number(d.data.contextType))}`;
+                }
+                if (d.data.isNegated) {
+                    html += `<br/><em style="color:red">Negated</em>`;
+                }
+                return html;
+            })
+            .attr("data-html", true)
+            .on("click", (d: any) => {  // Function on node click
+                setActiveNode(d.data);
+                showModal();
+            })
+
+        // Label above Statement nodes showing node type
+        if (useNodeLabels) {
+            nodeEnter.append("text")
+                .attr('text-anchor', 'middle')
+                .attr('alignment-baseline', 'middle')
+                .attr("data-html", true)
+                .attr("pointer-events", "none")
+                .attr("dy", "-25")
+                .style("color", "#495057")
+                .text((d: any) => {
+                    if ([NodeType.regulativestatement, NodeType.constitutivestatement].includes(d.data.nodeType)) {
+                        return d.data.nodeType;
+                    }
+                    return "";
+                });
         }
-    }
+
+        // Label below nodes showing text content
+        if (useNodeLabels) {
+            // White rectangles behind text content so it doesn't clash with lines
+            nodeEnter.append("rect")
+                .attr("x", -10)
+                .attr("y", 18)
+                .attr("width", 20)
+                .attr("height", 17)
+                .attr("rx", 8)
+                .attr("fill", "white")
+                .style("display", (d: any) => { // Render only on nodes with text content
+                    if ([NodeType.component, NodeType.property, NodeType.statementjunction,
+                        NodeType.componentjunction, NodeType.propertyjunction].includes(d.data.nodeType)) {
+                        if (d.data.text && d.data.text.isSet()) {
+                            return "inherit";
+                        }
+                        return "none";
+                    }
+                    return "none";
+                })
+
+            // Text content labels
+            nodeEnter.append("text")
+                .attr('text-anchor', 'middle')
+                .attr('alignment-baseline', 'middle')
+                .attr("data-html", true)
+                .attr("pointer-events", "none")
+                .style('font-style', 'italic')
+                .style("color", "#495057")
+                .each( function (d: any) {  // Must be explicit function to be able to use `this`, not "() =>"
+                    let textContent: string = "";
+                    if ([NodeType.component, NodeType.property, NodeType.statementjunction,
+                        NodeType.componentjunction, NodeType.propertyjunction].includes(d.data.nodeType)) {
+                        textContent = (d.data.text ? d.data.text.getString() : "");
+                    }
+                    if (textContent) {  // Split text content into word-wrapped lines
+                        let regex = new RegExp(".{0,18}(?:\\s|$)","g");
+                        let lines = textContent.match(regex);   // Returns an array of suitably sized strings
+
+                        for (let j = 0; j < lines.length - 1; j++) {    // Skip the last element, it's always empty
+                            select(this).append("tspan")    // Each line uses a separate <tspan>
+                            .attr("dy",() => {
+                                if (j === 0) {
+                                    return 30;  // Place the first line below the node,
+                                }
+                                return 15;  // and the rest at a line height of 15px each
+                            })
+                            .attr("x",0)
+                            .text(lines[j]);
+                        }
+                    }
+                });
+        }
+
+        // Label on each node showing logical operators and component letters
+        nodeEnter.append("text")
+            .attr("text-anchor", "middle")
+            .attr('alignment-baseline', "middle")
+            .style("font-size", "14px")
+            .attr("data-html", true)
+            .attr("pointer-events", "none")
+            .attr("dy", "1")
+            .style("color", "#222")
+            .html((d: any) => {
+                if (d.data.junctionType) {
+                    const jtype = d.data.junctionType;
+                    if (jtype !== JunctionType.none) {
+                        return jtype;
+                    } else {
+                        return "";
+                    }
+                }
+                if (d.data.componentType && d.data.nodeType !== NodeType.junction) {
+                    switch (d.data.componentType) {
+                        case ComponentType.attribute:
+                            return "A";
+                        case ComponentType.directobject:
+                            return "Bdir";
+                        case ComponentType.indirectobject:
+                            return "Bind";
+                        case ComponentType.deontic:
+                            return "D"
+                        case ComponentType.aim:
+                            return "I";
+                        case ComponentType.activationconditions:
+                            return "Cac";
+                        case ComponentType.executionconstraints:
+                            return "Cex";
+                        case ComponentType.constitutingproperties:
+                            return "P";
+                        case ComponentType.modal:
+                            return "M";
+                        case ComponentType.constitutivefunction:
+                            return "F";
+                        case ComponentType.constitutedentity:
+                            return "E";
+                        case ComponentType.orelse:
+                            return "O";
+                        case ComponentType.simplecontext:
+                            return "";
+                        default:
+                            return "";
+                    }
+                }
+            })
+
+        ReactTooltip.rebuild();
+
+        return () => { // Cleanup
+            ReactTooltip.hide();
+        };
+
+    }, [svgEl, currentEntry.root, setActiveNode, showModal, useNodeLabels])
 
     return (
-        <div>
-			<div className="treeContainer">
-				<svg
-					className="d3-component"
-					width={800}
-					height={500}
-					ref={n => (svgNode = n)} />
-			</div>
-            <span>{props.currentDocument.forest[0].updatedAt.toLocaleString()}</span>
-            <Modal show={modal} onHide={() => setModal(false)} className="modal-open">
-                <Edit close={toggle} />
-            </Modal>
+        <div className="treeContainer">
+            <svg
+                ref={svgEl}
+            />
         </div>
     );
 }
 
 const mapStateToProps = (state: any) => ({
-    currentDocument: state.documents.currentDocument
+    useNodeLabels: state.appSettings.preferences.useNodeLabels
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    preSetActiveNode: (node: INode) => dispatch(preSetActiveNode(node))
+    setActiveNode: (node: INode) => dispatch(setActiveNode(node))
 });
 
 export default connect(

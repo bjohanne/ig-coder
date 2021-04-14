@@ -6,7 +6,7 @@ export const openSnackbar = () => {
 };
 
 export const OPEN_SNACKBAR_WITH_DUR = "OPEN_SNACKBAR_WITH_DUR";
-export const openSnackbarWithDur = (duration) => {
+export const openSnackbarWithDur = (duration: number) => {
     return {
         type: "OPEN_SNACKBAR_WITH_DUR",
         duration
@@ -14,7 +14,7 @@ export const openSnackbarWithDur = (duration) => {
 };
 
 export const OPEN_SNACKBAR_WITH_DATA = "OPEN_SNACKBAR_WITH_DATA";
-export const openSnackbarWithData = (color, message, duration) => {
+export const openSnackbarWithData = (color: string, message: string, duration: number) => {
     return {
         type: "OPEN_SNACKBAR_WITH_DATA",
         color,
