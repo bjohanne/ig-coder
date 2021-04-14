@@ -19,7 +19,6 @@
     "axios": "^0.21.1",
     "bootstrap": "^4.5.2",
     "d3": "^5.16.0",
-    "d3plus-text": "^1.0.1",
     "firebase": "^8.0.0",
     "immutability-helper": "^3.1.1",
     "react": "^16.13.1",

@@ -31,10 +31,10 @@ chmod -R 777 /var/www/app/.*
 # Start build for the client app
 cd client
 npm install
-npm run build:test
+npm run prebuild:prod
+npm run build:prod
 cp -a /home/ubuntu/ig-coder/client/build/. /var/www/app/client -rf
 
 # Restart services
-systemctl daemon-reload
 systemctl restart nginx
 echo 'Deployment done!\r\r\r'
