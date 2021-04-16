@@ -3,10 +3,11 @@ import {
     ConstitutiveStatementNode,
     PropertyJunctionNode,
     RegulativeStatementNode,
-    StatementJunctionNode, StatementNode
+    StatementJunctionNode,
+    StatementNode
 } from "./";
 import {INode, IPropertyNode} from "../interfaces";
-import {Arg, JunctionType, NodeType} from "../enums";
+import {Arg, JunctionType, NodeType, PropertyType} from "../enums";
 import {TextContent} from "../textcontent";
 import {DataError, DataErrorType} from "../errors";
 
@@ -19,6 +20,8 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
     text!: TextContent;
     /* Whether this property/object is functionally dependent on its parent */
     isFunctionallyDependent: Boolean = false;
+    /* One of a type hierarchy for properties, e.g., qualitative or quantitative */
+    propertyType: PropertyType = PropertyType.none;
     /* Array of child nodes of this Node */
     children!: INode[];
 
@@ -119,6 +122,15 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
             throw new DataError(DataErrorType.PRP_GET_TXT_UNDEF, this.id);
         }
         this.text.unset();
+        this.update();
+    }
+
+    /**
+     * Set this node's property type.
+     * @param propertyType The new property type to give this node
+     */
+    setPropertyType(propertyType: PropertyType) : void {
+        this.propertyType = propertyType;
         this.update();
     }
 

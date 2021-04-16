@@ -10,7 +10,7 @@
     width: 5.5em;
 }
 
-#actions-head {
+#status-head, #actions-head {
     text-align: center !important;
 }
 

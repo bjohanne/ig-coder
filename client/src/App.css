@@ -45,6 +45,11 @@ Nav .breadcrumb {
     font-size: small;
 }
 
+.custom-breadcrumb small:last-child {
+    margin-left: auto !important;
+    color: #6c757d;
+}
+
 /* MODAL */
 
 .modal-open {

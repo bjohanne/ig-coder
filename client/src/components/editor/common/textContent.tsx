@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useState} from "react";
 import {connect} from "react-redux";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -14,6 +14,8 @@ import {
     PropertyNode,
     StatementJunctionNode
 } from "../../../core/model/nodes";
+import {NodeType} from "../../../core/model/enums";
+import ViewStatementText from "./viewStatementText";
 
 interface IProps {
     activeNode: ComponentNode | PropertyNode | PropertyJunctionNode | ComponentJunctionNode | StatementJunctionNode,
@@ -36,19 +38,7 @@ const TextContentComponent = (props: IProps) => {
         usePrefixSuffix
     } = props;
 
-    const statementTextArea = useRef(null);
-
     const [textState, setTextState] = useState<ITextContent>(activeNode.getText());
-
-    useEffect(() => {
-        if (statementTextArea.current) {
-            // For the textarea that displays the statement, adapt the number of rows to the length of the statement
-            statementTextArea.current.rows = 1;
-            if (statementTextArea.current.scrollHeight > 36) {
-                statementTextArea.current.rows = ((statementTextArea.current.scrollHeight - 12) / 24);
-            }
-        }
-    }, []); // Run only once on mount
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -88,61 +78,80 @@ const TextContentComponent = (props: IProps) => {
         unsetTextContent(currentEntryIndex, activeNode.id);     // Set app-wide state
     }
 
+    const isJunctionNode: boolean = [NodeType.statementjunction, NodeType.componentjunction, NodeType.propertyjunction]
+        .includes(activeNode.nodeType);
+
     return (
         <Form id="textContentForm">
-            <Row className="pb-3">
-                <Col>                                                   {/* Use rephrased if set, otherwise original */}
-                    <Form.Control as="textarea" ref={statementTextArea} id="statement-textarea" disabled
-                                  value={currentEntry.rephrased !== "" ?
-                                         currentEntry.rephrased : currentEntry.original}/>
-                </Col>
-            </Row>
-            <Row xs={1} lg={3}>
-                <Col>
-                    {usePrefixSuffix &&
+            <ViewStatementText currentEntry={currentEntry} className="pb-2"/>
+            <Row>
+                {isJunctionNode ?
+                    <Col xs={{ order: 3, span: 12 }} lg={{ order: 'first', span: 4 }}
+                         className="d-flex justify-content-start align-items-end pb-3">
+                        <Button variant="warning" onClick={handleClearText} disabled={disabled}>Clear text content</Button>
+                    </Col>
+                    :
+                    <Col xs={12} lg={4}>
+                        {usePrefixSuffix &&
                         <Form.Group controlId="textContentForm.prefix">
                             <Form.Label column="sm">Prefix</Form.Label>
                             <Form.Control type="text" name="prefix" onChange={handleChange}
                                           onBlur={handleSaveText} onMouseOut={handleSaveText}
                                           value={textState.prefix} disabled={disabled} />
                         </Form.Group>
-                    }
-                </Col>
-                <Col>
+                        }
+                    </Col>
+                }
+                <Col xs={12} lg={4}>
                     <Form.Group controlId="textContentForm.main">
-                        <Form.Label column="sm">Main</Form.Label>
+                        <Form.Label column="sm">
+                            {isJunctionNode ?
+                                "Junction text"
+                            :
+                                "Main content"
+                            }
+                        </Form.Label>
                         <Form.Control type="text" name="main" onChange={handleChange}
                                       onBlur={handleSaveText} onMouseOut={handleSaveText}
                                       value={textState.main} disabled={disabled} />
                     </Form.Group>
                 </Col>
-                <Col>
-                    {usePrefixSuffix &&
+                {isJunctionNode ?
+                    <Col xs={0} lg={4} />
+                    :
+                    <Col xs={12} lg={4}>
+                        {usePrefixSuffix &&
                         <Form.Group controlId="textContentForm.suffix">
                             <Form.Label column="sm">Suffix</Form.Label>
                             <Form.Control type="text" name="suffix" onChange={handleChange}
                                           onBlur={handleSaveText} onMouseOut={handleSaveText}
-                                          value={textState.suffix} disabled={disabled}/>
+                                          value={textState.suffix} disabled={disabled} />
                         </Form.Group>
-                    }
-                </Col>
+                        }
+                    </Col>
+                }
             </Row>
-            <Row className="justify-content-center">
-                <Col xs={{ order: 'last', span: 12 }} lg={{ order: 'first', span: 4 }}
-                     className="d-flex justify-content-start align-items-end pb-3">
-                    <Button variant="warning" onClick={handleClearText} disabled={disabled}>Clear text content</Button>
-                </Col>
-                <Col xs={12} lg={4}>
-                    <Form.Group controlId="textContentForm.inferredOrRephrased">
-                        <Form.Label column="sm">Inferred/Rephrased</Form.Label>
-                        <Form.Control type="text" name="inferredOrRephrased" onChange={handleChange}
-                                      onBlur={handleSaveText} onMouseOut={handleSaveText}
-                                      value={textState.inferredOrRephrased} disabled={disabled} />
-                    </Form.Group>
-                </Col>
-                <Col xs={0} lg={4} className="pb-3">
-                </Col>
-            </Row>
+            {!isJunctionNode &&
+                <Row className="justify-content-center">
+                    <Col xs={{order: 3, span: 12}} lg={{order: 'first', span: 4}}
+                         className="d-flex justify-content-start align-items-end pb-3">
+                        <Button variant="warning" onClick={handleClearText} disabled={disabled}>Clear text content</Button>
+                    </Col>
+                    <Col xs={12} lg={4}>
+                        <Form.Group controlId="textContentForm.inferredOrRephrased">
+                            <Form.Label column="sm">Inferred/Rephrased</Form.Label>
+                            <Form.Control type="text" name="inferredOrRephrased" onChange={handleChange}
+                                          onBlur={handleSaveText} onMouseOut={handleSaveText}
+                                          value={textState.inferredOrRephrased} disabled={disabled} />
+                        </Form.Group>
+                    </Col>
+                    <Col xs={{order: 2, span: 12}} lg={4} className="pb-3 d-flex align-items-end">
+                        {disabled &&
+                        <small>NB: Text content is disabled because this node has a child node.</small>
+                        }
+                    </Col>
+                </Row>
+            }
         </Form>
     )
 }

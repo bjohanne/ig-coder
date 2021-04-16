@@ -211,6 +211,45 @@ export function getComponentStringByIndex(type: Arg.regulative | Arg.constitutiv
 }
 
 /**
+ * A simplified hierarchy of property types.
+ * This is a work in progress in IG research, so preliminary version.
+ */
+export enum PropertyType {
+    none = "None",
+    quantitative = "Quantitative",
+    qualitative = "Qualitative",
+        qual_simple = "Simple",
+        qual_complex = "Complex"
+}
+
+/**
+ * Filters PropertyType into an array of its string constants.
+ * Excludes the NONE type.
+ * @return An array of the string constants of PropertyType
+ */
+export function propertyTypeToStringArray(): string[] {
+    return Object.values(PropertyType).filter(v => (isNaN(Number(v)) && v !== PropertyType.none));
+}
+
+/**
+ * Get the string for the given PropertyType including indentation dashes.
+ * @param propertyType The enum string for the context type to get
+ * @return The full string associated with the passed in property type, with indentation dashes
+ */
+export function getPropertyTypeStringAndIndent(propertyType: string): string {
+    switch (propertyType) {
+        case PropertyType.qualitative:
+            return "Qualitative:";
+        case PropertyType.qual_simple:
+            return "--Simple";
+        case PropertyType.qual_complex:
+            return "--Complex";
+        default:
+            return propertyType;
+    }
+}
+
+/**
  * A representation of the Context Taxonomy used to label Context components.
  * The indentation shows the hierarchy for reference, though this hierarchy is inconsequential
  * for the purposes of labelling Context nodes.

@@ -29,7 +29,7 @@ import {
     SET_TEXT_CONTENT_RESPONSE,
     UNSET_TEXT_CONTENT_RESPONSE,
     SET_JUNCTION_TYPE_RESPONSE,
-    UNSET_JUNCTION_TYPE_RESPONSE,
+    SET_PROPERTY_TYPE_RESPONSE,
     ADD_CHILD_TO_STATEMENT_RESPONSE,
     ADD_CHILD_TO_COMPONENT_RESPONSE,
     ADD_CHILD_TO_JUNCTION_RESPONSE,
@@ -311,7 +311,7 @@ const documents = (state: IDocumentState = initialState, action: any) => {
                 },
                 changed: { $set: true }
             });
-        case UNSET_JUNCTION_TYPE_RESPONSE:
+        case SET_PROPERTY_TYPE_RESPONSE:
             return update(state, {
                 currentDocument: {
                     entries: {

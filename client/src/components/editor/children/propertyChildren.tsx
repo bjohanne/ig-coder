@@ -42,13 +42,15 @@ const PropertyChildren = (props: IProps) => {
     return (
         <>
             {(children.length === 0) ?
-                <DropdownButton size="lg" title="Create" disabled={useCoreOnly}>
-                    <Dropdown.Item data-type={NodeType.regulativestatement} onClick={addChild}>Regulative Statement</Dropdown.Item>
-                    <Dropdown.Item data-type={NodeType.constitutivestatement} onClick={addChild}>Constitutive Statement</Dropdown.Item>
-                    <Dropdown.Item data-type={NodeType.statementjunction} onClick={addChild}>Statement Junction</Dropdown.Item>
-                    <Dropdown.Item data-type={NodeType.propertyjunction} onClick={addChild}>Property Junction</Dropdown.Item>
-                    <Dropdown.Item data-type={NodeType.property} onClick={addChild}>Property</Dropdown.Item>
-                </DropdownButton>
+                <div title="Create a child node">
+                    <DropdownButton size="lg" title="Create" disabled={useCoreOnly}>
+                        <Dropdown.Item data-type={NodeType.regulativestatement} onClick={addChild}>Regulative Statement</Dropdown.Item>
+                        <Dropdown.Item data-type={NodeType.constitutivestatement} onClick={addChild}>Constitutive Statement</Dropdown.Item>
+                        <Dropdown.Item data-type={NodeType.statementjunction} onClick={addChild}>Statement Junction</Dropdown.Item>
+                        <Dropdown.Item data-type={NodeType.propertyjunction} onClick={addChild}>Property Junction</Dropdown.Item>
+                        <Dropdown.Item data-type={NodeType.property} onClick={addChild}>Property</Dropdown.Item>
+                    </DropdownButton>
+                </div>
             :
                 <Row noGutters>
                     {children.map((node: INode, i: number) => // It can never have more than 1 child, but we're mapping to be safe

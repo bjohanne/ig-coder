@@ -24,6 +24,8 @@ import {
     SET_CONTEXT_TYPE_RESPONSE,
     SET_JUNCTION_TYPE,
     SET_JUNCTION_TYPE_RESPONSE,
+    SET_PROPERTY_TYPE,
+    SET_PROPERTY_TYPE_RESPONSE,
     SET_REPHRASED,
     SET_REPHRASED_RESPONSE,
     SET_TEXT_CONTENT,
@@ -38,8 +40,6 @@ import {
     TURN_NEGATION_ON_RESPONSE,
     UNSET_CONTEXT_TYPE,
     UNSET_CONTEXT_TYPE_RESPONSE,
-    UNSET_JUNCTION_TYPE,
-    UNSET_JUNCTION_TYPE_RESPONSE,
     UNSET_REPHRASED,
     UNSET_REPHRASED_RESPONSE,
     UNSET_TEXT_CONTENT,
@@ -215,23 +215,6 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                 console.error(e);
             }
             break;
-        case UNSET_JUNCTION_TYPE:
-            entryCopy = Entry.fromData(store.getState().documents.currentDocument.entries[action.entryIndex]);
-            try {
-                node = entryCopy.find(action.nodeId);
-                if ([NodeType.statementjunction, NodeType.componentjunction, NodeType.propertyjunction].includes(node.nodeType)) {
-                    (node as StatementJunctionNode | ComponentJunctionNode | PropertyJunctionNode)
-                        .unsetJunctionType();
-                }
-                store.dispatch({
-                    type: UNSET_JUNCTION_TYPE_RESPONSE,
-                    entryIndex: action.entryIndex,
-                    newEntry: entryCopy
-                });
-            } catch (e) {
-                console.error(e);
-            }
-            break;
         case SET_TEXT_CONTENT:
             entryCopy = Entry.fromData(store.getState().documents.currentDocument.entries[action.entryIndex]);
             try {
@@ -261,6 +244,20 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                     type: UNSET_TEXT_CONTENT_RESPONSE,
                     entryIndex: action.entryIndex,
                     newNode: node,
+                    newEntry: entryCopy
+                });
+            } catch (e) {
+                console.error(e);
+            }
+            break;
+        case SET_PROPERTY_TYPE:
+            entryCopy = Entry.fromData(store.getState().documents.currentDocument.entries[action.entryIndex]);
+            try {
+                node = entryCopy.find(action.nodeId);
+                (node as PropertyNode).setPropertyType(action.propertyType);
+                store.dispatch({
+                    type: SET_PROPERTY_TYPE_RESPONSE,
+                    entryIndex: action.entryIndex,
                     newEntry: entryCopy
                 });
             } catch (e) {

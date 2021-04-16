@@ -74,7 +74,7 @@ const StatementAccordion = (props: IProps) => {
                 </Accordion>
                 <Accordion>
                     <AccordionToggle text="Rephrased" isLast eventKey="0" id="rephrased-toggle"
-                                     title="Optionally rephrase the raw statement before coding"/>
+                     title="Optionally rephrase the raw statement and code that version instead. The rephrasing can be changed at any time."/>
                     <Accordion.Collapse eventKey="0">
                         <Form.Group controlId="rephrased-textarea" id="rephrased-textarea">
                             <InputGroup>

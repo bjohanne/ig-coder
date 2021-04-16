@@ -11,8 +11,8 @@ import {TextContent} from "../textcontent";
  */
 export default class JunctionNode extends BaseNode implements IJunctionNode {
 	nodeType: NodeType = NodeType.junction;
-	/* Logical operator of the junction */
-	junctionType: JunctionType = JunctionType.none;
+	/* Logical operator of the junction. Default is AND */
+	junctionType: JunctionType = JunctionType.and;
 	/* Holds the text content of the junction. Should always be defined */
 	text!: TextContent;
 	/* Two fixed children for Junction nodes */

@@ -39,7 +39,7 @@ const testDocumentString = `
         {
           "id": 6,
           "document": 1,
-          "original": "The Ministry may issue regulations with further provisions concerning the activities of the committee, including provisions concerning procedure and concerning the duty of secrecy for members of the committee.",
+          "original": "The employer and the employee may agree in writing that overtime hours shall wholly or partly be taken out as off-duty time on agreed dates.",
           "rephrased": ""
         },
         {
@@ -57,19 +57,19 @@ const testDocumentString = `
         {
           "id": 9,
           "document": 1,
-          "original": "The employer and the employee may agree in writing that overtime hours shall wholly or partly be taken out as off-duty time on agreed dates.",
+          "original": "The Ministry may issue regulations with further provisions concerning the activities of the committee, including provisions concerning procedure and concerning the duty of secrecy for members of the committee.",
           "rephrased": ""
         },
         {
           "id": 10,
           "document": 1,
-          "original": "The Commission may set up, from among its own members and experts or advisers, such committees as it considers desirable to perform such functions as it may authorize.",
+          "original": "All male U.S. citizens, 18 years of age and older, must register with the Selective Service by filling out a form at the U.S. Post Office or else face arrest for evading registration.",
           "rephrased": ""
         },
         {
           "id": 11,
           "document": 1,
-          "original": "All male U.S. citizens, 18 years of age and older, must register with the Selective Service by filling out a form at the U.S. Post Office or else face arrest for evading registration.",
+          "original": "Employees who have children in their care are entitled to leave of absence:\\na) when necessary to attend a sick child,\\nb) if a child shall be accompanied to a medical examination or other follow-up in connection with sickness, or\\nc) if the person responsible for the daily childcare is sick or has leave of absence pursuant to this section owing to another child.",
           "rephrased": ""
         },
         {
@@ -81,17 +81,11 @@ const testDocumentString = `
         {
           "id": 13,
           "document": 1,
-          "original": "Employees who have children in their care are entitled to leave of absence:\\na) when necessary to attend a sick child,\\nb) if a child shall be accompanied to a medical examination or other follow-up in connection with sickness, or\\nc) if the person responsible for the daily childcare is sick or has leave of absence pursuant to this section owing to another child.",
+          "original": "The notification shall provide:\\n(1) A description of each noncompliance;\\n(2) The facts upon which the notification of noncompliance is based; and\\n(3) The date by which the certifying agent must rebut or correct each noncompliance and submit supporting documentation of each correction when correction is possible.",
           "rephrased": ""
         },
         {
           "id": 14,
-          "document": 1,
-          "original": "Such notification shall provide:\\n(1) A description of each noncompliance;\\n(2) The facts upon which the notification of noncompliance is based; and\\n(3) The date by which the certifying agent must rebut or correct each noncompliance and submit supporting documentation of each correction when correction is possible.",
-          "rephrased": ""
-        },
-        {
-          "id": 15,
           "document": 1,
           "original": "Drivers must hand their driver’s license to the police officer when stopped in traffic control, or else the police officer must enforce this under any circumstances and, depending on severity, must either fine the driver or arrest him, or else internal investigators must follow up on this issue in any case.",
           "rephrased": ""
@@ -111,8 +105,7 @@ const testDocumentString = `
         "11": 10,
         "12": 11,
         "13": 12,
-        "14": 13,
-        "15": 14
+        "14": 13
       }
     }
 `;

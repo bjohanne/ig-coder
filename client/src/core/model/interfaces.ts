@@ -6,7 +6,7 @@ import {
     StatementJunctionNode,
     StatementNode
 } from "./nodes";
-import {NodeType, ComponentType, ContextType, JunctionType, Arg} from "./enums";
+import {NodeType, ComponentType, ContextType, JunctionType, Arg, PropertyType} from "./enums";
 import {Entry} from "./entry";
 import {TextContent} from "./textcontent";
 
@@ -216,12 +216,14 @@ export interface IPropertyJunctionNode extends IJunctionNode {
 export interface IPropertyNode extends INode {
     text: TextContent,
     isFunctionallyDependent: Boolean,
+    propertyType: PropertyType,
     makeFunctionallyDependent(): void,
     makeNotFunctionallyDependent(): void,
     setFunctionallyDependent(isFD: Boolean): void,
     getText(): TextContent,
     setText(content?: string, prefix?: string, suffix?: string): void,
     unsetText(): void,
+    setPropertyType(propertyType: PropertyType): void,
     deleteChild(childPos: number): void,
     createStatementNode(type: Arg.regulative | Arg.constitutive): StatementNode,
     createStatementJunctionNode(junctionType?: JunctionType): StatementJunctionNode,

@@ -15,12 +15,13 @@ interface IProps {
 const PropertyEditor = (props: IProps) => {
     const {currentEntry, activeNode} = props;
 
+    const textContentDisabled: boolean =
+        activeNode.children.length > 0 &&
+        ![NodeType.property, NodeType.propertyjunction].includes(activeNode.children[0].nodeType);
+
     return (
         <CommonEditorTable>
-            <TextContentComponent currentEntry={currentEntry} disabled={
-                activeNode.children.length > 0 &&
-                ![NodeType.property, NodeType.propertyjunction].includes(activeNode.children[0].nodeType)
-            }/>
+            <TextContentComponent currentEntry={currentEntry} disabled={textContentDisabled}/>
             <hr className="pb-2"/>
             <PropertyChildren/> {/* Can always have children, no check necessary */}
         </CommonEditorTable>

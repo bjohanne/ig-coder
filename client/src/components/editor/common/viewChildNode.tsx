@@ -63,7 +63,7 @@ const ViewChildNode = (props: IProps) => {
                         )
                     }
                 </Card.Title>
-                {(node.isDummy() && !parentJunctionNodeType) ?    // parentJunctionNodeType is only set if the parent is Junction
+                {(node.isDummy() && !parentJunctionNodeType) ? // parentJunctionNodeType is only set if the parent is Junction
                     <Card.Text className="text-center">
                         <em>Empty</em>
                     </Card.Text>
@@ -76,41 +76,55 @@ const ViewChildNode = (props: IProps) => {
                 <Row>
                     <Col className="d-flex justify-content-center pb-2">
                         {!node.isDummy() ?  // Node is NOT a dummy
-                            (!component || componentTypeIsOptional((node as ComponentNode).componentType)) && // Disable deletion of fixed components
+                            // Disable deletion of fixed components
+                            (!component || componentTypeIsOptional((node as ComponentNode).componentType)) &&
                             <Button data-index={childIndex} variant="warning" onClick={deleteSelf}
                                     disabled={isDefaultSimpleContext}>
                                 Delete
                             </Button>
                             :   // Node is a dummy
                             parentJunctionNodeType === NodeType.statementjunction ?
-                                <DropdownButton title="Create">
-                                    <Dropdown.Item data-index={childIndex} data-type={NodeType.regulativestatement} onClick={createSelf}>
-                                        Regulative Statement</Dropdown.Item>
-                                    <Dropdown.Item data-index={childIndex} data-type={NodeType.constitutivestatement} onClick={createSelf}>
-                                        Constitutive Statement</Dropdown.Item>
-                                    <Dropdown.Item data-index={childIndex} data-type={NodeType.statementjunction} onClick={createSelf}>
-                                        Statement Junction</Dropdown.Item>
-                                </DropdownButton>
+                                <div title="Create a child node">
+                                    <DropdownButton title="Create">
+                                        <Dropdown.Item data-index={childIndex} data-type={NodeType.regulativestatement}
+                                                       onClick={createSelf}>
+                                            Regulative Statement</Dropdown.Item>
+                                        <Dropdown.Item data-index={childIndex} data-type={NodeType.constitutivestatement}
+                                                       onClick={createSelf}>
+                                            Constitutive Statement</Dropdown.Item>
+                                        <Dropdown.Item data-index={childIndex} data-type={NodeType.statementjunction}
+                                                       onClick={createSelf}>
+                                            Statement Junction</Dropdown.Item>
+                                    </DropdownButton>
+                                </div>
                                 :
                                 parentJunctionNodeType === NodeType.componentjunction ?
-                                    <DropdownButton title="Create">
-                                        {!useCoreOnly &&
-                                        <Dropdown.Item data-index={childIndex} data-type={NodeType.componentjunction} onClick={createSelf}>
-                                            Component Junction</Dropdown.Item>
-                                        }
-                                        <Dropdown.Item data-index={childIndex} data-type={NodeType.component} onClick={createSelf}>
-                                            Component</Dropdown.Item> {/* Creating this node uses the parent's component type automatically */}
-                                    </DropdownButton>
-                                    :
-                                    parentJunctionNodeType === NodeType.propertyjunction ?
+                                    <div title="Create a child node">
                                         <DropdownButton title="Create">
                                             {!useCoreOnly &&
-                                            <Dropdown.Item data-index={childIndex} data-type={NodeType.propertyjunction}
-                                                           onClick={createSelf}>Property Junction</Dropdown.Item>
+                                            <Dropdown.Item data-index={childIndex} data-type={NodeType.componentjunction}
+                                                           onClick={createSelf}>
+                                                Component Junction</Dropdown.Item>
                                             }
-                                            <Dropdown.Item data-index={childIndex} data-type={NodeType.property} onClick={createSelf}>
-                                                Property</Dropdown.Item>
+                                            {/* Creating this node uses the parent's component type automatically */}
+                                            <Dropdown.Item data-index={childIndex} data-type={NodeType.component}
+                                                           onClick={createSelf}>
+                                                Component</Dropdown.Item>
                                         </DropdownButton>
+                                    </div>
+                                    :
+                                    parentJunctionNodeType === NodeType.propertyjunction ?
+                                        <div title="Create a child node">
+                                            <DropdownButton title="Create">
+                                                {!useCoreOnly &&
+                                                <Dropdown.Item data-index={childIndex} data-type={NodeType.propertyjunction}
+                                                               onClick={createSelf}>Property Junction</Dropdown.Item>
+                                                }
+                                                <Dropdown.Item data-index={childIndex} data-type={NodeType.property}
+                                                               onClick={createSelf}>
+                                                    Property</Dropdown.Item>
+                                            </DropdownButton>
+                                        </div>
                                         :   // No parentJunctionNodeType is set, it's a non-Junction fixed child
                             <Button data-index={childIndex} variant="primary" onClick={createSelf}>
                                 Create

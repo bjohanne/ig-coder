@@ -33,7 +33,6 @@ export default function MyListItem(props:any) {
         console.log(event.target)
         switch (event.target.innerHTML) {
             case 'Edit':
-                // @TODO add edit functionality
                 console.log('edit')
                 break;
             case 'Delete':

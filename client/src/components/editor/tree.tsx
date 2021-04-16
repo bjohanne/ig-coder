@@ -162,14 +162,9 @@ const TreeComponent = (props: IProps) => {
                     case NodeType.constitutivestatement:
                         html = `<strong>${NodeType.constitutivestatement}</strong>`;
                         break;
-                    case NodeType.statementjunction:
-                        html = `<strong>${NodeType.statementjunction}</strong><br/>` +
-                            ((d.data.junctionType && d.data.junctionType !== JunctionType.none) ?
-                                `${getOperatorString(d.data.junctionType)}` : `<em>No junction type</em>`) + `<br/>` +
-                            ((d.data.text.isSet()) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
-                        break;
+                    case NodeType.statementjunction: // Same as ComponentJunction
                     case NodeType.componentjunction:
-                        html = `<strong>${NodeType.componentjunction}</strong><br/>` +
+                        html = `<strong>${d.data.nodeType}</strong><br/>` +
                             ((d.data.junctionType && d.data.junctionType !== JunctionType.none) ?
                                 `${getOperatorString(d.data.junctionType)}` : `<em>No junction type</em>`) + `<br/>` +
                             ((d.data.text.isSet()) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
@@ -185,7 +180,8 @@ const TreeComponent = (props: IProps) => {
                         textContent = (d.data.text.isSet()) ? d.data.text.getString() : undefined;
                         html = `<strong>${NodeType.component}</strong><br/>` +
                             `${d.data.componentType}` +
-                            (![ComponentType.activationconditions, ComponentType.executionconstraints].includes(d.data.componentType) ?
+                            (![ComponentType.activationconditions, ComponentType.executionconstraints, ComponentType.orelse]
+                                .includes(d.data.componentType) ?
                             (textContent ? `<br/>"${textContent}"` : `<br/><em>No text content</em>`) : ``);
                         break;
                     case NodeType.property:

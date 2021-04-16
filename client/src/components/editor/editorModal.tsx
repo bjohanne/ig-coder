@@ -13,16 +13,13 @@ import StatementEditor from "./nodes/statementEditor";
 import JunctionEditor from "./nodes/junctionEditor";
 import ComponentEditor from "./nodes/componentEditor";
 import PropertyEditor from "./nodes/propertyEditor";
-import {setSaved} from "../../state/documents/actions";
 import {openSnackbarWithData} from "../../state/ui/actions";
 
 interface IProps {
 	activeNode: INode,
 	modalState: Boolean,
 	currentEntry: Entry,
-	closeModal: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void,
-	setSaved: Function,
-	openSnackbarWithData: Function
+	closeModal: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void
 }
 
 const EditorModal = (props: IProps) => {
@@ -30,26 +27,16 @@ const EditorModal = (props: IProps) => {
 		activeNode,
 		modalState,
 		currentEntry,
-		closeModal,
-		setSaved,
-		openSnackbarWithData
+		closeModal
 	} = props;
 
-	const handleSave = () => {
-		// Like the save button in ViewEntry, this doesn't actually save anything,
-		// because work is saved automatically in the browser.
-		// It's implemented for users who feel they need to click a save button.
-		setSaved();
-		openSnackbarWithData("success", "Your changes have been saved locally.", 3000);
-    }
-
-	const renderEditor = () => {	// Node types with text content receive currentEntry to display the statement.
+	const renderEditor = () => {	// Node types receive currentEntry to display the statement text
 		if (activeNode && activeNode.nodeType) {
 			switch (activeNode.nodeType) {
 				case NodeType.regulativestatement:
-					return <StatementEditor/>;
+					return <StatementEditor currentEntry={currentEntry}/>;
 				case NodeType.constitutivestatement:
-					return <StatementEditor/>;
+					return <StatementEditor currentEntry={currentEntry}/>;
 				case NodeType.statementjunction:
 					return <JunctionEditor currentEntry={currentEntry}/>;
 				case NodeType.componentjunction:
@@ -73,9 +60,8 @@ const EditorModal = (props: IProps) => {
 			<ModalBody>
 				{renderEditor()}
 			</ModalBody>
-			<ModalFooter className="d-flex justify-content-between">
+			<ModalFooter className="d-flex justify-content-start">
 				<Button variant="secondary" onClick={closeModal}>Close</Button>
-				<Button variant="primary" id="save-button-bottom" onClick={handleSave}>Save changes</Button>
 			</ModalFooter>
 		</Modal>
 	);
@@ -87,7 +73,6 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-	setSaved: () => dispatch(setSaved()),
 	openSnackbarWithData: (color: string, message: string, duration: number) =>
 		dispatch(openSnackbarWithData(color, message, duration))
 });

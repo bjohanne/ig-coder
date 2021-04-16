@@ -7,6 +7,7 @@ import NegatedComponent from "./negated";
 import FunctionallyDependentComponent from "./functionallyDependent";
 import ContextTypeComponent from "./contextType";
 import JunctionTypeComponent from "./junctionType";
+import PropertyTypeComponent from "./propertyType";
 import HelpTextComponent from "./helpText";
 import {INode} from "../../../core/model/interfaces";
 import {NodeType} from "../../../core/model/enums";
@@ -46,6 +47,11 @@ const CommonEditorTable = (props: IProps) => {
                             .includes(activeNode.nodeType) &&
                             <Col xs={12} lg={7} xl={3} className="d-flex align-items-center pb-2">
                                 <FunctionallyDependentComponent/>
+                            </Col>
+                        }
+                        {activeNode.nodeType && [NodeType.property].includes(activeNode.nodeType) &&
+                            <Col xs={12} lg={12} xl={4} className="d-flex align-items-center pb-2">
+                                <PropertyTypeComponent/>
                             </Col>
                         }
                         {activeNode.nodeType && [NodeType.statementjunction, NodeType.componentjunction, NodeType.propertyjunction]

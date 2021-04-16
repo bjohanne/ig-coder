@@ -231,7 +231,7 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
                 break;
             default:
                 console.warn("Deleting child of Component node with ID " + this.id);
-                this.children.length = 0;
+                this.children.splice(position, 1);
                 this.update();
         }
     }

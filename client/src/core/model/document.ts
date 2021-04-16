@@ -200,7 +200,7 @@ export default class Document implements IDocument {
 	}
 
     /**
-     * Validate this document against the restrictions set in the specification.
+     * Validate this document against the restrictions not enforced by the data model (list in wiki).
      */
     validate() {
       // TODO

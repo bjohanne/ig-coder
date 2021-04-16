@@ -5,12 +5,13 @@ import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import Dropdown from "react-bootstrap/Dropdown";
+import {IDocument} from "../../../core/model/interfaces";
 import {loadDocumentFromString, setSaved} from "../../../state/documents/actions";
 import getDateYYYYMMDDHHMM from "../../../core/helpers/date";
 import "./statementAccordion.css";
 
 interface IProps {
-    currentDocument: Document | null,
+    currentDocument: IDocument | null,
     loadDocumentFromString: Function,
     setSaved: Function
 }
@@ -41,7 +42,9 @@ const DocumentActionBar = (props: IProps) => {
     }, [fileDownloadUrl, setFileDownloadUrl, setSaved]);
 
     const handleSaveFile = () => {
-        setFileName("igc_document_" + getDateYYYYMMDDHHMM(new Date()) + ".json");
+        // Generate filename. It contains the document name but whitespace is replaced with underscores.
+        const documentNameUnderscore = currentDocument.name.replace(/\s/g,"_");
+        setFileName("IGC_" + documentNameUnderscore + "_" + getDateYYYYMMDDHHMM(new Date()) + ".json");
         const jsonString = JSON.stringify(currentDocument, undefined, 2);
         const blob = new Blob([jsonString], {type: "application/json"});
         setFileDownloadUrl(URL.createObjectURL(blob));  // The download process continues in useEffect()

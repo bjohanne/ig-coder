@@ -51,74 +51,87 @@ const ComponentChildren = (props: IProps) => {
                         </Col>
                     )}
                     <Col xs="auto" className="ml-2">
-                        <DropdownButton size="lg" title="Create" disabled={disabled}>
-                            {!useCoreOnly &&
-                            <Dropdown.Item data-type={NodeType.regulativestatement} onClick={addChild}>
-                                Regulative Statement</Dropdown.Item>
-                            }
-                            {!useCoreOnly &&
-                            <Dropdown.Item data-type={NodeType.constitutivestatement} onClick={addChild}>
-                                Constitutive Statement</Dropdown.Item>
-                            }
-                            {!useCoreOnly &&
-                            <Dropdown.Item data-type={NodeType.statementjunction} onClick={addChild}>
-                                Statement Junction</Dropdown.Item>
-                            }
-                            {!useCoreOnly &&
-                            <Dropdown.Item data-type={NodeType.componentjunction} onClick={addChild}>
-                                Component Junction</Dropdown.Item>
-                            }
-                            <Dropdown.Item data-type={NodeType.component} onClick={addChild}>
-                                Component (Simple Context)</Dropdown.Item> {/* SimpleContext only */}
-                        </DropdownButton>
+                        <div title="Create a child node">
+                            <DropdownButton size="lg" title="Create" disabled={disabled}>
+                                {!useCoreOnly &&
+                                <Dropdown.Item data-type={NodeType.regulativestatement} onClick={addChild}>
+                                    Regulative Statement</Dropdown.Item>
+                                }
+                                {!useCoreOnly &&
+                                <Dropdown.Item data-type={NodeType.constitutivestatement} onClick={addChild}>
+                                    Constitutive Statement</Dropdown.Item>
+                                }
+                                {!useCoreOnly &&
+                                <Dropdown.Item data-type={NodeType.statementjunction} onClick={addChild}>
+                                    Statement Junction</Dropdown.Item>
+                                }
+                                {!useCoreOnly &&
+                                <Dropdown.Item data-type={NodeType.componentjunction} onClick={addChild}>
+                                    Component Junction</Dropdown.Item>
+                                }
+                                <Dropdown.Item data-type={NodeType.component} onClick={addChild}>
+                                    Component (Simple Context)</Dropdown.Item> {/* SimpleContext only */}
+                            </DropdownButton>
+                        </div>
                     </Col>
                 </Row>
                 :
             (children.length === 0) ? // Node has no children
                 [ComponentType.attribute, ComponentType.directobject, ComponentType.indirectobject,
                     ComponentType.constitutingproperties, ComponentType.constitutedentity].includes(activeNode.componentType) ?
-                    <DropdownButton size="lg" title="Create" disabled={disabled}>
-                        {(!useCoreOnly && !activeNode.getText().isSet()) &&
-                        <Dropdown.Item data-type={NodeType.regulativestatement} onClick={addChild}>
-                            Regulative Statement</Dropdown.Item>
-                        }
-                        {(!useCoreOnly && !activeNode.getText().isSet()) &&
-                        <Dropdown.Item data-type={NodeType.constitutivestatement} onClick={addChild}>
-                            Constitutive Statement</Dropdown.Item>
-                        }
-                        {(!useCoreOnly && !activeNode.getText().isSet()) &&
-                        <Dropdown.Item data-type={NodeType.statementjunction} onClick={addChild}>
-                            Statement Junction</Dropdown.Item>
-                        }
-                        {(!useCoreOnly && !activeNode.getText().isSet()) &&
-                        <Dropdown.Item data-type={NodeType.componentjunction} onClick={addChild}>
-                            Component Junction</Dropdown.Item>
-                        }
-                        {!useCoreOnly &&
-                        <Dropdown.Item data-type={NodeType.propertyjunction} onClick={addChild}>
-                            Property Junction</Dropdown.Item>
-                        }
-                        <Dropdown.Item data-type={NodeType.property} onClick={addChild}>
-                            Property</Dropdown.Item>
-                    </DropdownButton>
+                    <div title="Create a child node">
+                        <DropdownButton size="lg" title="Create" disabled={disabled}>
+                            {(!useCoreOnly && !activeNode.getText().isSet()) &&
+                            <Dropdown.Item data-type={NodeType.regulativestatement} onClick={addChild}>
+                                Regulative Statement</Dropdown.Item>
+                            }
+                            {(!useCoreOnly && !activeNode.getText().isSet()) &&
+                            <Dropdown.Item data-type={NodeType.constitutivestatement} onClick={addChild}>
+                                Constitutive Statement</Dropdown.Item>
+                            }
+                            {(!useCoreOnly && !activeNode.getText().isSet()) &&
+                            <Dropdown.Item data-type={NodeType.statementjunction} onClick={addChild}>
+                                Statement Junction</Dropdown.Item>
+                            }
+                            {(!useCoreOnly && !activeNode.getText().isSet()) &&
+                            <Dropdown.Item data-type={NodeType.componentjunction} onClick={addChild}>
+                                Component Junction</Dropdown.Item>
+                            }
+                            {!useCoreOnly &&
+                            <Dropdown.Item data-type={NodeType.propertyjunction} onClick={addChild}>
+                                Property Junction</Dropdown.Item>
+                            }
+                            <Dropdown.Item data-type={NodeType.property} onClick={addChild}>
+                                Property</Dropdown.Item>
+                        </DropdownButton>
+                    </div>
                 :
                 [ComponentType.aim, ComponentType.constitutivefunction].includes(activeNode.componentType) ?
-                    <DropdownButton size="lg" title="Create" disabled={disabled || useCoreOnly}>
-                        <Dropdown.Item data-type={NodeType.componentjunction} disabled={disabled} onClick={addChild}>
-                            Component Junction</Dropdown.Item>
-                    </DropdownButton>
+                    <>
+                        <div title="Create a child node">
+                            <DropdownButton size="lg" title="Create" disabled={disabled || useCoreOnly}>
+                                <Dropdown.Item data-type={NodeType.componentjunction} disabled={disabled} onClick={addChild}>
+                                    Component Junction</Dropdown.Item>
+                            </DropdownButton>
+                        </div>
+                        {disabled &&
+                            <small>NB: Creating a child node is disabled because this node has text content.</small>
+                        }
+                    </>
                 :
                     activeNode.componentType === ComponentType.orelse &&
-                    <DropdownButton size="lg" title="Create" disabled={disabled}>
-                        <Dropdown.Item data-type={NodeType.regulativestatement} onClick={addChild}>
-                            Regulative Statement</Dropdown.Item>
-                        <Dropdown.Item data-type={NodeType.constitutivestatement} onClick={addChild}>
-                            Constitutive Statement</Dropdown.Item>
-                        {!useCoreOnly &&
-                        <Dropdown.Item data-type={NodeType.statementjunction} onClick={addChild}>
-                            Statement Junction</Dropdown.Item>
-                        }
-                    </DropdownButton>
+                    <div title="Create a child node">
+                        <DropdownButton size="lg" title="Create" disabled={disabled}>
+                            <Dropdown.Item data-type={NodeType.regulativestatement} onClick={addChild}>
+                                Regulative Statement</Dropdown.Item>
+                            <Dropdown.Item data-type={NodeType.constitutivestatement} onClick={addChild}>
+                                Constitutive Statement</Dropdown.Item>
+                            {!useCoreOnly &&
+                            <Dropdown.Item data-type={NodeType.statementjunction} onClick={addChild}>
+                                Statement Junction</Dropdown.Item>
+                            }
+                        </DropdownButton>
+                    </div>
             :                       // Node has children
                 <Row noGutters>
                     {children.map((node: INode, i: number) =>
@@ -128,14 +141,16 @@ const ComponentChildren = (props: IProps) => {
                     )}
                     {[NodeType.property, NodeType.propertyjunction].includes(children[0].nodeType) &&
                         <Col xs="auto" className="ml-2">
-                            <DropdownButton size="lg" title="Create" disabled={disabled}>
-                                {!useCoreOnly &&
-                                <Dropdown.Item data-type={NodeType.propertyjunction} onClick={addChild}>
-                                    Property Junction</Dropdown.Item>
-                                }
-                                <Dropdown.Item data-type={NodeType.property} onClick={addChild}>
-                                    Property</Dropdown.Item>
-                            </DropdownButton>
+                            <div title="Create a child node">
+                                <DropdownButton size="lg" title="Create" disabled={disabled}>
+                                    {!useCoreOnly &&
+                                    <Dropdown.Item data-type={NodeType.propertyjunction} onClick={addChild}>
+                                        Property Junction</Dropdown.Item>
+                                    }
+                                    <Dropdown.Item data-type={NodeType.property} onClick={addChild}>
+                                        Property</Dropdown.Item>
+                                </DropdownButton>
+                            </div>
                         </Col>
                     }
                 </Row>

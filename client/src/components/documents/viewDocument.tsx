@@ -5,6 +5,7 @@ import Spinner from "react-bootstrap/Spinner";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
+import Badge from "react-bootstrap/Badge";
 
 import "./viewDocument.css";
 import {getDocument, saveDocumentRequest} from "../../state/documents/actions";
@@ -37,7 +38,7 @@ export function ViewDocumentComponent(props) {
 
     const handleRowClicked = (e: React.MouseEvent<HTMLTableRowElement>) => {
         // The entry ID is stored in the data-id attribute of the row
-        props.history.push("/documents/" + id + "/entries/" + e.currentTarget.getAttribute("data-id"));
+        props.history.push("/documents/" + id + "/entries/" + e.currentTarget.dataset.id);
     }
 
     return (
@@ -48,9 +49,12 @@ export function ViewDocumentComponent(props) {
         :
         (currentDocument ?
         <div className="card">
-            <Breadcrumb>
-                <Link to="/" className="breadcrumb-item">Home</Link>
-                <li className="breadcrumb-item active">{currentDocument.name}</li>
+            <Breadcrumb listProps={{"className": "custom-breadcrumb"}}>
+                <Link className="breadcrumb-item" to="/">Home</Link>
+                <Breadcrumb.Item active>{currentDocument.name}</Breadcrumb.Item>
+                <small title="Nevertheless, remember to save to file before quitting.">
+                    Your work is saved automatically.
+                </small>
             </Breadcrumb>
 
             <div className="card-body">
@@ -71,13 +75,15 @@ export function ViewDocumentComponent(props) {
                     <colgroup>
                         <col id="number-col"/>
                         <col id="statement-col"/>
+                        <col id="status-col"/>
                         <col id="actions-col"/>
                     </colgroup>
                     <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Institutional Statement</th>
-                        <th id="actions-head">Actions</th>
+                        <th title="Entry number">#</th>
+                        <th title="The raw statement for each entry">Institutional Statement</th>
+                        <th id="status-head" title="Whether or not coding has been started for each entry">Status</th>
+                        <th id="actions-head" title="Available actions for each entry">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -85,6 +91,19 @@ export function ViewDocumentComponent(props) {
                         <tr data-id={entry.id} key={entry.id} onClick={handleRowClicked}>
                             <td>{currentDocument.entryMap[entry.id]+1}</td>
                             <td><small>{entry.original}</small></td>
+                            <td>
+                                <span className="m-0 p-0 d-flex justify-content-center">
+                                    {entry.root ?
+                                        <Badge variant="info" title="A coding exists (it may or may not be complete)">
+                                            Started
+                                        </Badge>
+                                    :
+                                        <Badge variant="secondary" title="No coding exists yet">
+                                            Not coded
+                                        </Badge>
+                                    }
+                                </span>
+                            </td>
                             <td>
                                 <Link to={"/documents/" + id + "/entries/" + entry.id}>
                                     <Button size="sm" title="Code this statement">Code</Button>

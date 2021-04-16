@@ -15,30 +15,34 @@ interface IProps {
 const ComponentEditor = (props: IProps) => {
     const {currentEntry, activeNode} = props;
 
-    // If this conditional rendering is too slow:
-    // Make these checks in the text content save function (preventing throwing) (and remember to narrow to Component node type)
-    // AND in the children component's add child function.
+    // A Component node cannot have text content under the following conditions:
+    const textContentDisabled: boolean =
+        ([ComponentType.orelse, ComponentType.aim, ComponentType.constitutivefunction].includes(activeNode.componentType) &&
+            activeNode.children.length > 0) ||
+        ([ComponentType.attribute, ComponentType.directobject, ComponentType.indirectobject,
+            ComponentType.constitutingproperties, ComponentType.constitutedentity].includes(activeNode.componentType) &&
+        activeNode.children.length > 0 && ![NodeType.property, NodeType.propertyjunction].includes(activeNode.children[0].nodeType));
+
+    // A Component node cannot have children under the following conditions (NB: Or Else not included):
+    const childrenDisabled: boolean =
+        !!([ComponentType.aim, ComponentType.constitutivefunction].includes(activeNode.componentType) &&
+        activeNode.getText().isSet());
 
     return (
         <CommonEditorTable>
-            {/* A Component node cannot have text content under the following conditions (never for ActConds/ExeCstrts): */}
-            {![ComponentType.activationconditions, ComponentType.executionconstraints].includes(activeNode.componentType) &&
-            <TextContentComponent currentEntry={currentEntry} disabled={
-                ([ComponentType.orelse, ComponentType.aim, ComponentType.constitutivefunction].includes(activeNode.componentType) &&
-                    activeNode.children.length > 0) ||
-                ([ComponentType.attribute, ComponentType.directobject, ComponentType.indirectobject,
-                    ComponentType.constitutingproperties, ComponentType.constitutedentity].includes(activeNode.componentType) &&
-                activeNode.children.length > 0 && ![NodeType.property, NodeType.propertyjunction].includes(activeNode.children[0].nodeType))
-            }/>
+            {/* An ActConds/ExeCstrts Component node can never have text content. */}
+            {/* NB: Text content has also been disabled for the Or Else type.
+                The rest of codebase still treats Or Else as able to have text content! */}
+            {![ComponentType.activationconditions, ComponentType.executionconstraints, ComponentType.orelse]
+                .includes(activeNode.componentType) &&
+            <TextContentComponent currentEntry={currentEntry} disabled={textContentDisabled}/>
             }
             {![ComponentType.deontic, ComponentType.modal, ComponentType.simplecontext].includes(activeNode.componentType) &&
             <hr className="pb-2"/>
             }
-            {/* A Component node cannot have children under the following conditions (never for 3 types): */}
+            {/* The following 3 component types can never have children: */}
             {![ComponentType.deontic, ComponentType.modal, ComponentType.simplecontext].includes(activeNode.componentType) &&
-            <ComponentChildren disabled={
-            !!([ComponentType.orelse, ComponentType.aim, ComponentType.constitutivefunction].includes(activeNode.componentType) &&
-                activeNode.getText().isSet())}/>
+            <ComponentChildren disabled={childrenDisabled}/>
             }
         </CommonEditorTable>
     )

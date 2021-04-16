@@ -16,8 +16,7 @@ import Document from "../../core/model/document";
 import TreeComponent from "../editor/tree";
 import EditorModal from "../editor/editorModal";
 import {createRootNode, clearTree} from "../../state/model/actions";
-import {setEntryIndex, setSaved} from "../../state/documents/actions";
-import {openSnackbarWithData} from "../../state/ui/actions";
+import {setEntryIndex} from "../../state/documents/actions";
 import StatementAccordion from "./components/statementAccordion";
 
 type PathParamsType = {
@@ -30,8 +29,6 @@ interface IProps extends RouteComponentProps<PathParamsType> {
     loading: Boolean,
     createRootNode: Function,
     clearTree: Function,
-    setSaved: Function,
-    openSnackbarWithData: Function,
     setEntryIndex: Function
 }
 
@@ -45,8 +42,6 @@ export function ViewEntryComponent(props: IProps) {
         loading,
         createRootNode,
         clearTree,
-        setSaved,
-        openSnackbarWithData,
         setEntryIndex
     } = props;
 
@@ -75,18 +70,11 @@ export function ViewEntryComponent(props: IProps) {
     };
 
     const handleClearTree = () => {
-        if (!window.confirm("The entire tree for this entry will be deleted. Proceed?")) {
+        if (!window.confirm("The entire coding of this entry will be deleted. Proceed?")) {
             return;
         }
         clearTree(currentDocument.entryMap[entryid]);
     };
-
-    const handleSave = () => {
-        // This doesn't actually save anything, because work is saved automatically in the browser.
-        // It's implemented for users who feel they need to click a save button.
-        setSaved();
-        openSnackbarWithData("success", "Your changes have been saved locally.", 3000);
-    }
 
     return (
         loading ?
@@ -97,10 +85,13 @@ export function ViewEntryComponent(props: IProps) {
         ((currentDocument && currentEntry) ?
         <>
             <div className="card">
-                <Breadcrumb>
-                    <Link to="/" className="breadcrumb-item">Home</Link>
-                    <Link to={"/documents/" + docid} className="breadcrumb-item">{currentDocument.name}</Link>
-                    <li className="breadcrumb-item active">Entry {currentDocument.entryMap[entryid]+1}</li>
+                <Breadcrumb listProps={{"className": "custom-breadcrumb"}}>
+                    <li className="breadcrumb-item"><Link to="/">Home</Link></li>
+                    <li className="breadcrumb-item"><Link to={"/documents/" + docid}>{currentDocument.name}</Link></li>
+                    <Breadcrumb.Item active>Entry {currentDocument.entryMap[entryid]+1}</Breadcrumb.Item>
+                    <small title="Nevertheless, remember to save to file before quitting.">
+                        Your work is saved automatically.
+                    </small>
                 </Breadcrumb>
 
                 <div className="card-body">
@@ -113,16 +104,15 @@ export function ViewEntryComponent(props: IProps) {
                     :                                   /* The Entry does not have a root node */
                     <Row className="py-2">
                         <Col className="d-flex flex-column align-items-start">
-                            <small className="mb-2">To start coding, choose a statement type.<br/>
-                                Use Statement Junction if there are multiple top-level statements.</small>
+                            <small className="mb-2">To start coding, choose a statement type.</small>
                             <ButtonGroup>
                                 <Button onClick={handleCreateRootRegulative} title="The top-level statement is regulative">
                                     Regulative</Button>
                                 <Button onClick={handleCreateRootConstitutive} title="The top-level statement is constitutive">
                                     Constitutive</Button>
                                 <Button onClick={handleCreateRootStmtJunction}
-                                        title="There are multiple, horizontally nested top-level statements">
-                                    Statement Junction</Button>
+                                        title="There are multiple, horizontally nested top-level statements. Example: Farmers may sell their goods AND farmers must pay taxes.">
+                                    Statement combination</Button>
                             </ButtonGroup>
                         </Col>
                     </Row>
@@ -131,12 +121,11 @@ export function ViewEntryComponent(props: IProps) {
                     <Row className="pt-2">
                         {currentEntry.root &&
                         <Col className="d-flex justify-content-start">
-                            <Button onClick={handleClearTree} variant="danger">Clear tree</Button>
+                            <Button onClick={handleClearTree} variant="danger" title="Deletes the coding after a confirm prompt">
+                                Clear tree
+                            </Button>
                         </Col>
                         }
-                        <Col className="d-flex justify-content-end">
-                            <Button onClick={handleSave} variant="primary">Save changes</Button>
-                        </Col>
                     </Row>
                 </div>
             </div>
@@ -159,10 +148,7 @@ const mapDispatchToProps = (dispatch: any) => ({
     setEntryIndex: (entryIndex: number) => dispatch(setEntryIndex(entryIndex)),
     createRootNode: (entryIndex: number, nodeType: Arg.regulative | Arg.constitutive | Arg.statementjunction) =>
         dispatch(createRootNode(entryIndex, nodeType)),
-    clearTree: (entryIndex: number) => dispatch(clearTree(entryIndex)),
-    setSaved: () => dispatch(setSaved()),
-    openSnackbarWithData: (color: string, message: string, duration: number) =>
-        dispatch(openSnackbarWithData(color, message, duration))
+    clearTree: (entryIndex: number) => dispatch(clearTree(entryIndex))
 });
 
 export default connect(

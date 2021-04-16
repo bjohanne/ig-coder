@@ -61,7 +61,7 @@ const Preferences = (props) => {
 
     return (
         <NavDropdown title="Preferences" id="nav-dropdown">
-            <NavDropdown.ItemText title="Core mode restricts coding to a simpler version">
+            <NavDropdown.ItemText title="Core mode restricts coding to a basic version of IG. Enabling Core mode doesn't delete any of your work.">
                 <span className="mr-3">
                     Coding mode:
                 </span>
@@ -103,7 +103,7 @@ const Preferences = (props) => {
                     ))}
                 </ButtonGroup>
             </NavDropdown.ItemText>
-            <NavDropdown.ItemText title="Toggle the Prefix and Suffix slots for text content">
+            <NavDropdown.ItemText title="Toggle whether to show the Prefix and Suffix slots when coding text. Disabling this doesn't delete any of your work.">
                 <span style={{"marginRight": "30px"}}>
                     Use prefix/suffix:
                 </span>

@@ -1,4 +1,4 @@
-import {Arg, ContextType, JunctionType, NodeType} from "../../core/model/enums";
+import {Arg, ContextType, JunctionType, NodeType, PropertyType} from "../../core/model/enums";
 import {ITextContent} from "../../core/model/interfaces";
 
 export const CREATE_ROOT_NODE = "CREATE_ROOT_NODE";
@@ -89,13 +89,14 @@ export const setJunctionType = (entryIndex: number, nodeId: number, junctionType
 });
 export const SET_JUNCTION_TYPE_RESPONSE = "SET_JUNCTION_TYPE_RESPONSE";
 
-export const UNSET_JUNCTION_TYPE = "UNSET_JUNCTION_TYPE";
-export const unsetJunctionType = (entryIndex: number, nodeId: number) => ({
-    type: UNSET_JUNCTION_TYPE,
+export const SET_PROPERTY_TYPE = "SET_PROPERTY_TYPE";
+export const setPropertyType = (entryIndex: number, nodeId: number, propertyType: PropertyType) => ({
+    type: SET_PROPERTY_TYPE,
     entryIndex,
-    nodeId
+    nodeId,
+    propertyType
 });
-export const UNSET_JUNCTION_TYPE_RESPONSE = "UNSET_JUNCTION_TYPE_RESPONSE";
+export const SET_PROPERTY_TYPE_RESPONSE = "SET_PROPERTY_TYPE_RESPONSE";
 
 export const SET_TEXT_CONTENT = "SET_TEXT_CONTENT";
 export const setTextContent = (entryIndex: number, nodeId: number, textContent: ITextContent) => ({

@@ -3,22 +3,20 @@ import {connect} from "react-redux";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import {JunctionType, junctionTypeToStringArray, getOperatorString} from "../../../core/model/enums";
-import {setJunctionType, unsetJunctionType} from "../../../state/model/actions";
+import {setJunctionType} from "../../../state/model/actions";
 import {ComponentJunctionNode, PropertyJunctionNode, StatementJunctionNode} from "../../../core/model/nodes";
 
 interface IProps {
     activeNode: StatementJunctionNode | ComponentJunctionNode | PropertyJunctionNode,
     currentEntryIndex: Number,
-    setJunctionType: Function,
-    unsetJunctionType: Function
+    setJunctionType: Function
 }
 
 const JunctionTypeComponent = (props: IProps) => {
     const {
         activeNode,
         currentEntryIndex,
-        setJunctionType,
-        unsetJunctionType
+        setJunctionType
     } = props;
 
     const [currentJunctionType, setCurrentJunctionType] = useState(activeNode.junctionType);
@@ -28,11 +26,7 @@ const JunctionTypeComponent = (props: IProps) => {
     }
 
     const handleSave = () => {
-        if (currentJunctionType === JunctionType.none) {
-            unsetJunctionType(currentEntryIndex, activeNode.id);
-        } else {
-            setJunctionType(currentEntryIndex, activeNode.id, currentJunctionType);
-        }
+        setJunctionType(currentEntryIndex, activeNode.id, currentJunctionType);
     }
 
     return (
@@ -53,7 +47,7 @@ const JunctionTypeComponent = (props: IProps) => {
                         onBlur={handleSave}
                         onMouseOut={handleSave}
                     >
-                        <option value={JunctionType.none} style={{fontStyle: "italic"}}>None</option>
+                        {/*<option value={JunctionType.none} style={{fontStyle: "italic"}}>None</option>*/}
                         {junctionTypeToStringArray().map((val: string, i: number) =>
                             <option key={i} value={val} title={getOperatorString(val)}>
                                 {val}
@@ -73,8 +67,7 @@ const mapStateToProps = (state: any) => ({
 
 const mapDispatchToProps = (dispatch: any) => ({
     setJunctionType: (entryIndex: number, nodeId: number, junctionType: JunctionType) =>
-        dispatch(setJunctionType(entryIndex, nodeId, junctionType)),
-    unsetJunctionType: (entryIndex: number, nodeId: number) => dispatch(unsetJunctionType(entryIndex, nodeId))
+        dispatch(setJunctionType(entryIndex, nodeId, junctionType))
 });
 
 export default connect(

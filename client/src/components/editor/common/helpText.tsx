@@ -8,7 +8,8 @@ import "../editor.css";
 
 interface IProps {
     activeNode: INode,
-    usePrefixSuffix: Boolean
+    usePrefixSuffix: Boolean,
+    useCoreOnly: Boolean
 }
 
 /**
@@ -18,14 +19,9 @@ interface IProps {
 const HelpTextComponent = (props: IProps) => {
     const {
         activeNode,
-        usePrefixSuffix
+        usePrefixSuffix,
+        useCoreOnly
     } = props;
-
-    const junctionHtml = () => {
-        return <>
-            <p>A Junction node represents a logical combination of its two child nodes, i.e., horizontal nesting.</p>
-        </>;
-    }
 
     const negatedHtml = () => {
         return <>
@@ -34,39 +30,33 @@ const HelpTextComponent = (props: IProps) => {
         </>;
     }
 
-    const textContentHtml = (type: "component" | "junction" | "property") => {
-        if (usePrefixSuffix) {
-            if (type === "junction") {
-                return <>
-                    <p>For Junction nodes, you code the source text that signals a logical relationship,
-                        commonly a simple "and" or "or". Place this in the Main slot if you are copying the source text verbatim,
-                        otherwise the Inferred/Rephrased slot. You may use other slots in addition but please note that
-                        at least one of the Main and Inferred/Rephrased slots must be used.</p>
-                    {negatedHtml()}
-                </>;
-            }
+    const junctionHtml = () => {
+        return <>
+            <p>A Junction node represents a logical combination of its two child nodes, i.e., horizontal nesting.</p>
+            <p>For Junction nodes, you code the source text that signifies a logical relationship,
+                commonly a simple "and" or "or". Only one text slot is available,<br/>Junction text.</p>
+            {negatedHtml()}
+        </>;
+    }
+
+    const textContentHtml = (type: "component" | "property") => {
+        if (usePrefixSuffix) { // Prefix/Suffix ON
             return <>
-                <p>Text content is divided into slots. Use the Main slot for the text that most narrowly fits the {type}.
+                <p>Use the Main content slot for the text that most narrowly fits the {type}.
                 The Prefix slot can hold prepositions or articles that precede the main part.
                 Similarly, the Suffix slot can hold prepositions or other text that succeeds the main part.</p>
                 <p>The Inferred/Rephrased slot has multiple uses: you might use it for explicitly specifying an
-                    inferred component, rephrasing the source text or a combination of both.</p>
+                    inferred component, rephrasing the source text or a combination of both. Please note that you
+                    must use at least one of the Main content and Inferred/Rephrased slots.</p>
                 {negatedHtml()}
             </>;
-        } else {
-            if (type === "junction") {
-                return <>
-                    <p>For Junction nodes, you code the source text that signals a logical relationship,
-                        commonly a simple "and" or "or". Place this in the Main slot if you are copying the source text verbatim,
-                        otherwise the Inferred/Rephrased slot.</p>
-                    {negatedHtml()}
-                </>;
-            }
+        } else {    // Prefix/Suffix OFF
             return <>
-                <p>Text content is divided into slots. Place the entire source text of the {type} in the Main slot,
-                    including any prepositions and articles.</p>
+                <p>Place the entire source text of the {type} in the Main content slot, including any prepositions
+                    and articles.</p>
                 <p>The Inferred/Rephrased slot has multiple uses: you might use it for explicitly specifying an
-                    inferred component, rephrasing the source text or a combination of both.</p>
+                    inferred component, rephrasing the source text or a combination of both. Please note that you
+                    must use at least one of the Main content and Inferred/Rephrased slots.</p>
                 {negatedHtml()}
             </>;
         }
@@ -88,17 +78,14 @@ const HelpTextComponent = (props: IProps) => {
                 case NodeType.statementjunction:
                     return <>
                         {junctionHtml()}
-                        {textContentHtml("junction")}
                     </>;
                 case NodeType.componentjunction:
                     return <>
                         {junctionHtml()}
-                        {textContentHtml("junction")}
                     </>;
                 case NodeType.propertyjunction:
                     return <>
                         {junctionHtml()}
-                        {textContentHtml("junction")}
                     </>;
                 case NodeType.component:
                     return <>
@@ -124,11 +111,12 @@ const HelpTextComponent = (props: IProps) => {
                                         type<br/>Simple Context.</p>
                                 </>
                                 :
-                                [ComponentType.orelse, ComponentType.aim, ComponentType.constitutivefunction]
+                                [ComponentType.aim, ComponentType.constitutivefunction]
                                     .includes((activeNode as ComponentNode).componentType) ?
                                 <>
                                     <p>This component type can have either text content or a child node, not both.
-                                    To add one, you must first remove the other.</p>
+                                        To set text content, you must first delete any child nodes, and to create a
+                                        child node, you must first clear text content if any.</p>
                                     {textContentHtml("component")}
                                 </>
                                     :
@@ -143,18 +131,29 @@ const HelpTextComponent = (props: IProps) => {
                                             <p>Otherwise, it can have either text content or a child node, not both.</p>
                                             {textContentHtml("component")}
                                         </>
-                                        :   // Deontic/Modal/SimpleContext
+                                        :
+                                        [ComponentType.deontic, ComponentType.modal, ComponentType.simplecontext]
+                                            .includes((activeNode as ComponentNode).componentType) ?
                                         <>
                                             <p>This component type cannot have child nodes, only text content.</p>
-                                            {textContentHtml("property")}
+                                            {textContentHtml("component")}
                                         </>
+                                            :   // Or Else
+                                            <>
+                                                {useCoreOnly ?
+                                                    <p>The Or else component type holds a nested statement.</p>
+                                                    :
+                                                    <p>The Or else component type holds a nested statement or
+                                                        a combination of nested statements.</p>
+                                                }
+                                            </>
                         }
                     </>;
                 case NodeType.property:
                     return <>
-                        <p>A Property node can be used to represent a simple property, or as a building block in a
+                        <p>A Property node can be used to represent a single property or object, or as a building block in a
                             more complicated property hierarchy. To support this, it can have a Property or Property
-                            Junction child node and text content simultaneously.</p>
+                            Junction child node and text content simultaneously. It can only have one child node.</p>
                         {textContentHtml("property")}
                     </>;
                 default:
@@ -175,7 +174,8 @@ const HelpTextComponent = (props: IProps) => {
 
 const mapStateToProps = (state: any) => ({
     activeNode: state.documents.activeNode,
-    usePrefixSuffix: state.appSettings.preferences.usePrefixSuffix
+    usePrefixSuffix: state.appSettings.preferences.usePrefixSuffix,
+    useCoreOnly: state.appSettings.preferences.useCoreOnly
 });
 
 export default connect(
