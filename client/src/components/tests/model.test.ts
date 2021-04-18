@@ -60,6 +60,36 @@ it("Template for tests", () => {
 /*
 */
 
+/** Generator for the video tutorial document */
+it("VIDEO TUTORIAL DOCUMENT GENERATOR", () => {
+    // Setup
+    const document = new Document("Policy Coding Test", "", 1);
+
+    let entry1 = document.createEntry();
+    entry1.setOriginal("Certified farmers must strictly adhere to organic farming practices following their certification.");
+    entry1.setRephrased("Certified (A,prop) farmers (A) must (D) strictly (Cex) adhere (I) to organic farming practices (Bdir) following their certification (Cac).");
+
+    let entry2 = document.createEntry();
+    entry2.setOriginal("A certified farmer whose certification is suspended by the Secretary under this section may at any time submit a recertification request.");
+    entry2.setRephrased("A certified (A,prop1) farmer (A) {whose certification (Bdir) is suspended [suspends (I)] by the Secretary (A) under this section (Cex)}(A,prop2) may (D) at any time (Cac) submit (I) a recertification (Bdir,prop) request (Bdir).");
+
+    let entry3 = document.createEntry();
+    entry3.setOriginal("The Program Manager shall send a written notification of proposed suspension or revocation of certification to certified organic farmer.");
+    entry3.setRephrased("The Program Manager (A) shall (D) send (I) a written (Bdir,prop) notification (Bdir) of proposed (Ba,1,prop; Ba,2,prop) suspension (Ba,1) or revocation (Ba,2) of certification (Ba) to certified (Bind,prop1) organic (Bind,prop2) farmer (Bind).");
+
+    let entry4 = document.createEntry();
+    entry4.setOriginal("Upon entrance into agreement with organic farmer to serve as his/her certifying agent, organic certifier must inspect farmer’s operation within 60 days.");
+    entry4.setRephrased("Organic certifier (A) must (D) inspect (I) farmer’s operation (Bdir) within 60 days (Cex,tfr) under the condition {that the organic farmer (A) enters (I) an agreement (Bdir) with the organic certifier (Bind) to serve as his/her certifying agent (Cex,pur)}(Cac,prc).");
+
+    let entry5 = document.createEntry();
+    entry5.setOriginal("No member of the Council shall be disqualified from holding any public office or employment.");
+    entry5.setRephrased("No (NOT) member (E) of the Council (E,prop) shall (M) be (F) disqualified from holding any public office or employment (P).");
+
+    console.log(JSON.stringify(document, null, 2));
+});
+
+//------------------------------------------------------------------------------
+
 /** Generator for the test document */
 it("TEST DOCUMENT GENERATOR", () => {
     // Setup
@@ -210,6 +240,8 @@ it("DEV TEST DOCUMENT GENERATOR", () => {
     //console.log(JSON.stringify(document, null, 2));
 
 });
+
+//------------------------------------------------------------------------------
 
 /**
  * This test verifies that a complete tree is built without any errors being thrown. (NB: Does not test Or else.)
