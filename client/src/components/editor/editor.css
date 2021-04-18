@@ -38,6 +38,7 @@
     width: 12rem;
     height: 12rem;
     border-radius: 6rem !important;
+    transition: background-color 0.15s ease-in-out;
 }
 
 .node-card:hover {

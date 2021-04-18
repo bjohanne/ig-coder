@@ -32,6 +32,8 @@ const StatementAccordion = (props: IProps) => {
     const rephrasedTextArea = useRef(null);
     const [rephrasedTextState, setRephrasedTextState] = useState<string>(currentEntry.rephrased);
 
+    const hasRephrased: boolean = (currentEntry.rephrased !== "");
+
     useEffect(() => {
         if (rawTextArea.current && rephrasedTextArea.current) {
             // For the 2 textareas that display the statement, adapt the number of rows to the length of the statement
@@ -72,8 +74,9 @@ const StatementAccordion = (props: IProps) => {
                         </Form.Group>
                     </Accordion.Collapse>
                 </Accordion>
-                <Accordion>
-                    <AccordionToggle text="Rephrased" isLast eventKey="0" id="rephrased-toggle"
+                <Accordion defaultActiveKey={hasRephrased ? "0" : null}>
+                    <AccordionToggle text="Rephrased" openByDefault={hasRephrased}
+                                     isLast eventKey="0" id="rephrased-toggle"
                      title="Optionally rephrase the raw statement and code that version instead. The rephrasing can be changed at any time."/>
                     <Accordion.Collapse eventKey="0">
                         <Form.Group controlId="rephrased-textarea" id="rephrased-textarea">
@@ -83,9 +86,7 @@ const StatementAccordion = (props: IProps) => {
                                               onBlur={handleSaveRephrased}
                                               onMouseOut={handleSaveRephrased}/>
                                 <InputGroup.Append>
-                                    <div id="rephrased-button-container">
-                                        <Button variant="warning" onClick={handleClearRephrased}>Clear</Button>
-                                    </div>
+                                    <Button variant="warning" onClick={handleClearRephrased}>Clear</Button>
                                 </InputGroup.Append>
                             </InputGroup>
                         </Form.Group>
