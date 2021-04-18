@@ -30,7 +30,7 @@ const ComponentEditor = (props: IProps) => {
         activeNode.getText().isSet());
 
     return (
-        <CommonEditorTable>
+        <CommonEditorTable key={activeNode.id}>
             {/* An ActConds/ExeCstrts Component node can never have text content. */}
             {/* NB: Text content has also been disabled for the Or Else type.
                 The rest of codebase still treats Or Else as able to have text content! */}

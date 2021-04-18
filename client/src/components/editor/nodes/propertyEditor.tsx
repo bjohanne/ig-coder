@@ -20,7 +20,7 @@ const PropertyEditor = (props: IProps) => {
         ![NodeType.property, NodeType.propertyjunction].includes(activeNode.children[0].nodeType);
 
     return (
-        <CommonEditorTable>
+        <CommonEditorTable key={activeNode.id}>
             <TextContentComponent currentEntry={currentEntry} disabled={textContentDisabled}/>
             <hr className="pb-2"/>
             <PropertyChildren/> {/* Can always have children, no check necessary */}

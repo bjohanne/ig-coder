@@ -4,16 +4,18 @@ import CommonEditorTable from "../common/commonTable";
 import StatementChildren from "../children/statementChildren";
 import ViewStatementText from "../common/viewStatementText";
 import {Entry} from "../../../core/model/entry";
+import {StatementNode} from "../../../core/model/nodes";
 
 interface IProps {
-    currentEntry: Entry
+    currentEntry: Entry,
+    activeNode: StatementNode
 }
 
 const StatementEditor = (props: IProps) => {
-    const { currentEntry } = props;
+    const { currentEntry, activeNode } = props;
 
     return (
-        <CommonEditorTable>
+        <CommonEditorTable key={activeNode.id}>
             <ViewStatementText currentEntry={currentEntry} className="pb-2"/>
             <hr className="pb-2"/>
             <StatementChildren/>
@@ -21,7 +23,11 @@ const StatementEditor = (props: IProps) => {
     )
 }
 
+const mapStateToProps = (state: any) => ({
+    activeNode: state.documents.activeNode
+});
+
 export default connect(
-    null,
+    mapStateToProps,
     null
 )(StatementEditor);

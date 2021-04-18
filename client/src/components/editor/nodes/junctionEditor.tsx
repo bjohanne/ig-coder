@@ -4,25 +4,32 @@ import CommonEditorTable from "../common/commonTable";
 import TextContentComponent from "../common/textContent";
 import JunctionChildren from "../children/junctionChildren";
 import {Entry} from "../../../core/model/entry";
+import {JunctionNode} from "../../../core/model/nodes";
 
 interface IProps {
-    currentEntry: Entry
+    currentEntry: Entry,
+    activeNode: JunctionNode
 }
 
 const JunctionEditor = (props: IProps) => {
-    const {currentEntry} = props;
+    const {currentEntry, activeNode} = props;
 
     return (
-        <CommonEditorTable>
-            <TextContentComponent currentEntry={currentEntry} disabled={false}/> {/* Text content is always present on Junction nodes */}
+        <CommonEditorTable key={activeNode.id}>
+            {/* Text content is always present on Junction nodes */}
+            <TextContentComponent currentEntry={currentEntry} disabled={false}/>
             <hr className="pb-2"/>
             <JunctionChildren/>
         </CommonEditorTable>
     )
 }
 
+const mapStateToProps = (state: any) => ({
+    activeNode: state.documents.activeNode
+});
+
 export default connect(
-    null,
+    mapStateToProps,
     null
 )(JunctionEditor);
 
