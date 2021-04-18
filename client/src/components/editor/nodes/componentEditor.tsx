@@ -6,6 +6,7 @@ import TextContentComponent from "../common/textContent";
 import {Entry} from "../../../core/model/entry";
 import {ComponentNode} from "../../../core/model/nodes";
 import {ComponentType, NodeType} from "../../../core/model/enums";
+import ViewStatementText from "../common/viewStatementText";
 
 interface IProps {
     currentEntry: Entry,
@@ -34,8 +35,10 @@ const ComponentEditor = (props: IProps) => {
             {/* NB: Text content has also been disabled for the Or Else type.
                 The rest of codebase still treats Or Else as able to have text content! */}
             {![ComponentType.activationconditions, ComponentType.executionconstraints, ComponentType.orelse]
-                .includes(activeNode.componentType) &&
+                .includes(activeNode.componentType) ?
             <TextContentComponent currentEntry={currentEntry} disabled={textContentDisabled}/>
+            :
+            <ViewStatementText currentEntry={currentEntry} className="pb-2"/>
             }
             {![ComponentType.deontic, ComponentType.modal, ComponentType.simplecontext].includes(activeNode.componentType) &&
             <hr className="pb-2"/>
