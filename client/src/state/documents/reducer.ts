@@ -43,7 +43,7 @@ import {
 import {API_CALL_BEGIN, API_CALL_SUCCESS, API_CALL_ERROR} from "../apiCall/actions";
 
 import Document from "../../core/model/document";
-import {testDocumentVideo} from "../../core/config/testDocumentVideo";
+import {testDocument} from "../../core/config/testDocument";
 import {RegulativeStatementNode, JunctionNode} from '../../core/model/nodes';
 import {Arg} from '../../core/model/enums';
 import {IDocument, INode} from '../../core/model/interfaces';
@@ -67,7 +67,7 @@ interface IDocumentState {
 
 const initialState: IDocumentState = {
     documentList: [],
-    currentDocument: testDocumentVideo, // NB: Test document set as default regardless of whether management mode is on! Should be null if on.
+    currentDocument: testDocument, // NB: Test document set as default regardless of whether management mode is on! Should be null if on.
     currentEntryIndex: null,
     activeNode: null,
     changed: false,
