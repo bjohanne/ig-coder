@@ -21,7 +21,7 @@ echo "server {
         listen [::]:80;
         location / {
                 root /var/www/app/client/;
-                try_files $uri $uri/ /index.html;
+                try_files \$uri \$uri/ /index.html;
         }
 }
 " > /etc/nginx/sites-enabled/igcoder
