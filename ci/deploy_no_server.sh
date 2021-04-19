@@ -6,7 +6,8 @@ git pull
 
 # Cleanup
 rm -rf /var/www/app
-# Re-create directory structure on the web-root
+
+# Re-create directory structure on the web root
 mkdir -p /var/www/app
 mkdir -p /var/www/app/client
 
@@ -36,5 +37,6 @@ npm run build:prod
 cp -a /home/ubuntu/ig-coder/client/build/. /var/www/app/client -rf
 
 # Restart services
+sudo nginx -s reload
 sudo systemctl restart nginx
 echo 'Deployment done!\r\r\r'
