@@ -47,22 +47,12 @@ const TextContentComponent = (props: IProps) => {
 
     const handleSaveText = () => {
         if (!disabled) {
-            let trimmedTextState: ITextContent;
-            if (usePrefixSuffix) {
-                trimmedTextState = {
-                    main: textState.main.trim(),
-                    prefix: textState.prefix.trim(),
-                    suffix: textState.suffix.trim(),
-                    inferredOrRephrased: textState.inferredOrRephrased.trim(),
-                };
-            } else {    // Use prefix/suffix OFF: prefix and suffix are emptied when saving
-                trimmedTextState = {
-                    main: textState.main.trim(),
-                    prefix: "",
-                    suffix: "",
-                    inferredOrRephrased: textState.inferredOrRephrased.trim(),
-                };
-            }
+            let trimmedTextState: ITextContent = {
+                main: textState.main.trim(),
+                prefix: textState.prefix.trim(),
+                suffix: textState.suffix.trim(),
+                inferredOrRephrased: textState.inferredOrRephrased.trim(),
+            };
             setTextState(trimmedTextState);                                     // Set local state
             setTextContent(currentEntryIndex, activeNode.id, trimmedTextState); // Set app-wide state
         }
