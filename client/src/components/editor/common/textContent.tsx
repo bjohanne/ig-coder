@@ -4,6 +4,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import DOMPurify from "dompurify";
 import {setTextContent, unsetTextContent} from "../../../state/model/actions";
 import {ITextContent} from "../../../core/model/interfaces";
 import {Entry} from "../../../core/model/entry";
@@ -47,14 +48,14 @@ const TextContentComponent = (props: IProps) => {
 
     const handleSaveText = () => {
         if (!disabled) {
-            let trimmedTextState: ITextContent = {
-                main: textState.main.trim(),
-                prefix: textState.prefix.trim(),
-                suffix: textState.suffix.trim(),
-                inferredOrRephrased: textState.inferredOrRephrased.trim(),
+            let cleanTextState: ITextContent = {  // All text content is trimmed then sanitized upon saving
+                main: DOMPurify.sanitize(textState.main.trim()),
+                prefix: DOMPurify.sanitize(textState.prefix.trim()),
+                suffix: DOMPurify.sanitize(textState.suffix.trim()),
+                inferredOrRephrased: DOMPurify.sanitize(textState.inferredOrRephrased.trim()),
             };
-            setTextState(trimmedTextState);                                     // Set local state
-            setTextContent(currentEntryIndex, activeNode.id, trimmedTextState); // Set app-wide state
+            setTextState(cleanTextState);                                     // Set local state
+            setTextContent(currentEntryIndex, activeNode.id, cleanTextState); // Set app-wide state
         }
     }
 

@@ -5,18 +5,17 @@ import Accordion from "react-bootstrap/Accordion";
 import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
+import DOMPurify from "dompurify";
 import {Entry} from "../../../core/model/entry";
 import {AccordionToggle} from "../../common/accordionToggle";
 import {setRephrased, unsetRephrased} from "../../../state/model/actions";
-import {setSaved} from "../../../state/documents/actions";
 import "./statementAccordion.css";
 
 interface IProps {
     currentEntry: Entry,
     currentEntryIndex: number,
     setRephrased: Function,
-    unsetRephrased: Function,
-    setSaved: Function
+    unsetRephrased: Function
 }
 
 const StatementAccordion = (props: IProps) => {
@@ -24,8 +23,7 @@ const StatementAccordion = (props: IProps) => {
         currentEntry,
         currentEntryIndex,
         setRephrased,
-        unsetRephrased,
-        setSaved
+        unsetRephrased
     } = props;
 
     const rawTextArea = useRef(null);
@@ -56,9 +54,10 @@ const StatementAccordion = (props: IProps) => {
         unsetRephrased(currentEntryIndex);                      // Set app-wide state
     }
 
-    const handleSaveRephrased = () => {
-        setRephrased(currentEntryIndex, rephrasedTextState);    // Set app-wide state
-        setSaved();
+    const handleSaveRephrased = () => { // Input is sanitized upon saving
+        let cleanRephrasedTextState: string = DOMPurify.sanitize(rephrasedTextState);
+        setRephrasedTextState(cleanRephrasedTextState);   // Set local state
+        setRephrased(currentEntryIndex, cleanRephrasedTextState);    // Set app-wide state
     }
 
     return (
@@ -107,8 +106,7 @@ const mapStateToProps = (state: any) => ({
 
 const mapDispatchToProps = (dispatch: any) => ({
     setRephrased: (entryIndex: number, rephrased: string) => dispatch(setRephrased(entryIndex, rephrased)),
-    unsetRephrased: (entryIndex: number) => dispatch(unsetRephrased(entryIndex)),
-    setSaved: () => dispatch(setSaved())
+    unsetRephrased: (entryIndex: number) => dispatch(unsetRephrased(entryIndex))
 });
 
 export default connect(

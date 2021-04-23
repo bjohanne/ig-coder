@@ -59,4 +59,4 @@ cp -a /home/ubuntu/ig-coder/client/build/. /var/www/app/client -rf
 systemctl daemon-reload
 systemctl restart igcoder.service
 systemctl restart nginx
-echo 'Deployment done!\r\r\r'
+echo 'Deployment done!'

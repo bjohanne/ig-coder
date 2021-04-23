@@ -2,6 +2,7 @@ import React, {useEffect, useRef} from "react";
 import {connect} from "react-redux";
 import {hierarchy, select, tree, TreeLayout} from "d3";
 import ReactTooltip from "react-tooltip";
+import DOMPurify from "dompurify";
 
 import {INode} from "../../core/model/interfaces";
 import {ComponentType, NodeType, JunctionType, getContextString, getOperatorString} from "../../core/model/enums";
@@ -151,7 +152,7 @@ const TreeComponent = (props: IProps) => {
             .attr("cursor", "pointer")
             .attr("r", 17)
 
-            // Tooltips when hovering over nodes
+            // Tooltips when hovering over nodes. NB: Generates HTML. Ensure all text inputs are sanitized.
             .attr("data-tip", (d: any) => {
                 let html: string;
                 let textContent: string | undefined;
@@ -200,7 +201,7 @@ const TreeComponent = (props: IProps) => {
                 if (d.data.isNegated) {
                     html += `<br/><em style="color:red">Negated</em>`;
                 }
-                return html;
+                return DOMPurify.sanitize(html);    // Remove any scripts from the HTML
             })
             .attr("data-html", true)
             .on("click", (d: any) => {  // Function on node click
