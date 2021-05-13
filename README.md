@@ -1,4 +1,4 @@
-# IG-Coder
+# IG Coder
 
 This project houses IG Coder, a web application that facilitates the interactive encoding of regulations in the Institutional Grammar syntax.
 
