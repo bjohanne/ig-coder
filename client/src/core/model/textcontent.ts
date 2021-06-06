@@ -119,11 +119,15 @@ import {ITextContent} from "./interfaces"
 
 	/**
 	 * Concatenates the text content's prefix, main/inferredOrRephrased and suffix and returns the resulting string.
-	 * If inferredOrRephrased is set, prints that in place of main, otherwise prints main.
+	 * If inferredOrRephrased is set, prints that in place of main, surrounded by brackets, otherwise prints main.
 	 * The resulting string will have exactly one space between each present component and no superfluous spaces.
 	 * @return A string concatenated from the present components out of prefix, main, inferredOrRephrased and suffix
 	 */
 	getString() : string {
+
+		// NB: When implementing shorthand export, write a new function because shorthand displays both
+		// original (tacit) and explicit components side by side.
+
 		let str: string = "";
 
 		if (this.prefix) {
@@ -134,7 +138,7 @@ import {ITextContent} from "./interfaces"
 		}
 
 		if (this.inferredOrRephrased) {	// Takes precedence over main if both are set
-			str += this.inferredOrRephrased;
+			str += "[" + this.inferredOrRephrased + "]";
 
 			if (this.suffix) {
 				str += " ";

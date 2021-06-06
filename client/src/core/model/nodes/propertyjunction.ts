@@ -4,7 +4,7 @@ import {NodeType, Arg, JunctionType} from "../enums";
 import {TextContent} from "../textcontent";
 
 /**
- * This is the class for Junction nodes in the Attribute/Object-Property Hierarchy.
+ * This is the class for Junction nodes in the Object-Property Hierarchy.
  */
 export default class PropertyJunctionNode extends JunctionNode implements IPropertyJunctionNode {
     nodeType: NodeType = NodeType.propertyjunction;

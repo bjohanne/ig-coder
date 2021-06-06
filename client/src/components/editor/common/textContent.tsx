@@ -77,23 +77,23 @@ const TextContentComponent = (props: IProps) => {
             <ViewStatementText currentEntry={currentEntry} className="pb-2"/>
             <Row>
                 {isJunctionNode ?
-                    <Col xs={{ order: 3, span: 12 }} lg={{ order: 'first', span: 4 }}
-                         className="d-flex justify-content-start align-items-end pb-3">
-                        <Button variant="warning" onClick={handleClearText} disabled={disabled}>Clear text content</Button>
-                    </Col>
-                    :
-                    <Col xs={12} lg={4}>
-                        {usePrefixSuffix &&
-                        <Form.Group controlId="textContentForm.prefix">
-                            <Form.Label column="sm">Prefix</Form.Label>
-                            <Form.Control type="text" name="prefix" onChange={handleChange}
-                                          onBlur={handleSaveText} onMouseOut={handleSaveText}
-                                          value={textState.prefix} disabled={disabled} />
-                        </Form.Group>
-                        }
-                    </Col>
+                <Col xs={{ order: 3, span: 12 }} lg={{ order: 'first', span: 3 }}
+                     className="d-flex justify-content-start align-items-end pb-3">
+                    <Button variant="warning" onClick={handleClearText} disabled={disabled}>Clear text content</Button>
+                </Col>
+                :
+                <Col xs={12} lg={3}>
+                    {usePrefixSuffix &&
+                    <Form.Group controlId="textContentForm.prefix">
+                        <Form.Label column="sm">Prefix</Form.Label>
+                        <Form.Control type="text" name="prefix" onChange={handleChange}
+                                      onBlur={handleSaveText} onMouseOut={handleSaveText}
+                                      value={textState.prefix} disabled={disabled} />
+                    </Form.Group>
+                    }
+                </Col>
                 }
-                <Col xs={12} lg={4}>
+                <Col xs={12} lg={6}>
                     <Form.Group controlId="textContentForm.main">
                         <Form.Label column="sm">
                             {isJunctionNode ?
@@ -108,27 +108,27 @@ const TextContentComponent = (props: IProps) => {
                     </Form.Group>
                 </Col>
                 {isJunctionNode ?
-                    <Col xs={0} lg={4} />
-                    :
-                    <Col xs={12} lg={4}>
-                        {usePrefixSuffix &&
-                        <Form.Group controlId="textContentForm.suffix">
-                            <Form.Label column="sm">Suffix</Form.Label>
-                            <Form.Control type="text" name="suffix" onChange={handleChange}
-                                          onBlur={handleSaveText} onMouseOut={handleSaveText}
-                                          value={textState.suffix} disabled={disabled} />
-                        </Form.Group>
-                        }
-                    </Col>
+                <Col xs={0} lg={3} />
+                :
+                <Col xs={12} lg={3}>
+                    {usePrefixSuffix &&
+                    <Form.Group controlId="textContentForm.suffix">
+                        <Form.Label column="sm">Suffix</Form.Label>
+                        <Form.Control type="text" name="suffix" onChange={handleChange}
+                                      onBlur={handleSaveText} onMouseOut={handleSaveText}
+                                      value={textState.suffix} disabled={disabled} />
+                    </Form.Group>
+                    }
+                </Col>
                 }
             </Row>
             {!isJunctionNode &&
                 <Row className="justify-content-center">
-                    <Col xs={{order: 3, span: 12}} lg={{order: 'first', span: 4}}
+                    <Col xs={{order: 3, span: 12}} lg={{order: 'first', span: 3}}
                          className="d-flex justify-content-start align-items-end pb-3">
                         <Button variant="warning" onClick={handleClearText} disabled={disabled}>Clear text content</Button>
                     </Col>
-                    <Col xs={12} lg={4}>
+                    <Col xs={12} lg={6}>
                         <Form.Group controlId="textContentForm.inferredOrRephrased">
                             <Form.Label column="sm">Inferred/Rephrased</Form.Label>
                             <Form.Control type="text" name="inferredOrRephrased" onChange={handleChange}
@@ -136,9 +136,9 @@ const TextContentComponent = (props: IProps) => {
                                           value={textState.inferredOrRephrased} disabled={disabled} />
                         </Form.Group>
                     </Col>
-                    <Col xs={{order: 2, span: 12}} lg={4} className="pb-3 d-flex align-items-end">
+                    <Col xs={{order: 2, span: 12}} lg={3} className="pb-3 d-flex align-items-end">
                         {disabled &&
-                        <small>NB: Text content is disabled because this node has a child node.</small>
+                        <small>Text content is disabled because this node has a child node.</small>
                         }
                     </Col>
                 </Row>

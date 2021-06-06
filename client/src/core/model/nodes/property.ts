@@ -12,7 +12,7 @@ import {TextContent} from "../textcontent";
 import {DataError, DataErrorType} from "../errors";
 
 /**
- * Property nodes represent properties and objects in the Attribute/Object-Property Hierarchy.
+ * Property nodes represent properties and objects in the Object-Property Hierarchy.
  */
 export default class PropertyNode extends BaseNode implements IPropertyNode {
     nodeType: NodeType = NodeType.property;

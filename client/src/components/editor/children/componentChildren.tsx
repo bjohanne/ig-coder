@@ -115,7 +115,7 @@ const ComponentChildren = (props: IProps) => {
                             </DropdownButton>
                         </div>
                         {disabled &&
-                            <small>NB: Creating a child node is disabled because this node has text content.</small>
+                            <small>Creating a child node is disabled because this node has text content.</small>
                         }
                     </>
                 :

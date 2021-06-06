@@ -155,7 +155,6 @@ const TreeComponent = (props: IProps) => {
             // Tooltips when hovering over nodes. NB: Generates HTML. Ensure all text inputs are sanitized.
             .attr("data-tip", (d: any) => {
                 let html: string;
-                let textContent: string | undefined;
                 switch (d.data.nodeType) {
                     case NodeType.regulativestatement:
                         html = `<strong>${NodeType.regulativestatement}</strong>`;
@@ -178,18 +177,16 @@ const TreeComponent = (props: IProps) => {
                             ((d.data.text.isSet()) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
                         break;
                     case NodeType.component:
-                        textContent = (d.data.text.isSet()) ? d.data.text.getString() : undefined;
                         html = `<strong>${NodeType.component}</strong><br/>` +
-                            `${d.data.componentType}` +
+                            `${d.data.componentType}<br/>` +
                             (![ComponentType.activationconditions, ComponentType.executionconstraints, ComponentType.orelse]
                                 .includes(d.data.componentType) ?
-                            (textContent ? `<br/>"${textContent}"` : `<br/><em>No text content</em>`) : ``);
+                        ((d.data.text.isSet()) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`) : ``);
                         break;
                     case NodeType.property:
-                        textContent = (d.data.text.isSet()) ? d.data.text.getString() : undefined;
                         html = `<strong>${NodeType.property}</strong><br/>` +
                             `Functionally dependent: ${d.data.isFunctionallyDependent ? "Yes" : "No"}<br/>` +
-                            (textContent ? `"${textContent}"` : `<em>No text content</em>`);
+                            ((d.data.text.isSet()) ? `"${d.data.text.getString()}"` : `<em>No text content</em>`);
                         break;
                     default:
                         html = `<em>Missing node type</em>`;

@@ -30,7 +30,7 @@ export enum ComponentType {
     orelse     = "Or Else",
 
     // Regulative
-    attribute      = "Attribute",
+    attribute      = "Attributes",
     directobject   = "Direct Object",
     indirectobject = "Indirect Object",
     deontic        = "Deontic",

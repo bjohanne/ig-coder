@@ -29,7 +29,7 @@ const ViewStatementText = (props: IProps) => {
             <Col>                                                   {/* Use rephrased if set, otherwise original */}
                 <Form.Control as="textarea" ref={statementTextArea} id="statement-textarea" disabled
                               value={currentEntry.rephrased !== "" ?
-                                  currentEntry.rephrased : currentEntry.original}/>
+                                  `[${currentEntry.rephrased}]` : currentEntry.original}/>
             </Col>
         </Row>
     )

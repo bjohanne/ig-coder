@@ -43,8 +43,8 @@ const HelpTextComponent = (props: IProps) => {
         if (usePrefixSuffix) { // Prefix/Suffix ON
             return <>
                 <p>Use the Main content slot for the text that most narrowly fits the {type}.
-                The Prefix slot can hold prepositions or articles that precede the main part.
-                Similarly, the Suffix slot can hold prepositions or other text that succeeds the main part.</p>
+                    The Prefix and Suffix slots can be used for stop words (e.g., prepositions and articles) that precede
+                    or succeed the main part, respectively.</p>
                 <p>The Inferred/Rephrased slot has multiple uses: you might use it for explicitly specifying an
                     inferred component, rephrasing the source text or a combination of both. Please note that you
                     must use at least one of the Main content and Inferred/Rephrased slots.</p>
@@ -52,8 +52,7 @@ const HelpTextComponent = (props: IProps) => {
             </>;
         } else {    // Prefix/Suffix OFF
             return <>
-                <p>Place the entire source text of the {type} in the Main content slot, including any prepositions
-                    and articles.</p>
+                <p>Code the source text of the {type} in the Main content slot. Whether to code stop words is up to you.</p>
                 <p>The Inferred/Rephrased slot has multiple uses: you might use it for explicitly specifying an
                     inferred component, rephrasing the source text or a combination of both. Please note that you
                     must use at least one of the Main content and Inferred/Rephrased slots.</p>
