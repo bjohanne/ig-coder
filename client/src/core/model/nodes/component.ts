@@ -52,7 +52,7 @@ export default class ComponentNode extends BaseNode implements IComponentNode {
      * @return A new ComponentNode with the passed in properties
      */
     static fromData(data: IComponentNode) : ComponentNode {
-        let newNode = new ComponentNode(data.componentType, data.document, data.parent, data.id);
+        let newNode = new this(data.componentType, data.document, data.parent, data.id);
         newNode.contextType = data.contextType;
         newNode.text = TextContent.fromData(data.text);
         return newNode;

@@ -16,6 +16,13 @@ export const clearTree = (entryIndex: number) => ({
 });
 export const CLEAR_TREE_RESPONSE = "CLEAR_TREE_RESPONSE";
 
+export const COMPLETE_CODING = "COMPLETE_CODING";
+export const completeCoding = (entryIndex: number) => ({
+    type: COMPLETE_CODING,
+    entryIndex
+});
+export const COMPLETE_CODING_RESPONSE = "COMPLETE_CODING_RESPONSE";
+
 export const SET_REPHRASED = "SET_REPHRASED";
 export const setRephrased = (entryIndex: number, rephrased: string) => ({
     type: SET_REPHRASED,

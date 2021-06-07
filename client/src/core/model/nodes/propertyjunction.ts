@@ -19,7 +19,7 @@ export default class PropertyJunctionNode extends JunctionNode implements IPrope
      * @return A new PropertyJunctionNode with the passed in properties
      */
     static fromData(data: IPropertyJunctionNode) : PropertyJunctionNode {
-        let newNode = new PropertyJunctionNode(data.document, data.parent, data.junctionType, data.id);
+        let newNode = new this(data.document, data.parent, data.junctionType, data.id);
         newNode.isFunctionallyDependent = data.isFunctionallyDependent;
         newNode.text = TextContent.fromData(data.text);
         return newNode;

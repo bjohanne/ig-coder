@@ -211,6 +211,15 @@ export function getComponentStringByIndex(type: Arg.regulative | Arg.constitutiv
 }
 
 /**
+ * The coding state of a statement, i.e., to what degree it has been coded.
+ */
+export enum CodingStatus {
+    notcoded  = "Not coded",
+    started   = "Started",
+    completed = "Completed"
+}
+
+/**
  * A simplified hierarchy of property types.
  * This is a work in progress in IG research, so preliminary version.
  */

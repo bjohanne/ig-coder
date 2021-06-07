@@ -92,7 +92,7 @@ export default class BaseNode implements INode {
 					throw new DataError(DataErrorType.BAS_BAD_NODETYPE, data.id);
 			}
 
-			// Rebuild children - not for dummy nodes
+			// Rebuild children - does not happen for dummy nodes
 			newNode.children = [];	// Make sure we start with an empty array (some constructors create children)
 			for (let i = 0; i < data.children.length; i++) {
 				newNode.children.push(BaseNode.fromData(data.children[i]));	// Call this same function for each child

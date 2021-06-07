@@ -6,7 +6,7 @@ import {
     StatementJunctionNode,
     StatementNode
 } from "./nodes";
-import {NodeType, ComponentType, ContextType, JunctionType, Arg, PropertyType} from "./enums";
+import {NodeType, ComponentType, ContextType, JunctionType, Arg, CodingStatus, PropertyType} from "./enums";
 import {Entry} from "./entry";
 import {TextContent} from "./textcontent";
 
@@ -75,7 +75,9 @@ export interface IEntry {
     /* The complete, undivided text of the statement */
     original:  string,
     /* Rephrased, prepared version of the statement for coding */
-    rephrased: string
+    rephrased: string,
+    /* The degree to which the statement has been coded */
+    status:    CodingStatus
 }
 
 /**

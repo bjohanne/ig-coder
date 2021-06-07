@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {withRouter, Link, Redirect} from "react-router-dom";
+import {Link, Redirect, withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import Spinner from "react-bootstrap/Spinner";
 import Table from "react-bootstrap/Table";
@@ -8,10 +8,11 @@ import Breadcrumb from "react-bootstrap/Breadcrumb";
 import Badge from "react-bootstrap/Badge";
 
 import "./viewDocument.css";
-import {getDocument, saveDocumentRequest} from "../../state/documents/actions";
+import {getDocument} from "../../state/documents/actions";
 import pageTitles from "../../core/config/pageTitles";
 import {Entry} from "../../core/model/entry";
 import DocumentActionBar from "./components/documentActionBar";
+import {CodingStatus} from "../../core/model/enums";
 
 export function ViewDocumentComponent(props) {
     const {
@@ -93,14 +94,24 @@ export function ViewDocumentComponent(props) {
                             <td><small>{entry.original}</small></td>
                             <td>
                                 <span className="m-0 p-0 d-flex justify-content-center">
-                                    {entry.root ?
-                                        <Badge variant="info" title="A coding exists (it may or may not be complete)">
-                                            Started
-                                        </Badge>
-                                    :
+                                    {entry.status === CodingStatus.notcoded ?
                                         <Badge variant="secondary" title="No coding exists yet">
                                             Not coded
                                         </Badge>
+                                    :
+                                    entry.status === CodingStatus.started ?
+                                            <Badge variant="info" title="A coding exists">
+                                                Started
+                                            </Badge>
+                                        :
+                                        entry.status === CodingStatus.completed ?
+                                                <Badge variant="success" title="Coding has been completed">
+                                                    Completed
+                                                </Badge>
+                                            :   // In this case, the status has an invalid value, such as undefined. Default to Not coded.
+                                                <Badge variant="secondary" title="No coding exists yet">
+                                                    Not coded
+                                                </Badge>
                                     }
                                 </span>
                             </td>
@@ -131,8 +142,7 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    getDocument: (document_id: number) => dispatch(getDocument(document_id)),
-    saveDocumentRequest: (document: any) => dispatch(saveDocumentRequest(document))
+    getDocument: (document_id: number) => dispatch(getDocument(document_id))
 });
 
 export default connect(

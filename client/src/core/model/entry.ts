@@ -1,6 +1,6 @@
 import {BaseNode, ConstitutiveStatementNode, RegulativeStatementNode, StatementJunctionNode,} from "./nodes";
 import {IEntry, INode} from "./interfaces";
-import {Arg} from "./enums";
+import {Arg, CodingStatus} from "./enums";
 import {IDCounter} from "./document";
 import {DataError, DataErrorType} from "./errors";
 
@@ -19,6 +19,8 @@ export class Entry implements IEntry {
 	original: string;
 	/* Optionally, the statement can be rephrased before coding. The rephrased version is stored here. */
 	rephrased: string;
+	/* The degree to which the statement has been coded */
+	status: CodingStatus = CodingStatus.notcoded;
 
     /**
      * Create a new Entry without a statement or root node.
@@ -44,6 +46,7 @@ export class Entry implements IEntry {
 		let newEntry = new this(data.document, data.id);
 		newEntry.original = data.original;
 		newEntry.rephrased = data.rephrased;
+		newEntry.status = data.status;
 		if (data.root) {
 			newEntry.root = BaseNode.fromData(data.root);
 		}
@@ -53,6 +56,7 @@ export class Entry implements IEntry {
 	/**
 	 * Create a root node in this Entry.
 	 * If an original statement is provided, it is set in this Entry.
+	 * Sets the coding status to Started.
 	 * @param type The node type of the root statement
 	 * @param statement?? (Optional) The full text of the statement
 	 * @return The newly created root node. You must type assert its node type.
@@ -64,6 +68,7 @@ export class Entry implements IEntry {
 		if (typeof(statement) !== "undefined") {
 			this.original = statement;
 		}
+		this.status = CodingStatus.started;
 		return this.root;
 	}
 
@@ -77,11 +82,13 @@ export class Entry implements IEntry {
 
 	/**
 	 * Delete this Entry's root node, which deletes the entire tree.
+	 * Sets the coding status to Not coded.
 	 */
 	deleteRoot() : void {
 		if (this.root) {
 			console.warn("Deleting root node with ID " + this.root.id + " from entry with ID " + this.id);
 			this.root = undefined;
+			this.status = CodingStatus.notcoded;
 		} else {
 			throw new DataError(DataErrorType.ENT_NO_ROOT, this.id);
 		}
@@ -115,6 +122,21 @@ export class Entry implements IEntry {
 	 */
 	unsetRephrased() : void {
 		this.rephrased = "";
+	}
+
+	/**
+	 * Set this Entry's coding status to Completed.
+	 */
+	completeCoding() : void {
+		this.status = CodingStatus.completed;
+	}
+
+	/**
+	 * Set this Entry's coding status to Started.
+	 * Used for manually changing from Completed to Started.
+	 */
+	setCodingStarted() : void {
+		this.status = CodingStatus.started;
 	}
 
 	/**

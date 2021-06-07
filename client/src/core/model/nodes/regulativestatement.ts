@@ -47,7 +47,7 @@ export default class RegulativeStatementNode extends StatementNode implements IR
      * @return A new RegulativeStatementNode with the passed in properties
      */
     static fromData(data: IRegulativeStatementNode) : RegulativeStatementNode {
-        let newNode = new RegulativeStatementNode(data.document, data.parent, data.id);
+        let newNode = new this(data.document, data.parent, data.id);
 
         // Note that we could have had a common function Statement.fromData for this one and ConstitutiveStatementNode
         //  that sets contextType. However, the function overhead is probably not worth this one line:

@@ -39,53 +39,7 @@ export const loadDocumentFromString = (documentString: string, onSuccess, onErro
     onError
 });
 
-
-/* OLD, not in use */
-
-export const PRE_SET_ACTIVE_NODE = "PRE_SET_ACTIVE_NODE";
-export const preSetActiveNode = (node: INode) => ({
-    type: PRE_SET_ACTIVE_NODE,
-    payload: node
-});
-
-export const ADD_ENTRY_TO_DOCUMENT = "ADD_ENTRY_TO_DOCUMENT";
-export const addEntryToDocument = ((entry: { documentId: number, content: string, hasDeontic: boolean }) => ({
-    type: ADD_ENTRY_TO_DOCUMENT,
-    payload: entry
-}));
-
-export const SAVE_DOCUMENT_REQUEST = "SAVE_DOCUMENT_REQUEST";
-export const saveDocumentRequest = (document: any) => ({
-    type: SAVE_DOCUMENT_REQUEST,
-    payload: document
-});
-
-export const UPDATE_ENTRY = "UPDATE_ENTRY";
-export const updateEntry = (node: any) => ({
-    type: UPDATE_ENTRY,
-    payload: node
-});
-
-export const ADD_JUNCTION = "ADD_JUNCTION";
-export const addJunction = (parentNode: any) => ({
-    type: ADD_JUNCTION,
-    payload: parentNode
-});
-
-export const UPDATE_JUNCTION = "UPDATE_JUNCTION";
-export const updateJunction = (payload: any) => ({
-    type: UPDATE_JUNCTION,
-    payload
-});
-
-export const UPDATE_NEGATION = "UPDATE_NEGATION";
-export const updateNegation = (payload: any) => ({
-    type: UPDATE_NEGATION,
-    payload
-});
-
-/* This one is used, though */
-
+/* For Management Project */
 export const createDocument = (name, description, visibility, onSuccess, onError) => async dispatch => {
     dispatch({ type: API_CALL_BEGIN });
     axios({

@@ -7,17 +7,13 @@ import {
     GET_DOCUMENT_RESPONSE_FETCHED,
     CREATE_DOCUMENT_RESPONSE_THEN,
     LOAD_DOCUMENT_RESPONSE,
-    ADD_ENTRY_TO_DOCUMENT,
-    SET_ACTIVE_NODE,
-    UPDATE_ENTRY,
-    ADD_JUNCTION,
-    UPDATE_JUNCTION,
-    UPDATE_NEGATION
+    SET_ACTIVE_NODE
 } from "./actions";
 
 import {
     CREATE_ROOT_NODE_RESPONSE,
     CLEAR_TREE_RESPONSE,
+    COMPLETE_CODING_RESPONSE,
     SET_REPHRASED_RESPONSE,
     UNSET_REPHRASED_RESPONSE,
     TURN_NEGATION_ON_RESPONSE,
@@ -44,8 +40,6 @@ import {API_CALL_BEGIN, API_CALL_SUCCESS, API_CALL_ERROR} from "../apiCall/actio
 
 import Document from "../../core/model/document";
 import {testDocument} from "../../core/config/testDocument";
-import {RegulativeStatementNode, JunctionNode} from '../../core/model/nodes';
-import {Arg} from '../../core/model/enums';
 import {IDocument, INode} from '../../core/model/interfaces';
 
 interface IDocumentState {
@@ -76,12 +70,9 @@ const initialState: IDocumentState = {
 };
 
 const documents = (state: IDocumentState = initialState, action: any) => {
-    let currentDocument: Document;
-    let newDocument: Document;
-    let node: INode;
     switch (action.type) {
 
-        // API_CALL
+        // API_CALL ACTIONS
 
         case API_CALL_BEGIN:
             return update(state, {
@@ -99,7 +90,7 @@ const documents = (state: IDocumentState = initialState, action: any) => {
                 error: {$set: action.error}
             });
 
-        // DOCUMENT
+        // DOCUMENT ACTIONS
 
         case SET_SAVED:
             return update(state, {changed: {$set: false}});
@@ -123,194 +114,34 @@ const documents = (state: IDocumentState = initialState, action: any) => {
         case SET_ACTIVE_NODE:
             return update(state, {activeNode: {$set: action.payload}});
 
-        /* OLD */
-        case ADD_JUNCTION:
-            node = action.payload as INode;
-            currentDocument = state.currentDocument as Document;
-            currentDocument.entries[0].root.updatedAt = new Date();
-            currentDocument.replaceNode(node);
-            newDocument = Object.assign(new Document("", "", -1), currentDocument);
-            return update(state, {currentDocument: {$set: newDocument }});
-        case UPDATE_JUNCTION:
-            let junctionNode = action.payload.node as JunctionNode;
-            currentDocument = state.currentDocument as Document;
-            currentDocument.entries[0].root.updatedAt = new Date();
-            junctionNode.setJunctionType(action.payload.junctionType);
-            currentDocument.replaceNode(junctionNode);
-            newDocument = Object.assign(new Document("", "", -1), currentDocument);
-            return update(state, {currentDocument: {$set: newDocument }});
-        case UPDATE_NEGATION:
-            let negationNode = action.payload.node;
-            currentDocument = state.currentDocument as Document;
-            currentDocument.entries[0].root.updatedAt = new Date();
-            currentDocument.replaceNode(negationNode);
-            newDocument = Object.assign(new Document("", "", -1), currentDocument);
-            return update(state, {currentDocument: {$set: newDocument }});
-        case ADD_ENTRY_TO_DOCUMENT:
-            if(state.currentDocument.entries.length >= 0) { // Not sure why this check is necessary
-                let doc = new Document(state.currentDocument.name, state.currentDocument.description, state.currentDocument.id);
-                let entry = doc.createEntry();
-                let root = entry.createRoot(Arg.regulative, action.payload.content) as RegulativeStatementNode;
-				root.createDirectObject();
-				return update(state, { currentDocument: { $set: doc }});
-			} else {
-				return state;
-			}
-        case UPDATE_ENTRY:
-            state.currentDocument.replaceNode(action.payload);
-            let nDoc = Object.assign(new Document("", "", -1), state.currentDocument);
-            return update(state, {currentDocument: { $set: nDoc } });
+        // MODEL ACTIONS
 
-        // MODEL
-
-        // All reducers for model actions just overwrite the correct Entry with an updated one. They also set changed to true.
-        case CREATE_ROOT_NODE_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                changed: { $set: true }
-            });
+        // All reducers for model actions just overwrite the correct Entry with an updated one passed in the action.
+        // They also set changed to true.
+        case CREATE_ROOT_NODE_RESPONSE: // All the following reducers perform the exact same code
+            /* falls through */
         case CLEAR_TREE_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            root: {
-                                $set: undefined
-                            }
-                        }
-                    }
-                },
-                changed: { $set: true }
-            });
+            /* falls through */
+        case COMPLETE_CODING_RESPONSE:
+            /* falls through */
         case SET_REPHRASED_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                changed: { $set: true }
-            });
+            /* falls through */
         case UNSET_REPHRASED_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                changed: { $set: true }
-            });
+            /* falls through */
         case TURN_NEGATION_ON_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                changed: { $set: true }
-            });
+            /* falls through */
         case TURN_NEGATION_OFF_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                changed: { $set: true }
-            });
+            /* falls through */
         case TURN_FUNCDEP_ON_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                changed: { $set: true }
-            });
+            /* falls through */
         case TURN_FUNCDEP_OFF_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                changed: { $set: true }
-            });
+            /* falls through */
         case SET_CONTEXT_TYPE_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                changed: { $set: true }
-            });
+            /* falls through */
         case UNSET_CONTEXT_TYPE_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                changed: { $set: true }
-            });
-        case SET_TEXT_CONTENT_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                activeNode: { $set: action.newNode },
-                changed: { $set: true }
-            });
-        case UNSET_TEXT_CONTENT_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                activeNode: { $set: action.newNode },
-                changed: { $set: true }
-            });
+            /* falls through */
         case SET_JUNCTION_TYPE_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                changed: { $set: true }
-            });
+            /* falls through */
         case SET_PROPERTY_TYPE_RESPONSE:
             return update(state, {
                 currentDocument: {
@@ -322,93 +153,26 @@ const documents = (state: IDocumentState = initialState, action: any) => {
                 },
                 changed: { $set: true }
             });
-        /* ---------------------Children--------------------- */
-        // Add
+
+        /* Reducers that update activeNode */
+        case SET_TEXT_CONTENT_RESPONSE:     // These reducers run the same code, slightly different from the above
+            /* falls through */
+        case UNSET_TEXT_CONTENT_RESPONSE:
+            /* falls through */
         case ADD_CHILD_TO_STATEMENT_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                activeNode: { $set: action.newParentNode },
-                changed: { $set: true }
-            });
+            /* falls through */
         case ADD_CHILD_TO_COMPONENT_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                activeNode: { $set: action.newParentNode },
-                changed: { $set: true }
-            });
+            /* falls through */
         case ADD_CHILD_TO_JUNCTION_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                activeNode: { $set: action.newParentNode },
-                changed: { $set: true }
-            });
+            /* falls through */
         case ADD_CHILD_TO_PROPERTY_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                activeNode: { $set: action.newParentNode },
-                changed: { $set: true }
-            });
-        // Delete
+            /* falls through */
         case DELETE_CHILD_FROM_STATEMENT_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                activeNode: { $set: action.newParentNode },
-                changed: { $set: true }
-            });
+            /* falls through */
         case DELETE_CHILD_FROM_COMPONENT_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                activeNode: { $set: action.newParentNode },
-                changed: { $set: true }
-            });
+            /* falls through */
         case DELETE_CHILD_FROM_JUNCTION_RESPONSE:
-            return update(state, {
-                currentDocument: {
-                    entries: {
-                        [action.entryIndex]: {
-                            $set: action.newEntry
-                        }
-                    }
-                },
-                activeNode: { $set: action.newParentNode },
-                changed: { $set: true }
-            });
+            /* falls through */
         case DELETE_CHILD_FROM_PROPERTY_RESPONSE:
             return update(state, {
                 currentDocument: {
@@ -418,14 +182,14 @@ const documents = (state: IDocumentState = initialState, action: any) => {
                         }
                     }
                 },
-                activeNode: { $set: action.newParentNode },
+                activeNode: { $set: action.newActiveNode },
                 changed: { $set: true }
             });
 
-        // OTHER
+        // OTHER ACTIONS
 
         case "persist/REHYDRATE":
-			// This is a "manual override" for rehydrating Redux state from local storage. Happens on page load/refresh.
+			// This is a "manual override" for rehydrating Redux state from local storage. Happens on page load and refresh.
 
             if (action.key !== "documents") {
                 return state;
@@ -433,22 +197,22 @@ const documents = (state: IDocumentState = initialState, action: any) => {
             if (!action.payload) {
                 return state;
             }
-			// Rehydrate documents array
-			let origList = action.payload.documentList;
-			let dlist = [];
-			if (origList && origList.length > 0) {
-				origList.forEach((d: IDocument) => {
-					dlist.push(Document.fromData(d));
+			// Rebuild documents array
+			let originalList = action.payload.documentList;
+			let rebuiltList = [];
+			if (originalList && originalList.length > 0) {
+				originalList.forEach((d: IDocument) => {
+					rebuiltList.push(Document.fromData(d));
 				});
 			}
 
-			// Rehydrate current document
+			// Rebuild current document
             let d: IDocument = action.payload.currentDocument;
 	        let rebuiltDoc;
 			if (d) {
 				rebuiltDoc = Document.fromData(d);
 			}
-		    return update(state, {documentList: {$set: dlist}, currentDocument: { $set: rebuiltDoc }})
+		    return update(state, {documentList: {$set: rebuiltList}, currentDocument: { $set: rebuiltDoc }})
 
         default:
             return state;

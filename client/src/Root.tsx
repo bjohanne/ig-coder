@@ -1,5 +1,6 @@
 /*
   The Root component wraps the App component and gives it access to the store.
+  This is because the App DOM has two different versions depending on whether Management mode is on.
 */
 
 import React from "react";

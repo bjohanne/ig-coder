@@ -34,7 +34,7 @@ export default class ComponentJunctionNode extends JunctionNode implements IComp
 	 * @return A new StatementJunctionNode with the passed in properties
 	 */
 	static fromData(data: IComponentJunctionNode) : ComponentJunctionNode {
-		let newNode = new ComponentJunctionNode(data.componentType, data.document, data.parent, data.junctionType, data.id);
+		let newNode = new this(data.componentType, data.document, data.parent, data.junctionType, data.id);
 		newNode.text = TextContent.fromData(data.text);
 		return newNode;
 	}

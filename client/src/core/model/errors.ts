@@ -5,7 +5,7 @@ import {ComponentType} from "./enums";
  */
 export enum DataErrorType {
 	// Base
-	BAS_BAD_NODETYPE		= "This Node has an invalid node type (probably base Statement or Junction)",
+	BAS_BAD_NODETYPE		= "This Node has an invalid node type (could be undefined, i.e., dummy node, or base Statement or Junction)",
 
 	// Component
 	CMP_AC_TXT				= "Component nodes of type Activation Conditions cannot have text content",

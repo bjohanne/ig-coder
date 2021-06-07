@@ -51,13 +51,13 @@ const StatementAccordion = (props: IProps) => {
 
     const handleClearRephrased = () => {
         setRephrasedTextState("");                // Set local state
-        unsetRephrased(currentEntryIndex);                      // Set app-wide state
+        unsetRephrased(currentEntryIndex);                      // Set central state
     }
 
     const handleSaveRephrased = () => { // Input is sanitized upon saving
         let cleanRephrasedTextState: string = DOMPurify.sanitize(rephrasedTextState);
         setRephrasedTextState(cleanRephrasedTextState);   // Set local state
-        setRephrased(currentEntryIndex, cleanRephrasedTextState);    // Set app-wide state
+        setRephrased(currentEntryIndex, cleanRephrasedTextState);    // Set central state
     }
 
     return (

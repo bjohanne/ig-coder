@@ -48,14 +48,17 @@ const TextContentComponent = (props: IProps) => {
 
     const handleSaveText = () => {
         if (!disabled) {
-            let cleanTextState: ITextContent = {  // All text content is trimmed then sanitized upon saving
-                main: DOMPurify.sanitize(textState.main.trim()),
-                prefix: DOMPurify.sanitize(textState.prefix.trim()),
-                suffix: DOMPurify.sanitize(textState.suffix.trim()),
-                inferredOrRephrased: DOMPurify.sanitize(textState.inferredOrRephrased.trim()),
-            };
-            setTextState(cleanTextState);                                     // Set local state
-            setTextContent(currentEntryIndex, activeNode.id, cleanTextState); // Set app-wide state
+            // Check if local text state is currently different from central text state before saving
+            if (JSON.stringify(activeNode.getText()) !== JSON.stringify(textState)) {
+                let cleanTextState: ITextContent = {  // All text content is trimmed then sanitized upon saving
+                    main: DOMPurify.sanitize(textState.main.trim()),
+                    prefix: DOMPurify.sanitize(textState.prefix.trim()),
+                    suffix: DOMPurify.sanitize(textState.suffix.trim()),
+                    inferredOrRephrased: DOMPurify.sanitize(textState.inferredOrRephrased.trim()),
+                };
+                setTextState(cleanTextState);                                     // Set local state
+                setTextContent(currentEntryIndex, activeNode.id, cleanTextState); // Set central state
+            }
         }
     }
 
@@ -66,7 +69,7 @@ const TextContentComponent = (props: IProps) => {
             suffix: "",
             inferredOrRephrased: ""
         });
-        unsetTextContent(currentEntryIndex, activeNode.id);     // Set app-wide state
+        unsetTextContent(currentEntryIndex, activeNode.id);     // Set central state
     }
 
     const isJunctionNode: boolean = [NodeType.statementjunction, NodeType.componentjunction, NodeType.propertyjunction]

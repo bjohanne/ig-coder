@@ -10,6 +10,8 @@ import {
     ADD_CHILD_TO_STATEMENT_RESPONSE,
     CLEAR_TREE,
     CLEAR_TREE_RESPONSE,
+    COMPLETE_CODING,
+    COMPLETE_CODING_RESPONSE,
     CREATE_ROOT_NODE,
     CREATE_ROOT_NODE_RESPONSE,
     DELETE_CHILD_FROM_COMPONENT,
@@ -76,16 +78,28 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
             });
             break;
         case CLEAR_TREE:
-            // No changes to make, just signal that the tree is to be deleted
+            entryCopy = Entry.fromData(store.getState().documents.currentDocument.entries[action.entryIndex]);
+            entryCopy.deleteRoot();
             store.dispatch({
                 type: CLEAR_TREE_RESPONSE,
-                entryIndex: action.entryIndex
+                entryIndex: action.entryIndex,
+                newEntry: entryCopy
+            });
+            break;
+        case COMPLETE_CODING:
+            entryCopy = Entry.fromData(store.getState().documents.currentDocument.entries[action.entryIndex]);
+            entryCopy.completeCoding();
+            store.dispatch({
+                type: COMPLETE_CODING_RESPONSE,
+                entryIndex: action.entryIndex,
+                newEntry: entryCopy
             });
             break;
         case SET_REPHRASED:
             entryCopy = Entry.fromData(store.getState().documents.currentDocument.entries[action.entryIndex]);
             try {
                 entryCopy.setRephrased(action.rephrased);
+                entryCopy.setCodingStarted();
                 store.dispatch({
                     type: SET_REPHRASED_RESPONSE,
                     entryIndex: action.entryIndex,
@@ -99,6 +113,7 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
             entryCopy = Entry.fromData(store.getState().documents.currentDocument.entries[action.entryIndex]);
             try {
                 entryCopy.unsetRephrased();
+                entryCopy.setCodingStarted();
                 store.dispatch({
                     type: UNSET_REPHRASED_RESPONSE,
                     entryIndex: action.entryIndex,
@@ -113,6 +128,7 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
             try {
                 node = entryCopy.find(action.nodeId);
                 node.turnNegationOn();
+                entryCopy.setCodingStarted();
                 store.dispatch({
                     type: TURN_NEGATION_ON_RESPONSE,
                     entryIndex: action.entryIndex,
@@ -127,6 +143,7 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
             try {
                 node = entryCopy.find(action.nodeId);
                 node.turnNegationOff();
+                entryCopy.setCodingStarted();
                 store.dispatch({
                     type: TURN_NEGATION_OFF_RESPONSE,
                     entryIndex: action.entryIndex,
@@ -144,6 +161,7 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                     (node as PropertyNode | PropertyJunctionNode).makeFunctionallyDependent();
                     // Note that elevateFunctionallyDependent() is not called since we don't have access to this
                     // node's ancestor Component node. Users will have to do that manually.
+                    entryCopy.setCodingStarted();
                 }
                 store.dispatch({
                     type: TURN_FUNCDEP_ON_RESPONSE,
@@ -160,6 +178,9 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                 node = entryCopy.find(action.nodeId);
                 if ([NodeType.property, NodeType.propertyjunction].includes(node.nodeType)) {
                     (node as PropertyNode | PropertyJunctionNode).makeNotFunctionallyDependent();
+                    // Note that elevateFunctionallyDependent() is not called since we don't have access to this
+                    // node's ancestor Component node. Users will have to do that manually.
+                    entryCopy.setCodingStarted();
                 }
                 store.dispatch({
                     type: TURN_FUNCDEP_OFF_RESPONSE,
@@ -175,6 +196,7 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
             try {
                 node = entryCopy.find(action.nodeId);
                 node.setContextType(action.contextType);
+                entryCopy.setCodingStarted();
                 store.dispatch({
                     type: SET_CONTEXT_TYPE_RESPONSE,
                     entryIndex: action.entryIndex,
@@ -189,6 +211,7 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
             try {
                 node = entryCopy.find(action.nodeId);
                 node.unsetContextType();
+                entryCopy.setCodingStarted();
                 store.dispatch({
                     type: UNSET_CONTEXT_TYPE_RESPONSE,
                     entryIndex: action.entryIndex,
@@ -205,6 +228,7 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                 if ([NodeType.statementjunction, NodeType.componentjunction, NodeType.propertyjunction].includes(node.nodeType)) {
                     (node as StatementJunctionNode | ComponentJunctionNode | PropertyJunctionNode)
                         .setJunctionType(action.junctionType);
+                    entryCopy.setCodingStarted();
                 }
                 store.dispatch({
                     type: SET_JUNCTION_TYPE_RESPONSE,
@@ -223,11 +247,12 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                 NodeType.componentjunction, NodeType.statementjunction].includes(node.nodeType)) {
                     (node as ComponentNode | PropertyNode | PropertyJunctionNode | ComponentJunctionNode | StatementJunctionNode)
                         .getText().setFromData(action.textContent);
+                    entryCopy.setCodingStarted();
                 }
                 store.dispatch({
                     type: SET_TEXT_CONTENT_RESPONSE,
                     entryIndex: action.entryIndex,
-                    newNode: node,
+                    newActiveNode: node,
                     newEntry: entryCopy
                 });
             } catch (e) {
@@ -240,10 +265,11 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                 node = entryCopy.find(action.nodeId);
                 (node as ComponentNode | PropertyNode | PropertyJunctionNode | ComponentJunctionNode | StatementJunctionNode)
                     .unsetText();
+                entryCopy.setCodingStarted();
                 store.dispatch({
                     type: UNSET_TEXT_CONTENT_RESPONSE,
                     entryIndex: action.entryIndex,
-                    newNode: node,
+                    newActiveNode: node,
                     newEntry: entryCopy
                 });
             } catch (e) {
@@ -255,6 +281,7 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
             try {
                 node = entryCopy.find(action.nodeId);
                 (node as PropertyNode).setPropertyType(action.propertyType);
+                entryCopy.setCodingStarted();
                 store.dispatch({
                     type: SET_PROPERTY_TYPE_RESPONSE,
                     entryIndex: action.entryIndex,
@@ -288,6 +315,7 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                             break;
                         default:
                     }
+                    entryCopy.setCodingStarted();
                 } else if (node.nodeType === NodeType.constitutivestatement) {
                     switch (Number(action.childIndex)) {
                         case Arg.con_modal:
@@ -301,13 +329,14 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                             break;
                         default:
                     }
+                    entryCopy.setCodingStarted();
                 } else {
-                    console.error("Called addChildToStatement on a node that was not a Statement node");
+                    console.error("Called addChildToStatement on a node that was not a Statement node, but " + node.nodeType);
                 }
                 store.dispatch({
                     type: ADD_CHILD_TO_STATEMENT_RESPONSE,
                     entryIndex: action.entryIndex,
-                    newParentNode: node,
+                    newActiveNode: node,
                     newEntry: entryCopy
                 });
             } catch (e) {
@@ -347,10 +376,11 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                         break;
                     default:
                 }
+                entryCopy.setCodingStarted();
                 store.dispatch({
                     type: ADD_CHILD_TO_COMPONENT_RESPONSE,
                     entryIndex: action.entryIndex,
-                    newParentNode: node,
+                    newActiveNode: node,
                     newEntry: entryCopy
                 });
             } catch (e) {
@@ -390,10 +420,11 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                         break;
                     default:
                 }
+                entryCopy.setCodingStarted();
                 store.dispatch({
                     type: ADD_CHILD_TO_JUNCTION_RESPONSE,
                     entryIndex: action.entryIndex,
-                    newParentNode: node,
+                    newActiveNode: node,
                     newEntry: entryCopy
                 });
             } catch (e) {
@@ -422,10 +453,11 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                         break;
                     default:
                 }
+                entryCopy.setCodingStarted();
                 store.dispatch({
                     type: ADD_CHILD_TO_PROPERTY_RESPONSE,
                     entryIndex: action.entryIndex,
-                    newParentNode: node,
+                    newActiveNode: node,
                     newEntry: entryCopy
                 });
             } catch (e) {
@@ -454,6 +486,7 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                             break;
                         default:
                     }
+                    entryCopy.setCodingStarted();
                 } else if (node.nodeType === NodeType.constitutivestatement) {
                     switch (Number(action.childIndex)) {
                         case Arg.con_modal:
@@ -467,13 +500,14 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                             break;
                         default:
                     }
+                    entryCopy.setCodingStarted();
                 } else {
-                    console.error("Called deleteChildFromStatement on a node that was not a Statement node");
+                    console.error("Called addChildToStatement on a node that was not a Statement node, but " + node.nodeType);
                 }
                 store.dispatch({
                     type: DELETE_CHILD_FROM_STATEMENT_RESPONSE,
                     entryIndex: action.entryIndex,
-                    newParentNode: node,
+                    newActiveNode: node,
                     newEntry: entryCopy
                 });
             } catch (e) {
@@ -485,10 +519,11 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
             try {
                 node = entryCopy.find(action.parentId);
                 (node as ComponentNode).deleteChild(action.childIndex);
+                entryCopy.setCodingStarted();
                 store.dispatch({
                     type: DELETE_CHILD_FROM_COMPONENT_RESPONSE,
                     entryIndex: action.entryIndex,
-                    newParentNode: node,
+                    newActiveNode: node,
                     newEntry: entryCopy
                 });
             } catch (e) {
@@ -504,10 +539,11 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
                 } else if (Number(action.childIndex) === Arg.right) {
                     (node as JunctionNode).deleteRight();
                 }
+                entryCopy.setCodingStarted();
                 store.dispatch({
                     type: DELETE_CHILD_FROM_JUNCTION_RESPONSE,
                     entryIndex: action.entryIndex,
-                    newParentNode: node,
+                    newActiveNode: node,
                     newEntry: entryCopy
                 });
             } catch (e) {
@@ -519,10 +555,11 @@ export const modelMiddleware: Middleware = (store: MiddlewareAPI) => (next: any)
             try {
                 node = entryCopy.find(action.parentId);
                 (node as PropertyNode).deleteChild();
+                entryCopy.setCodingStarted();
                 store.dispatch({
                     type: DELETE_CHILD_FROM_PROPERTY_RESPONSE,
                     entryIndex: action.entryIndex,
-                    newParentNode: node,
+                    newActiveNode: node,
                     newEntry: entryCopy
                 });
             } catch (e) {

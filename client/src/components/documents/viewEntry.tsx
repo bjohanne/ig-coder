@@ -10,12 +10,12 @@ import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 
 import pageTitles from "../../core/config/pageTitles";
-import {Arg} from "../../core/model/enums";
+import {Arg, CodingStatus} from "../../core/model/enums";
 import {Entry} from "../../core/model/entry";
 import Document from "../../core/model/document";
 import TreeComponent from "../editor/tree";
 import EditorModal from "../editor/editorModal";
-import {createRootNode, clearTree} from "../../state/model/actions";
+import {createRootNode, clearTree, completeCoding} from "../../state/model/actions";
 import {setEntryIndex} from "../../state/documents/actions";
 import StatementAccordion from "./components/statementAccordion";
 
@@ -29,6 +29,7 @@ interface IProps extends RouteComponentProps<PathParamsType> {
     loading: Boolean,
     createRootNode: Function,
     clearTree: Function,
+    completeCoding: Function,
     setEntryIndex: Function
 }
 
@@ -42,6 +43,7 @@ export function ViewEntryComponent(props: IProps) {
         loading,
         createRootNode,
         clearTree,
+        completeCoding,
         setEntryIndex
     } = props;
 
@@ -74,6 +76,10 @@ export function ViewEntryComponent(props: IProps) {
             return;
         }
         clearTree(currentDocument.entryMap[entryid]);
+    };
+
+    const handleCompleteCoding = () => {
+        completeCoding(currentDocument.entryMap[entryid]);
     };
 
     return (
@@ -120,9 +126,13 @@ export function ViewEntryComponent(props: IProps) {
 
                     <Row className="pt-2">
                         {currentEntry.root &&
-                        <Col className="d-flex justify-content-start">
-                            <Button onClick={handleClearTree} variant="danger" title="Deletes the coding after a confirm prompt">
+                        <Col className="d-flex justify-content-between">
+                            <Button onClick={handleClearTree} variant="danger" title="Deletes the coding upon confirmation">
                                 Clear tree
+                            </Button>
+                            <Button onClick={handleCompleteCoding} variant="primary" title="Mark the coding as completed"
+                                disabled={currentEntry.status !== CodingStatus.started}>
+                                Complete coding
                             </Button>
                         </Col>
                         }
@@ -145,10 +155,11 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-    setEntryIndex: (entryIndex: number) => dispatch(setEntryIndex(entryIndex)),
     createRootNode: (entryIndex: number, nodeType: Arg.regulative | Arg.constitutive | Arg.statementjunction) =>
         dispatch(createRootNode(entryIndex, nodeType)),
-    clearTree: (entryIndex: number) => dispatch(clearTree(entryIndex))
+    clearTree: (entryIndex: number) => dispatch(clearTree(entryIndex)),
+    completeCoding: (entryIndex: number) => dispatch(completeCoding(entryIndex)),
+    setEntryIndex: (entryIndex: number) => dispatch(setEntryIndex(entryIndex))
 });
 
 export default connect(

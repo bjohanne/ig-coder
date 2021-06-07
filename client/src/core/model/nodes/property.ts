@@ -46,7 +46,7 @@ export default class PropertyNode extends BaseNode implements IPropertyNode {
      * @return A new PropertyNode with the passed in properties
      */
     static fromData(data: IPropertyNode) : PropertyNode {
-        let newNode = new PropertyNode(data.document, data.parent, data.id);
+        let newNode = new this(data.document, data.parent, data.id);
         newNode.isFunctionallyDependent = data.isFunctionallyDependent;
         newNode.text = TextContent.fromData(data.text);
         return newNode;

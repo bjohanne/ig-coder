@@ -5,7 +5,7 @@
 */
 
 const pageTitles = {
-    prefix: "IG Coder \u00b7 ",
+    prefix: "IG Coder \u00b7 ", // Small bullet symbol
     dashboard: "Dashboard",
     landing: "Welcome",
     welcome: "Welcome",

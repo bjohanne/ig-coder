@@ -42,7 +42,7 @@ export default class ConstitutiveStatementNode extends StatementNode implements 
      * @return A new ConstitutiveStatementNode with the passed in properties
      */
     static fromData(data: IConstitutiveStatementNode) : ConstitutiveStatementNode {
-        let newNode = new ConstitutiveStatementNode(data.document, data.parent, data.id);
+        let newNode = new this(data.document, data.parent, data.id);
 
         // Note that we could have had a common function Statement.fromData for this one and RegulativeStatementNode
         //  that sets contextType. However, the function overhead is probably not worth this one line:

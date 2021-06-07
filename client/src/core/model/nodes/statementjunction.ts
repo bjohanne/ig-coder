@@ -17,7 +17,7 @@ export default class StatementJunctionNode extends JunctionNode implements IStat
 	 * @return A new StatementJunctionNode with the passed in properties
 	 */
 	static fromData(data: IStatementJunctionNode) : StatementJunctionNode {
-		let newNode = new StatementJunctionNode(data.document, data.parent, data.junctionType, data.id);
+		let newNode = new this(data.document, data.parent, data.junctionType, data.id);
 		newNode.text = TextContent.fromData(data.text);
 		return newNode;
 	}

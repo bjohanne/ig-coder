@@ -10,7 +10,7 @@ import {
 } from "../../core/model/nodes";
 import {Entry} from "../../core/model/entry";
 import {
-    Arg,
+    Arg, CodingStatus,
     ComponentType,
     ContextType,
     JunctionType
@@ -85,7 +85,7 @@ it("VIDEO TUTORIAL DOCUMENT GENERATOR", () => {
     entry5.setOriginal("No member of the Council shall be disqualified from holding any public office or employment.");
     entry5.setRephrased("No (NOT) member (E) of the Council (E,prop) shall (M) be (F) disqualified from holding any public office or employment (P).");
 
-    console.log(JSON.stringify(document, null, 2));
+    //console.log(JSON.stringify(document, null, 2));
 });
 
 //------------------------------------------------------------------------------
@@ -432,7 +432,7 @@ it("Concatenate text content", () => {
     expect(text.getString()).toBe("one three");
 
     attr.setText("", "one", "three", "TWO");    // Inferred/Rephrased
-    expect(text.getString()).toBe("one TWO three");
+    expect(text.getString()).toBe("one [TWO] three");
 
 });
 
@@ -580,6 +580,28 @@ it("Elevate isFunctionallyDependent", () => {
     // Both ancestor PropertyJunction nodes should have their isFD flag set to true
     expect(propJun1.isFunctionallyDependent).toBeTruthy();
     expect(propJun2.isFunctionallyDependent).toBeTruthy();
+});
+
+//------------------------------------------------------------------------------
+
+it("Coding status for Entries", () => {
+    // Setup
+    let document = new Document("Test Policy", "Description", documentId);
+    let entry = document.createEntry();
+
+    expect(entry.status).toEqual(CodingStatus.notcoded); // Initial status
+
+    entry.createRoot(Arg.regulative);
+    expect(entry.status).toEqual(CodingStatus.started);
+
+    entry.completeCoding();
+    expect(entry.status).toEqual(CodingStatus.completed);
+
+    entry.deleteRoot();
+    expect(entry.status).toEqual(CodingStatus.notcoded);
+
+    // NB: The data model is unable to automatically change status from Completed to Started upon
+     // a change to an Entry's tree. This is handled by application logic (Redux reducers). Thus, we cannot test for this.
 });
 
 //------------------------------------------------------------------------------

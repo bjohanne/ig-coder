@@ -40,7 +40,6 @@ import axios from "axios";
 import firebase, { rrfConfig } from "./core/config/firebase";
 
 function App(props) {
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { inManagementMode, changed } = props;
 
 	useEffect(() => {
@@ -48,17 +47,17 @@ function App(props) {
 		axios.defaults.timeout = 1500;
 	}, []);
 
-	/*	This creates a pop-up every time the user closes the tab/browser if they have unsaved work.
+	/*
+		This creates a pop-up every time the user closes the tab/browser if they have unsaved work.
 		However, everything is saved automatically so it uses an artificial check for whether there is unsaved work.
 		The check is a flag that is set to true whenever changes are made to the document,
-		and false when downloading the document using the "Save file" button.
+		and is set to false when downloading the document using the "Save file" button.
 	 */
-
 	const alertUser = (e: BeforeUnloadEvent) => {
 		if (changed) {
 			// Cancel the event
 			e.preventDefault(); // If you prevent default behavior in Mozilla Firefox, prompt will always be shown
-			// Chrome requires returnValue to be set
+			// However, Google Chrome requires returnValue to be set
 			e.returnValue = "";
 		}
 	}
